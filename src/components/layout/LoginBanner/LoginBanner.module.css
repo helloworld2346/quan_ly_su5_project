@@ -1,0 +1,101 @@
+.loginLeft {
+  width: 62%;
+
+  position: relative;
+  overflow: hidden;
+
+  background: linear-gradient(
+    135deg,
+    var(--bg-dark-1),
+    var(--bg-dark-2),
+    var(--bg-dark-3)
+  );
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loginLeft::before {
+  content: "";
+
+  position: absolute;
+
+  width: 850px;
+  height: 850px;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.05);
+
+  top: -300px;
+  right: -200px;
+}
+
+.loginLeft::after {
+  content: "";
+
+  position: absolute;
+
+  width: 600px;
+  height: 600px;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.03);
+
+  bottom: -220px;
+  left: -150px;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.leftContent {
+  position: relative;
+  z-index: 2;
+
+  text-align: center;
+
+  padding: 40px;
+}
+
+.leftContent h1 {
+  font-size: 78px;
+  font-weight: 700;
+
+  letter-spacing: 5px;
+
+  color: var(--text-white);
+
+  margin-bottom: 28px;
+
+  text-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+}
+
+.line {
+  width: 160px;
+  height: 5px;
+
+  margin: 0 auto 40px auto;
+
+  border-radius: 20px;
+
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.leftContent h2 {
+  font-size: 36px;
+  font-weight: 500;
+
+  line-height: 1.9;
+  letter-spacing: 1px;
+
+  color: var(--gold-color);
+
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}

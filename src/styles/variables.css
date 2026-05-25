@@ -1,0 +1,17 @@
+:root {
+  --primary-color: #1f5c3f;
+  --primary-hover: #184a32;
+
+  --bg-dark-1: #0d3b28;
+  --bg-dark-2: #145338;
+  --bg-dark-3: #1f6b48;
+
+  --text-white: #ffffff;
+  --text-dark: #1d1d1d;
+
+  --gold-color: #f4d35e;
+
+  --border-color: #d7d7d7;
+
+  --shadow-color: rgba(0, 0, 0, 0.2);
+}
