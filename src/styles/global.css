@@ -8,8 +8,20 @@
   font-style: normal;
 }
 
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
 body {
   font-family: "Inter", sans-serif;
-
+  color: var(--text-dark);
   background: #f5f5f5;
+}
+
+button,
+input,
+label {
+  font-family: inherit;
 }

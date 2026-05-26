@@ -35,3 +35,23 @@
 
   box-shadow: 0 0 0 4px rgba(31, 92, 63, 0.12);
 }
+
+.compact {
+  margin-bottom: 22px;
+}
+
+.compact label {
+  font-size: 15px;
+  color: var(--login-text-muted);
+}
+
+.compact input {
+  height: 50px;
+  border-radius: 10px;
+  border-color: var(--login-border);
+  font-size: 15px;
+}
+
+.compact input:focus {
+  box-shadow: 0 0 0 3px rgba(31, 92, 63, 0.15);
+}
