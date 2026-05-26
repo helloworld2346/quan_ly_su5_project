@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, FormEvent } from "react";
 
 import styles from "./Login.module.css";
 
@@ -12,7 +12,16 @@ const pageStyle = {
   "--login-bg": `url(${loginBg})`,
 } as CSSProperties;
 
-export default function Login() {
+type Props = {
+  onSuccess?: () => void;
+};
+
+export default function Login({ onSuccess }: Props) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    onSuccess?.();
+  }
+
   return (
     <main className={styles.page} style={pageStyle}>
       <section className={styles.card} aria-labelledby="login-title">
@@ -31,7 +40,7 @@ export default function Login() {
           Đăng nhập
         </h1>
 
-        <form className={styles.form}>
+        <form className={styles.form} onSubmit={handleSubmit}>
           <Input
             variant="compact"
             label="Tên đăng nhập"

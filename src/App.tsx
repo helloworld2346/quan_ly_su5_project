@@ -1,7 +1,16 @@
+import { useState } from "react";
+
+import Dashboard from "./pages/Dashboard/Dashboard";
 import Login from "./pages/Login/Login";
 
 function App() {
-  return <Login />;
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  if (!isAuthenticated) {
+    return <Login onSuccess={() => setIsAuthenticated(true)} />;
+  }
+
+  return <Dashboard onLogout={() => setIsAuthenticated(false)} />;
 }
 
 export default App;

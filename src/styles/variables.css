@@ -13,4 +13,8 @@
   --login-text: #1a2e24;
   --login-text-muted: #4a5f54;
   --login-border: #cfd9d3;
+
+  --sidebar-bg-top: #145338;
+  --sidebar-bg-bottom: #0d3b28;
+  --dashboard-bg: #f0f4f2;
 }
