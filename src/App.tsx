@@ -5,14 +5,7 @@ import Login from "./pages/Login/Login";
 
 
 function App() {
-    return (
-        <BrowserRouter>
-            <Routes>
-                <Route path="/" element={<Login />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-            </Routes>
-        </BrowserRouter>
-    );
+ 
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     if (!isAuthenticated) {
