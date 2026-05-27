@@ -1,5 +1,8 @@
 import { useState } from "react";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFilter } from "@fortawesome/free-solid-svg-icons";
+
 import PieChart from "../../../components/charts/PieChart/PieChart";
 import {
   ATTENDANCE_META,
@@ -26,6 +29,8 @@ const FILTER_OPTIONS: { key: FilterKey; label: string }[] = [
   { key: "department", label: "Phòng ban" },
 ];
 
+const SUBORDINATE_COUNT = SUBORDINATE_TROOP_CHARTS.length;
+
 function getVisibleGroups(filter: FilterKey) {
   const types =
     filter === "all"
@@ -41,6 +46,10 @@ function getVisibleGroups(filter: FilterKey) {
     .filter((group) => group.charts.length > 0);
 }
 
+function formatNum(value: number) {
+  return value.toLocaleString("vi-VN");
+}
+
 export default function ExecutiveTroopCharts() {
   const [filter, setFilter] = useState<FilterKey>("all");
   const summary = getDivisionSummary();
@@ -48,19 +57,57 @@ export default function ExecutiveTroopCharts() {
 
   return (
     <section className={styles.section} aria-labelledby="troop-charts-title">
-      <div className={styles.sectionHead}>
+      <header className={styles.pageHeader}>
         <div>
           <h2 id="troop-charts-title" className={styles.sectionTitle}>
-            Thống kê quân số theo đơn vị
+            Tổng quan điều hành
           </h2>
           <p className={styles.sectionDesc}>
-            Di chuột vào biểu đồ hoặc chú thích để xem chi tiết hiện diện /
-            vắng. Tổng cộng 13 đơn vị (1 toàn sư đoàn + 12 trực thuộc).
+            Theo dõi tổng quân số, hiện diện và vắng theo từng đơn vị. Di chuột
+            vào biểu đồ hoặc chú thích để xem chi tiết.
           </p>
         </div>
 
-        <ul className={styles.legendBar}>
-          {(Object.keys(ATTENDANCE_META) as AttendanceKey[]).map((key) => (
+        <dl className={styles.metricsBar}>
+          <div className={styles.metric}>
+            <dt>Tổng quân số</dt>
+            <dd>{formatNum(summary.total)}</dd>
+          </div>
+          <div className={`${styles.metric} ${styles.metricPresent}`}>
+            <dt>Hiện diện</dt>
+            <dd>
+              {formatNum(summary.present)}
+              <span className={styles.metricPct}>
+                {summary.presentRate.toFixed(1)}%
+              </span>
+            </dd>
+          </div>
+          <div className={`${styles.metric} ${styles.metricAbsent}`}>
+            <dt>Vắng</dt>
+            <dd>
+              {formatNum(summary.absent)}
+              <span className={styles.metricPct}>
+                {(100 - summary.presentRate).toFixed(1)}%
+              </span>
+            </dd>
+          </div>
+          <div className={styles.metric}>
+            <dt>Đơn vị trực thuộc</dt>
+            <dd>
+              {SUBORDINATE_COUNT}
+              <span className={styles.metricPct}>+ 1 toàn SD</span>
+            </dd>
+          </div>
+        </dl>
+      </header>
+
+      <div className={styles.chartSection}>
+        <div className={styles.chartSectionHead}>
+          <h3 className={styles.chartSectionTitle}>
+            Báo ban quân số toàn Sư đoàn
+          </h3>
+          <ul className={styles.legendBar}>
+            {(Object.keys(ATTENDANCE_META) as AttendanceKey[]).map((key) => (
               <li key={key}>
                 <span
                   className={styles.legendDot}
@@ -68,97 +115,101 @@ export default function ExecutiveTroopCharts() {
                 />
                 {ATTENDANCE_META[key].label}
               </li>
-          ))}
-        </ul>
+            ))}
+          </ul>
+        </div>
+
+        <div className={styles.featuredBlock}>
+          <PieChart
+            size="large"
+            chart={DIVISION_TROOP_CHART}
+            badge={UNIT_TYPE_LABELS[DIVISION_TROOP_CHART.unitType]}
+          />
+        </div>
       </div>
 
-      <div className={styles.summaryStrip}>
-        <div className={styles.summaryItem}>
-          <span className={styles.summaryLabel}>Tổng quân số</span>
-          <strong>{summary.total.toLocaleString("vi-VN")}</strong>
+      <div className={styles.subSection}>
+        <div className={styles.subSectionHead}>
+          <h3 className={styles.subSectionTitle}>
+            Thống kê theo đơn vị trực thuộc
+          </h3>
+          <p className={styles.subSectionDesc}>
+            {SUBORDINATE_COUNT} đơn vị — trung đoàn, tiểu đoàn, đại đội, phòng
+            ban
+          </p>
         </div>
-        <div className={`${styles.summaryItem} ${styles.summaryPresent}`}>
-          <span className={styles.summaryLabel}>Hiện diện</span>
-          <strong>{summary.present.toLocaleString("vi-VN")}</strong>
-          <span className={styles.summaryHint}>
-            {summary.presentRate.toFixed(1)}%
+
+        <div className={styles.toolbar}>
+          <span className={styles.toolbarIcon} aria-hidden>
+            <FontAwesomeIcon icon={faFilter} />
           </span>
-        </div>
-        <div className={`${styles.summaryItem} ${styles.summaryAbsent}`}>
-          <span className={styles.summaryLabel}>Vắng</span>
-          <strong>{summary.absent.toLocaleString("vi-VN")}</strong>
-          <span className={styles.summaryHint}>
-            {(100 - summary.presentRate).toFixed(1)}%
-          </span>
-        </div>
-      </div>
-
-      <div className={styles.featuredBlock}>
-        <PieChart
-          size="large"
-          chart={DIVISION_TROOP_CHART}
-          badge={UNIT_TYPE_LABELS[DIVISION_TROOP_CHART.unitType]}
-        />
-      </div>
-
-      <div className={styles.toolbar}>
-        <span className={styles.toolbarLabel}>Lọc đơn vị:</span>
-        <div className={styles.filters} role="tablist" aria-label="Lọc loại đơn vị">
-          {FILTER_OPTIONS.map((option) => (
-            <button
-              key={option.key}
-              type="button"
-              role="tab"
-              aria-selected={filter === option.key}
-              className={
-                filter === option.key
-                  ? `${styles.filterBtn} ${styles.filterBtnActive}`
-                  : styles.filterBtn
-              }
-              onClick={() => setFilter(option.key)}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className={styles.groups}>
-        {visibleGroups.map((group) => (
-          <section
-            key={group.unitType}
-            className={styles.group}
-            aria-labelledby={`group-${group.unitType}`}
+          <div
+            className={styles.filters}
+            role="tablist"
+            aria-label="Lọc loại đơn vị"
           >
-            <div className={styles.groupHead}>
-              <h3 id={`group-${group.unitType}`} className={styles.groupTitle}>
-                {group.label}
-              </h3>
-              <span className={styles.groupCount}>
-                {group.charts.length} đơn vị
-              </span>
-            </div>
+            {FILTER_OPTIONS.map((option) => (
+              <button
+                key={option.key}
+                type="button"
+                role="tab"
+                aria-selected={filter === option.key}
+                className={
+                  filter === option.key
+                    ? `${styles.filterBtn} ${styles.filterBtnActive}`
+                    : styles.filterBtn
+                }
+                onClick={() => setFilter(option.key)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
-            <div className={styles.groupGrid}>
-              {group.charts.map((chart) => (
-                <PieChart
-                  key={chart.id}
-                  chart={chart}
-                  badge={UNIT_TYPE_LABELS[chart.unitType]}
-                />
-              ))}
-            </div>
-          </section>
-        ))}
+        <div className={styles.groups}>
+          {visibleGroups.map((group) => (
+            <section
+              key={group.unitType}
+              className={styles.group}
+              aria-labelledby={`group-${group.unitType}`}
+            >
+              <div className={styles.groupHead}>
+                <h4
+                  id={`group-${group.unitType}`}
+                  className={styles.groupTitle}
+                >
+                  {group.label}
+                </h4>
+                <span className={styles.groupCount}>
+                  {group.charts.length} đơn vị
+                </span>
+              </div>
+
+              <div className={styles.groupGrid}>
+                {group.charts.map((chart) => (
+                  <PieChart
+                    key={chart.id}
+                    chart={chart}
+                    badge={UNIT_TYPE_LABELS[chart.unitType]}
+                  />
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+
+        {filter !== "all" && (
+          <p className={styles.filterNote}>
+            Đang hiển thị{" "}
+            {
+              SUBORDINATE_TROOP_CHARTS.filter((c) => c.unitType === filter)
+                .length
+            }{" "}
+            / {SUBORDINATE_COUNT} đơn vị.
+          </p>
+        )}
       </div>
-
-      {filter !== "all" && (
-        <p className={styles.filterNote}>
-          Đang hiển thị {SUBORDINATE_TROOP_CHARTS.filter((c) => c.unitType === filter).length}{" "}
-          / {SUBORDINATE_TROOP_CHARTS.length} đơn vị. Chọn 「Tất cả đơn vị」 để xem
-          đầy đủ.
-        </p>
-      )}
     </section>
   );
 }

@@ -45,16 +45,10 @@ export default function PieChart({ chart, size = "small", badge }: Props) {
   const center = viewSize / 2;
   const circumference = 2 * Math.PI * radius;
 
-  const activeSegment = hovered
-    ? sized.find((s) => s.key === hovered)
-    : null;
+  const activeSegment = hovered ? sized.find((s) => s.key === hovered) : null;
 
-  const centerValue = activeSegment
-    ? activeSegment.value
-    : chart.total;
-  const centerCaption = activeSegment
-    ? activeSegment.label
-    : "Tổng quân số";
+  const centerValue = activeSegment ? activeSegment.value : chart.total;
+  const centerCaption = activeSegment ? activeSegment.label : "Tổng quân số";
 
   const centerPercent =
     activeSegment && chart.total > 0
@@ -65,8 +59,12 @@ export default function PieChart({ chart, size = "small", badge }: Props) {
     <article
       className={isLarge ? `${styles.card} ${styles.large}` : styles.card}
     >
-      <div className={styles.header}>
-        <h3 className={styles.title}>{chart.name}</h3>
+      <div
+        className={
+          isLarge ? `${styles.header} ${styles.headerCompact}` : styles.header
+        }
+      >
+        {!isLarge && <h3 className={styles.title}>{chart.name}</h3>}
         <div className={styles.headerMeta}>
           {badge && <span className={styles.badge}>{badge}</span>}
           <span className={styles.rateBadge}>
@@ -143,25 +141,6 @@ export default function PieChart({ chart, size = "small", badge }: Props) {
             </div>
           )}
         </div>
-
-        <ul className={styles.stats}>
-          <li>
-            <span className={styles.statLabel}>Tổng QS</span>
-            <span className={styles.statValue}>{formatNumber(chart.total)}</span>
-          </li>
-          <li className={styles.statPresent}>
-            <span className={styles.statLabel}>Hiện diện</span>
-            <span className={styles.statValue}>
-              {formatNumber(chart.present)}
-            </span>
-          </li>
-          <li className={styles.statAbsent}>
-            <span className={styles.statLabel}>Vắng</span>
-            <span className={styles.statValue}>
-              {formatNumber(chart.absent)}
-            </span>
-          </li>
-        </ul>
 
         <ul className={styles.legend}>
           {segments.map((segment) => (

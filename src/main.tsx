@@ -7,10 +7,8 @@ import "./styles/reset.css";
 import "./styles/variables.css";
 import "./styles/global.css";
 
-ReactDOM.createRoot(
-  document.getElementById("root")!
-).render(
+ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>
+  </React.StrictMode>,
 );

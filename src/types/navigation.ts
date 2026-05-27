@@ -17,7 +17,7 @@ export const EXECUTIVE_NAV: NavItem = {
 export const REPORT_NAV_GROUP = {
   label: "Thống kê báo cáo",
   items: [
-    { id: "report-troop" as const, label: "Báo ban quân số" },
+    { id: "report-troop" as const, label: "Báo ban ngày" },
     {
       id: "report-training" as const,
       label: "Báo ban thống kê quân số huấn luyện",

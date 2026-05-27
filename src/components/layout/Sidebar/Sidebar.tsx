@@ -1,5 +1,15 @@
 import { useState } from "react";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import type { IconProp } from "@fortawesome/fontawesome-svg-core";
+import {
+  faChartPie,
+  faChartColumn,
+  faGaugeHigh,
+  faFileLines,
+  faUsers,
+} from "@fortawesome/free-solid-svg-icons";
+
 import styles from "./Sidebar.module.css";
 
 import logo from "../../../assets/images/logo-su5.png";
@@ -15,7 +25,18 @@ type Props = {
   onLogout?: () => void;
 };
 
-export default function Sidebar({ activeId, onNavigate, onLogout }: Props) {
+export default function Sidebar({
+  activeId,
+  onNavigate,
+  onLogout,
+}: Props) {
+  const iconById: Record<NavItemId, IconProp> = {
+    executive: faGaugeHigh,
+    "report-troop": faChartPie,
+    "report-training": faFileLines,
+    "report-family": faUsers,
+  };
+
   const reportActive = REPORT_NAV_GROUP.items.some(
     (item) => item.id === activeId
   );
@@ -27,6 +48,7 @@ export default function Sidebar({ activeId, onNavigate, onLogout }: Props) {
     <aside className={styles.sidebar}>
       <div className={styles.brand}>
         <img src={logo} alt="Logo Sư đoàn 5" className={styles.logo} />
+
         <p className={styles.unitName}>Sư đoàn 5</p>
         <p className={styles.appName}>Thống kê báo ban quân số</p>
       </div>
@@ -41,6 +63,10 @@ export default function Sidebar({ activeId, onNavigate, onLogout }: Props) {
           }
           onClick={() => onNavigate(EXECUTIVE_NAV.id)}
         >
+          <FontAwesomeIcon
+            icon={iconById[EXECUTIVE_NAV.id]}
+            className={styles.navIcon}
+          />
           {EXECUTIVE_NAV.label}
         </button>
 
@@ -51,7 +77,10 @@ export default function Sidebar({ activeId, onNavigate, onLogout }: Props) {
             aria-expanded={reportsOpen}
             onClick={() => setReportsOpen((open) => !open)}
           >
-            <span>{REPORT_NAV_GROUP.label}</span>
+            <span className={styles.groupLabel}>
+              <FontAwesomeIcon icon={faChartColumn} className={styles.navIcon} />
+              {REPORT_NAV_GROUP.label}
+            </span>
             <span
               className={reportsOpen ? styles.chevronOpen : styles.chevron}
               aria-hidden
@@ -73,6 +102,10 @@ export default function Sidebar({ activeId, onNavigate, onLogout }: Props) {
                     }
                     onClick={() => onNavigate(item.id)}
                   >
+                    <FontAwesomeIcon
+                      icon={iconById[item.id]}
+                      className={styles.navIcon}
+                    />
                     {item.label}
                   </button>
                 </li>
