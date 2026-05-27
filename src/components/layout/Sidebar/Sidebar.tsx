@@ -8,6 +8,7 @@ import {
   faGaugeHigh,
   faFileLines,
   faUsers,
+  faRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
 
 import styles from "./Sidebar.module.css";
@@ -23,12 +24,14 @@ type Props = {
   activeId: NavItemId;
   onNavigate: (id: NavItemId) => void;
   onLogout?: () => void;
+  collapsed?: boolean;
 };
 
 export default function Sidebar({
   activeId,
   onNavigate,
   onLogout,
+  collapsed,
 }: Props) {
   const iconById: Record<NavItemId, IconProp> = {
     executive: faGaugeHigh,
@@ -38,19 +41,28 @@ export default function Sidebar({
   };
 
   const reportActive = REPORT_NAV_GROUP.items.some(
-    (item) => item.id === activeId
+    (item) => item.id === activeId,
   );
-  const [reportsOpen, setReportsOpen] = useState(
-    reportActive || activeId !== EXECUTIVE_NAV.id
-  );
+  const [reportsOpen, setReportsOpen] = useState(() => {
+    const saved = localStorage.getItem("reportsOpen");
+    return saved ? saved === "true" : true;
+  });
 
   return (
-    <aside className={styles.sidebar}>
+    <aside
+      className={
+        collapsed ? `${styles.sidebar} ${styles.collapsed}` : styles.sidebar
+      }
+    >
       <div className={styles.brand}>
         <img src={logo} alt="Logo Sư đoàn 5" className={styles.logo} />
 
-        <p className={styles.unitName}>Sư đoàn 5</p>
-        <p className={styles.appName}>Thống kê báo ban quân số</p>
+        {!collapsed && (
+          <>
+            <p className={styles.unitName}>Sư đoàn 5</p>
+            <p className={styles.appName}>Phần mềm thống kê báo ban quân số</p>
+          </>
+        )}
       </div>
 
       <nav className={styles.nav} aria-label="Điều hướng chính">
@@ -67,7 +79,7 @@ export default function Sidebar({
             icon={iconById[EXECUTIVE_NAV.id]}
             className={styles.navIcon}
           />
-          {EXECUTIVE_NAV.label}
+          {!collapsed && EXECUTIVE_NAV.label}
         </button>
 
         <div className={styles.group}>
@@ -75,11 +87,19 @@ export default function Sidebar({
             type="button"
             className={`${styles.groupToggle} ${reportActive ? styles.groupActive : ""}`}
             aria-expanded={reportsOpen}
-            onClick={() => setReportsOpen((open) => !open)}
+            onClick={() =>
+              setReportsOpen((open) => {
+                localStorage.setItem("reportsOpen", String(!open));
+                return !open;
+              })
+            }
           >
             <span className={styles.groupLabel}>
-              <FontAwesomeIcon icon={faChartColumn} className={styles.navIcon} />
-              {REPORT_NAV_GROUP.label}
+              <FontAwesomeIcon
+                icon={faChartColumn}
+                className={styles.navIcon}
+              />
+              {!collapsed && REPORT_NAV_GROUP.label}
             </span>
             <span
               className={reportsOpen ? styles.chevronOpen : styles.chevron}
@@ -106,7 +126,7 @@ export default function Sidebar({
                       icon={iconById[item.id]}
                       className={styles.navIcon}
                     />
-                    {item.label}
+                    {!collapsed && item.label}
                   </button>
                 </li>
               ))}
@@ -116,8 +136,19 @@ export default function Sidebar({
       </nav>
 
       {onLogout && (
-        <button type="button" className={styles.logout} onClick={onLogout}>
-          Đăng xuất
+        <button
+          type="button"
+          className={styles.logout}
+          onClick={onLogout}
+          aria-label="Đăng xuất"
+          title={collapsed ? "Đăng xuất" : undefined}
+        >
+          <FontAwesomeIcon
+            icon={faRightFromBracket}
+            className={styles.navIcon}
+            aria-hidden
+          />
+          {!collapsed && <span>Đăng xuất</span>}
         </button>
       )}
     </aside>

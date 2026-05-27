@@ -20,7 +20,7 @@ export const REPORT_NAV_GROUP = {
     { id: "report-troop" as const, label: "Báo ban ngày" },
     {
       id: "report-training" as const,
-      label: "Báo ban thống kê quân số huấn luyện",
+      label: "Báo ban quân số huấn luyện",
     },
     {
       id: "report-family" as const,
@@ -31,7 +31,7 @@ export const REPORT_NAV_GROUP = {
 
 export const NAV_PAGE_TITLES: Record<NavItemId, string> = {
   executive: "Dashboard điều hành",
-  "report-troop": "Báo ban quân số",
+  "report-troop": "Báo ban ngày",
   "report-training": "Báo ban thống kê quân số huấn luyện",
   "report-family": "Báo ban thân nhân thăm nuôi",
 };

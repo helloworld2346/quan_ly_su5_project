@@ -23,10 +23,10 @@ type FilterKey = "all" | SubordinateUnitType;
 
 const FILTER_OPTIONS: { key: FilterKey; label: string }[] = [
   { key: "all", label: "Tất cả đơn vị" },
+  { key: "department", label: "Phòng, ban" },
   { key: "regiment", label: "Trung đoàn" },
   { key: "battalion", label: "Tiểu đoàn" },
   { key: "company", label: "Đại đội" },
-  { key: "department", label: "Phòng ban" },
 ];
 
 const SUBORDINATE_COUNT = SUBORDINATE_TROOP_CHARTS.length;
@@ -134,8 +134,8 @@ export default function ExecutiveTroopCharts() {
             Thống kê theo đơn vị trực thuộc
           </h3>
           <p className={styles.subSectionDesc}>
-            {SUBORDINATE_COUNT} đơn vị — trung đoàn, tiểu đoàn, đại đội, phòng
-            ban
+            {SUBORDINATE_COUNT} đơn vị — phòng, ban, trung đoàn, tiểu đoàn, đại
+            đội
           </p>
         </div>
 

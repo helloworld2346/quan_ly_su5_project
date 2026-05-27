@@ -1,6 +1,5 @@
 .page {
-  --login-overlay: rgba(20, 30, 22, 0.38);
-
+  background-color: var(--primary-color);
   position: relative;
   min-height: 100vh;
   display: flex;
@@ -19,11 +18,24 @@
 }
 
 .page::before {
-  background: var(--login-bg) center / cover no-repeat;
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: var(--login-bg) center center / contain no-repeat;
+  opacity: 0.5; 
 }
 
 .page::after {
-  background: var(--login-overlay);
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(
+    circle, 
+    rgba(0, 0, 0, 0) 20%, 
+    rgba(0, 0, 0, 0.4) 100%
+  );
 }
 
 .card {
@@ -35,7 +47,7 @@
   border: 1px solid rgba(255, 255, 255, 0.8);
   border-top: 4px solid var(--primary-color);
   border-radius: 16px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 24px 60px rgba(10, 25, 15, 0.5);
 }
 
 .logo {
