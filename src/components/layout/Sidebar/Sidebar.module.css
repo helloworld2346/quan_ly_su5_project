@@ -1,8 +1,15 @@
 .sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 20;
+
   display: flex;
   flex-direction: column;
-  width: 280px;
+  width: var(--sidebar-width);
+  height: 100vh;
   min-height: 100vh;
+  overflow-y: auto;
   flex-shrink: 0;
   padding: 24px 16px 20px;
 
@@ -20,13 +27,15 @@
   text-align: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   margin-bottom: 20px;
+  flex-shrink: 0;
+  position: relative;
 }
 
 .logo {
-  width: 64px;
-  height: 64px;
+  width: 120px;
+  height: 120px;
   object-fit: contain;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .unitName {
@@ -51,6 +60,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-height: 0;
 }
 
 .navItem,
@@ -61,7 +71,9 @@
   cursor: pointer;
   text-align: left;
   font-family: inherit;
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
 
 .navItem {
@@ -71,6 +83,9 @@
   font-weight: 600;
   color: rgba(255, 255, 255, 0.9);
   background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .navItem:hover,
@@ -103,6 +118,12 @@
   font-weight: 600;
   color: rgba(255, 255, 255, 0.9);
   background: transparent;
+}
+
+.groupLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .groupActive {
@@ -140,10 +161,22 @@
   line-height: 1.4;
   color: rgba(255, 255, 255, 0.78);
   background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.navIcon {
+  width: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
 }
 
 .logout {
-  margin-top: 16px;
+  margin-top: auto;
+  flex-shrink: 0;
   padding: 11px 14px;
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 10px;
@@ -153,7 +186,9 @@
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
 }
 
 .logout:hover {

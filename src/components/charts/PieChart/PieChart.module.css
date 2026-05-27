@@ -77,11 +77,15 @@
   gap: 14px;
 }
 
+.headerCompact {
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
 .large .body {
   display: grid;
   grid-template-columns: auto 1fr;
-  grid-template-rows: auto auto;
-  gap: 20px 28px;
+  gap: 24px 32px;
   align-items: center;
 }
 
@@ -92,7 +96,6 @@
 }
 
 .large .chartWrap {
-  grid-row: 1 / 3;
   margin: 0;
 }
 
@@ -200,68 +203,6 @@
   transform: translate(-50%, -100%);
 }
 
-.stats {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  width: 100%;
-}
-
-.large .stats {
-  grid-column: 2;
-}
-
-.stats li {
-  padding: 8px 6px;
-  text-align: center;
-  border-radius: 8px;
-  background: #f4f7f5;
-  border: 1px solid var(--login-border);
-}
-
-.statPresent {
-  border-color: rgba(31, 92, 63, 0.25);
-  background: rgba(31, 92, 63, 0.06);
-}
-
-.statAbsent {
-  border-color: rgba(217, 119, 6, 0.25);
-  background: rgba(217, 119, 6, 0.06);
-}
-
-.statLabel {
-  display: block;
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--login-text-muted);
-  margin-bottom: 4px;
-}
-
-.large .statLabel {
-  font-size: 11px;
-}
-
-.statValue {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--login-text);
-}
-
-.large .statValue {
-  font-size: 18px;
-}
-
-.statPresent .statValue {
-  color: var(--primary-color);
-}
-
-.statAbsent .statValue {
-  color: #b45309;
-}
-
 .legend {
   list-style: none;
   margin: 0;
@@ -273,7 +214,7 @@
 }
 
 .large .legend {
-  grid-column: 2;
+  align-self: center;
 }
 
 .legendBtn {
@@ -323,11 +264,6 @@
   .large .chartWrap {
     grid-row: auto;
     margin: 0 auto;
-  }
-
-  .large .stats,
-  .large .legend {
-    grid-column: 1;
   }
 
   .tooltip {
