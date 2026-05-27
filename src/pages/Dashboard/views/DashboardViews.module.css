@@ -16,7 +16,6 @@
   border: 0;
 }
 
-/* Thanh công cụ: 1 hàng ngang */
 .toolbar {
   display: flex;
   flex-wrap: wrap;

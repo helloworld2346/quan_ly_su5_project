@@ -217,10 +217,10 @@
 .logout:hover {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.4);
-<<<<<<< HEAD
+
 }
-=======
-}
+
+
 
 .collapsed {
   width: var(--sidebar-collapsed-width);
@@ -260,4 +260,4 @@
   width: 26px;
   font-size: 22px;
 }
->>>>>>> 48e48e3153d931f2941ef2e4e53d5aff50b42ca4
+
