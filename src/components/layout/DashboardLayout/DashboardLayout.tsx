@@ -1,12 +1,22 @@
 import type { ReactNode } from "react";
+import { useState } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faBell, faMoon } from "@fortawesome/free-solid-svg-icons";
+import {
+  faBars,
+  faBell,
+  faMoon,
+  faSun,
+} from "@fortawesome/free-solid-svg-icons";
 
 import Sidebar from "../Sidebar/Sidebar";
 import styles from "./DashboardLayout.module.css";
 
-import { EXECUTIVE_NAV, REPORT_NAV_GROUP, type NavItemId } from "../../../types/navigation";
+import {
+  EXECUTIVE_NAV,
+  REPORT_NAV_GROUP,
+  type NavItemId,
+} from "../../../types/navigation";
 
 type Props = {
   activeId: NavItemId;
@@ -17,17 +27,26 @@ type Props = {
 };
 
 function TopBarActions() {
+  const [isDark, setIsDark] = useState(false);
+
   return (
     <div className={styles.topBarRight}>
       <button
         type="button"
         className={styles.iconButton}
-        aria-label="Chế độ tối (sẽ làm sau)"
+        aria-label={
+          isDark ? "Chuyển sang giao diện sáng" : "Chuyển sang giao diện tối"
+        }
+        onClick={() => setIsDark((v) => !v)}
       >
-        <FontAwesomeIcon icon={faMoon} />
+        <FontAwesomeIcon icon={isDark ? faSun : faMoon} />
       </button>
 
-      <button type="button" className={styles.iconButton} aria-label="Thông báo">
+      <button
+        type="button"
+        className={styles.iconButton}
+        aria-label="Thông báo"
+      >
         <FontAwesomeIcon icon={faBell} />
       </button>
 
@@ -49,22 +68,33 @@ export default function DashboardLayout({
   onLogout,
 }: Props) {
   const isExecutive = activeId === EXECUTIVE_NAV.id;
-
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   return (
     <div className={styles.layout}>
-      <Sidebar activeId={activeId} onNavigate={onNavigate} onLogout={onLogout} />
+      <Sidebar
+        activeId={activeId}
+        onNavigate={onNavigate}
+        onLogout={onLogout}
+        collapsed={sidebarCollapsed}
+      />
 
-      <div className={styles.main}>
-        <header
-          className={
-            styles.topBar
-          }
-        >
+      <div
+        className={
+          sidebarCollapsed
+            ? `${styles.main} ${styles.mainCollapsed}`
+            : styles.main
+        }
+      >
+        <header className={styles.topBar}>
           <div className={styles.topBarLeft}>
             <button
               type="button"
               className={styles.hamburgerBtn}
-              aria-label="Menu (sẽ làm hamburger sau)"
+              aria-label={
+                sidebarCollapsed ? "Mở rộng sidebar" : "Thu gọn sidebar"
+              }
+              aria-expanded={!sidebarCollapsed}
+              onClick={() => setSidebarCollapsed((v) => !v)}
             >
               <FontAwesomeIcon icon={faBars} />
             </button>

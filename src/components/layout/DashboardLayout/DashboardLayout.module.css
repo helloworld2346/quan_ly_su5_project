@@ -55,7 +55,9 @@
   justify-content: center;
   cursor: pointer;
   color: var(--primary-color);
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
 }
 
 .hamburgerBtn:hover {
@@ -102,7 +104,10 @@
   justify-content: center;
   cursor: pointer;
   color: var(--login-text-muted);
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
 }
 
 .iconButton:hover {
@@ -175,4 +180,8 @@
   .pageTitle {
     font-size: 15px;
   }
+}
+
+.mainCollapsed {
+  margin-left: var(--sidebar-collapsed-width);
 }
