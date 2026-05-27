@@ -1,17 +1,38 @@
 import styles from "./DashboardViews.module.css";
 
+import ExecutiveTroopCharts from "./ExecutiveTroopCharts";
+
 import type { NavItemId } from "../../../types/navigation";
 import { NAV_PAGE_TITLES } from "../../../types/navigation";
+import { getDivisionSummary } from "../../../types/troopStats";
 
 type Props = {
   activeId: NavItemId;
 };
 
+const summary = getDivisionSummary();
+
 const EXECUTIVE_STATS = [
-  { label: "Tổng quân số", value: "—", hint: "Cập nhật từ báo ban quân số" },
-  { label: "Đơn vị đã báo cáo", value: "—", hint: "Trong kỳ hiện tại" },
-  { label: "Huấn luyện", value: "—", hint: "Tỷ lệ hoàn thành kế hoạch" },
-  { label: "Thăm nuôi", value: "—", hint: "Hồ sơ thân nhân trong tháng" },
+  {
+    label: "Tổng quân số",
+    value: summary.total.toLocaleString("vi-VN"),
+    hint: "Toàn Sư đoàn 5",
+  },
+  {
+    label: "Hiện diện",
+    value: summary.present.toLocaleString("vi-VN"),
+    hint: `${summary.presentRate.toFixed(1)}% tổng quân số`,
+  },
+  {
+    label: "Vắng",
+    value: summary.absent.toLocaleString("vi-VN"),
+    hint: `${(100 - summary.presentRate).toFixed(1)}% tổng quân số`,
+  },
+  {
+    label: "Đơn vị trực thuộc",
+    value: "12",
+    hint: "Trung đoàn, tiểu đoàn, đại đội, phòng ban",
+  },
 ];
 
 export default function DashboardViews({ activeId }: Props) {
@@ -19,8 +40,8 @@ export default function DashboardViews({ activeId }: Props) {
     return (
       <div className={styles.executive}>
         <p className={styles.lead}>
-          Tổng quan điều hành — theo dõi nhanh các chỉ tiêu chính từ các báo
-          ban.
+          Tổng quan điều hành — theo dõi tổng quân số, hiện diện và vắng theo
+          từng đơn vị.
         </p>
 
         <div className={styles.statGrid}>
@@ -33,13 +54,7 @@ export default function DashboardViews({ activeId }: Props) {
           ))}
         </div>
 
-        <section className={styles.panel}>
-          <h2 className={styles.panelTitle}>Hoạt động gần đây</h2>
-          <p className={styles.placeholder}>
-            Khu vực biểu đồ và bảng tổng hợp sẽ được bổ sung khi kết nối dữ
-            liệu.
-          </p>
-        </section>
+        <ExecutiveTroopCharts />
       </div>
     );
   }
