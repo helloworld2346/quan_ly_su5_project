@@ -45,16 +45,10 @@ export default function PieChart({ chart, size = "small", badge }: Props) {
   const center = viewSize / 2;
   const circumference = 2 * Math.PI * radius;
 
-  const activeSegment = hovered
-    ? sized.find((s) => s.key === hovered)
-    : null;
+  const activeSegment = hovered ? sized.find((s) => s.key === hovered) : null;
 
-  const centerValue = activeSegment
-    ? activeSegment.value
-    : chart.total;
-  const centerCaption = activeSegment
-    ? activeSegment.label
-    : "Tổng quân số";
+  const centerValue = activeSegment ? activeSegment.value : chart.total;
+  const centerCaption = activeSegment ? activeSegment.label : "Tổng quân số";
 
   const centerPercent =
     activeSegment && chart.total > 0

@@ -7,7 +7,9 @@
   border: 1px solid var(--login-border);
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-  transition: box-shadow 0.2s, border-color 0.2s;
+  transition:
+    box-shadow 0.2s,
+    border-color 0.2s;
 }
 
 .card:hover {
@@ -112,7 +114,9 @@
 
 .segment {
   cursor: pointer;
-  transition: opacity 0.2s, stroke-width 0.15s;
+  transition:
+    opacity 0.2s,
+    stroke-width 0.15s;
   outline: none;
 }
 
@@ -230,7 +234,9 @@
   font-family: inherit;
   font-size: 12px;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
 }
 
 .legendBtn:hover,

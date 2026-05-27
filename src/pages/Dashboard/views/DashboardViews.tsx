@@ -18,13 +18,9 @@ export default function DashboardViews({ activeId }: Props) {
   }
 
   return (
-    <section
-      className={styles.report}
-      aria-labelledby="dashboard-page-heading"
-    >
+    <section className={styles.report} aria-labelledby="dashboard-page-heading">
       <p className={styles.lead}>
-        Trang nhập liệu, thống kê và xuất báo cáo sẽ được triển khai tiếp
-        theo.
+        Trang nhập liệu, thống kê và xuất báo cáo sẽ được triển khai tiếp theo.
       </p>
 
       <div className={styles.tableShell}>
