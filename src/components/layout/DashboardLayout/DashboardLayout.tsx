@@ -39,7 +39,7 @@ function TopBarActions() {
         }
         onClick={() => setIsDark((v) => !v)}
       >
-        <FontAwesomeIcon icon={isDark ? faSun : faMoon} />
+        <FontAwesomeIcon icon={isDark ? faMoon : faSun} />
       </button>
 
       <button

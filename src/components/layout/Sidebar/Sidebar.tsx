@@ -60,7 +60,7 @@ export default function Sidebar({
         {!collapsed && (
           <>
             <p className={styles.unitName}>Sư đoàn 5</p>
-            <p className={styles.appName}>Thống kê báo ban quân số</p>
+            <p className={styles.appName}>Phần mềm thống kê báo ban quân số</p>
           </>
         )}
       </div>
