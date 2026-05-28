@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react"; // cần xóa dữ liệu ảo khi đổ data của cả family và  báo ban quân số hl 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 
@@ -7,31 +7,37 @@ import ExecutiveTroopCharts from "./ExecutiveTroopCharts";
 
 import type { NavItemId } from "../../../types/navigation";
 
-const REPORT_UNITS = [
-  "CH/f",
-  "PTM",
-  "c23",
-  "PCT",
-  "PHCKT",
-  "cSC",
-  "cKho",
-  "e4",
-  "e5",
-  "e271",
-  "d14",
-  "d15",
-  "d16",
-  "d17",
-  "d18",
-  "d24",
-  "d25",
-  "c19",
-  "c20",
-  "dHLCSM",
-] as const;
+type ReportSeed = {
+  unit: string;
+  total1: number;
+  total2: number;
+};
 
-const DATA_COLUMN_COUNT = 20;
+const REPORT_ROWS: ReportSeed[] = [
+  { unit: "CH/f", total1: 8, total2: 8 },
+  { unit: "PTM", total1: 78, total2: 144 },
+  { unit: "c23", total1: 46, total2: 46 },
+  { unit: "PCT", total1: 47, total2: 47 },
+  { unit: "PHCKT", total1: 51, total2: 51 },
+  { unit: "cSC", total1: 31, total2: 111 },
+  { unit: "cKho", total1: 19, total2: 19 },
+  { unit: "e4", total1: 1963, total2: 1963 },
+  { unit: "e5", total1: 1951, total2: 1951 },
+  { unit: "e271", total1: 1963, total2: 1963 },
+  { unit: "d14", total1: 93, total2: 93 },
+  { unit: "d15", total1: 67, total2: 67 },
+  { unit: "d16", total1: 84, total2: 84 },
+  { unit: "d17", total1: 118, total2: 118 },
+  { unit: "d18", total1: 109, total2: 109 },
+  { unit: "d24", total1: 64, total2: 64 },
+  { unit: "d25", total1: 68, total2: 68 },
+  { unit: "c19", total1: 44, total2: 44 },
+  { unit: "c20", total1: 43, total2: 43 },
+  { unit: "dHLCSM", total1: 390, total2: 390 },
+];
 
+const FILL_FROM_PRESENT_TO_SIGN_COUNT = 18;
+const NO_REPORT_UNITS = new Set(["PHCKT"]);
 type Props = {
   activeId: NavItemId;
 };
@@ -51,10 +57,28 @@ export default function DashboardViews({ activeId }: Props) {
   const [query, setQuery] = useState("");
   const [reportDate, setReportDate] = useState(todayIsoDate);
 
-  const filteredUnits = useMemo(() => {
+  const filteredRows = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return [...REPORT_UNITS];
-    return REPORT_UNITS.filter((unit) => unit.toLowerCase().includes(q));
+    if (!q) return REPORT_ROWS;
+
+    return REPORT_ROWS.filter((row) => {
+      const generatedCols = Array.from(
+        { length: FILL_FROM_PRESENT_TO_SIGN_COUNT },
+        () => row.unit
+      );
+
+      const rowText = [
+        row.unit,
+        row.total1,
+        row.total2,
+        ...generatedCols,
+        NO_REPORT_UNITS.has(row.unit) ? "khong bao cao" : "",
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      return rowText.includes(q);
+    });
   }, [query]);
 
   if (activeId === "executive") {
@@ -81,29 +105,29 @@ export default function DashboardViews({ activeId }: Props) {
     >
       <div className={styles.toolbar}>
         <div className={styles.searchWrap}>
- 
-  <input
-    id={searchId}
-    type="search"
-    className={styles.searchInput}
-    placeholder="Bạn cần tìm gì!?"
-    value={query}
-    onChange={(e) => setQuery(e.target.value)}
-    autoComplete="off"
-  />
-  <span className={styles.searchDivider} aria-hidden />
-  <button
-    type="button"
-    className={styles.searchIconBtn}
-    aria-label="Tìm kiếm"
-    onClick={() => document.getElementById(searchId)?.focus()}
-  >
-    <FontAwesomeIcon icon={faMagnifyingGlass} className={styles.searchIcon} />
-  </button>
-</div>
+
+          <input
+            id={searchId}
+            type="search"
+            className={styles.searchInput}
+            placeholder="Bạn cần tìm gì!?"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            autoComplete="off"
+          />
+          <span className={styles.searchDivider} aria-hidden />
+          <button
+            type="button"
+            className={styles.searchIconBtn}
+            aria-label="Tìm kiếm"
+            onClick={() => document.getElementById(searchId)?.focus()}
+          >
+            <FontAwesomeIcon icon={faMagnifyingGlass} className={styles.searchIcon} />
+          </button>
+        </div>
 
         <div className={styles.dateWrap}>
-          
+
           <input
             id={dateId}
             type="date"
@@ -119,7 +143,7 @@ export default function DashboardViews({ activeId }: Props) {
             type="button"
             className={`${styles.exportBtn} ${styles.exportWord}`}
             onClick={() => {
-           
+
             }}
           >
             Xuất File Word
@@ -128,7 +152,7 @@ export default function DashboardViews({ activeId }: Props) {
             type="button"
             className={`${styles.exportBtn} ${styles.exportExcel}`}
             onClick={() => {
-            
+
             }}
           >
             Xuất File Excel
@@ -173,23 +197,33 @@ export default function DashboardViews({ activeId }: Props) {
             </tr>
           </thead>
 
-          <tbody>
-            {filteredUnits.map((unit) => (
-              <tr key={unit}>
-                <td className={styles.unitCell}>{unit}</td>
-                {Array.from({ length: DATA_COLUMN_COUNT }, (_, i) => (
-                  <td key={i} />
-                ))}
-              </tr>
-            ))}
+       <tbody>
+  {filteredRows.map((row) => {
+    const isNoReport = NO_REPORT_UNITS.has(row.unit);
 
-            <tr className={styles.totalRow}>
-              <td className={styles.unitCell}>Tổng</td>
-              {Array.from({ length: DATA_COLUMN_COUNT }, (_, i) => (
-                <td key={i} />
-              ))}
-            </tr>
-          </tbody>
+    return (
+      <tr key={row.unit} className={isNoReport ? styles.noReportRow : undefined}>
+        <td className={styles.unitCell}>{row.unit}</td>
+
+        <td>{isNoReport ? "" : row.total1}</td>
+        <td>{isNoReport ? "" : row.total2}</td>
+
+        {Array.from({ length: FILL_FROM_PRESENT_TO_SIGN_COUNT }, (_, i) => (
+          <td key={i}>{isNoReport ? "" : row.unit}</td>
+        ))}
+      </tr>
+    );
+  })}
+
+  <tr className={styles.totalRow}>
+    <td className={styles.unitCell}>Tổng</td>
+    <td>7267</td>
+    <td>7267</td>
+    {Array.from({ length: FILL_FROM_PRESENT_TO_SIGN_COUNT }, (_, i) => (
+      <td key={i}>Tổng</td>
+    ))}
+  </tr>
+</tbody>
         </table>
       </div>
     </section>

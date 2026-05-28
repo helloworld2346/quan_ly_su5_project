@@ -200,6 +200,16 @@
   color: var(--login-text-muted);
 }
 
+.noReportRow td {
+  background: #ffe9e9;
+  color: #b42318;
+  font-weight: 600;
+}
+
+.noReportRow td:first-child {
+  color: #8f1010;
+}
+
 @media (max-width: 768px) {
   .toolbar {
     flex-direction: column;

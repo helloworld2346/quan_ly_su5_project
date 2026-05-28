@@ -7,6 +7,11 @@ function AppRoutes() {
     return (
         <Routes>
             <Route
+                path="/"
+                element={<Navigate to="/login" replace />}
+            />
+
+            <Route
                 path="/login"
                 element={
                     isAuthenticated ? (
@@ -16,6 +21,7 @@ function AppRoutes() {
                     )
                 }
             />
+
             <Route
                 path="/dashboard"
                 element={
@@ -36,6 +42,32 @@ function AppRoutes() {
                         <Navigate to="/login" replace />
                     )
                 }
+            />
+            <Route
+                path="/training-report"
+                element={
+                    isAuthenticated ? (
+                        <Dashboard onLogout={() => setIsAuthenticated(false)} />
+                    ) : (
+                        <Navigate to="/login" replace />
+                    )
+                }
+            />
+
+            <Route
+                path="/family-report"
+                element={
+                    isAuthenticated ? (
+                        <Dashboard onLogout={() => setIsAuthenticated(false)} />
+                    ) : (
+                        <Navigate to="/login" replace />
+                    )
+                }
+            />
+
+            <Route
+                path="*"
+                element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />}
             />
         </Routes>
     );
