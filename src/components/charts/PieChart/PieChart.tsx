@@ -2,6 +2,8 @@ import { useMemo, useState } from "react";
 
 import styles from "./PieChart.module.css";
 
+import { PRESENT_GRADIENTS } from "../../../styles/chartColors";
+
 import type { AttendanceKey, TroopSegment } from "../../../types/troopStats";
 import {
   getChartSegments,
@@ -13,6 +15,7 @@ type Props = {
   chart: UnitTroopChart;
   size?: "large" | "small";
   badge?: string;
+  unitType?: UnitTroopChart["unitType"];
 };
 
 function getSegmentOffsets(segments: TroopSegment[]) {
@@ -31,7 +34,15 @@ function formatNumber(value: number) {
   return value.toLocaleString("vi-VN");
 }
 
-export default function PieChart({ chart, size = "small", badge }: Props) {
+export default function PieChart({
+  chart,
+  size = "small",
+  badge,
+  unitType = chart.unitType,
+}: Props) {
+  const presentGradientId = `present-${unitType}`;
+  const [gStart, gEnd] = PRESENT_GRADIENTS[unitType];
+
   const segments = useMemo(() => getChartSegments(chart), [chart]);
   const sized = useMemo(() => getSegmentOffsets(segments), [segments]);
   const presentRate = getPresentRate(chart);
@@ -81,6 +92,18 @@ export default function PieChart({ chart, size = "small", badge }: Props) {
             role="img"
             aria-label={`Biểu đồ ${chart.name}: tổng ${chart.total}, hiện diện ${chart.present}, vắng ${chart.absent}`}
           >
+            <defs>
+              <linearGradient
+                id={presentGradientId}
+                x1="0"
+                y1="0"
+                x2="1"
+                y2="1"
+              >
+                <stop offset="0%" stopColor={gStart} />
+                <stop offset="100%" stopColor={gEnd} />
+              </linearGradient>
+            </defs>
             <circle
               cx={center}
               cy={center}
@@ -100,7 +123,11 @@ export default function PieChart({ chart, size = "small", badge }: Props) {
                   cy={center}
                   r={radius}
                   fill="none"
-                  stroke={segment.color}
+                  stroke={
+                    segment.key === "present"
+                      ? `url(#${presentGradientId})`
+                      : segment.color
+                  }
                   strokeWidth={isFocused ? stroke + 4 : stroke}
                   strokeDasharray={`${segment.ratio * circumference} ${circumference}`}
                   strokeDashoffset={-segment.start * circumference}
@@ -159,7 +186,13 @@ export default function PieChart({ chart, size = "small", badge }: Props) {
               >
                 <span
                   className={styles.swatch}
-                  style={{ background: segment.color }}
+                  style={
+                    segment.key === "present"
+                      ? {
+                          background: `linear-gradient(135deg, ${gStart}, ${gEnd})`,
+                        }
+                      : { background: segment.color }
+                  }
                 />
                 <span className={styles.legendLabel}>{segment.label}</span>
                 <span className={styles.legendValue}>

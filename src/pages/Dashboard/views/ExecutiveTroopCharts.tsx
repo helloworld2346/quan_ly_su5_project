@@ -5,7 +5,6 @@ import { faFilter } from "@fortawesome/free-solid-svg-icons";
 
 import PieChart from "../../../components/charts/PieChart/PieChart";
 import {
-  ATTENDANCE_META,
   CHART_GROUP_LABELS,
   CHART_GROUP_ORDER,
   DIVISION_TROOP_CHART,
@@ -13,7 +12,6 @@ import {
   UNIT_TYPE_LABELS,
   getChartsByGroup,
   getDivisionSummary,
-  type AttendanceKey,
   type SubordinateUnitType,
 } from "../../../types/troopStats";
 
@@ -106,17 +104,7 @@ export default function ExecutiveTroopCharts() {
           <h3 className={styles.chartSectionTitle}>
             Báo ban quân số toàn Sư đoàn
           </h3>
-          <ul className={styles.legendBar}>
-            {(Object.keys(ATTENDANCE_META) as AttendanceKey[]).map((key) => (
-              <li key={key}>
-                <span
-                  className={styles.legendDot}
-                  style={{ background: ATTENDANCE_META[key].color }}
-                />
-                {ATTENDANCE_META[key].label}
-              </li>
-            ))}
-          </ul>
+         
         </div>
 
         <div className={styles.featuredBlock}>

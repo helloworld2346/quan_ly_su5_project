@@ -12,11 +12,19 @@
   z-index: 0;
   background-image: url("../../../assets/images/login-bg-dongson.png");
 
-  background-position: center;
   background-repeat: no-repeat;
   background-size: 720px auto;
   opacity: 0.5;
   pointer-events: none;
+  background-position: calc(50% + 140px) 50%; /* 280/2 */
+  transform: translateX(0);
+}
+
+.layoutCollapsed::before {
+  background-position: calc(50% + 44px) 50%; /* 88/2 */
+  background-size: 720px auto;
+  opacity: 0.5;
+  transform: translateX(-10px);
 }
 
 .main {
@@ -197,6 +205,12 @@
 
   .pageTitle {
     font-size: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layout::before {
+    transition: none !important;
   }
 }
 

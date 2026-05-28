@@ -70,7 +70,13 @@ export default function DashboardLayout({
   const isExecutive = activeId === EXECUTIVE_NAV.id;
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   return (
-    <div className={styles.layout}>
+    <div
+      className={
+        sidebarCollapsed
+          ? `${styles.layout} ${styles.layoutCollapsed}`
+          : styles.layout
+      }
+    >
       <Sidebar
         activeId={activeId}
         onNavigate={onNavigate}
