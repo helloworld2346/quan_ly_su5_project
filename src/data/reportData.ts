@@ -28,4 +28,5 @@ export const REPORT_ROWS: ReportSeed[] = [
 ];
 
 export const FILL_FROM_PRESENT_TO_SIGN_COUNT = 18;
+
 export const NO_REPORT_UNITS = new Set(["PHCKT"]);
