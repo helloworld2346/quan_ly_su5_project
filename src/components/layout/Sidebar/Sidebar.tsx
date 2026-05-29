@@ -3,9 +3,9 @@ import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { IconProp } from "@fortawesome/fontawesome-svg-core";
 import {
-  faChartColumn,
   faGaugeHigh,
   faRightFromBracket,
+  faChartColumn,
   faClipboardList,
   faGear,
 } from "@fortawesome/free-solid-svg-icons";
@@ -20,6 +20,8 @@ import {
   SETTINGS_NAV,
   type NavItemId,
 } from "../../../types/navigation";
+import NavGroup from "./NavGroup";
+import { useNavGroupState } from "./useNavGroupState";
 
 type Props = {
   activeId: NavItemId;
@@ -51,15 +53,8 @@ export default function Sidebar({
   );
   const dutyActive = DUTY_NAV_GROUP.items.some((item) => item.id === activeId);
 
-  const [reportsOpen, setReportsOpen] = useState(() => {
-    const saved = localStorage.getItem("reportsOpen");
-    return saved ? saved === "true" : true;
-  });
-
-  const [dutyOpen, setDutyOpen] = useState(() => {
-    const saved = localStorage.getItem("dutyOpen");
-    return saved ? saved === "true" : true;
-  });
+  const [reportsOpen, setReportsOpen] = useNavGroupState("reportsOpen");
+  const [dutyOpen, setDutyOpen] = useNavGroupState("dutyOpen");
 
   const [prevCollapsed, setPrevCollapsed] = useState(collapsed);
 
@@ -69,11 +64,9 @@ export default function Sidebar({
     if (collapsed) {
       if (!reportActive) {
         setReportsOpen(false);
-        localStorage.setItem("reportsOpen", "false");
       }
       if (!dutyActive) {
         setDutyOpen(false);
-        localStorage.setItem("dutyOpen", "false");
       }
     }
   }
@@ -113,123 +106,31 @@ export default function Sidebar({
           {!collapsed && EXECUTIVE_NAV.label}
         </button>
 
-        <div className={styles.group}>
-          <button
-            type="button"
-            className={`${styles.groupToggle} ${reportActive && collapsed ? styles.active : ""} ${reportActive ? styles.groupActive : ""}`}
-            aria-expanded={reportsOpen}
-            data-tooltip={collapsed ? REPORT_NAV_GROUP.label : undefined}
-            aria-label={collapsed ? REPORT_NAV_GROUP.label : undefined}
-            onClick={() => {
-              if (collapsed) {
-                if (onExpand) onExpand();
-                setReportsOpen(true);
-                localStorage.setItem("reportsOpen", "true");
-                return;
-              }
+        <NavGroup
+          label={REPORT_NAV_GROUP.label}
+          icon={faChartColumn}
+          items={REPORT_NAV_GROUP.items}
+          isOpen={reportsOpen}
+          onToggle={() => setReportsOpen(!reportsOpen)}
+          activeId={activeId}
+          onNavigate={onNavigate}
+          collapsed={collapsed}
+          onExpand={onExpand}
+          isActive={reportActive}
+        />
 
-              setReportsOpen((open) => {
-                localStorage.setItem("reportsOpen", String(!open));
-                return !open;
-              });
-            }}
-          >
-            <span className={styles.groupLabel}>
-              <FontAwesomeIcon
-                icon={faChartColumn}
-                className={styles.navIcon}
-              />
-              {!collapsed && REPORT_NAV_GROUP.label}
-            </span>
-            {!collapsed && (
-              <span
-                className={reportsOpen ? styles.chevronOpen : styles.chevron}
-                aria-hidden
-              >
-                ▾
-              </span>
-            )}
-          </button>
-
-          {reportsOpen && !collapsed && (
-            <ul className={styles.subList}>
-              {REPORT_NAV_GROUP.items.map((item) => (
-                <li key={item.id} className={styles.subLi}>
-                  <button
-                    type="button"
-                    className={
-                      activeId === item.id
-                        ? `${styles.subItem} ${styles.active}`
-                        : styles.subItem
-                    }
-                    onClick={() => onNavigate(item.id)}
-                  >
-                    {item.label}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        <div className={styles.group}>
-          <button
-            type="button"
-            className={`${styles.groupToggle} ${dutyActive && collapsed ? styles.active : ""} ${dutyActive ? styles.groupActive : ""}`}
-            aria-expanded={dutyOpen}
-            data-tooltip={collapsed ? DUTY_NAV_GROUP.label : undefined}
-            aria-label={collapsed ? DUTY_NAV_GROUP.label : undefined}
-            onClick={() => {
-              if (collapsed) {
-                if (onExpand) onExpand();
-                setDutyOpen(true);
-                localStorage.setItem("dutyOpen", "true");
-                return;
-              }
-
-              setDutyOpen((open) => {
-                localStorage.setItem("dutyOpen", String(!open));
-                return !open;
-              });
-            }}
-          >
-            <span className={styles.groupLabel}>
-              <FontAwesomeIcon
-                icon={faClipboardList}
-                className={styles.navIcon}
-              />
-              {!collapsed && DUTY_NAV_GROUP.label}
-            </span>
-            {!collapsed && (
-              <span
-                className={dutyOpen ? styles.chevronOpen : styles.chevron}
-                aria-hidden
-              >
-                ▾
-              </span>
-            )}
-          </button>
-
-          {dutyOpen && !collapsed && (
-            <ul className={styles.subList}>
-              {DUTY_NAV_GROUP.items.map((item) => (
-                <li key={item.id} className={styles.subLi}>
-                  <button
-                    type="button"
-                    className={
-                      activeId === item.id
-                        ? `${styles.subItem} ${styles.active}`
-                        : styles.subItem
-                    }
-                    onClick={() => onNavigate(item.id)}
-                  >
-                    {item.label}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        <NavGroup
+          label={DUTY_NAV_GROUP.label}
+          icon={faClipboardList}
+          items={DUTY_NAV_GROUP.items}
+          isOpen={dutyOpen}
+          onToggle={() => setDutyOpen(!dutyOpen)}
+          activeId={activeId}
+          onNavigate={onNavigate}
+          collapsed={collapsed}
+          onExpand={onExpand}
+          isActive={dutyActive}
+        />
 
         <button
           type="button"

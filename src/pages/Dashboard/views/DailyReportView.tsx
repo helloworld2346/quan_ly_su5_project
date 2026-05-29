@@ -1,0 +1,189 @@
+import { useId, useMemo, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+
+import styles from "./DashboardViews.module.css";
+import {
+  FILL_FROM_PRESENT_TO_SIGN_COUNT,
+  NO_REPORT_UNITS,
+  REPORT_ROWS,
+} from "../../../data/reportData";
+
+function todayIsoDate() {
+  const d = new Date();
+  return [
+    d.getFullYear(),
+    String(d.getMonth() + 1).padStart(2, "0"),
+    String(d.getDate()).padStart(2, "0"),
+  ].join("-");
+}
+
+export default function DailyReportView() {
+  const searchId = useId();
+  const dateId = useId();
+  const [query, setQuery] = useState("");
+  const [reportDate, setReportDate] = useState(todayIsoDate);
+
+  const filteredRows = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return REPORT_ROWS;
+
+    return REPORT_ROWS.filter((row) => {
+      const generatedCols = Array.from(
+        { length: FILL_FROM_PRESENT_TO_SIGN_COUNT },
+        () => row.unit,
+      );
+
+      const rowText = [
+        row.unit,
+        row.total1,
+        row.total2,
+        ...generatedCols,
+        NO_REPORT_UNITS.has(row.unit) ? "khong bao cao" : "",
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      return rowText.includes(q);
+    });
+  }, [query]);
+
+  return (
+    <section className={styles.report} aria-labelledby="dashboard-page-heading">
+      <div className={styles.toolbar}>
+        <div className={styles.searchWrap}>
+          <input
+            id={searchId}
+            type="search"
+            className={styles.searchInput}
+            placeholder="Bạn cần tìm gì!?"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            autoComplete="off"
+          />
+          <span className={styles.searchDivider} aria-hidden />
+          <button
+            type="button"
+            className={styles.searchIconBtn}
+            aria-label="Tìm kiếm"
+            onClick={() => document.getElementById(searchId)?.focus()}
+          >
+            <FontAwesomeIcon
+              icon={faMagnifyingGlass}
+              className={styles.searchIcon}
+            />
+          </button>
+        </div>
+
+        <div className={styles.dateWrap}>
+          <input
+            id={dateId}
+            type="date"
+            className={styles.dateInput}
+            value={reportDate}
+            max={todayIsoDate()}
+            onChange={(e) => setReportDate(e.target.value)}
+          />
+        </div>
+
+        <div className={styles.exportGroup}>
+          <button
+            type="button"
+            className={`${styles.exportBtn} ${styles.exportWord}`}
+            onClick={() => {
+              // TODO: Implement export Word
+            }}
+          >
+            Xuất File Word
+          </button>
+          <button
+            type="button"
+            className={`${styles.exportBtn} ${styles.exportExcel}`}
+            onClick={() => {
+              // TODO: Implement export Excel
+            }}
+          >
+            Xuất File Excel
+          </button>
+        </div>
+      </div>
+
+      <div className={styles.tableShell}>
+        <table className={styles.reportTable}>
+          <thead>
+            <tr>
+              <th rowSpan={3}>Đơn vị</th>
+              <th rowSpan={3}>Tổng quân số</th>
+              <th rowSpan={3}>Tổng quân số</th>
+              <th rowSpan={3}>Hiện diện</th>
+              <th rowSpan={3}>Tổng vắng</th>
+              <th colSpan={13}>Quân số vắng</th>
+              <th rowSpan={3}>TCH</th>
+              <th rowSpan={3}>Trực ban</th>
+              <th rowSpan={3}>Ký tên</th>
+            </tr>
+            <tr>
+              <th colSpan={2}>HT</th>
+              <th colSpan={2}>Xây</th>
+              <th rowSpan={2}>Chờ hưu</th>
+              <th rowSpan={2}>Nghi (TT, cuối tuần)</th>
+              <th rowSpan={2}>Phép</th>
+              <th colSpan={2}>Viện</th>
+              <th colSpan={2}>Công tác</th>
+              <th colSpan={2}>Học</th>
+            </tr>
+            <tr>
+              <th>Ngoài Sư</th>
+              <th>e, f</th>
+              <th>Ngoài Sư</th>
+              <th>e, f</th>
+              <th>Ngoài Sư</th>
+              <th>e, f</th>
+              <th>Ngoài Sư</th>
+              <th>f</th>
+              <th>SQ</th>
+              <th>CS</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {filteredRows.map((row) => {
+              const isNoReport = NO_REPORT_UNITS.has(row.unit);
+
+              return (
+                <tr
+                  key={row.unit}
+                  className={isNoReport ? styles.noReportRow : undefined}
+                >
+                  <td className={styles.unitCell}>{row.unit}</td>
+
+                  <td>{isNoReport ? "" : row.total1}</td>
+                  <td>{isNoReport ? "" : row.total2}</td>
+
+                  {Array.from(
+                    { length: FILL_FROM_PRESENT_TO_SIGN_COUNT },
+                    (_, i) => (
+                      <td key={i}>{isNoReport ? "" : row.unit}</td>
+                    ),
+                  )}
+                </tr>
+              );
+            })}
+
+            <tr className={styles.totalRow}>
+              <td className={styles.unitCell}>Tổng</td>
+              <td>7267</td>
+              <td>7267</td>
+              {Array.from(
+                { length: FILL_FROM_PRESENT_TO_SIGN_COUNT },
+                (_, i) => (
+                  <td key={i}>Tổng</td>
+                ),
+              )}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}

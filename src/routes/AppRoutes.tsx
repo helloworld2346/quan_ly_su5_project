@@ -2,8 +2,8 @@ import { Navigate, Route, Routes } from "react-router-dom";
 
 import Dashboard from "../pages/Dashboard/Dashboard";
 import Login from "../pages/Login/Login";
-import RequireAuth from "./RequireAuth";
-import RouteLoader from "./RouteLoader";
+import ProtectedRoute from "./ProtectedRoute";
+import { PROTECTED_ROUTES } from "./routeConfig";
 
 type Props = {
   isAuthenticated: boolean;
@@ -31,109 +31,21 @@ export default function AppRoutes({
         }
       />
 
-      <Route
-        path="/dashboard"
-        element={
-          <RequireAuth isAuthenticated={isAuthenticated}>
-            <RouteLoader
-              title="Đang tải Dashboard"
-              subtitle="Đang đồng bộ dữ liệu quân số…"
-              deps={[]}
+      {PROTECTED_ROUTES.map(({ path, title, subtitle }) => (
+        <Route
+          key={path}
+          path={path}
+          element={
+            <ProtectedRoute
+              isAuthenticated={isAuthenticated}
+              title={title}
+              subtitle={subtitle}
             >
               <Dashboard onLogout={onLogout} />
-            </RouteLoader>
-          </RequireAuth>
-        }
-      />
-
-      <Route
-        path="/daily-report"
-        element={
-          <RequireAuth isAuthenticated={isAuthenticated}>
-            <RouteLoader
-              title="Đang tải báo cáo ngày"
-              subtitle="Đang tải dữ liệu báo cáo…"
-              deps={[]}
-            >
-              <Dashboard onLogout={onLogout} />
-            </RouteLoader>
-          </RequireAuth>
-        }
-      />
-
-      <Route
-        path="/training-report"
-        element={
-          <RequireAuth isAuthenticated={isAuthenticated}>
-            <RouteLoader
-              title="Đang tải báo cáo huấn luyện"
-              subtitle="Đang tải dữ liệu…"
-              deps={[]}
-            >
-              <Dashboard onLogout={onLogout} />
-            </RouteLoader>
-          </RequireAuth>
-        }
-      />
-
-      <Route
-        path="/family-report"
-        element={
-          <RequireAuth isAuthenticated={isAuthenticated}>
-            <RouteLoader
-              title="Đang tải báo cáo gia đình"
-              subtitle="Đang tải dữ liệu…"
-              deps={[]}
-            >
-              <Dashboard onLogout={onLogout} />
-            </RouteLoader>
-          </RequireAuth>
-        }
-      />
-
-      <Route
-        path="/duty-command"
-        element={
-          <RequireAuth isAuthenticated={isAuthenticated}>
-            <RouteLoader
-              title="Đang tải trực chỉ huy"
-              subtitle="Đang tải dữ liệu…"
-              deps={[]}
-            >
-              <Dashboard onLogout={onLogout} />
-            </RouteLoader>
-          </RequireAuth>
-        }
-      />
-
-      <Route
-        path="/duty-tactical"
-        element={
-          <RequireAuth isAuthenticated={isAuthenticated}>
-            <RouteLoader
-              title="Đang tải trực tác chiến"
-              subtitle="Đang tải dữ liệu…"
-              deps={[]}
-            >
-              <Dashboard onLogout={onLogout} />
-            </RouteLoader>
-          </RequireAuth>
-        }
-      />
-
-      <Route
-        path="/settings"
-        element={
-          <RequireAuth isAuthenticated={isAuthenticated}>
-            <RouteLoader
-              title="Đang tải cài đặt"
-              deps={[]}
-            >
-              <Dashboard onLogout={onLogout} />
-            </RouteLoader>
-          </RequireAuth>
-        }
-      />
+            </ProtectedRoute>
+          }
+        />
+      ))}
 
       <Route
         path="*"

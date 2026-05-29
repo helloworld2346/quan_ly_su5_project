@@ -3,8 +3,9 @@ import DashboardLayout from "../../components/layout/DashboardLayout/DashboardLa
 import DashboardViews from "./views/DashboardViews";
 
 import {
-  EXECUTIVE_NAV,
   NAV_PAGE_TITLES,
+  getIdByPath,
+  getPathById,
   type NavItemId,
 } from "../../types/navigation";
 
@@ -12,34 +13,14 @@ type Props = {
   onLogout?: () => void;
 };
 
-const NAV_PATHS: Record<NavItemId, string> = {
-  executive: "/dashboard",
-  "report-troop": "/daily-report",
-  "report-training": "/training-report",
-  "report-family": "/family-report",
-  "duty-command": "/duty-command",
-  "duty-tactical": "/duty-tactical",
-  settings: "/settings",
-};
-
-const PATH_TO_NAV: Record<string, NavItemId> = {
-  "/dashboard": "executive",
-  "/daily-report": "report-troop",
-  "/training-report": "report-training",
-  "/family-report": "report-family",
-  "/duty-command": "duty-command",
-  "/duty-tactical": "duty-tactical",
-  "/settings": "settings",
-};
-
 export default function Dashboard({ onLogout }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const activeId = PATH_TO_NAV[location.pathname] ?? EXECUTIVE_NAV.id;
+  const activeId = getIdByPath(location.pathname);
 
   function handleNavigate(id: NavItemId) {
-    navigate(NAV_PATHS[id]);
+    navigate(getPathById(id));
   }
 
   return (
