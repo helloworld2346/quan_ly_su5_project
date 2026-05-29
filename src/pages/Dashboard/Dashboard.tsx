@@ -1,6 +1,12 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import DashboardLayout from "../../components/layout/DashboardLayout/DashboardLayout";
-import DashboardViews from "./views/DashboardViews";
+import ExecutiveDashboard from "../Executive/ExecutiveDashboard";
+import DailyTroopReport from "../DailyReport/DailyTroopReport";
+import TrainingReport from "../TrainingReport/TrainingReport";
+import FamilyReport from "../FamilyReport/FamilyReport";
+import CommandDuty from "../CommandDuty/CommandDuty";
+import TacticalDuty from "../TacticalDuty/TacticalDuty";
+import Settings from "../Settings/Settings";
 
 import {
   NAV_PAGE_TITLES,
@@ -30,7 +36,26 @@ export default function Dashboard({ onLogout }: Props) {
       onNavigate={handleNavigate}
       onLogout={onLogout}
     >
-      <DashboardViews activeId={activeId} />
+      {(() => {
+        switch (activeId) {
+          case "executive":
+            return <ExecutiveDashboard />;
+          case "report-troop":
+            return <DailyTroopReport />;
+          case "report-training":
+            return <TrainingReport />;
+          case "report-family":
+            return <FamilyReport />;
+          case "duty-command":
+            return <CommandDuty />;
+          case "duty-tactical":
+            return <TacticalDuty />;
+          case "settings":
+            return <Settings />;
+          default:
+            return <ExecutiveDashboard />;
+        }
+      })()}
     </DashboardLayout>
   );
 }

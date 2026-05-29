@@ -3,7 +3,7 @@ import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
 
-import PieChart from "../../../components/charts/PieChart/PieChart";
+import PieChart from "../../components/charts/PieChart/PieChart";
 import {
   CHART_GROUP_LABELS,
   CHART_GROUP_ORDER,
@@ -13,9 +13,9 @@ import {
   getChartsByGroup,
   getDivisionSummary,
   type SubordinateUnitType,
-} from "../../../types/troopStats";
+} from "../../types/troopStats";
 
-import styles from "./ExecutiveTroopCharts.module.css";
+import styles from "./ExecutiveDashboard.module.css";
 
 type FilterKey = "all" | SubordinateUnitType;
 
@@ -48,7 +48,7 @@ function formatNum(value: number) {
   return value.toLocaleString("vi-VN");
 }
 
-export default function ExecutiveTroopCharts() {
+export default function ExecutiveDashboard() {
   const [filter, setFilter] = useState<FilterKey>("all");
   const summary = getDivisionSummary();
   const visibleGroups = getVisibleGroups(filter);
