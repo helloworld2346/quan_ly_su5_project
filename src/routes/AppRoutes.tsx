@@ -3,7 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import Login from "../pages/Login/Login";
 import ProtectedRoute from "./ProtectedRoute";
-import { PROTECTED_ROUTES } from "./routeConfig";
+import { ALL_NAV_ITEMS } from "../types/navigation"
 
 type Props = {
   isAuthenticated: boolean;
@@ -31,15 +31,15 @@ export default function AppRoutes({
         }
       />
 
-      {PROTECTED_ROUTES.map(({ path, title, subtitle }) => (
+      {ALL_NAV_ITEMS.map(({ path, loadingTitle, loadingSubtitle }) => (
         <Route
           key={path}
           path={path}
           element={
             <ProtectedRoute
               isAuthenticated={isAuthenticated}
-              title={title}
-              subtitle={subtitle}
+              title={loadingTitle}
+              subtitle={loadingSubtitle}
             >
               <Dashboard onLogout={onLogout} />
             </ProtectedRoute>

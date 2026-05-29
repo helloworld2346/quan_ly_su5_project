@@ -11,12 +11,16 @@ export type NavItem = {
   id: NavItemId;
   label: string;
   path: string;
+  loadingTitle?: string;
+  loadingSubtitle?: string;
 };
 
 export const EXECUTIVE_NAV: NavItem = {
   id: "executive",
   label: "Dashboard điều hành",
   path: "/dashboard",
+  loadingTitle: "Đang tải Dashboard",
+  loadingSubtitle: "Đang đồng bộ dữ liệu quân số…",
 };
 
 export const REPORT_NAV_GROUP = {
@@ -26,16 +30,22 @@ export const REPORT_NAV_GROUP = {
       id: "report-troop" as const,
       label: "Báo ban ngày",
       path: "/daily-report",
+      loadingTitle: "Đang tải báo cáo ngày",
+      loadingSubtitle: "Đang tải dữ liệu…",
     },
     {
       id: "report-training" as const,
       label: "Báo ban quân số huấn luyện",
       path: "/training-report",
+      loadingTitle: "Đang tải báo cáo huấn luyện",
+      loadingSubtitle: "Đang tải dữ liệu…",
     },
     {
       id: "report-family" as const,
       label: "Báo ban thân nhân thăm nuôi",
       path: "/family-report",
+      loadingTitle: "Đang tải báo cáo thân nhân thăm nuôi",
+      loadingSubtitle: "Đang tải dữ liệu…",
     },
   ],
 };
@@ -47,11 +57,15 @@ export const DUTY_NAV_GROUP = {
       id: "duty-command" as const,
       label: "Trực chỉ huy",
       path: "/duty-command",
+      loadingTitle: "Đang tải trực chỉ huy",
+      loadingSubtitle: "Đang tải dữ liệu…",
     },
     {
       id: "duty-tactical" as const,
       label: "Trực ban tác chiến",
       path: "/duty-tactical",
+      loadingTitle: "Đang tải trực ban tác chiến",
+      loadingSubtitle: "Đang tải dữ liệu…",
     },
   ],
 };
@@ -60,9 +74,11 @@ export const SETTINGS_NAV: NavItem = {
   id: "settings",
   label: "Cài đặt",
   path: "/settings",
+  loadingTitle: "Đang tải cài đặt",
+  loadingSubtitle: "Đang tải dữ liệu…",
 };
 
-export const NAV_PAGE_TITLES: Record<NavItemId, string> = {
+export const NAV_PAGE_TITLES: Record<NavItemId, string | undefined> = {
   executive: "Dashboard điều hành",
   "report-troop": "Báo ban ngày",
   "report-training": "Báo ban quân số huấn luyện",
@@ -72,7 +88,6 @@ export const NAV_PAGE_TITLES: Record<NavItemId, string> = {
   settings: "Cài đặt",
 };
 
-// Single source of truth cho tất cả navigation items
 export const ALL_NAV_ITEMS: NavItem[] = [
   EXECUTIVE_NAV,
   ...REPORT_NAV_GROUP.items,
@@ -80,7 +95,6 @@ export const ALL_NAV_ITEMS: NavItem[] = [
   SETTINGS_NAV,
 ];
 
-// Helper functions
 export function getPathById(id: NavItemId): string {
   return ALL_NAV_ITEMS.find((item) => item.id === id)?.path ?? "/dashboard";
 }
