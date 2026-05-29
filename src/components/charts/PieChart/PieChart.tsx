@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 
 import styles from "./PieChart.module.css";
 
-import { PRESENT_GRADIENTS } from "../../../styles/chartColors";
+import { PRESENT_GRADIENTS } from "../../../constants/chartColors";
 
 import type { AttendanceKey, TroopSegment } from "../../../types/troopStats";
 import {
