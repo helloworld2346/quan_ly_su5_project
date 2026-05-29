@@ -74,6 +74,8 @@ export default function Sidebar({
               : styles.navItem
           }
           onClick={() => onNavigate(EXECUTIVE_NAV.id)}
+          data-tooltip={collapsed ? EXECUTIVE_NAV.label : undefined}
+          aria-label={collapsed ? EXECUTIVE_NAV.label : undefined}
         >
           <FontAwesomeIcon
             icon={iconById[EXECUTIVE_NAV.id]}
@@ -87,6 +89,8 @@ export default function Sidebar({
             type="button"
             className={`${styles.groupToggle} ${reportActive ? styles.groupActive : ""}`}
             aria-expanded={reportsOpen}
+            data-tooltip={collapsed ? REPORT_NAV_GROUP.label : undefined}
+            aria-label={collapsed ? REPORT_NAV_GROUP.label : undefined}
             onClick={() =>
               setReportsOpen((open) => {
                 localStorage.setItem("reportsOpen", String(!open));
@@ -121,6 +125,8 @@ export default function Sidebar({
                         : styles.subItem
                     }
                     onClick={() => onNavigate(item.id)}
+                    data-tooltip={collapsed ? item.label : undefined}
+                    aria-label={collapsed ? item.label : undefined}
                   >
                     <FontAwesomeIcon
                       icon={iconById[item.id]}
@@ -141,7 +147,7 @@ export default function Sidebar({
           className={styles.logout}
           onClick={onLogout}
           aria-label="Đăng xuất"
-          title={collapsed ? "Đăng xuất" : undefined}
+          data-tooltip={collapsed ? "Đăng xuất" : undefined}
         >
           <FontAwesomeIcon
             icon={faRightFromBracket}

@@ -3,9 +3,7 @@
   top: 0;
   left: 0;
 
-
   z-index: 20;
-
 
   display: flex;
   height: 100vh;
@@ -19,9 +17,11 @@
   flex-shrink: 0;
   padding: 24px 16px 20px;
 
-  background: linear-gradient(180deg,
-      var(--sidebar-bg-top) 0%,
-      var(--sidebar-bg-bottom) 100%);
+  background: linear-gradient(
+    180deg,
+    var(--sidebar-bg-top) 0%,
+    var(--sidebar-bg-bottom) 100%
+  );
   border-right: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
 }
@@ -107,7 +107,7 @@
   );
   color: var(--text-white);
   box-shadow: none;
-  border: 1px solid rgba(244, 211, 94, 0.45);
+  box-shadow: inset 0 0 0 1px rgba(244, 211, 94, 0.45);
 }
 
 .navItem.active .navIcon,
@@ -212,24 +212,24 @@
 .collapsed .logout {
   padding-left: 0;
   padding-right: 0;
+  position: relative;
 }
 
 .logout:hover {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.4);
-
 }
-
-
 
 .collapsed {
   width: var(--sidebar-collapsed-width);
   padding: 24px 10px 20px;
+  overflow: visible;
 }
 
 .collapsed .navItem,
 .collapsed .subItem,
 .collapsed .groupToggle {
+  position: relative;
   justify-content: center;
   padding-left: 0;
   padding-right: 0;
@@ -261,3 +261,45 @@
   font-size: 22px;
 }
 
+.collapsed .navItem[data-tooltip]::after,
+.collapsed .subItem[data-tooltip]::after,
+.collapsed .groupToggle[data-tooltip]::after,
+.collapsed .logout[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1001;
+
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  max-width: 240px;
+
+  color: var(--text-white);
+  background: var(--primary-color);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.15s ease,
+    visibility 0.15s ease;
+}
+
+.collapsed .navItem[data-tooltip]:hover::after,
+.collapsed .navItem[data-tooltip]:focus-visible::after,
+.collapsed .subItem[data-tooltip]:hover::after,
+.collapsed .subItem[data-tooltip]:focus-visible::after,
+.collapsed .groupToggle[data-tooltip]:hover::after,
+.collapsed .groupToggle[data-tooltip]:focus-visible::after,
+.collapsed .logout[data-tooltip]:hover::after,
+.collapsed .logout[data-tooltip]:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+}
