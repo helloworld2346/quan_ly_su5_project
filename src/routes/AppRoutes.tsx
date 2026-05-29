@@ -38,7 +38,6 @@ export default function AppRoutes({
             <RouteLoader
               title="Đang tải Dashboard"
               subtitle="Đang đồng bộ dữ liệu quân số…"
-              // load={() => api.dashboard.prefetch()}  // sau này mở lại
               deps={[]}
             >
               <Dashboard onLogout={onLogout} />
@@ -84,6 +83,50 @@ export default function AppRoutes({
             <RouteLoader
               title="Đang tải báo cáo gia đình"
               subtitle="Đang tải dữ liệu…"
+              deps={[]}
+            >
+              <Dashboard onLogout={onLogout} />
+            </RouteLoader>
+          </RequireAuth>
+        }
+      />
+
+      <Route
+        path="/duty-command"
+        element={
+          <RequireAuth isAuthenticated={isAuthenticated}>
+            <RouteLoader
+              title="Đang tải trực chỉ huy"
+              subtitle="Đang tải dữ liệu…"
+              deps={[]}
+            >
+              <Dashboard onLogout={onLogout} />
+            </RouteLoader>
+          </RequireAuth>
+        }
+      />
+
+      <Route
+        path="/duty-tactical"
+        element={
+          <RequireAuth isAuthenticated={isAuthenticated}>
+            <RouteLoader
+              title="Đang tải trực tác chiến"
+              subtitle="Đang tải dữ liệu…"
+              deps={[]}
+            >
+              <Dashboard onLogout={onLogout} />
+            </RouteLoader>
+          </RequireAuth>
+        }
+      />
+
+      <Route
+        path="/settings"
+        element={
+          <RequireAuth isAuthenticated={isAuthenticated}>
+            <RouteLoader
+              title="Đang tải cài đặt"
               deps={[]}
             >
               <Dashboard onLogout={onLogout} />

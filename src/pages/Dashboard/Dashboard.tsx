@@ -17,6 +17,9 @@ const NAV_PATHS: Record<NavItemId, string> = {
   "report-troop": "/daily-report",
   "report-training": "/training-report",
   "report-family": "/family-report",
+  "duty-command": "/duty-command",
+  "duty-tactical": "/duty-tactical",
+  settings: "/settings",
 };
 
 const PATH_TO_NAV: Record<string, NavItemId> = {
@@ -24,6 +27,9 @@ const PATH_TO_NAV: Record<string, NavItemId> = {
   "/daily-report": "report-troop",
   "/training-report": "report-training",
   "/family-report": "report-family",
+  "/duty-command": "duty-command",
+  "/duty-tactical": "duty-tactical",
+  "/settings": "settings",
 };
 
 export default function Dashboard({ onLogout }: Props) {

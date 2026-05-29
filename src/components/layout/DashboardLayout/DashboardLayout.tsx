@@ -1,5 +1,4 @@
-import type { ReactNode } from "react";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -14,7 +13,7 @@ import styles from "./DashboardLayout.module.css";
 
 import {
   EXECUTIVE_NAV,
-  REPORT_NAV_GROUP,
+  getNavGroupLabel,
   type NavItemId,
 } from "../../../types/navigation";
 
@@ -69,6 +68,10 @@ export default function DashboardLayout({
 }: Props) {
   const isExecutive = activeId === EXECUTIVE_NAV.id;
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const groupLabel = getNavGroupLabel(activeId);
+  const showBreadcrumb = Boolean(groupLabel);
+  const showPageHeading = !isExecutive;
+
   return (
     <div
       className={
@@ -82,6 +85,7 @@ export default function DashboardLayout({
         onNavigate={onNavigate}
         onLogout={onLogout}
         collapsed={sidebarCollapsed}
+        onExpand={() => setSidebarCollapsed(false)}
       />
 
       <div
@@ -105,9 +109,9 @@ export default function DashboardLayout({
               <FontAwesomeIcon icon={faBars} />
             </button>
 
-            {!isExecutive && (
+            {showBreadcrumb && (
               <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-                <span>{REPORT_NAV_GROUP.label}</span>
+                <span>{groupLabel}</span>
                 <span className={styles.breadcrumbSep} aria-hidden>
                   /
                 </span>
@@ -115,14 +119,20 @@ export default function DashboardLayout({
               </nav>
             )}
 
-            {!isExecutive && (
+            {activeId === "settings" && (
+              <nav className={styles.breadcrumb} aria-label="Breadcrumb">
+                <span className={styles.breadcrumbCurrent}>{pageTitle}</span>
+              </nav>
+            )}
+
+            {showPageHeading && (
               <h1 id="dashboard-page-heading" className={styles.srOnly}>
                 {pageTitle}
               </h1>
             )}
           </div>
 
-          {isExecutive ? <TopBarActions /> : <TopBarActions />}
+          <TopBarActions />
         </header>
 
         <div className={styles.content}>{children}</div>

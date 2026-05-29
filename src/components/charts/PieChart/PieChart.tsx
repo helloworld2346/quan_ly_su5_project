@@ -75,12 +75,16 @@ export default function PieChart({
           isLarge ? `${styles.header} ${styles.headerCompact}` : styles.header
         }
       >
-        {!isLarge && <h3 className={styles.title}>{chart.name}</h3>}
-        <div className={styles.headerMeta}>
-          {badge && <span className={styles.badge}>{badge}</span>}
-          <span className={styles.rateBadge}>
-            {presentRate.toFixed(1)}% hiện diện
-          </span>
+        <div className={styles.titleContainer}>
+          {!isLarge && <h3 className={styles.title}>{chart.name}</h3>}
+          {badge && (
+            <div className={styles.headerMeta}>
+              <span className={styles.badge}>{badge}</span>
+              <span className={styles.rateBadge}>
+                {presentRate.toFixed(1)}% hiện diện
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
