@@ -67,6 +67,16 @@
   --dialog-confirm-text: var(--text-white);  
   --dialog-confirm-hover-bg: var(--primary-hover);  
   --dialog-info-icon: var(--primary-color);  
+
+    /* Toast variables - Light mode */  
+  --toast-bg: #ffffff;  
+  --toast-message-text: #374151;  
+  --toast-close-text: #6b7280;  
+  --toast-close-hover-text: #374151;  
+  --toast-success-color: #10b981;  
+  --toast-error-color: #ef4444;  
+  --toast-warning-color: #f59e0b;  
+  --toast-info-color: #3b82f6;  
 }
 
 [data-theme="dark"] {
@@ -122,4 +132,11 @@
   --dialog-confirm-text: #121a16;  
   --dialog-confirm-hover-bg: #5aa882;  
   --dialog-info-icon: var(--primary-color);  
+    
+  /* Toast variables - Dark mode */  
+  --toast-bg-dark: #1c2822;  
+  --toast-message-text-dark: #d8e4de;  
+  --toast-close-text-dark: #9fb0a8;  
+  --toast-close-hover-text-dark: #d8e4de;  
+  --toast-info-color-dark: #6bb892;  
 }

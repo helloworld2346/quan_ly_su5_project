@@ -8,11 +8,15 @@ import Button from "../../components/ui/Button/Button";
 import { authService } from "../../services/auth/authService";
 import { storage } from "../../utils/storage";
 import type { LoginRequest } from "../../types/auth";
+import { getErrorMessage } from "../../utils/errorHandler";
+import { useToast } from "../../context/useToast";
+
+import { loginValidation } from "../../utils/validation";  
+
 
 import logo from "../../assets/images/logo-su5.png";
 import loginBg from "../../assets/images/login-bg-dongson.png";
 
-import { getErrorMessage } from "../../utils/errorHandler";
 
 const pageStyle = {
   "--login-bg": `url(${loginBg})`,
@@ -27,11 +31,26 @@ export default function Login({ onSuccess }: Props) {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const { showError, showSuccess } = useToast();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     setLoading(true);
+
+    const usernameError = loginValidation.username(username);
+    if (usernameError) {
+      setError(usernameError);
+      setLoading(false);
+      return;
+    }
+
+    const passwordError = loginValidation.password(password);
+    if (passwordError) {
+      setError(passwordError);
+      setLoading(false);
+      return;
+    }
 
     try {
       const credentials: LoginRequest = {
@@ -43,12 +62,17 @@ export default function Login({ onSuccess }: Props) {
 
       if (response.success && response.Result.token) {
         storage.setToken(response.Result.token);
+        showSuccess("Đăng nhập thành công!");
         onSuccess?.();
       } else {
         setError(response.message || "Đăng nhập thất bại");
       }
     } catch (err) {
-      setError(getErrorMessage(err));
+      if (!err.response) {
+        showError("Không thể kết nối đến server. Vui lòng thử lại.");
+      } else {
+        setError(getErrorMessage(err));
+      }
       console.error("Login error:", err);
     } finally {
       setLoading(false);

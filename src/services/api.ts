@@ -2,12 +2,18 @@ import axios from "axios";
 import { storage } from "../utils/storage";
 
 const api = axios.create({
-  baseURL: "/api",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api",
   headers: {
     "Content-Type": "application/json",
-    accept: "*/*",
   },
 });
+
+type ToastErrorHandler = (message: string) => void;
+let toastErrorHandler: ToastErrorHandler | null = null;
+
+export function setToastErrorHandler(handler: ToastErrorHandler) {
+  toastErrorHandler = handler;
+}
 
 api.interceptors.request.use((config) => {
   const token = storage.getToken();
@@ -20,11 +26,18 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 && storage.getToken()) {
       storage.removeToken();
       storage.clearNavState();
       window.location.href = "/login";
     }
+
+    if (toastErrorHandler && error.response?.status !== 401) {
+      const message =
+        error.response?.data?.message || error.message || "Có lỗi xảy ra";
+      toastErrorHandler(message);
+    }
+
     return Promise.reject(error);
   },
 );

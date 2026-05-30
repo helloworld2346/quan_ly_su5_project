@@ -1,18 +1,18 @@
 export interface Role {
-  roleId: string;
-  roleName: string;
+  roleId: string | null;
+  roleName: string | null;
 }
 
 export interface Account {
-  accountId: string;
-  accountName: string;
+  idTaiKhoan: string;
+  tenDangNhap: string;
+  tenTaiKhoan: string;
+  vaiTro: Role;
+  matKhau: string;
   createdAt: string;
+  updatedAt: string;
   deletedAt: string | null;
   isDeleted: boolean;
-  password: string;
-  role: Role;
-  updatedAt: string;
-  userName: string;
 }
 
 export interface AccountResponse {

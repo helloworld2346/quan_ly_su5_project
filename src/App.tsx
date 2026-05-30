@@ -1,9 +1,13 @@
 import { BrowserRouter } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { authService } from "./services/auth/authService";
 import { storage } from "./utils/storage";
+import { ToastProvider } from "./context/ToastContext";
+import { useToast } from "./context/useToast";
+import ToastContainer from "./components/ui/Toast/ToastContainer";
 import ConfirmDialog from "./components/ui/ConfirmDialog/ConfirmDialog";
 import { useConfirmDialog } from "./components/ui/ConfirmDialog/useConfirmDialog";
+import { setToastErrorHandler } from "./services/api";
 
 import AppRoutes from "./routes/AppRoutes";
 
@@ -13,7 +17,12 @@ function AppContent() {
     return !!token;
   });
 
+  const { showError } = useToast();
   const { confirm, isOpen, options, onConfirm, onCancel } = useConfirmDialog();
+
+  useEffect(() => {
+    setToastErrorHandler(showError);
+  }, [showError]);
 
   const handleLogout = async () => {
     const confirmed = await confirm({
@@ -49,6 +58,7 @@ function AppContent() {
           onLogout={handleLogout}
         />
       </BrowserRouter>
+      <ToastContainer />
       <ConfirmDialog
         isOpen={isOpen}
         title={options.title}
@@ -64,5 +74,9 @@ function AppContent() {
 }
 
 export default function App() {
-  return <AppContent />;
+  return (
+    <ToastProvider>
+      <AppContent />
+    </ToastProvider>
+  );
 }

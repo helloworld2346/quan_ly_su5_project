@@ -95,22 +95,26 @@ export default function Settings() {
           <div className={styles.infoGrid}>
             <div className={styles.formGroup}>
               <label>Tên đăng nhập</label>
-              <input type="text" value={account.userName} disabled />
+              <input type="text" value={account.tenDangNhap} disabled />
             </div>
 
             <div className={styles.formGroup}>
               <label>Tên tài khoản</label>
-              <input type="text" value={account.accountName} disabled />
+              <input type="text" value={account.tenTaiKhoan} disabled />
             </div>
 
             <div className={styles.formGroup}>
               <label>Vai trò</label>
-              <input type="text" value={account.role.roleName} disabled />
+              <input
+                type="text"
+                value={account.vaiTro?.roleName || "Chưa phân vai trò"}
+                disabled
+              />
             </div>
 
             <div className={styles.formGroup}>
               <label>Account ID</label>
-              <input type="text" value={account.accountId} disabled />
+              <input type="text" value={account.idTaiKhoan} disabled />
             </div>
 
             <div className={styles.formGroup}>

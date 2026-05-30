@@ -1,4 +1,3 @@
-// src/utils/errorHandler.ts
 import type { AxiosError } from "axios";
 
 interface ErrorResponse {
@@ -19,6 +18,10 @@ export function getErrorMessage(error: unknown): string {
         return "Tên đăng nhập hoặc mật khẩu không đúng";
       }
 
+      if (axiosError.response?.status === 404) {
+        return "Tên đăng nhập hoặc mật khẩu không đúng";
+      }
+
       if (axiosError.response?.status === 400) {
         return "Dữ liệu không hợp lệ";
       }
@@ -26,7 +29,6 @@ export function getErrorMessage(error: unknown): string {
       return "Đăng nhập thất bại. Vui lòng thử lại.";
     }
 
-    // Lỗi network
     return "Không thể kết nối đến server. Vui lòng thử lại.";
   }
 
