@@ -49,32 +49,34 @@
   --primary-color: #6bb892;
   --primary-hover: #5aa67f;
 
-  --text-dark: #d8e4de;
-  --login-text: #d8e4de;
-  --login-text-muted: #9fb0a8;
-  --login-border: #354840;
+  --text-dark: #dce8e2;
+  --login-text: #dce8e2;
+  --login-text-muted: #9eb0a6;
+  --login-border: #3a4f45;
 
-  --dashboard-bg: #121a16;
-  --surface-card: #1c2822;
-  --surface-muted: #243329;
-  --topbar-bg: rgba(22, 32, 28, 0.88);
-  --topbar-btn-bg: #243029;
-  --topbar-btn-hover: #2d3b34;
+  /* Nền xám-xanh, không đen gắt */
+  --dashboard-bg: #141c18;
+  --surface-card: #1e2a24;
+  --surface-muted: #263530;
+  --topbar-bg: rgba(24, 34, 30, 0.9);
+  --topbar-btn-bg: #263530;
+  --topbar-btn-hover: #2f4038;
 
-  --sidebar-bg-top: #152820;
-  --sidebar-bg-bottom: #101c17;
+  --sidebar-bg-top: #162820;
+  --sidebar-bg-bottom: #111c17;
 
   --gold-color: #d4b85a;
 
-  --on-surface: #e4ede8;
-  --on-surface-muted: #b0c2b8;
+  /* Chữ trên card — rõ, không xám nhạt */
+  --on-surface: #eef4f0;
+  --on-surface-muted: #c5d4cc;
 
   --rate-badge-fg: #fdba74;
   --rate-badge-bg: rgba(251, 146, 60, 0.28);
   --rate-badge-border: rgba(253, 186, 116, 0.45);
 
-  --tooltip-bg: #243329;
-  --tooltip-fg: #eef5f1;
-  --tooltip-muted: #b5c9be;
-  --legend-hover-bg: rgba(107, 184, 146, 0.14);
+  --tooltip-bg: #2a3832;
+  --tooltip-fg: #f2f8f4;
+  --tooltip-muted: #b8ccc2;
+  --legend-hover-bg: rgba(107, 184, 146, 0.18);
 }

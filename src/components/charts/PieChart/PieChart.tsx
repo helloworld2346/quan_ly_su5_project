@@ -50,8 +50,8 @@ export default function PieChart({
   const [hovered, setHovered] = useState<AttendanceKey | null>(null);
 
   const isLarge = size === "large";
-  const radius = isLarge ? 92 : 54;
-  const stroke = isLarge ? 30 : 18;
+  const radius = isLarge ? 92 : 62;
+const stroke = isLarge ? 30 : 20;
   const viewSize = (radius + stroke) * 2;
   const center = viewSize / 2;
   const circumference = 2 * Math.PI * radius;
