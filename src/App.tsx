@@ -21,6 +21,7 @@ export default function App() {
       console.error("Logout failed:", error);
     } finally {
       storage.removeToken();
+      storage.clearNavState();
       setIsAuthenticated(false);
     }
   };

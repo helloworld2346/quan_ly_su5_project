@@ -12,6 +12,8 @@ import type { LoginRequest } from "../../types/auth";
 import logo from "../../assets/images/logo-su5.png";
 import loginBg from "../../assets/images/login-bg-dongson.png";
 
+import { getErrorMessage } from "../../utils/errorHandler";
+
 const pageStyle = {
   "--login-bg": `url(${loginBg})`,
 } as React.CSSProperties;
@@ -46,7 +48,7 @@ export default function Login({ onSuccess }: Props) {
         setError(response.message || "Đăng nhập thất bại");
       }
     } catch (err) {
-      setError("Không thể kết nối đến server. Vui lòng thử lại.");
+      setError(getErrorMessage(err));
       console.error("Login error:", err);
     } finally {
       setLoading(false);
