@@ -110,3 +110,14 @@
 .form {
   width: 100%;
 }
+
+.error {  
+  margin: 0 0 20px;  
+  padding: 12px 16px;  
+  background-color: #fee2e2;  
+  border: 1px solid #fecaca;  
+  border-radius: 8px;  
+  color: #dc2626;  
+  font-size: 14px;  
+  text-align: center;  
+}

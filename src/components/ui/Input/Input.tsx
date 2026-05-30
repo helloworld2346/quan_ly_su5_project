@@ -11,6 +11,9 @@ type Props = {
   placeholder?: string;
   id?: string;
   variant?: "default" | "compact";
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  disabled?: boolean;
 };
 
 function toFieldId(label: string) {
@@ -27,6 +30,9 @@ export default function Input({
   placeholder,
   id,
   variant = "default",
+  value,
+  onChange,
+  disabled = false,
 }: Props) {
   const fieldId = id ?? toFieldId(label);
 
@@ -52,6 +58,9 @@ export default function Input({
           placeholder={placeholder}
           autoComplete={isPasswordType ? "current-password" : "username"}
           className={isPasswordType ? styles.passwordInput : ""}
+          value={value}
+          onChange={onChange}
+          disabled={disabled}
         />
 
         {isPasswordType && (
@@ -61,6 +70,7 @@ export default function Input({
             onClick={() => setShowPassword((prev) => !prev)}
             aria-label={showPassword ? "Ẩn mật khẩu" : "Hiển thị mật khẩu"}
             title={showPassword ? "Ẩn mật khẩu" : "Hiển thị mật khẩu"}
+            disabled={disabled}
           >
             <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
           </button>

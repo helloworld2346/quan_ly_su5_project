@@ -4,12 +4,14 @@ type Props = {
   text: string;
   type?: "button" | "submit";
   variant?: "default" | "compact";
+  disabled?: boolean;
 };
 
 export default function Button({
   text,
   type = "submit",
   variant = "default",
+  disabled = false,
 }: Props) {
   const className =
     variant === "compact"
@@ -17,7 +19,7 @@ export default function Button({
       : styles.button;
 
   return (
-    <button type={type} className={className}>
+    <button type={type} className={className} disabled={disabled}>
       {text}
     </button>
   );

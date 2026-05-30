@@ -1,25 +1,56 @@
-import type { CSSProperties, FormEvent } from "react";
+import { useState } from "react";
+import type { FormEvent } from "react";
 
 import styles from "./Login.module.css";
 
 import Input from "../../components/ui/Input/Input";
 import Button from "../../components/ui/Button/Button";
+import { authService } from "../../services/auth/authService";
+import { storage } from "../../utils/storage";
+import type { LoginRequest } from "../../types/auth";
 
 import logo from "../../assets/images/logo-su5.png";
 import loginBg from "../../assets/images/login-bg-dongson.png";
 
 const pageStyle = {
   "--login-bg": `url(${loginBg})`,
-} as CSSProperties;
+} as React.CSSProperties;
 
 type Props = {
   onSuccess?: () => void;
 };
 
 export default function Login({ onSuccess }: Props) {
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    onSuccess?.();
+    setError("");
+    setLoading(true);
+
+    try {
+      const credentials: LoginRequest = {
+        userName: username,
+        password: password,
+      };
+
+      const response = await authService.login(credentials);
+
+      if (response.success && response.Result.token) {
+        storage.setToken(response.Result.token);
+        onSuccess?.();
+      } else {
+        setError(response.message || "Đăng nhập thất bại");
+      }
+    } catch (err) {
+      setError("Không thể kết nối đến server. Vui lòng thử lại.");
+      console.error("Login error:", err);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -29,9 +60,7 @@ export default function Login({ onSuccess }: Props) {
 
         <header className={styles.branding}>
           <p className={styles.unitName}>Sư đoàn 5</p>
-          <p className={styles.appName}>
-            Phần mềm thống kê báo ban quân số
-          </p>
+          <p className={styles.appName}>Phần mềm thống kê báo ban quân số</p>
         </header>
 
         <div className={styles.divider} role="presentation" />
@@ -40,12 +69,17 @@ export default function Login({ onSuccess }: Props) {
           Đăng nhập
         </h1>
 
+        {error && <p className={styles.error}>{error}</p>}
+
         <form className={styles.form} onSubmit={handleSubmit}>
           <Input
             variant="compact"
             label="Tên đăng nhập"
             type="text"
             placeholder="Nhập tên đăng nhập"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            disabled={loading}
           />
 
           <Input
@@ -53,9 +87,16 @@ export default function Login({ onSuccess }: Props) {
             label="Mật khẩu"
             type="password"
             placeholder="Nhập mật khẩu"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={loading}
           />
 
-          <Button variant="compact" text="Đăng nhập" />
+          <Button
+            variant="compact"
+            text={loading ? "Đang đăng nhập..." : "Đăng nhập"}
+            disabled={loading}
+          />
         </form>
       </section>
     </main>
