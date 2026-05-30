@@ -1,0 +1,198 @@
+.container {  
+  width: 100%;  
+  max-width: 900px;  
+  margin: 0 auto;  
+}  
+  
+.header {  
+  display: flex;  
+  align-items: center;  
+  gap: 16px;  
+  padding-bottom: 20px;  
+  border-bottom: 1px solid var(--login-border);  
+  margin-bottom: 24px;  
+}  
+  
+.headerIcon {  
+  width: 48px;  
+  height: 48px;  
+  display: flex;  
+  align-items: center;  
+  justify-content: center;  
+  background: var(--primary-color);  
+  border-radius: 12px;  
+  color: var(--text-white);  
+  font-size: 20px;  
+}  
+  
+.headerContent {  
+  flex: 1;  
+}  
+  
+.title {  
+  margin: 0 0 4px;  
+  font-size: 24px;  
+  font-weight: 700;  
+  color: var(--login-text);  
+}  
+  
+.subtitle {  
+  margin: 0;  
+  font-size: 14px;  
+  color: var(--login-text-muted);  
+}  
+  
+.card {  
+  background: var(--text-white);  
+  border: 1px solid var(--login-border);  
+  border-top: 4px solid var(--primary-color);  
+  border-radius: 14px;  
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);  
+  padding: 28px 32px;  
+}  
+  
+.cardHeader {  
+  display: flex;  
+  align-items: center;  
+  gap: 12px;  
+  margin-bottom: 24px;  
+  padding-bottom: 16px;  
+  border-bottom: 1px solid var(--login-border);  
+}  
+  
+.cardTitle {  
+  margin: 0;  
+  font-size: 18px;  
+  font-weight: 700;  
+  color: var(--primary-color);  
+}  
+  
+.form {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 20px;  
+}  
+  
+.formGroup {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 8px;  
+}  
+  
+.formGroup label {  
+  font-size: 14px;  
+  font-weight: 600;  
+  color: var(--login-text-muted);  
+  text-transform: uppercase;  
+  letter-spacing: 0.3px;  
+}  
+  
+.formGroup input {  
+  height: 48px;  
+  padding: 0 16px;  
+  border: 1px solid var(--login-border);  
+  border-radius: 10px;  
+  font-size: 15px;  
+  font-family: inherit;  
+  color: var(--login-text);  
+  background: #f8faf9;  
+  outline: none;  
+  transition: border-color 0.15s, background 0.15s;  
+}  
+  
+.formGroup input:focus {  
+  border-color: var(--primary-color);  
+  background: var(--text-white);  
+  box-shadow: 0 0 0 3px rgba(31, 92, 63, 0.12);  
+}  
+  
+.formGroup input:disabled {  
+  cursor: not-allowed;  
+  opacity: 0.7;  
+}  
+  
+.infoGrid {  
+  display: grid;  
+  grid-template-columns: repeat(2, 1fr);  
+  gap: 20px;  
+}  
+  
+.fullWidth {  
+  grid-column: 1 / -1;  
+}  
+  
+.loading {  
+  display: flex;  
+  flex-direction: column;  
+  align-items: center;  
+  justify-content: center;  
+  padding: 80px 20px;  
+  gap: 16px;  
+}  
+  
+.loadingSpinner {  
+  width: 40px;  
+  height: 40px;  
+  border: 3px solid var(--login-border);  
+  border-top-color: var(--primary-color);  
+  border-radius: 50%;  
+  animation: spin 0.8s linear infinite;  
+}  
+  
+@keyframes spin {  
+  to {  
+    transform: rotate(360deg);  
+  }  
+}  
+  
+.loadingText {  
+  font-size: 15px;  
+  color: var(--login-text-muted);  
+}  
+  
+.error {  
+  padding: 16px 20px;  
+  background: #fee2e2;  
+  border: 1px solid #fecaca;  
+  border-radius: 12px;  
+  color: #dc2626;  
+  font-size: 15px;  
+  text-align: center;  
+}  
+  
+.errorIcon {  
+  display: block;  
+  font-size: 32px;  
+  margin-bottom: 12px;  
+}  
+  
+@media (max-width: 768px) {  
+  .container {  
+    padding: 0;  
+  }  
+  
+  .header {  
+    flex-direction: column;  
+    text-align: center;  
+    gap: 12px;  
+  }  
+  
+  .title {  
+    font-size: 20px;  
+  }  
+  
+  .card {  
+    padding: 20px;  
+    border-radius: 12px;  
+  }  
+  
+  .infoGrid {  
+    grid-template-columns: 1fr;  
+    gap: 16px;  
+  }  
+  
+  .formGroup input {  
+    height: 44px;  
+    font-size: 14px;  
+  }  
+}

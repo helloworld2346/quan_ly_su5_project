@@ -1,17 +1,13 @@
+import { Suspense } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import DashboardLayout from "../../components/layout/DashboardLayout/DashboardLayout";
-import ExecutiveDashboard from "../Executive/ExecutiveDashboard";
-import DailyTroopReport from "../DailyReport/DailyTroopReport";
-import TrainingReport from "../TrainingReport/TrainingReport";
-import FamilyReport from "../FamilyReport/FamilyReport";
-import CommandDuty from "../CommandDuty/CommandDuty";
-import TacticalDuty from "../TacticalDuty/TacticalDuty";
-import Settings from "../Settings/Settings";
-
+import LoadingScreen from "../../components/ui/LoadingScreen/LoadingScreen";
 import {
   NAV_PAGE_TITLES,
   getIdByPath,
   getPathById,
+  getNavItemById,
+  getLoadingText,
   type NavItemId,
 } from "../../types/navigation";
 
@@ -24,9 +20,16 @@ export default function Dashboard({ onLogout }: Props) {
   const location = useLocation();
 
   const activeId = getIdByPath(location.pathname);
+  const navItem = getNavItemById(activeId);
+  const ActiveComponent = navItem?.component;
+  const loadingText = getLoadingText(activeId);
 
   function handleNavigate(id: NavItemId) {
     navigate(getPathById(id));
+  }
+
+  if (!ActiveComponent) {
+    return <div>Page not found</div>;
   }
 
   return (
@@ -36,26 +39,16 @@ export default function Dashboard({ onLogout }: Props) {
       onNavigate={handleNavigate}
       onLogout={onLogout}
     >
-      {(() => {
-        switch (activeId) {
-          case "executive":
-            return <ExecutiveDashboard />;
-          case "report-troop":
-            return <DailyTroopReport />;
-          case "report-training":
-            return <TrainingReport />;
-          case "report-family":
-            return <FamilyReport />;
-          case "duty-command":
-            return <CommandDuty />;
-          case "duty-tactical":
-            return <TacticalDuty />;
-          case "settings":
-            return <Settings />;
-          default:
-            return <ExecutiveDashboard />;
+      <Suspense
+        fallback={
+          <LoadingScreen
+            title={loadingText.title}
+            subtitle={loadingText.subtitle}
+          />
         }
-      })()}
+      >
+        <ActiveComponent />
+      </Suspense>
     </DashboardLayout>
   );
 }

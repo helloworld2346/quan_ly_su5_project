@@ -1,3 +1,5 @@
+import { lazy } from "react";
+
 export type NavItemId =
   | "executive"
   | "report-troop"
@@ -13,7 +15,22 @@ export type NavItem = {
   path: string;
   loadingTitle?: string;
   loadingSubtitle?: string;
+  component: React.LazyExoticComponent<React.ComponentType>;
 };
+
+const ExecutiveDashboard = lazy(
+  () => import("../pages/Executive/ExecutiveDashboard"),
+);
+const DailyTroopReport = lazy(
+  () => import("../pages/DailyReport/DailyTroopReport"),
+);
+const TrainingReport = lazy(
+  () => import("../pages/TrainingReport/TrainingReport"),
+);
+const FamilyReport = lazy(() => import("../pages/FamilyReport/FamilyReport"));
+const CommandDuty = lazy(() => import("../pages/CommandDuty/CommandDuty"));
+const TacticalDuty = lazy(() => import("../pages/TacticalDuty/TacticalDuty"));
+const Settings = lazy(() => import("../pages/Settings/Settings"));
 
 export const EXECUTIVE_NAV: NavItem = {
   id: "executive",
@@ -21,6 +38,7 @@ export const EXECUTIVE_NAV: NavItem = {
   path: "/dashboard",
   loadingTitle: "Đang tải Dashboard",
   loadingSubtitle: "Đang đồng bộ dữ liệu quân số…",
+  component: ExecutiveDashboard,
 };
 
 export const REPORT_NAV_GROUP = {
@@ -32,6 +50,7 @@ export const REPORT_NAV_GROUP = {
       path: "/daily-report",
       loadingTitle: "Đang tải báo cáo ngày",
       loadingSubtitle: "Đang tải dữ liệu…",
+      component: DailyTroopReport,
     },
     {
       id: "report-training" as const,
@@ -39,6 +58,7 @@ export const REPORT_NAV_GROUP = {
       path: "/training-report",
       loadingTitle: "Đang tải báo cáo huấn luyện",
       loadingSubtitle: "Đang tải dữ liệu…",
+      component: TrainingReport,
     },
     {
       id: "report-family" as const,
@@ -46,6 +66,7 @@ export const REPORT_NAV_GROUP = {
       path: "/family-report",
       loadingTitle: "Đang tải báo cáo thân nhân thăm nuôi",
       loadingSubtitle: "Đang tải dữ liệu…",
+      component: FamilyReport,
     },
   ],
 };
@@ -59,6 +80,7 @@ export const DUTY_NAV_GROUP = {
       path: "/duty-command",
       loadingTitle: "Đang tải trực chỉ huy",
       loadingSubtitle: "Đang tải dữ liệu…",
+      component: CommandDuty,
     },
     {
       id: "duty-tactical" as const,
@@ -66,6 +88,7 @@ export const DUTY_NAV_GROUP = {
       path: "/duty-tactical",
       loadingTitle: "Đang tải trực ban tác chiến",
       loadingSubtitle: "Đang tải dữ liệu…",
+      component: TacticalDuty,
     },
   ],
 };
@@ -76,6 +99,7 @@ export const SETTINGS_NAV: NavItem = {
   path: "/settings",
   loadingTitle: "Đang tải cài đặt",
   loadingSubtitle: "Đang tải dữ liệu…",
+  component: Settings,
 };
 
 export const NAV_PAGE_TITLES: Record<NavItemId, string | undefined> = {
@@ -114,4 +138,19 @@ export function getNavGroupLabel(activeId: NavItemId): string | null {
     return DUTY_NAV_GROUP.label;
   }
   return null;
+}
+
+export function getNavItemById(id: NavItemId): NavItem | undefined {
+  return ALL_NAV_ITEMS.find((item) => item.id === id);
+}
+
+export function getLoadingText(id: NavItemId): {
+  title: string;
+  subtitle: string;
+} {
+  const item = getNavItemById(id);
+  return {
+    title: item?.loadingTitle || "Đang tải",
+    subtitle: item?.loadingSubtitle || "Vui lòng chờ…",
+  };
 }

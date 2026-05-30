@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useState, useEffect } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -16,6 +16,8 @@ import {
   getNavGroupLabel,
   type NavItemId,
 } from "../../../types/navigation";
+import { accountService } from "../../../services/account/accountService";
+import type { Account } from "../../../types/account";
 
 type Props = {
   activeId: NavItemId;
@@ -27,6 +29,33 @@ type Props = {
 
 function TopBarActions() {
   const [isDark, setIsDark] = useState(false);
+  const [account, setAccount] = useState<Account | null>(null);
+
+  useEffect(() => {
+    const fetchAccount = async () => {
+      try {
+        const response = await accountService.getAccount();
+        if (response.success) {
+          setAccount(response.Result);
+        }
+      } catch (error) {
+        console.error("Failed to fetch account:", error);
+      }
+    };
+
+    fetchAccount();
+  }, []);
+
+  const getAvatarText = () => {
+    if (!account) return "QT";
+    const name = account.userName || account.accountName;
+    return name.slice(0, 2).toUpperCase();
+  };
+
+  const getDisplayName = () => {
+    if (!account) return "Quản trị viên";
+    return account.accountName || account.userName;
+  };
 
   return (
     <div className={styles.topBarRight}>
@@ -51,9 +80,9 @@ function TopBarActions() {
 
       <div className={styles.userBlock}>
         <span className={styles.userAvatar} aria-hidden>
-          QT
+          {getAvatarText()}
         </span>
-        <span className={styles.userName}>Quản trị viên</span>
+        <span className={styles.userName}>{getDisplayName()}</span>
       </div>
     </div>
   );
