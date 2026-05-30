@@ -1,0 +1,129 @@
+.container {  
+  position: fixed;  
+  bottom: 24px;  
+  right: 24px;  
+  z-index: 9999;  
+  display: flex;  
+  flex-direction: column-reverse; 
+  gap: 12px;  
+}
+  
+.toast {  
+  display: flex;  
+  align-items: center;  
+  gap: 12px;  
+  min-width: 300px;  
+  max-width: 400px;  
+  padding: 16px;  
+  border-radius: 8px;  
+  background: var(--toast-bg, #ffffff);  
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);  
+  backdrop-filter: blur(10px);  
+  animation: slideIn 0.3s ease-out;  
+}  
+  
+.toast.removing {  
+  animation: slideOut 0.3s ease-in forwards;  
+}  
+  
+@keyframes slideIn {  
+  from {  
+    transform: translateX(100%);  
+    opacity: 0;  
+  }  
+  to {  
+    transform: translateX(0);  
+    opacity: 1;  
+  }  
+}  
+  
+@keyframes slideOut {  
+  from {  
+    transform: translateX(0);  
+    opacity: 1;  
+  }  
+  to {  
+    transform: translateX(100%);  
+    opacity: 0;  
+  }  
+}  
+  
+.icon {  
+  font-size: 20px;  
+  flex-shrink: 0;  
+}  
+  
+.message {  
+  flex: 1;  
+  font-size: 14px;  
+  line-height: 1.4;  
+  color: var(--toast-message-text, #374151);  
+}  
+  
+.closeButton {  
+  background: none;  
+  border: none;  
+  cursor: pointer;  
+  padding: 4px;  
+  color: var(--toast-close-text, #6b7280);  
+  transition: color 0.2s;  
+  flex-shrink: 0;  
+}  
+  
+.closeButton:hover {  
+  color: var(--toast-close-hover-text, #374151);  
+}  
+  
+/* Type colors */  
+.success {  
+  border-left: 4px solid var(--toast-success-color, #10b981);  
+}  
+  
+.success .icon {  
+  color: var(--toast-success-color, #10b981);  
+}  
+  
+.error {  
+  border-left: 4px solid var(--toast-error-color, #ef4444);  
+}  
+  
+.error .icon {  
+  color: var(--toast-error-color, #ef4444);  
+}  
+  
+.warning {  
+  border-left: 4px solid var(--toast-warning-color, #f59e0b);  
+}  
+  
+.warning .icon {  
+  color: var(--toast-warning-color, #f59e0b);  
+}  
+  
+.info {  
+  border-left: 4px solid var(--toast-info-color, #3b82f6);  
+}  
+  
+.info .icon {  
+  color: var(--toast-info-color, #3b82f6);  
+}  
+  
+/* Dark mode overrides */  
+[data-theme="dark"] .toast {  
+  background: var(--toast-bg-dark, #1c2822);  
+}  
+  
+[data-theme="dark"] .message {  
+  color: var(--toast-message-text-dark, #d8e4de);  
+}  
+  
+[data-theme="dark"] .closeButton {  
+  color: var(--toast-close-text-dark, #9fb0a8);  
+}  
+  
+[data-theme="dark"] .closeButton:hover {  
+  color: var(--toast-close-hover-text-dark, #d8e4de);  
+}  
+  
+[data-theme="dark"] .info .icon {  
+  color: var(--toast-info-color-dark, #6bb892);  
+}

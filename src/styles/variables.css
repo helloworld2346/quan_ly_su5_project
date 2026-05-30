@@ -1,38 +1,51 @@
 /* src/styles/variables.css */
 :root {
+  color-scheme: light;
+
+  /* --- BRAND COLORS (Hệ màu chủ đạo - Xanh lục) --- */
   --primary-color: #1f5c3f;
   --primary-hover: #184a32;
-
-  --text-white: #ffffff;
-  --text-dark: #1d1d1d;
-
   --gold-color: #f4d35e;
 
+  /* --- SYSTEM STATS (Dùng chung cho cả 2 mode) --- */
+  --dialog-danger-bg: #ef4444;
+  --dialog-danger-hover-bg: #dc2626;
+  --dialog-danger-icon: #ef4444;
+  --dialog-warning-bg: #f59e0b;
+  --dialog-warning-hover-bg: #d97706;
+  --dialog-warning-icon: #f59e0b;
+
+  /* --- GENERAL TEXT & BORDERS --- */
+  --text-white: #ffffff;
+  --text-dark: #1d1d1d;
   --border-color: #d7d7d7;
   --shadow-color: rgba(0, 0, 0, 0.2);
 
+  /* --- LAYOUT SIZES --- */
+  --sidebar-width: 280px;
+  --sidebar-collapsed-width: 88px;
+
+  /* --- LOGIN SYSTEM --- */
   --login-text: #1a2e24;
   --login-text-muted: #4a5f54;
   --login-border: #cfd9d3;
 
+  /* --- CORE APP LAYOUT (LIGHT MODE) --- */
   --sidebar-bg-top: #145338;
   --sidebar-bg-bottom: #0d3b28;
   --dashboard-bg: #f0f4f2;
-
-  --sidebar-width: 280px;
-  --sidebar-collapsed-width: 88px;
-
-  /* Surface (card, input trên nền dashboard) */
-  --surface-card: #ffffff;
-  --surface-muted: #f4f7f5;
+  
   --topbar-bg: rgba(255, 255, 255, 0.92);
   --topbar-btn-bg: #ffffff;
   --topbar-btn-hover: #f0f5f2;
 
-  /* Chữ trên card (PieChart, bảng) */
+  /* --- SURFACES & COMPONENTS (LIGHT MODE) --- */
+  --surface-card: #ffffff;
+  --surface-muted: #f4f7f5;
   --on-surface: #152a22;
   --on-surface-muted: #3a5248;
 
+  /* --- BADGES & TOOLTIPS (LIGHT MODE) --- */
   --rate-badge-fg: #c2410c;
   --rate-badge-bg: rgba(234, 88, 12, 0.16);
   --rate-badge-border: transparent;
@@ -41,42 +54,89 @@
   --tooltip-fg: #f5faf7;
   --tooltip-muted: #c8d9d0;
   --legend-hover-bg: rgba(31, 92, 63, 0.08);
+
+  /* --- DIALOGS (LIGHT MODE) --- */  
+  --dialog-bg: #ffffff;  
+  --dialog-overlay-bg: rgba(0, 0, 0, 0.5);  
+  --dialog-title-text: #111827;  
+  --dialog-message-text: #6b7280;  
+  --dialog-cancel-bg: #f3f4f6;  
+  --dialog-cancel-text: #374151;  
+  --dialog-cancel-hover-bg: #e5e7eb;  
+  --dialog-confirm-bg: var(--primary-color);  
+  --dialog-confirm-text: var(--text-white);  
+  --dialog-confirm-hover-bg: var(--primary-hover);  
+  --dialog-info-icon: var(--primary-color);  
+
+    /* Toast variables - Light mode */  
+  --toast-bg: #ffffff;  
+  --toast-message-text: #374151;  
+  --toast-close-text: #6b7280;  
+  --toast-close-hover-text: #374151;  
+  --toast-success-color: #10b981;  
+  --toast-error-color: #ef4444;  
+  --toast-warning-color: #f59e0b;  
+  --toast-info-color: #3b82f6;  
 }
 
 [data-theme="dark"] {
   color-scheme: dark;
 
+  /* --- BRAND COLORS (DARK MODE) --- */
   --primary-color: #6bb892;
   --primary-hover: #5aa67f;
-
-  --text-dark: #dce8e2;
-  --login-text: #dce8e2;
-  --login-text-muted: #9eb0a6;
-  --login-border: #3a4f45;
-
-  /* Nền xám-xanh, không đen gắt */
-  --dashboard-bg: #141c18;
-  --surface-card: #1e2a24;
-  --surface-muted: #263530;
-  --topbar-bg: rgba(24, 34, 30, 0.9);
-  --topbar-btn-bg: #263530;
-  --topbar-btn-hover: #2f4038;
-
-  --sidebar-bg-top: #162820;
-  --sidebar-bg-bottom: #111c17;
-
   --gold-color: #d4b85a;
 
-  /* Chữ trên card — rõ, không xám nhạt */
-  --on-surface: #eef4f0;
-  --on-surface-muted: #c5d4cc;
+  /* --- GENERAL TEXT --- */
+  --text-dark: #d8e4de;
 
+  /* --- LOGIN SYSTEM (DARK MODE) --- */
+  --login-text: #d8e4de;
+  --login-text-muted: #9fb0a8;
+  --login-border: #354840;
+
+  /* --- CORE APP LAYOUT (DARK MODE) --- */
+  --sidebar-bg-top: #152820;
+  --sidebar-bg-bottom: #101c17;
+  --dashboard-bg: #121a16;
+  
+  --topbar-bg: rgba(22, 32, 28, 0.88);
+  --topbar-btn-bg: #243029;
+  --topbar-btn-hover: #2d3b34;
+
+  /* --- SURFACES & COMPONENTS (DARK MODE) --- */
+  --surface-card: #1c2822;
+  --surface-muted: #243329;
+  --on-surface: #e4ede8;
+  --on-surface-muted: #b0c2b8;
+
+  /* --- BADGES & TOOLTIPS (DARK MODE) --- */
   --rate-badge-fg: #fdba74;
   --rate-badge-bg: rgba(251, 146, 60, 0.28);
   --rate-badge-border: rgba(253, 186, 116, 0.45);
 
-  --tooltip-bg: #2a3832;
-  --tooltip-fg: #f2f8f4;
-  --tooltip-muted: #b8ccc2;
-  --legend-hover-bg: rgba(107, 184, 146, 0.18);
+  --tooltip-bg: #243329;
+  --tooltip-fg: #eef5f1;
+  --tooltip-muted: #b5c9be;
+  --legend-hover-bg: rgba(107, 184, 146, 0.14);
+    
+  /* --- DIALOGS (DARK MODE) --- */  
+  --dialog-bg: #1c2822;  
+  --dialog-overlay-bg: rgba(0, 0, 0, 0.7);  
+  --dialog-title-text: #d8e4de;  
+  --dialog-message-text: #9fb0a8;  
+  --dialog-cancel-bg: #2a3a32;  
+  --dialog-cancel-text: #d8e4de;  
+  --dialog-cancel-hover-bg: #3a4a42;  
+  --dialog-confirm-bg: var(--primary-color);  
+  --dialog-confirm-text: #121a16;  
+  --dialog-confirm-hover-bg: #5aa882;  
+  --dialog-info-icon: var(--primary-color);  
+    
+  /* Toast variables - Dark mode */  
+  --toast-bg-dark: #1c2822;  
+  --toast-message-text-dark: #d8e4de;  
+  --toast-close-text-dark: #9fb0a8;  
+  --toast-close-hover-text-dark: #d8e4de;  
+  --toast-info-color-dark: #6bb892;  
 }

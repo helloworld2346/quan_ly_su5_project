@@ -46,16 +46,16 @@ function TopBarActions({ isDark, onToggleTheme }: TopBarActionsProps) {
     fetchAccount();
   }, []);
 
-  const getAvatarText = () => {
-    if (!account) return "QT";
-    const name = account.userName || account.accountName;
-    return name.slice(0, 2).toUpperCase();
-  };
+const getAvatarText = () => {
+  if (!account) return "QT";
+  const name = account.tenDangNhap || account.tenTaiKhoan || "";
+  return name.slice(0, 2).toUpperCase();
+};
 
-  const getDisplayName = () => {
-    if (!account) return "Quản trị viên";
-    return account.accountName || account.userName;
-  };
+const getDisplayName = () => {
+  if (!account) return "Quản trị viên";
+  return account.tenTaiKhoan || account.tenDangNhap || "Người dùng";
+};
 
   return (
     <div className={styles.topBarRight}>
@@ -107,10 +107,7 @@ export default function DashboardLayout({
     .filter(Boolean)
     .join(" ");
 
-  const mainClass = [
-    styles.main,
-    sidebarCollapsed ? styles.mainCollapsed : "",
-  ]
+  const mainClass = [styles.main, sidebarCollapsed ? styles.mainCollapsed : ""]
     .filter(Boolean)
     .join(" ");
 
