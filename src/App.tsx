@@ -1,23 +1,33 @@
 import { BrowserRouter } from "react-router-dom";
 import { useState } from "react";
+import { authService } from "./services/auth/authService";
+import { storage } from "./utils/storage";
 
 import AppRoutes from "./routes/AppRoutes";
 
 export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    const token = localStorage.getItem("token");
-    return !!token;
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+const handleLogout = async () => {
+  try {
+    const token = storage.getToken();
+    if (token) {
+      await authService.logout(token);
+    }
+  } catch (error) {
+    console.error("Logout failed:", error);
+  } finally {
+    storage.removeToken();
+    setIsAuthenticated(false);
+  }
+};
 
   return (
     <BrowserRouter>
       <AppRoutes
         isAuthenticated={isAuthenticated}
         onLoginSuccess={() => setIsAuthenticated(true)}
-        onLogout={() => {
-          setIsAuthenticated(false);
-          localStorage.removeItem("token");
-        }}
+        onLogout={handleLogout}
       />
     </BrowserRouter>
   );

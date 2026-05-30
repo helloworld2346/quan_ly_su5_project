@@ -12,3 +12,13 @@ export interface LoginResponse {
     token: string;
   };
 }
+
+export interface LogoutRequest {
+  token: string;
+}
+
+export interface LogoutResponse {
+  success: boolean;
+  code: number;
+  message: string;
+}
