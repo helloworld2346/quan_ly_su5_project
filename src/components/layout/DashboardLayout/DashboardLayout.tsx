@@ -1,12 +1,7 @@
-import { type ReactNode, useState, useEffect } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBars,
-  faBell,
-  faMoon,
-  faSun,
-} from "@fortawesome/free-solid-svg-icons";
+import { faBars, faBell } from "@fortawesome/free-solid-svg-icons";
 
 import Sidebar from "../Sidebar/Sidebar";
 import styles from "./DashboardLayout.module.css";
@@ -18,6 +13,7 @@ import {
 } from "../../../types/navigation";
 import { accountService } from "../../../services/account/accountService";
 import type { Account } from "../../../types/account";
+import { useTheme, ThemeToggle } from "../../../theme";
 
 type Props = {
   activeId: NavItemId;
@@ -27,8 +23,12 @@ type Props = {
   onLogout?: () => void;
 };
 
-function TopBarActions() {
-  const [isDark, setIsDark] = useState(false);
+type TopBarActionsProps = {
+  isDark: boolean;
+  onToggleTheme: () => void;
+};
+
+function TopBarActions({ isDark, onToggleTheme }: TopBarActionsProps) {
   const [account, setAccount] = useState<Account | null>(null);
 
   useEffect(() => {
@@ -59,16 +59,12 @@ function TopBarActions() {
 
   return (
     <div className={styles.topBarRight}>
-      <button
-        type="button"
+      <ThemeToggle
+        isDark={isDark}
+        onToggle={onToggleTheme}
         className={styles.iconButton}
-        aria-label={
-          isDark ? "Chuyển sang giao diện sáng" : "Chuyển sang giao diện tối"
-        }
-        onClick={() => setIsDark((v) => !v)}
-      >
-        <FontAwesomeIcon icon={isDark ? faMoon : faSun} />
-      </button>
+        activeClassName={styles.iconButtonActive}
+      />
 
       <button
         type="button"
@@ -97,18 +93,29 @@ export default function DashboardLayout({
 }: Props) {
   const isExecutive = activeId === EXECUTIVE_NAV.id;
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const { isDark, toggleTheme } = useTheme();
+
   const groupLabel = getNavGroupLabel(activeId);
   const showBreadcrumb = Boolean(groupLabel);
   const showPageHeading = !isExecutive;
 
+  const layoutClass = [
+    styles.layout,
+    sidebarCollapsed ? styles.layoutCollapsed : "",
+    isDark ? styles.layoutDark : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const mainClass = [
+    styles.main,
+    sidebarCollapsed ? styles.mainCollapsed : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <div
-      className={
-        sidebarCollapsed
-          ? `${styles.layout} ${styles.layoutCollapsed}`
-          : styles.layout
-      }
-    >
+    <div className={layoutClass}>
       <Sidebar
         activeId={activeId}
         onNavigate={onNavigate}
@@ -117,13 +124,7 @@ export default function DashboardLayout({
         onExpand={() => setSidebarCollapsed(false)}
       />
 
-      <div
-        className={
-          sidebarCollapsed
-            ? `${styles.main} ${styles.mainCollapsed}`
-            : styles.main
-        }
-      >
+      <div className={mainClass}>
         <header className={styles.topBar}>
           <div className={styles.topBarLeft}>
             <button
@@ -161,7 +162,7 @@ export default function DashboardLayout({
             )}
           </div>
 
-          <TopBarActions />
+          <TopBarActions isDark={isDark} onToggleTheme={toggleTheme} />
         </header>
 
         <div className={styles.content}>{children}</div>

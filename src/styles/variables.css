@@ -1,3 +1,4 @@
+/* src/styles/variables.css */
 :root {
   --primary-color: #1f5c3f;
   --primary-hover: #184a32;
@@ -17,6 +18,63 @@
   --sidebar-bg-top: #145338;
   --sidebar-bg-bottom: #0d3b28;
   --dashboard-bg: #f0f4f2;
+
   --sidebar-width: 280px;
   --sidebar-collapsed-width: 88px;
+
+  /* Surface (card, input trên nền dashboard) */
+  --surface-card: #ffffff;
+  --surface-muted: #f4f7f5;
+  --topbar-bg: rgba(255, 255, 255, 0.92);
+  --topbar-btn-bg: #ffffff;
+  --topbar-btn-hover: #f0f5f2;
+
+  /* Chữ trên card (PieChart, bảng) */
+  --on-surface: #152a22;
+  --on-surface-muted: #3a5248;
+
+  --rate-badge-fg: #c2410c;
+  --rate-badge-bg: rgba(234, 88, 12, 0.16);
+  --rate-badge-border: transparent;
+
+  --tooltip-bg: #1a2e24;
+  --tooltip-fg: #f5faf7;
+  --tooltip-muted: #c8d9d0;
+  --legend-hover-bg: rgba(31, 92, 63, 0.08);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --primary-color: #6bb892;
+  --primary-hover: #5aa67f;
+
+  --text-dark: #d8e4de;
+  --login-text: #d8e4de;
+  --login-text-muted: #9fb0a8;
+  --login-border: #354840;
+
+  --dashboard-bg: #121a16;
+  --surface-card: #1c2822;
+  --surface-muted: #243329;
+  --topbar-bg: rgba(22, 32, 28, 0.88);
+  --topbar-btn-bg: #243029;
+  --topbar-btn-hover: #2d3b34;
+
+  --sidebar-bg-top: #152820;
+  --sidebar-bg-bottom: #101c17;
+
+  --gold-color: #d4b85a;
+
+  --on-surface: #e4ede8;
+  --on-surface-muted: #b0c2b8;
+
+  --rate-badge-fg: #fdba74;
+  --rate-badge-bg: rgba(251, 146, 60, 0.28);
+  --rate-badge-border: rgba(253, 186, 116, 0.45);
+
+  --tooltip-bg: #243329;
+  --tooltip-fg: #eef5f1;
+  --tooltip-muted: #b5c9be;
+  --legend-hover-bg: rgba(107, 184, 146, 0.14);
 }

@@ -3,6 +3,10 @@
   position: relative;
   isolation: isolate;
   background: var(--dashboard-bg);
+  color: var(--login-text);
+  transition:
+    background 0.25s ease,
+    color 0.25s ease;
 }
 
 .layout::before {
@@ -11,20 +15,27 @@
   inset: 0;
   z-index: 0;
   background-image: url("../../../assets/images/login-bg-dongson.png");
-
   background-repeat: no-repeat;
   background-size: 720px auto;
-  opacity: 0.5;
+  background-position: calc(50% + 140px) 50%;
+  opacity: 0.45;
   pointer-events: none;
-  background-position: calc(50% + 140px) 50%; /* 280/2 */
   transform: translateX(0);
+  transition:
+    opacity 0.25s ease,
+    filter 0.25s ease;
 }
 
 .layoutCollapsed::before {
-  background-position: calc(50% + 44px) 50%; /* 88/2 */
+  background-position: calc(50% + 44px) 50%;
   background-size: 720px auto;
-  opacity: 0.5;
+  opacity: 0.45;
   transform: translateX(-10px);
+}
+
+.layoutDark::before {
+  opacity: 0.2;
+  filter: brightness(1.15) saturate(0.9) contrast(1.05);
 }
 
 .main {
@@ -38,6 +49,10 @@
   z-index: 1;
 }
 
+.mainCollapsed {
+  margin-left: var(--sidebar-collapsed-width);
+}
+
 .topBar {
   position: sticky;
   top: 0;
@@ -48,9 +63,12 @@
   gap: 20px;
   min-height: 56px;
   padding: 0 28px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(8px);
+  background: var(--topbar-bg);
+  backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--login-border);
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .topBarLeft {
@@ -75,19 +93,20 @@
   height: 36px;
   border-radius: 10px;
   border: 1px solid var(--login-border);
-  background: var(--text-white);
+  background: var(--topbar-btn-bg);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   color: var(--primary-color);
   transition:
-    background 0.15s,
-    border-color 0.15s;
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .hamburgerBtn:hover {
-  background: #f0f5f2;
+  background: var(--topbar-btn-hover);
   border-color: var(--primary-color);
 }
 
@@ -124,22 +143,27 @@
   height: 34px;
   border-radius: 999px;
   border: 1px solid var(--login-border);
-  background: var(--text-white);
+  background: var(--topbar-btn-bg);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   color: var(--login-text-muted);
   transition:
-    background 0.15s,
-    border-color 0.15s,
-    color 0.15s;
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .iconButton:hover {
-  background: #f0f5f2;
+  background: var(--topbar-btn-hover);
   border-color: var(--primary-color);
   color: var(--primary-color);
+}
+
+.iconButtonActive {
+  border-color: var(--primary-color);
+  color: var(--gold-color);
 }
 
 .userBlock {
@@ -172,6 +196,7 @@
   flex: 1;
   padding: 24px 28px 32px;
   overflow: auto;
+  min-height: 0;
 }
 
 @media (max-width: 1100px) {
@@ -209,11 +234,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .layout::before {
+  .layout,
+  .layout::before,
+  .topBar,
+  .hamburgerBtn,
+  .iconButton {
     transition: none !important;
   }
-}
-
-.mainCollapsed {
-  margin-left: var(--sidebar-collapsed-width);
 }

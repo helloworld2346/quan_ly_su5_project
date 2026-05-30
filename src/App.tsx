@@ -2,7 +2,7 @@ import { BrowserRouter } from "react-router-dom";
 import { useState } from "react";
 import { authService } from "./services/auth/authService";
 import { storage } from "./utils/storage";
-
+import { applyLoginSurfaceTheme } from "./theme";
 import AppRoutes from "./routes/AppRoutes";
 
 export default function App() {
@@ -20,6 +20,7 @@ export default function App() {
     } catch (error) {
       console.error("Logout failed:", error);
     } finally {
+      applyLoginSurfaceTheme();
       storage.removeToken();
       storage.clearNavState();
       setIsAuthenticated(false);
