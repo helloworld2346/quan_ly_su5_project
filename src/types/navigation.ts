@@ -20,7 +20,7 @@ export type NavItem = {
 
 const ExecutiveDashboard = lazy(
   () => import("../pages/Executive/ExecutiveDashboard"),
-);
+)
 const DailyTroopReport = lazy(
   () => import("../pages/DailyReport/DailyTroopReport"),
 );

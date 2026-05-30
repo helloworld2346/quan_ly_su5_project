@@ -2,7 +2,7 @@ import { useState } from "react";
 
 export function useNavGroupState(
   storageKey: string,
-  defaultValue: boolean = true,
+  defaultValue: boolean = false,
 ): [boolean, (value: boolean) => void] {
   const [isOpen, setIsOpen] = useState(() => {
     const saved = localStorage.getItem(storageKey);
