@@ -7,7 +7,7 @@
 .tableShell {  
   width: 100%;  
   max-width: 100%;  
-  overflow-x: hidden;  
+  overflow-x: auto;  
   background: white;  
   border-radius: 12px;  
   border: 1px solid var(--login-border);  
@@ -16,7 +16,7 @@
   
 .reportTable {  
   width: 100%;  
-  max-width: 100%;  
+  min-width: 2600px;  
   table-layout: fixed;  
   border-collapse: collapse;  
 }  
@@ -25,9 +25,9 @@
   background: var(--primary-color);  
   color: white;  
   border: 1px solid rgba(255, 255, 255, 0.15);  
-  font-size: 13px;  
+  font-size: 14px;  
   font-weight: 700;  
-  padding: 14px 10px;  
+  padding: 8px 4px;  
   text-align: center;  
   vertical-align: middle;  
   white-space: normal;  
@@ -38,12 +38,13 @@
   
 .reportTable td {  
   border: 1px solid #e0e0e0;  
-  padding: 12px;  
+  padding: 8px 4px;  
   text-align: center;  
   vertical-align: middle;  
   white-space: normal;  
   word-wrap: break-word;  
   overflow-wrap: break-word;  
+  font-size: 14px;  
 }  
   
 .reportTable thead tr:nth-child(2) th {  
@@ -54,18 +55,21 @@
   background: #2b8055;  
 }  
   
-.reportTable th:first-child,  
-.reportTable td:first-child {  
-  width: 9%;  
-}  
-  
-.reportTable th:last-child,  
-.reportTable td:last-child {  
-  width: 8%;  
-}  
-  
 .unitCell {  
   font-weight: 600;  
+  min-width: 70px;  
+}  
+  
+.dateCell {  
+  white-space: nowrap !important;  
+  min-width: 100px !important;  
+  width: 100px !important;  
+}
+  
+.noteCell {  
+  text-align: left;  
+  min-width: 150px;  
+  max-width: 200px;  
 }  
   
 .totalRow td {  
@@ -73,24 +77,14 @@
   background: #f0f4f2;  
 }  
   
-.noReportRow td {  
-  background: #ffe9e9;  
-  color: #b42318;  
-  font-weight: 600;  
-}  
-  
-.noReportRow td:first-child {  
-  color: #8f1010;  
-}  
-  
 @media (max-width: 768px) {  
   .reportTable th {  
-    font-size: 11px;  
-    padding: 10px 6px;  
+    font-size: 14px;  
+    padding: 6px 3px;  
   }  
   
   .reportTable td {  
-    padding: 10px 6px;  
-    font-size: 12px;  
+    padding: 6px 3px;  
+    font-size: 14px;  
   }  
 }

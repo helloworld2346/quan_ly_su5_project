@@ -5,6 +5,7 @@ export type NavItemId =
   | "report-troop"
   | "report-training"
   | "report-family"
+  | "report-communication" // THÊM
   | "duty-command"
   | "duty-tactical"
   | "settings";
@@ -20,7 +21,7 @@ export type NavItem = {
 
 const ExecutiveDashboard = lazy(
   () => import("../pages/Executive/ExecutiveDashboard"),
-)
+);
 const DailyTroopReport = lazy(
   () => import("../pages/DailyReport/DailyTroopReport"),
 );
@@ -28,6 +29,10 @@ const TrainingReport = lazy(
   () => import("../pages/TrainingReport/TrainingReport"),
 );
 const FamilyReport = lazy(() => import("../pages/FamilyReport/FamilyReport"));
+const CommunicationReport = lazy(
+  // THÊM
+  () => import("../pages/CommunicationReport/CommunicationReport"),
+);
 const CommandDuty = lazy(() => import("../pages/CommandDuty/CommandDuty"));
 const TacticalDuty = lazy(() => import("../pages/TacticalDuty/TacticalDuty"));
 const Settings = lazy(() => import("../pages/Settings/Settings"));
@@ -68,6 +73,14 @@ export const REPORT_NAV_GROUP = {
       loadingSubtitle: "Đang tải dữ liệu…",
       component: FamilyReport,
     },
+    {
+      id: "report-communication" as const,
+      label: "Báo ban thông tin liên lạc",
+      path: "/communication-report",
+      loadingTitle: "Đang tải báo cáo thông tin liên lạc",
+      loadingSubtitle: "Đang tải dữ liệu…",
+      component: CommunicationReport,
+    },
   ],
 };
 
@@ -107,6 +120,7 @@ export const NAV_PAGE_TITLES: Record<NavItemId, string | undefined> = {
   "report-troop": "Báo ban ngày",
   "report-training": "Báo ban quân số huấn luyện",
   "report-family": "Báo ban thân nhân thăm nuôi",
+  "report-communication": "Báo ban thông tin liên lạc",
   "duty-command": "Trực chỉ huy",
   "duty-tactical": "Trực ban tác chiến",
   settings: "Cài đặt",
