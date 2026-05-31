@@ -3,15 +3,15 @@
   flex-direction: column;
   height: 100%;
   padding: 16px;
-  background: var(--text-white);
+  background: var(--surface-card);
   border: 1px solid var(--login-border);
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
   transition:
     box-shadow 0.2s,
-    border-color 0.2s;
+    border-color 0.2s,
+    background 0.25s ease;
 }
-
 
 .card:hover {
   border-color: #b8cfc4;
@@ -33,11 +33,13 @@
 }
 
 .title {
+  display: flex;
+  justify-content: center;
   margin: 0;
   font-size: 14px;
   font-weight: 700;
   line-height: 1.4;
-  color: var(--login-text);
+  color: var(--on-surface, var(--login-text));
 }
 
 .titleContainer {
@@ -53,8 +55,10 @@
 
 .headerMeta {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
 }
 
 .badge {
@@ -71,8 +75,9 @@
   border-radius: 6px;
   font-size: 11px;
   font-weight: 600;
-  color: #9a3412;
-  background: rgba(217, 119, 6, 0.12);
+  color: var(--rate-badge-fg, #c2410c);
+  background: var(--rate-badge-bg, rgba(234, 88, 12, 0.16));
+  border: 1px solid var(--rate-badge-border, transparent);
 }
 
 .large .rateBadge {
@@ -92,6 +97,7 @@
   margin-bottom: 8px;
 }
 
+/* Layout chart lớn: donut trái — legend phải (GIỮ NGUYÊN) */
 .large .body {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -162,7 +168,7 @@
   margin-top: 2px;
   font-size: 10px;
   font-weight: 600;
-  color: var(--login-text-muted);
+  color: var(--on-surface-muted, var(--login-text-muted));
   text-align: center;
   max-width: 80%;
 }
@@ -184,28 +190,32 @@
 .tooltip {
   position: absolute;
   top: 0;
-  right: -8px;
+  right: -4px;                /* giảm từ -8px xuống -4px, sát chart hơn */
   transform: translateX(100%);
-  min-width: 120px;
+  min-width: fit-content;     /* đổi từ 120px → fit-content */
+  width: max-content;         /* thêm dòng này để không bị wrap */
   padding: 10px 12px;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  background: var(--login-text);
-  color: var(--text-white);
+  background: var(--tooltip-bg, #1a2e24);
+  color: var(--tooltip-fg, #f5faf7);
+  border: 1px solid rgba(107, 184, 146, 0.35);
   border-radius: 8px;
   font-size: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
   pointer-events: none;
   z-index: 2;
 }
 
 .tooltip strong {
   font-size: 13px;
+  font-weight: 700;
 }
 
 .tooltip span {
-  opacity: 0.9;
+  color: var(--tooltip-muted, #c8d9d0);
+  opacity: 1;
 }
 
 .large .tooltip {
@@ -247,9 +257,10 @@
     border-color 0.15s;
 }
 
+/* Chỉ đổi hover — không nền trắng #f0f5f2 */
 .legendBtn:hover,
 .legendBtnActive {
-  background: #f0f5f2;
+  background: var(--legend-hover-bg, rgba(31, 92, 63, 0.08));
   border-color: var(--login-border);
 }
 
@@ -259,14 +270,28 @@
   border-radius: 50%;
 }
 
+/* Hiện diện / Vắng — rõ trên dark */
 .legendLabel {
   text-align: left;
-  color: var(--login-text-muted);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--on-surface-muted, #3a5248);
 }
 
 .legendValue {
-  font-weight: 700;
-  color: var(--login-text);
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--on-surface, #152a22);
+}
+
+.legendBtn:hover .legendLabel,
+.legendBtnActive .legendLabel {
+  color: var(--on-surface, #152a22);
+}
+
+.legendBtn:hover .legendValue,
+.legendBtnActive .legendValue {
+  color: var(--on-surface, #0f1f18);
 }
 
 @media (max-width: 900px) {
