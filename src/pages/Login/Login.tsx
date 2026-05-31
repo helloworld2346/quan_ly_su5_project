@@ -30,7 +30,6 @@ export default function Login({ onSuccess }: Props) {
   const [error, setError] = useState("");
   const { showError, showSuccess } = useToast();
 
-  // ← thêm block này
   useEffect(() => {
     themeSession.applyOnAppStart(!!storage.getToken());
   }, []);
@@ -71,12 +70,13 @@ export default function Login({ onSuccess }: Props) {
         setError(response.message || "Đăng nhập thất bại");
       }
     } catch (err) {
-      if (!err.response) {
+      const errObj = error as any 
+      if (!errObj .response) {
         showError("Không thể kết nối đến server. Vui lòng thử lại.");
       } else {
-        setError(getErrorMessage(err));
+        setError(getErrorMessage(errObj));
       }
-      console.error("Login error:", err);
+      console.error("Login error:", errObj);
     } finally {
       setLoading(false);
     }

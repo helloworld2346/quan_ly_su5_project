@@ -1,0 +1,90 @@
+/* Layout trang */  
+.report {  
+  width: 100%;  
+  min-width: 0;  
+}  
+  
+.tableShell {  
+  width: 100%;  
+  max-width: 100%;  
+  overflow-x: auto;  
+  background: white;  
+  border-radius: 12px;  
+  border: 1px solid var(--login-border);  
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);  
+}  
+  
+.reportTable {  
+  width: 100%;  
+  min-width: 2600px;  
+  table-layout: fixed;  
+  border-collapse: collapse;  
+}  
+  
+.reportTable th {  
+  background: var(--primary-color);  
+  color: white;  
+  border: 1px solid rgba(255, 255, 255, 0.15);  
+  font-size: 14px;  
+  font-weight: 700;  
+  padding: 8px 4px;  
+  text-align: center;  
+  vertical-align: middle;  
+  white-space: normal;  
+  word-wrap: break-word;  
+  overflow-wrap: break-word;  
+  hyphens: auto;  
+}  
+  
+.reportTable td {  
+  border: 1px solid #e0e0e0;  
+  padding: 8px 4px;  
+  text-align: center;  
+  vertical-align: middle;  
+  white-space: normal;  
+  word-wrap: break-word;  
+  overflow-wrap: break-word;  
+  font-size: 14px;  
+}  
+  
+.reportTable thead tr:nth-child(2) th {  
+  background: #1c6b44;  
+}  
+  
+.reportTable thead tr:nth-child(3) th {  
+  background: #2b8055;  
+}  
+  
+.unitCell {  
+  font-weight: 600;  
+  min-width: 70px;  
+}  
+  
+.dateCell {  
+  white-space: nowrap !important;  
+  min-width: 100px !important;  
+  width: 100px !important;  
+}
+  
+.noteCell {  
+  text-align: left;  
+  min-width: 150px;  
+  max-width: 200px;  
+}  
+  
+.totalRow td {  
+  font-weight: 700;  
+  background: #f0f4f2;  
+}  
+  
+@media (max-width: 768px) {  
+  .reportTable th {  
+    font-size: 14px;  
+    padding: 6px 3px;  
+  }  
+  
+  .reportTable td {  
+    padding: 6px 3px;  
+    font-size: 14px;  
+  }  
+}

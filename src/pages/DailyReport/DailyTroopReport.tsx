@@ -1,9 +1,8 @@
-import { useId, useMemo, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMagnifyingGlass, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
-
+import { useMemo, useState } from "react";
 import styles from "./DailyTroopReport.module.css";
-
+import ReportToolbar from "../../components/report/ReportToolbar";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {  faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import {
   REPORT_ROWS,
   FILL_FROM_PRESENT_TO_SIGN_COUNT,
@@ -20,8 +19,6 @@ function todayIsoDate() {
 }
 
 export default function DailyTroopReport() {
-  const searchId = useId();
-  const dateId = useId();
   const [query, setQuery] = useState("");
   const [reportDate, setReportDate] = useState(todayIsoDate());
 
@@ -51,59 +48,12 @@ export default function DailyTroopReport() {
 
   return (
     <section className={styles.report} aria-labelledby="dashboard-page-heading">
-      <div className={styles.toolbar}>
-        <div className={styles.searchWrap}>
-          <input
-            id={searchId}
-            type="search"
-            className={styles.searchInput}
-            placeholder="Bạn cần tìm gì!?"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            autoComplete="off"
-          />
-          <span className={styles.searchDivider} aria-hidden />
-          <button
-            type="button"
-            className={styles.searchIconBtn}
-            aria-label="Tìm kiếm"
-            onClick={() => document.getElementById(searchId)?.focus()}
-          >
-            <FontAwesomeIcon
-              icon={faMagnifyingGlass}
-              className={styles.searchIcon}
-            />
-          </button>
-        </div>
-
-        <div className={styles.dateWrap}>
-          <input
-            id={dateId}
-            type="date"
-            className={styles.dateInput}
-            value={reportDate}
-            max={todayIsoDate()}
-            onChange={(e) => setReportDate(e.target.value)}
-          />
-        </div>
-
-        <div className={styles.exportGroup}>
-          <button
-            type="button"
-            className={`${styles.exportBtn} ${styles.exportWord}`}
-            onClick={() => { }}
-          >
-            Xuất File Word
-          </button>
-          <button
-            type="button"
-            className={`${styles.exportBtn} ${styles.exportExcel}`}
-            onClick={() => { }}
-          >
-            Xuất File Excel
-          </button>
-        </div>
-      </div>
+      <ReportToolbar
+        query={query}
+        onQueryChange={setQuery}
+        reportDate={reportDate}
+        onReportDateChange={setReportDate}
+      />
       <div className={styles.tableShell}>
         <table className={styles.reportTable}>
           <thead>
@@ -165,11 +115,11 @@ export default function DailyTroopReport() {
                     ),
                   )}
 
-                  <td>
-                    <button className={styles.detailBtn} aria-label="Xem chi tiết">
-                      <FontAwesomeIcon icon={faPenToSquare} />
-                    </button>
-                  </td>
+                <td>
+  <button className={styles.detailBtn} aria-label="Xem chi tiết">
+    <FontAwesomeIcon icon={faPenToSquare} />
+  </button>
+</td>
                 </tr>
               );
             })}
