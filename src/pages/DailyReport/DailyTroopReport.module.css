@@ -32,18 +32,17 @@
   vertical-align: middle;  
  
 }  
-  .reportTable tbody tr:nth-child(odd) td {
-  background: #ffffff;
+.reportTable tbody tr:nth-child(odd) td {
+  background: var(--table-row-odd);
 }
 
 .reportTable tbody tr:nth-child(even) td {
-  background: #f7f8f8;
+  background: var(--table-row-even);
 }
-   
 .reportTable td {    
   background: var(--surface-card);  
   color: var(--login-text);  
-  border: 2px solid var(--login-border);  
+  border: 1px solid var(--login-border);  
   padding: 12px 8px;  
   text-align: center;  
   vertical-align: middle;  

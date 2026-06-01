@@ -21,7 +21,8 @@
   --border-color: #d7d7d7;
   --shadow-color: rgba(0, 0, 0, 0.2);
 
-
+ --table-row-odd: #ffffff;
+  --table-row-even: #f3f8f5;
 
 
 
@@ -127,6 +128,10 @@
   --dialog-confirm-hover-bg: #5aa882;  
   --dialog-info-icon: var(--primary-color);  
  
+
+  --table-row-odd: #1f2937;
+  --table-row-even: #273444;
+  
   --toast-bg-dark: #1c2822;  
   --toast-message-text-dark: #d8e4de;  
   --toast-close-text-dark: #9fb0a8;  
