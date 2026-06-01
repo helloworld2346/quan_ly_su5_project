@@ -196,6 +196,28 @@
   filter: invert(0.7) brightness(1.5) sepia(0.3) hue-rotate(90deg);
   opacity: 0.8;
 }
+
+[data-theme="dark"] .exportWord {  
+  color: #6b9bd1;  
+  background: rgba(107, 155, 209, 0.15);  
+  border-color: rgba(107, 155, 209, 0.35);  
+}  
+  
+[data-theme="dark"] .exportWord:hover {  
+  background: rgba(107, 155, 209, 0.25);  
+  border-color: #6b9bd1;  
+}  
+  
+[data-theme="dark"] .exportExcel {  
+  color: #6bb892;  
+  background: rgba(107, 184, 146, 0.15);  
+  border-color: rgba(107, 184, 146, 0.35);  
+}  
+  
+[data-theme="dark"] .exportExcel:hover {  
+  background: rgba(107, 184, 146, 0.25);  
+  border-color: var(--primary-color);  
+}
   
 @media (max-width: 768px) {  
   .toolbar {  
