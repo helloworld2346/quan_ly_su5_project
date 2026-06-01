@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { IconProp } from "@fortawesome/fontawesome-svg-core";
 
@@ -15,6 +16,8 @@ type Props = {
   collapsed: boolean;
   onExpand?: () => void;
   isActive: boolean;
+  onTooltipEnter?: (text: string, ref: React.RefObject<HTMLElement>) => void;
+  onTooltipLeave?: () => void;
 };
 
 export default function NavGroup({
@@ -28,7 +31,11 @@ export default function NavGroup({
   collapsed,
   onExpand,
   isActive,
+  onTooltipEnter,
+  onTooltipLeave,
 }: Props) {
+  const groupToggleRef = useRef<HTMLButtonElement>(null);
+
   const handleClick = () => {
     if (collapsed) {
       if (onExpand) onExpand();
@@ -38,15 +45,29 @@ export default function NavGroup({
     onToggle();
   };
 
+  const handleGroupMouseEnter = () => {
+    if (collapsed && onTooltipEnter) {
+      onTooltipEnter(label, groupToggleRef);
+    }
+  };
+
+  const handleGroupMouseLeave = () => {
+    if (onTooltipLeave) {
+      onTooltipLeave();
+    }
+  };
+
   return (
     <div className={styles.group}>
       <button
+        ref={groupToggleRef}
         type="button"
         className={`${styles.groupToggle} ${isActive && collapsed ? styles.active : ""} ${isActive ? styles.groupActive : ""}`}
         aria-expanded={isOpen}
-        data-tooltip={collapsed ? label : undefined}
         aria-label={collapsed ? label : undefined}
         onClick={handleClick}
+        onMouseEnter={handleGroupMouseEnter}
+        onMouseLeave={handleGroupMouseLeave}
       >
         <span className={styles.groupLabel}>
           <FontAwesomeIcon icon={icon} className={styles.navIcon} />
