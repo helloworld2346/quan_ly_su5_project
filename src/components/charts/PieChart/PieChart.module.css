@@ -1,313 +1,395 @@
-.card {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 16px;
-  background: var(--surface-card);
-  border: 1px solid var(--login-border);
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-  transition:
-    box-shadow 0.2s,
-    border-color 0.2s,
-    background 0.25s ease;
-}
-
-.card:hover {
-  border-color: #b8cfc4;
-  box-shadow: 0 8px 24px rgba(31, 92, 63, 0.1);
-}
-
-.large {
-  padding: 28px;
-  border-top: 4px solid var(--primary-color);
-}
-
-.header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.title {
-  display: flex;
-  justify-content: center;
-  margin: 0;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 1.4;
-  color: var(--on-surface, var(--login-text));
-}
-
-.titleContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  width: 100%;
-}
-
-.large .title {
-  font-size: 20px;
-}
-
-.headerMeta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  gap: 12px;
-}
-
-.badge {
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--primary-color);
-  background: rgba(31, 92, 63, 0.1);
-}
-
-.rateBadge {
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--rate-badge-fg, #c2410c);
-  background: var(--rate-badge-bg, rgba(234, 88, 12, 0.16));
-  border: 1px solid var(--rate-badge-border, transparent);
-}
-
-.large .rateBadge {
-  font-size: 12px;
-}
-
-.body {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 14px;
-}
-
-.headerCompact {
-  justify-content: flex-end;
-  margin-bottom: 8px;
-}
-
-/* Layout chart lớn: donut trái — legend phải (GIỮ NGUYÊN) */
-.large .body {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 24px 32px;
-  align-items: center;
-}
-
-.chartWrap {
-  position: relative;
-  flex-shrink: 0;
-  margin: 0 auto;
-}
-
-.large .chartWrap {
-  margin: 0;
-}
-
-.chart {
-  display: block;
-  width: 148px;
-  height: 148px;
-}
-
-.large .chart {
-  width: 240px;
-  height: 240px;
-}
-
-.segment {
-  cursor: pointer;
-  transition:
-    opacity 0.2s,
-    stroke-width 0.15s;
-  outline: none;
-}
-
-.segment:focus-visible {
-  filter: drop-shadow(0 0 4px rgba(31, 92, 63, 0.5));
-}
-
-.centerLabel {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  transition: transform 0.2s;
-}
-
-.centerActive {
-  transform: scale(1.04);
-}
-
-.centerValue {
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--primary-color);
-  line-height: 1.2;
-}
-
-.large .centerValue {
-  font-size: 30px;
-}
-
-.centerCaption {
-  margin-top: 2px;
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--on-surface-muted, var(--login-text-muted));
-  text-align: center;
-  max-width: 80%;
-}
-
-.large .centerCaption {
-  font-size: 13px;
-}
-
-.centerPercent {
-  margin-top: 4px;
-  font-size: 11px;
-  font-weight: 700;
-  color: #fff;
-  padding: 2px 8px;
-  border-radius: 4px;
-  background: rgba(31, 92, 63, 0.88);
-}
-
-.tooltip {
-  position: absolute;
-  top: 0;
-  right: -4px;                /* giảm từ -8px xuống -4px, sát chart hơn */
-  transform: translateX(100%);
-  min-width: fit-content;     /* đổi từ 120px → fit-content */
-  width: max-content;         /* thêm dòng này để không bị wrap */
-  padding: 10px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  background: var(--tooltip-bg, #1a2e24);
-  color: var(--tooltip-fg, #f5faf7);
-  border: 1px solid rgba(107, 184, 146, 0.35);
-  border-radius: 8px;
-  font-size: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-  pointer-events: none;
-  z-index: 2;
-}
-
-.tooltip strong {
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.tooltip span {
-  color: var(--tooltip-muted, #c8d9d0);
-  opacity: 1;
-}
-
-.large .tooltip {
-  right: auto;
-  left: 50%;
-  top: -8px;
-  transform: translate(-50%, -100%);
-}
-
-.legend {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.large .legend {
-  align-self: center;
-}
-
-.legendBtn {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 10px 1fr auto;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  background: transparent;
-  font-family: inherit;
-  font-size: 12px;
-  cursor: pointer;
-  transition:
-    background 0.15s,
-    border-color 0.15s;
-}
-
-/* Chỉ đổi hover — không nền trắng #f0f5f2 */
-.legendBtn:hover,
-.legendBtnActive {
-  background: var(--legend-hover-bg, rgba(31, 92, 63, 0.08));
-  border-color: var(--login-border);
-}
-
-.swatch {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-
-/* Hiện diện / Vắng — rõ trên dark */
-.legendLabel {
-  text-align: left;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--on-surface-muted, #3a5248);
-}
-
-.legendValue {
-  font-size: 14px;
-  font-weight: 800;
-  color: var(--on-surface, #152a22);
-}
-
-.legendBtn:hover .legendLabel,
-.legendBtnActive .legendLabel {
-  color: var(--on-surface, #152a22);
-}
-
-.legendBtn:hover .legendValue,
-.legendBtnActive .legendValue {
-  color: var(--on-surface, #0f1f18);
-}
-
-@media (max-width: 900px) {
-  .large .body {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
-  }
-
-  .large .chartWrap {
-    grid-row: auto;
-    margin: 0 auto;
-  }
-
-  .tooltip {
-    right: 50%;
-    transform: translate(50%, -110%);
-    top: 0;
-  }
+.card {  
+  display: flex;  
+  flex-direction: column;  
+  height: 100%;  
+  padding: 16px;  
+  background: var(--surface-card);  
+  border: 1px solid var(--login-border);  
+  border-radius: 12px;  
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);  
+  transition:  
+    box-shadow 0.2s,  
+    border-color 0.2s,  
+    background 0.25s ease;  
+}  
+  
+.card:hover {  
+  border-color: #b8cfc4;  
+  box-shadow: 0 8px 24px rgba(31, 92, 63, 0.1);  
+}  
+  
+.large {  
+  padding: 28px;  
+  border-top: 4px solid var(--primary-color);  
+}  
+  
+.hero {  
+  padding: 36px;  
+  border-top: 6px solid var(--primary-color);  
+  background: linear-gradient(135deg, var(--surface-card) 0%, rgba(31, 92, 63, 0.03) 100%);  
+  box-shadow: 0 8px 32px rgba(31, 92, 63, 0.15), 0 0 0 1px rgba(31, 92, 63, 0.1);  
+}  
+  
+.header {  
+  display: flex;  
+  flex-wrap: wrap;  
+  align-items: flex-start;  
+  justify-content: space-between;  
+  gap: 8px;  
+  margin-bottom: 16px;  
+}  
+  
+.title {  
+  display: flex;  
+  justify-content: center;  
+  margin: 0;  
+  font-size: 14px;  
+  font-weight: 700;  
+  line-height: 1.4;  
+  color: var(--on-surface, var(--login-text));  
+}  
+  
+.titleContainer {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 6px;  
+  width: 100%;  
+}  
+  
+.large .title {  
+  font-size: 20px;  
+}  
+  
+.headerMeta {  
+  display: flex;  
+  justify-content: space-between;  
+  align-items: center;  
+  width: 100%;  
+  gap: 12px;  
+}  
+  
+.badge {  
+  padding: 3px 8px;  
+  border-radius: 6px;  
+  font-size: 11px;  
+  font-weight: 600;  
+  color: var(--primary-color);  
+  background: rgba(31, 92, 63, 0.1);  
+}  
+  
+.hero .badge {  
+  padding: 4px 12px;  
+  font-size: 13px;  
+  background: linear-gradient(135deg, var(--primary-color), #2d7a52);  
+  color: white;  
+}  
+  
+.rateBadge {  
+  padding: 3px 8px;  
+  border-radius: 6px;  
+  font-size: 11px;  
+  font-weight: 600;  
+  color: var(--rate-badge-fg, #c2410c);  
+  background: var(--rate-badge-bg, rgba(234, 88, 12, 0.16));  
+  border: 1px solid var(--rate-badge-border, transparent);  
+}  
+  
+.large .rateBadge {  
+  font-size: 12px;  
+}  
+  
+.hero .rateBadge {  
+  font-size: 14px;  
+}  
+  
+.body {  
+  display: flex;  
+  flex: 1;  
+  flex-direction: column;  
+  align-items: stretch;  
+  gap: 14px;  
+}  
+  
+.headerCompact {  
+  justify-content: flex-end;  
+  margin-bottom: 8px;  
+}  
+  
+/* Layout chart lớn: donut trái — legend phải (GIỮ NGUYÊN) */  
+.large .body {  
+  display: grid;  
+  grid-template-columns: auto 1fr;  
+  gap: 24px 32px;  
+  align-items: center;  
+}  
+  
+.hero .body {  
+  display: grid;  
+  grid-template-columns: auto 1fr;  
+  gap: 32px 40px;  
+  align-items: center;  
+}  
+  
+.chartWrap {  
+  position: relative;  
+  flex-shrink: 0;  
+  margin: 0 auto;  
+}  
+  
+.large .chartWrap {  
+  margin: 0;  
+}  
+  
+.heroChartWrap {  
+  margin: 0;  
+}  
+  
+.chart {  
+  display: block;  
+  width: 148px;  
+  height: 148px;  
+}  
+  
+.large .chart {  
+  width: 240px;  
+  height: 240px;  
+}  
+  
+.heroChart {  
+  width: 320px;  
+  height: 320px;  
+}  
+  
+.segment {  
+  cursor: pointer;  
+  transition:  
+    opacity 0.2s,  
+    stroke-width 0.15s;  
+  outline: none;  
+}  
+  
+.segment:focus-visible {  
+  filter: drop-shadow(0 0 4px rgba(31, 92, 63, 0.5));  
+}  
+  
+.centerLabel {  
+  position: absolute;  
+  inset: 0;  
+  display: flex;  
+  flex-direction: column;  
+  align-items: center;  
+  justify-content: center;  
+  pointer-events: none;  
+  transition: transform 0.2s;  
+}  
+  
+.centerActive {  
+  transform: scale(1.04);  
+}  
+  
+.centerValue {  
+  font-size: 17px;  
+  font-weight: 700;  
+  color: var(--primary-color);  
+  line-height: 1.2;  
+}  
+  
+.large .centerValue {  
+  font-size: 30px;  
+}  
+  
+.hero .centerValue {  
+  font-size: 42px;  
+}  
+  
+.centerCaption {  
+  margin-top: 2px;  
+  font-size: 10px;  
+  font-weight: 600;  
+  color: var(--on-surface-muted, var(--login-text-muted));  
+  text-align: center;  
+  max-width: 80%;  
+}  
+  
+.large .centerCaption {  
+  font-size: 13px;  
+}  
+  
+.hero .centerCaption {  
+  font-size: 15px;  
+}  
+  
+.centerPercent {  
+  margin-top: 4px;  
+  font-size: 11px;  
+  font-weight: 700;  
+  color: #fff;  
+  padding: 2px 8px;  
+  border-radius: 4px;  
+  background: rgba(31, 92, 63, 0.88);  
+}  
+  
+.tooltip {  
+  position: absolute;  
+  top: 0;  
+  right: -4px;  
+  transform: translateX(100%);  
+  min-width: fit-content;  
+  width: max-content;  
+  padding: 10px 12px;  
+  display: flex;  
+  flex-direction: column;  
+  gap: 2px;  
+  background: var(--tooltip-bg, #1a2e24);  
+  color: var(--tooltip-fg, #f5faf7);  
+  border: 1px solid rgba(107, 184, 146, 0.35);  
+  border-radius: 8px;  
+  font-size: 12px;  
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);  
+  pointer-events: none;  
+  z-index: 2;  
+}  
+  
+.tooltip strong {  
+  font-size: 13px;  
+  font-weight: 700;  
+}  
+  
+.tooltip span {  
+  color: var(--tooltip-muted, #c8d9d0);  
+  opacity: 1;  
+}  
+  
+.large .tooltip {  
+  right: auto;  
+  left: 50%;  
+  top: -8px;  
+  transform: translate(-50%, -100%);  
+}  
+  
+.hero .tooltip {  
+  right: auto;  
+  left: 50%;  
+  top: -8px;  
+  transform: translate(-50%, -100%);  
+}  
+  
+.legend {  
+  list-style: none;  
+  margin: 0;  
+  padding: 0;  
+  width: 100%;  
+  display: flex;  
+  flex-direction: column;  
+  gap: 4px;  
+}  
+  
+.large .legend {  
+  align-self: center;  
+}  
+  
+.hero .legend {  
+  align-self: center;  
+}  
+  
+.legendBtn {  
+  width: 100%;  
+  display: grid;  
+  grid-template-columns: 10px 1fr auto;  
+  align-items: center;  
+  gap: 8px;  
+  padding: 8px 10px;  
+  border: 1px solid transparent;  
+  border-radius: 8px;  
+  background: transparent;  
+  font-family: inherit;  
+  font-size: 12px;  
+  cursor: pointer;  
+  transition:  
+    background 0.15s,  
+    border-color 0.15s;  
+}  
+  
+/* Chỉ đổi hover — không nền trắng #f0f5f2 */  
+.legendBtn:hover,  
+.legendBtnActive {  
+  background: var(--legend-hover-bg, rgba(31, 92, 63, 0.08));  
+  border-color: var(--login-border);  
+}  
+  
+.swatch {  
+  width: 10px;  
+  height: 10px;  
+  border-radius: 50%;  
+}  
+  
+/* Hiện diện / Vắng — rõ trên dark */  
+.legendLabel {  
+  text-align: left;  
+  font-size: 13px;  
+  font-weight: 700;  
+  color: var(--on-surface-muted, #3a5248);  
+}  
+  
+.legendValue {  
+  font-size: 14px;  
+  font-weight: 800;  
+  color: var(--on-surface, #152a22);  
+}  
+  
+.legendBtn:hover .legendLabel,  
+.legendBtnActive .legendLabel {  
+  color: var(--on-surface, #152a22);  
+}  
+  
+.legendBtn:hover .legendValue,  
+.legendBtnActive .legendValue {  
+  color: var(--on-surface, #0f1f18);  
+}  
+  
+@media (max-width: 900px) {  
+  .large .body {  
+    grid-template-columns: 1fr;  
+    grid-template-rows: auto;  
+  }  
+  
+  .large .chartWrap {  
+    grid-row: auto;  
+    margin: 0 auto;  
+  }  
+  
+  .hero .body {  
+    grid-template-columns: 1fr;  
+    grid-template-rows: auto;  
+  }  
+  
+  .heroChartWrap {  
+    grid-row: auto;  
+    margin: 0 auto;  
+  }  
+  
+  .tooltip {  
+    right: 50%;  
+    transform: translate(50%, -110%);  
+    top: 0;  
+  }  
+}  
+  
+@media (max-width: 600px) {  
+  .hero {  
+    padding: 24px;  
+  }  
+  
+  .heroChart {  
+    width: 280px;  
+    height: 280px;  
+  }  
+  
+  .hero .centerValue {  
+    font-size: 36px;  
+  }  
+  
+  .hero .centerCaption {  
+    font-size: 13px;  
+  }  
 }

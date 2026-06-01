@@ -72,8 +72,8 @@ export default function DailyTroopReport() {
               <th rowSpan={3}>Xem chi tiết</th>
             </tr>
             <tr>
-              <th colSpan={2}>Hội Thao</th>
-              <th colSpan={2}>Xây</th>
+              <th colSpan={2}>Hội thao</th>
+              <th colSpan={2}>Xây dựng</th>
               <th rowSpan={2}>Chờ hưu</th>
               <th rowSpan={2}>Nghỉ (TT, cuối tuần)</th>
               <th rowSpan={2}>Phép</th>

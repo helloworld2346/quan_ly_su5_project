@@ -1,9 +1,14 @@
 import { useState } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFilter } from "@fortawesome/free-solid-svg-icons";
+import {
+  faFilter,
+  faTrophy,
+  faExclamationTriangle,
+} from "@fortawesome/free-solid-svg-icons";
 
 import PieChart from "../../components/charts/PieChart/PieChart";
+import type { SubordinateUnitType } from "../../types/troopStats";
 import {
   CHART_GROUP_LABELS,
   CHART_GROUP_ORDER,
@@ -12,8 +17,8 @@ import {
   UNIT_TYPE_LABELS,
   getChartsByGroup,
   getDivisionSummary,
-  type SubordinateUnitType,
-} from "../../types/troopStats";
+  getPresentRate,
+} from "../../data/troopData";
 
 import styles from "./ExecutiveDashboard.module.css";
 
@@ -21,13 +26,32 @@ type FilterKey = "all" | SubordinateUnitType;
 
 const FILTER_OPTIONS: { key: FilterKey; label: string }[] = [
   { key: "all", label: "Tất cả đơn vị" },
-  { key: "department", label: "Phòng, ban" },
+  { key: "department", label: "Phòng" },
   { key: "regiment", label: "Trung đoàn" },
   { key: "battalion", label: "Tiểu đoàn" },
   { key: "company", label: "Đại đội" },
 ];
 
 const SUBORDINATE_COUNT = SUBORDINATE_TROOP_CHARTS.length;
+
+// Mock data cho so sánh số người vắng
+const COMPARISON_DATA = [
+  {
+    label: "Hôm qua",
+    change: 5,
+    rate: 0.1,
+  },
+  {
+    label: "Tuần trước",
+    change: -12,
+    rate: -0.2,
+  },
+  {
+    label: "Tháng trước",
+    change: 23,
+    rate: 0.4,
+  },
+];
 
 function getVisibleGroups(filter: FilterKey) {
   const types =
@@ -44,14 +68,36 @@ function getVisibleGroups(filter: FilterKey) {
     .filter((group) => group.charts.length > 0);
 }
 
+function getTopUnits() {
+  const sorted = [...SUBORDINATE_TROOP_CHARTS].sort((a, b) => {
+    const rateA = getPresentRate(a);
+    const rateB = getPresentRate(b);
+    return rateB - rateA;
+  });
+
+  return {
+    highestPresent: sorted[0],
+    highestAbsent: sorted[sorted.length - 1],
+  };
+}
+
 function formatNum(value: number) {
   return value.toLocaleString("vi-VN");
+}
+
+function formatDate() {
+  const now = new Date();
+  const day = String(now.getDate()).padStart(2, "0");
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const year = now.getFullYear();
+  return `${day}/${month}/${year}`;
 }
 
 export default function ExecutiveDashboard() {
   const [filter, setFilter] = useState<FilterKey>("all");
   const summary = getDivisionSummary();
   const visibleGroups = getVisibleGroups(filter);
+  const topUnits = getTopUnits();
 
   return (
     <section className={styles.section} aria-labelledby="troop-charts-title">
@@ -101,18 +147,103 @@ export default function ExecutiveDashboard() {
 
       <div className={styles.chartSection}>
         <div className={styles.chartSectionHead}>
-          <h3 className={styles.chartSectionTitle}>
-            Báo ban quân số toàn Sư đoàn
-          </h3>
-         
+          <div>
+            <h3 className={styles.chartSectionTitle}>
+              Báo ban quân số toàn Sư đoàn
+            </h3>
+            <p className={styles.chartSectionSubtitle}>
+              Tổng hợp quân số toàn Sư đoàn 5 - Cập nhật ngày {formatDate()}
+            </p>
+          </div>
         </div>
 
-        <div className={styles.featuredBlock}>
-          <PieChart
-            size="large"
-            chart={DIVISION_TROOP_CHART}
-            badge={UNIT_TYPE_LABELS[DIVISION_TROOP_CHART.unitType]}
-          />
+        <div className={styles.featuredGrid}>
+          <div className={styles.comparisonPanel}>
+            <h4 className={styles.panelTitle}>SO SÁNH VẮNG</h4>
+            <div className={styles.comparisonList}>
+              {COMPARISON_DATA.map((item) => (
+                <div key={item.label} className={styles.comparisonItem}>
+                  <div className={styles.comparisonLabel}>{item.label}</div>
+                  <div className={styles.comparisonValues}>
+                    {item.change > 0 ? (
+                      <>
+                        <span className={styles.comparisonValue}>
+                          Tăng {formatNum(item.change)} người
+                        </span>
+                        <span className={styles.comparisonSeparator}>•</span>
+                        <span
+                          className={`${styles.comparisonRate} ${styles.ratePositive}`}
+                        >
+                          +{item.rate}%
+                        </span>
+                      </>
+                    ) : item.change < 0 ? (
+                      <>
+                        <span className={styles.comparisonValue}>
+                          Giảm {formatNum(Math.abs(item.change))} người
+                        </span>
+                        <span className={styles.comparisonSeparator}>•</span>
+                        <span
+                          className={`${styles.comparisonRate} ${styles.rateNegative}`}
+                        >
+                          {item.rate}%
+                        </span>
+                      </>
+                    ) : (
+                      <span className={styles.comparisonValue}>Không đổi</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.chartPanel}>
+            <PieChart
+              size="large"
+              chart={DIVISION_TROOP_CHART}
+              badge="TOÀN SƯ ĐOÀN"
+            />
+          </div>
+
+          <div className={styles.highlightPanel}>
+            <h4 className={styles.panelTitle}>ĐƠN VỊ TIÊU BIỂU</h4>
+            <div className={styles.highlightList}>
+              <div className={styles.highlightItem}>
+                <div className={styles.highlightIcon}>
+                  <FontAwesomeIcon icon={faTrophy} />
+                </div>
+                <div className={styles.highlightContent}>
+                  <div className={styles.highlightLabel}>
+                    Hiện diện cao nhất
+                  </div>
+                  <div className={styles.highlightValue}>
+                    {topUnits.highestPresent?.name}
+                  </div>
+                  <div className={styles.highlightRate}>
+                    {getPresentRate(topUnits.highestPresent!).toFixed(1)}%
+                  </div>
+                </div>
+              </div>
+              <div className={styles.highlightItem}>
+                <div
+                  className={styles.highlightIcon}
+                  style={{ color: "#dc2626" }}
+                >
+                  <FontAwesomeIcon icon={faExclamationTriangle} />
+                </div>
+                <div className={styles.highlightContent}>
+                  <div className={styles.highlightLabel}>Vắng cao nhất</div>
+                  <div className={styles.highlightValue}>
+                    {topUnits.highestAbsent?.name}
+                  </div>
+                  <div className={styles.highlightRate}>
+                    {getPresentRate(topUnits.highestAbsent!).toFixed(1)}%
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -122,8 +253,7 @@ export default function ExecutiveDashboard() {
             Thống kê theo đơn vị trực thuộc
           </h3>
           <p className={styles.subSectionDesc}>
-            {SUBORDINATE_COUNT} đơn vị — phòng, ban, trung đoàn, tiểu đoàn, đại
-            đội
+            {SUBORDINATE_COUNT} đơn vị — phòng, trung đoàn, tiểu đoàn, đại đội
           </p>
         </div>
 

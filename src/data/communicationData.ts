@@ -66,7 +66,7 @@ export const COMMUNICATION_REPORT_ROWS: CommunicationReportRow[] = [
   {
     date: "01/06/2026",
     unit: "d18TT",
-    dutyOfficer: "Đức",
+    dutyOfficer: "Mai Văn A",
     shortWaveReport: {
       objectCount: 2,
       totalSessions: 15,
@@ -109,12 +109,12 @@ export const COMMUNICATION_REPORT_ROWS: CommunicationReportRow[] = [
       documents2: { go: 4, come: 4 },
       vehicles: { bicycle: 2, motorcycle: 1, trips: 3, weight: 45 },
     },
-    note: "BT",
+    note: "Thông tin liên lạc ổn định",
   },
   {
     date: "01/06/2026",
     unit: "eBB4",
-    dutyOfficer: "Phúc",
+    dutyOfficer: "Nguyễn Văn B",
     shortWaveReport: {
       objectCount: 3,
       totalSessions: 20,
@@ -157,12 +157,12 @@ export const COMMUNICATION_REPORT_ROWS: CommunicationReportRow[] = [
       documents2: { go: 6, come: 6 },
       vehicles: { bicycle: 3, motorcycle: 2, trips: 5, weight: 78 },
     },
-    note: "BT",
+    note: "Có 1 máy điện thoại cần bảo trì",
   },
   {
     date: "01/06/2026",
     unit: "eBB5",
-    dutyOfficer: "Nguyên",
+    dutyOfficer: "Trần Văn C",
     shortWaveReport: {
       objectCount: 2,
       totalSessions: 18,
@@ -205,12 +205,12 @@ export const COMMUNICATION_REPORT_ROWS: CommunicationReportRow[] = [
       documents2: { go: 5, come: 5 },
       vehicles: { bicycle: 2, motorcycle: 2, trips: 4, weight: 65 },
     },
-    note: "BT",
+    note: "Hoạt động bình thường",
   },
   {
     date: "01/06/2026",
     unit: "eBB271",
-    dutyOfficer: "Cẩn",
+    dutyOfficer: "Lê Văn D",
     shortWaveReport: {
       objectCount: 3,
       totalSessions: 22,
@@ -253,6 +253,6 @@ export const COMMUNICATION_REPORT_ROWS: CommunicationReportRow[] = [
       documents2: { go: 7, come: 7 },
       vehicles: { bicycle: 4, motorcycle: 3, trips: 6, weight: 92 },
     },
-    note: "BT",
+    note: "Tín hiệu sóng ngắn có lúc bị nhiễu",
   },
 ];

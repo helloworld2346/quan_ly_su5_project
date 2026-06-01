@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"; 
+import { useState, useEffect } from "react";
 import type { FormEvent } from "react";
 
 import styles from "./Login.module.css";
@@ -6,7 +6,8 @@ import styles from "./Login.module.css";
 import Input from "../../components/ui/Input/Input";
 import Button from "../../components/ui/Button/Button";
 import { authService } from "../../services/auth/authService";
-import { storage, themeSession } from "../../utils/storage";
+import { storage } from "../../utils/storage";
+import { themeSession } from "../../utils/themeStorage";
 import type { LoginRequest } from "../../types/auth";
 import { getErrorMessage } from "../../utils/errorHandler";
 import { useToast } from "../../context/useToast";
@@ -70,8 +71,8 @@ export default function Login({ onSuccess }: Props) {
         setError(response.message || "Đăng nhập thất bại");
       }
     } catch (err) {
-      const errObj = error as any 
-      if (!errObj .response) {
+      const errObj = error as any;
+      if (!errObj.response) {
         showError("Không thể kết nối đến server. Vui lòng thử lại.");
       } else {
         setError(getErrorMessage(errObj));
