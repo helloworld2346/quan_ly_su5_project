@@ -6,7 +6,7 @@
   width: 100%;    
   max-width: 100%;    
   overflow-x: auto;    
-  background:#2caa6d;    
+  background:#218673;    
   border-radius: 12px;    
   border: 1px solid var(--login-border);    
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);    
@@ -19,15 +19,12 @@
    border-collapse: collapse;
  }
 
- .reportTable thead {  
-  border-bottom: 3px solid var(--comm-report-primary, #1e3a5f);  
-} 
  .reportTable th {    
   background: transparent;  
-  color: var(--login-text);  
+  color: #fff;  
   border: 1px solid var(--login-border);  
   font-size: 12px;   
-  font-weight: 800;  
+  font-weight: 600;  
   text-transform: uppercase;  
   letter-spacing: 0.5px;  
   padding: 14px 8px;  
@@ -35,12 +32,18 @@
   vertical-align: middle;  
  
 }  
-  
+  .reportTable tbody tr:nth-child(odd) td {
+  background: #ffffff;
+}
+
+.reportTable tbody tr:nth-child(even) td {
+  background: #f7f8f8;
+}
    
 .reportTable td {    
   background: var(--surface-card);  
   color: var(--login-text);  
-  border: 1px solid var(--login-border);  
+  border: 2px solid var(--login-border);  
   padding: 12px 8px;  
   text-align: center;  
   vertical-align: middle;  
