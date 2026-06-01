@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
-
 import styles from "./DailyTroopReport.module.css";
-
 import ReportToolbar from "../../components/report/ReportToolbar";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {  faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import {
   REPORT_ROWS,
   FILL_FROM_PRESENT_TO_SIGN_COUNT,
@@ -66,10 +66,10 @@ export default function DailyTroopReport() {
               <th colSpan={13}>Quân số vắng</th>
               <th rowSpan={3}>TCH</th>
               <th rowSpan={3}>Trực ban</th>
-              <th rowSpan={3}>Ký tên</th>
+              <th rowSpan={3}>Xem chi tiết</th>
             </tr>
             <tr>
-              <th colSpan={2}>HT</th>
+              <th colSpan={2}>Hội Thao</th>
               <th colSpan={2}>Xây</th>
               <th rowSpan={2}>Chờ hưu</th>
               <th rowSpan={2}>Nghi (TT, cuối tuần)</th>
@@ -79,13 +79,13 @@ export default function DailyTroopReport() {
               <th colSpan={2}>Học</th>
             </tr>
             <tr>
-              <th>Ngoài Sư</th>
+              <th>Ngoài Sư Đoàn</th>
               <th>e, f</th>
-              <th>Ngoài Sư</th>
+              <th>Ngoài Sư Đoàn</th>
               <th>e, f</th>
-              <th>Ngoài Sư</th>
+              <th>Ngoài Sư Đoàn</th>
               <th>e, f</th>
-              <th>Ngoài Sư</th>
+              <th>Ngoài Sư Đoàn</th>
               <th>f</th>
               <th>SQ</th>
               <th>CS</th>
@@ -107,11 +107,19 @@ export default function DailyTroopReport() {
                   <td>{isNoReport ? "" : row.total2}</td>
 
                   {Array.from(
-                    { length: FILL_FROM_PRESENT_TO_SIGN_COUNT },
+                    { length: FILL_FROM_PRESENT_TO_SIGN_COUNT - 1 },
                     (_, i) => (
-                      <td key={i}>{isNoReport ? "" : row.unit}</td>
+                      <td key={i} className={styles.numberCell}>
+                        {isNoReport ? "" : row.unit}
+                      </td>
                     ),
                   )}
+
+                <td>
+  <button className={styles.detailBtn} aria-label="Xem chi tiết">
+    <FontAwesomeIcon icon={faPenToSquare} />
+  </button>
+</td>
                 </tr>
               );
             })}
@@ -121,11 +129,12 @@ export default function DailyTroopReport() {
               <td>7267</td>
               <td>7267</td>
               {Array.from(
-                { length: FILL_FROM_PRESENT_TO_SIGN_COUNT },
+                { length: FILL_FROM_PRESENT_TO_SIGN_COUNT - 1 },
                 (_, i) => (
                   <td key={i}>Tổng</td>
                 ),
               )}
+              <td></td>
             </tr>
           </tbody>
         </table>

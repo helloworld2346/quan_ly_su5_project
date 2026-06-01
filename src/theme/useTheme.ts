@@ -1,4 +1,4 @@
-// src/theme/useTheme.ts
+
 import { useEffect, useState } from "react";
 
 import {

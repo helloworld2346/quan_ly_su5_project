@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react"; 
 import type { FormEvent } from "react";
 
 import styles from "./Login.module.css";
@@ -6,17 +6,14 @@ import styles from "./Login.module.css";
 import Input from "../../components/ui/Input/Input";
 import Button from "../../components/ui/Button/Button";
 import { authService } from "../../services/auth/authService";
-import { storage } from "../../utils/storage";
+import { storage, themeSession } from "../../utils/storage";
 import type { LoginRequest } from "../../types/auth";
 import { getErrorMessage } from "../../utils/errorHandler";
 import { useToast } from "../../context/useToast";
-
-import { loginValidation } from "../../utils/validation";  
-
+import { loginValidation } from "../../utils/validation";
 
 import logo from "../../assets/images/logo-su5.png";
 import loginBg from "../../assets/images/login-bg-dongson.png";
-
 
 const pageStyle = {
   "--login-bg": `url(${loginBg})`,
@@ -32,6 +29,10 @@ export default function Login({ onSuccess }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { showError, showSuccess } = useToast();
+
+  useEffect(() => {
+    themeSession.applyOnAppStart(!!storage.getToken());
+  }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -62,18 +63,20 @@ export default function Login({ onSuccess }: Props) {
 
       if (response.success && response.Result.token) {
         storage.setToken(response.Result.token);
+        themeSession.applyOnLogin(); // ← thêm dòng này
         showSuccess("Đăng nhập thành công!");
         onSuccess?.();
       } else {
         setError(response.message || "Đăng nhập thất bại");
       }
     } catch (err) {
-      if (!err.response) {
+      const errObj = error as any 
+      if (!errObj .response) {
         showError("Không thể kết nối đến server. Vui lòng thử lại.");
       } else {
-        setError(getErrorMessage(err));
+        setError(getErrorMessage(errObj));
       }
-      console.error("Login error:", err);
+      console.error("Login error:", errObj);
     } finally {
       setLoading(false);
     }
