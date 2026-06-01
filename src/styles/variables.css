@@ -24,11 +24,6 @@
  --table-row-odd: #ffffff;
   --table-row-even: #f3f8f5;
 
-
-
-
-
-
   --sidebar-width: 280px;
   --sidebar-collapsed-width: 88px;
 
@@ -129,8 +124,8 @@
   --dialog-info-icon: var(--primary-color);  
  
 
-  --table-row-odd: #1f2937;
-  --table-row-even: #273444;
+  --table-row-odd: #1c2822;
+  --table-row-even: #121a16;
   
   --toast-bg-dark: #1c2822;  
   --toast-message-text-dark: #d8e4de;  
