@@ -4,16 +4,16 @@ import styles from "./PieChart.module.css";
 
 import { PRESENT_GRADIENTS } from "../../../constants/chartColors";
 
-import type {
-  AttendanceKey,
-  TroopSegment,
-  UnitTroopChart,
-} from "../../../types/troopStats";
-import { getChartSegments, getPresentRate } from "../../../data/troopData";
+import type { AttendanceKey, TroopSegment } from "../../../types/troopStats";
+import {
+  getChartSegments,
+  getPresentRate,
+  type UnitTroopChart,
+} from "../../../data/troopData";
 
 type Props = {
   chart: UnitTroopChart;
-  size?: "large" | "small";
+  size?: "hero" | "large" | "small";
   badge?: string;
   unitType?: UnitTroopChart["unitType"];
 };
@@ -49,9 +49,10 @@ export default function PieChart({
 
   const [hovered, setHovered] = useState<AttendanceKey | null>(null);
 
+  const isHero = size === "hero";
   const isLarge = size === "large";
-  const radius = isLarge ? 92 : 62;
-  const stroke = isLarge ? 30 : 20;
+  const radius = isHero ? 120 : isLarge ? 92 : 62;
+  const stroke = isHero ? 40 : isLarge ? 30 : 20;
   const viewSize = (radius + stroke) * 2;
   const center = viewSize / 2;
   const circumference = 2 * Math.PI * radius;
@@ -68,15 +69,27 @@ export default function PieChart({
 
   return (
     <article
-      className={isLarge ? `${styles.card} ${styles.large}` : styles.card}
+      className={
+        isHero
+          ? `${styles.card} ${styles.hero}`
+          : isLarge
+            ? `${styles.card} ${styles.large}`
+            : styles.card
+      }
     >
       <div
         className={
-          isLarge ? `${styles.header} ${styles.headerCompact}` : styles.header
+          isHero
+            ? `${styles.header} ${styles.headerCompact} ${styles.heroHeader}`
+            : isLarge
+              ? `${styles.header} ${styles.headerCompact}`
+              : styles.header
         }
       >
         <div className={styles.titleContainer}>
-          {!isLarge && <h3 className={styles.title}>{chart.name}</h3>}
+          {!isLarge && !isHero && (
+            <h3 className={styles.title}>{chart.name}</h3>
+          )}
           {badge && (
             <div className={styles.headerMeta}>
               <span className={styles.badge}>{badge}</span>
@@ -89,10 +102,18 @@ export default function PieChart({
       </div>
 
       <div className={styles.body}>
-        <div className={styles.chartWrap}>
+        <div
+          className={
+            isHero
+              ? `${styles.chartWrap} ${styles.heroChartWrap}`
+              : styles.chartWrap
+          }
+        >
           <svg
             viewBox={`0 0 ${viewSize} ${viewSize}`}
-            className={styles.chart}
+            className={
+              isHero ? `${styles.chart} ${styles.heroChart}` : styles.chart
+            }
             role="img"
             aria-label={`Biểu đồ ${chart.name}: tổng ${chart.total}, hiện diện ${chart.present}, vắng ${chart.absent}`}
           >

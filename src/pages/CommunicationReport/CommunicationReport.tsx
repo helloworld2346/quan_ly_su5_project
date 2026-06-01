@@ -20,7 +20,7 @@ const formatDate = (date: string) => {
     return `${parts[0]}/${parts[1]}/${parts[2].slice(-2)}`;
   }
   return date;
-};  
+};
 
 export default function CommunicationReport() {
   const [query, setQuery] = useState("");
@@ -127,7 +127,8 @@ export default function CommunicationReport() {
                 đối tượng LL
               </th>
               <th>
-                Σ <br /> Số phiên
+                Σ <br />
+                Số phiên
               </th>
               <th>Phiên tốt</th>
               <th>Phiên đứt</th>

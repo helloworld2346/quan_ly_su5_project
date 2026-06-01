@@ -15,14 +15,13 @@ import {
   getDivisionSummary,
 } from "../../data/troopData";
 
-
 import styles from "./ExecutiveDashboard.module.css";
 
 type FilterKey = "all" | SubordinateUnitType;
 
 const FILTER_OPTIONS: { key: FilterKey; label: string }[] = [
   { key: "all", label: "Tất cả đơn vị" },
-  { key: "department", label: "Phòng" },
+  { key: "department", label: "Phòng, ban" },
   { key: "regiment", label: "Trung đoàn" },
   { key: "battalion", label: "Tiểu đoàn" },
   { key: "company", label: "Đại đội" },
@@ -105,14 +104,13 @@ export default function ExecutiveDashboard() {
           <h3 className={styles.chartSectionTitle}>
             Báo ban quân số toàn Sư đoàn
           </h3>
-         
         </div>
 
         <div className={styles.featuredBlock}>
           <PieChart
-            size="large"
+            size="hero"
             chart={DIVISION_TROOP_CHART}
-            badge={UNIT_TYPE_LABELS[DIVISION_TROOP_CHART.unitType]}
+            badge="TOÀN SƯ ĐOÀN"
           />
         </div>
       </div>
@@ -123,7 +121,8 @@ export default function ExecutiveDashboard() {
             Thống kê theo đơn vị trực thuộc
           </h3>
           <p className={styles.subSectionDesc}>
-            {SUBORDINATE_COUNT} đơn vị — phòng, trung đoàn, tiểu đoàn, đại đội
+            {SUBORDINATE_COUNT} đơn vị — phòng, ban, trung đoàn, tiểu đoàn, đại
+            đội
           </p>
         </div>
 
