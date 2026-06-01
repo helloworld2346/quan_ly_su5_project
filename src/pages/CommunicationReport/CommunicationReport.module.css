@@ -29,7 +29,7 @@
   background: transparent;  
   color: var(--login-text);  
   border: 1px solid var(--login-border);  
-  font-size: 14px;  
+  font-size: 12px;  
   font-weight: 800;  
   text-transform: uppercase;  
   letter-spacing: 0.5px;  

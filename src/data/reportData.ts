@@ -7,11 +7,8 @@ export type ReportSeed = {
 export const REPORT_ROWS: ReportSeed[] = [
   { unit: "CH/f", total1: 8, total2: 8 },
   { unit: "PTM", total1: 78, total2: 144 },
-  { unit: "c23", total1: 46, total2: 46 },
   { unit: "PCT", total1: 47, total2: 47 },
   { unit: "PHC-KT", total1: 51, total2: 51 },
-    { unit: "cKho", total1: 19, total2: 19 },
-  { unit: "cSC", total1: 31, total2: 111 },
   { unit: "e4", total1: 1963, total2: 1963 },
   { unit: "e5", total1: 1951, total2: 1951 },
   { unit: "e271", total1: 1963, total2: 1963 },
@@ -25,6 +22,9 @@ export const REPORT_ROWS: ReportSeed[] = [
   { unit: "d25", total1: 68, total2: 68 },
   { unit: "c19", total1: 44, total2: 44 },
   { unit: "c20", total1: 43, total2: 43 },
+  { unit: "c23", total1: 46, total2: 46 },
+  { unit: "cSC", total1: 31, total2: 111 },
+  { unit: "cKho", total1: 19, total2: 19 },
   { unit: "dHLCSM", total1: 390, total2: 390 },
 ];
 
