@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
 
 import PieChart from "../../components/charts/PieChart/PieChart";
+import type { SubordinateUnitType } from "../../types/troopStats";
 import {
   CHART_GROUP_LABELS,
   CHART_GROUP_ORDER,
@@ -12,8 +13,8 @@ import {
   UNIT_TYPE_LABELS,
   getChartsByGroup,
   getDivisionSummary,
-  type SubordinateUnitType,
-} from "../../types/troopStats";
+} from "../../data/troopData";
+
 
 import styles from "./ExecutiveDashboard.module.css";
 

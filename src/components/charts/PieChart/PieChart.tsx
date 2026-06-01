@@ -4,12 +4,12 @@ import styles from "./PieChart.module.css";
 
 import { PRESENT_GRADIENTS } from "../../../constants/chartColors";
 
-import type { AttendanceKey, TroopSegment } from "../../../types/troopStats";
-import {
-  getChartSegments,
-  getPresentRate,
-  type UnitTroopChart,
+import type {
+  AttendanceKey,
+  TroopSegment,
+  UnitTroopChart,
 } from "../../../types/troopStats";
+import { getChartSegments, getPresentRate } from "../../../data/troopData";
 
 type Props = {
   chart: UnitTroopChart;
@@ -51,7 +51,7 @@ export default function PieChart({
 
   const isLarge = size === "large";
   const radius = isLarge ? 92 : 62;
-const stroke = isLarge ? 30 : 20;
+  const stroke = isLarge ? 30 : 20;
   const viewSize = (radius + stroke) * 2;
   const center = viewSize / 2;
   const circumference = 2 * Math.PI * radius;
