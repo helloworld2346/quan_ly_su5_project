@@ -50,13 +50,16 @@ export const DIVISION_TROOP_CHART = buildChart(
   0.934
 );
 
-/** Đơn vị trực thuộc Sư đoàn 5 — sắp theo: phòng/ban → trung đoàn → tiểu đoàn → đại đội */
 export const SUBORDINATE_TROOP_CHARTS: UnitTroopChart[] = [
-  // Phòng, ban trực thuộc
   buildChart("phong-ct", "Phòng Chính Trị", "department", 95, 0.921),
   buildChart("phong-tm", "Phòng Tham Mưu", "department", 110, 0.918),
-  buildChart("phong-hckt", "Phòng Hậu Cần Kỹ Thuật", "department", 175, 0.912),
-  buildChart("ban-tc", "Ban Tài Chính", "department", 85, 0.929),
+  buildChart(
+    "phong-hckt",
+    "Phòng Hậu - Cần Kỹ Thuật",
+    "department",
+    175,
+    0.912,
+  ),
   // Trung đoàn
   buildChart("td-4", "Trung đoàn 4", "regiment", 1320, 1),
   buildChart("td-5", "Trung đoàn 5", "regiment", 1295, 0.935),
@@ -73,8 +76,8 @@ export const SUBORDINATE_TROOP_CHARTS: UnitTroopChart[] = [
   buildChart("dd-19", "Đại đội 19", "company", 98, 0.952),
   buildChart("dd-20", "Đại đội 20", "company", 92, 0.948),
   buildChart("dd-23", "Đại đội 23", "company", 88, 0.945),
-  buildChart("dd-kho", "Đại đội Kho", "company", 72, 0.958),
   buildChart("dd-sua-chua", "Đại đội Sửa chữa", "company", 68, 0.951),
+  buildChart("dd-kho", "Đại đội Kho", "company", 72, 0.958),
 ];
 
 export const UNIT_TYPE_LABELS: Record<UnitTroopChart["unitType"], string> = {
@@ -82,7 +85,7 @@ export const UNIT_TYPE_LABELS: Record<UnitTroopChart["unitType"], string> = {
   regiment: "Trung đoàn",
   battalion: "Tiểu đoàn",
   company: "Đại đội",
-  department: "Phòng ban",
+  department: "Phòng",
 };
 
 export type SubordinateUnitType = Exclude<
@@ -98,7 +101,7 @@ export const CHART_GROUP_ORDER: SubordinateUnitType[] = [
 ];
 
 export const CHART_GROUP_LABELS: Record<SubordinateUnitType, string> = {
-  department: "Phòng, ban trực thuộc",
+  department: "Phòng trực thuộc",
   regiment: "Trung đoàn",
   battalion: "Tiểu đoàn",
   company: "Đại đội",

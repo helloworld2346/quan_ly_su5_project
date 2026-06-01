@@ -5,7 +5,7 @@ export type NavItemId =
   | "report-troop"
   | "report-training"
   | "report-family"
-  | "report-communication" // THÊM
+  | "report-communication"
   | "duty-command"
   | "duty-tactical"
   | "settings";

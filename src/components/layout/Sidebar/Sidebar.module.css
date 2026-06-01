@@ -10,7 +10,6 @@
   flex-shrink: 0;
   padding: 24px 16px 20px;
   z-index: 1000;
-  overflow-y: auto;
 
   background: linear-gradient(
     180deg,
@@ -52,14 +51,35 @@
   font-weight: 500;
   line-height: 1.45;
   color: rgba(255, 255, 255, 0.75);
+  overflow-y: auto;
 }
 
-.nav {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-height: 0;
+.nav {  
+  flex: 1;  
+  display: flex;  
+  flex-direction: column;  
+  gap: 6px;  
+  min-height: 0;  
+  overflow-y: auto;  
+  scrollbar-width: thin; /* Firefox */  
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent; /* Firefox */  
+}  
+  
+.nav::-webkit-scrollbar {  
+  width: 6px;  
+}  
+  
+.nav::-webkit-scrollbar-track {  
+  background: transparent;  
+}  
+  
+.nav::-webkit-scrollbar-thumb {  
+  background: rgba(255, 255, 255, 0.3);  
+  border-radius: 3px;  
+}  
+  
+.nav::-webkit-scrollbar-thumb:hover {  
+  background: rgba(255, 255, 255, 0.5);  
 }
 
 .navItem,

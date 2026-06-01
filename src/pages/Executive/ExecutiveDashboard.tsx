@@ -21,7 +21,7 @@ type FilterKey = "all" | SubordinateUnitType;
 
 const FILTER_OPTIONS: { key: FilterKey; label: string }[] = [
   { key: "all", label: "Tất cả đơn vị" },
-  { key: "department", label: "Phòng, ban" },
+  { key: "department", label: "Phòng" },
   { key: "regiment", label: "Trung đoàn" },
   { key: "battalion", label: "Tiểu đoàn" },
   { key: "company", label: "Đại đội" },
@@ -122,8 +122,7 @@ export default function ExecutiveDashboard() {
             Thống kê theo đơn vị trực thuộc
           </h3>
           <p className={styles.subSectionDesc}>
-            {SUBORDINATE_COUNT} đơn vị — phòng, ban, trung đoàn, tiểu đoàn, đại
-            đội
+            {SUBORDINATE_COUNT} đơn vị — phòng, trung đoàn, tiểu đoàn, đại đội
           </p>
         </div>
 
