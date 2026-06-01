@@ -119,6 +119,7 @@
   white-space: nowrap;  
   transition: background 0.15s, border-color 0.15s, transform 0.1s;  
 }  
+
   
 .exportBtn:hover {  
   filter: brightness(0.97);  
@@ -149,6 +150,52 @@
   background: #d4edd9;  
   border-color: var(--primary-color);  
 }  
+
+[data-theme="dark"] .searchWrap {
+  background: var(--surface-card);
+  border: 1px solid var(--login-border);
+}
+
+[data-theme="dark"] .searchInput {
+  color: var(--login-text);
+  background: transparent;
+}
+
+[data-theme="dark"] .searchInput::placeholder {
+  color: var(--on-surface-muted);
+}
+
+[data-theme="dark"] .searchDivider {
+  background: var(--login-border);
+}
+
+[data-theme="dark"] .searchIcon {
+  color: var(--on-surface-muted);
+}
+
+[data-theme="dark"] .searchIconBtn:hover .searchIcon {
+  color: var(--primary-color);
+}
+
+[data-theme="dark"] .dateInput {
+  background: var(--surface-card);
+  color: var(--login-text);
+  border-color: var(--login-border);
+}
+
+[data-theme="dark"] .dateInput:hover {
+  border-color: var(--primary-color);
+}
+
+[data-theme="dark"] .dateInput:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(107, 184, 146, 0.15);
+}
+
+[data-theme="dark"] .dateInput::-webkit-calendar-picker-indicator {
+  filter: invert(0.7) brightness(1.5) sepia(0.3) hue-rotate(90deg);
+  opacity: 0.8;
+}
   
 @media (max-width: 768px) {  
   .toolbar {  
@@ -169,4 +216,6 @@
     flex: 1;  
     min-width: 0;  
   }  
+
+  
 }

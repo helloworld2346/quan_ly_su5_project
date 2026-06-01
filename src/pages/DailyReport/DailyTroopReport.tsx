@@ -2,7 +2,9 @@ import { useMemo, useState } from "react";
 import styles from "./DailyTroopReport.module.css";
 import ReportToolbar from "../../components/report/ReportToolbar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {  faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { ABSENT_MEMBERS } from "../../types/troopStats";
+import TroopDetailModal from "./TroopDetailModal";
 import {
   REPORT_ROWS,
   FILL_FROM_PRESENT_TO_SIGN_COUNT,
@@ -21,6 +23,7 @@ function todayIsoDate() {
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
   const [reportDate, setReportDate] = useState(todayIsoDate());
+  const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
 
   const filteredRows = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -47,7 +50,7 @@ export default function DailyTroopReport() {
   }, [query]);
 
   return (
-    <section className={styles.report} aria-labelledby="dashboard-page-heading">
+    <section className={styles.report} aria-labelledect="dashboard-page-heading">
       <ReportToolbar
         query={query}
         onQueryChange={setQuery}
@@ -72,7 +75,7 @@ export default function DailyTroopReport() {
               <th colSpan={2}>Hội Thao</th>
               <th colSpan={2}>Xây</th>
               <th rowSpan={2}>Chờ hưu</th>
-              <th rowSpan={2}>Nghi (TT, cuối tuần)</th>
+              <th rowSpan={2}>Nghỉ (TT, cuối tuần)</th>
               <th rowSpan={2}>Phép</th>
               <th colSpan={2}>Viện</th>
               <th colSpan={2}>Công tác</th>
@@ -115,11 +118,15 @@ export default function DailyTroopReport() {
                     ),
                   )}
 
-                <td>
-  <button className={styles.detailBtn} aria-label="Xem chi tiết">
-    <FontAwesomeIcon icon={faPenToSquare} />
-  </button>
-</td>
+                  <td>
+                    <button
+                      className={styles.detailBtn}
+                      aria-label="Xem chi tiết"
+                      onClick={() => setSelectedUnit(row.unit)}
+                    >
+                    <FontAwesomeIcon icon={faPenToSquare} />
+                    </button>
+                  </td>
                 </tr>
               );
             })}
@@ -129,16 +136,24 @@ export default function DailyTroopReport() {
               <td>7267</td>
               <td>7267</td>
               {Array.from(
-                { length: FILL_FROM_PRESENT_TO_SIGN_COUNT - 1 },
-                (_, i) => (
-                  <td key={i}>Tổng</td>
-                ),
-              )}
+  { length: FILL_FROM_PRESENT_TO_SIGN_COUNT - 1 },
+  (_, i) => (
+    <td key={i}>Tổng</td>
+  ),
+)}
               <td></td>
             </tr>
           </tbody>
         </table>
       </div>
+
+  {selectedUnit && (
+  <TroopDetailModal
+    unit={selectedUnit}
+    members={ABSENT_MEMBERS[selectedUnit] || []}
+    onClose={() => setSelectedUnit(null)}
+  />
+)}
     </section>
   );
 }

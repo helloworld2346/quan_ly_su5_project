@@ -1,192 +1,138 @@
- 
-.report {  
-  width: 100%;  
-  min-width: 0;  
-}  
-  
-.tableShell {  
-  width: 100%;  
-  max-width: 100%;  
-  overflow-x: hidden;  
-  background: white;  
-  border-radius: 12px;  
-  border: 1px solid var(--login-border);  
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);  
-}  
-  
-.reportTable {  
-  width: 100%;  
-  max-width: 100%;  
-  table-layout: fixed;  
-  border-collapse: collapse;  
+ .report {
+   width: 100%;
+   min-width: 0;
+ }
 
-}  
-  
-.reportTable th {
-  background: var(--primary-color);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  font-size: 13px;
-  font-weight: 700;
-  padding: 14px 10px;
-  text-align: center;
-  vertical-align: middle;
+ .tableShell {
+   width: 100%;
+   max-width: 100%;
+   overflow-x: hidden;
+   background: white;
+   border-radius: 12px;
+   border: 1px solid var(--login-border);
+   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+ }
 
-  white-space: normal;     
-  word-break: keep-all;   
-}
-  
-.reportTable td {
-  background: var(--surface-card);
-  color: var(--login-text);
-  border: 1px solid var(--login-border);
-  text-align: center;
-  padding: 10px 6px;
-  vertical-align: middl;
-  font-size: 15px;
-  word-wrap: break-word;
-  
-}
+ .reportTable {
+   width: 100%;
+   max-width: 100%;
+   table-layout: fixed;
+   border-collapse: collapse;
 
-[data-theme="dark"] .dateInput::-webkit-calendar-picker-indicator {
-  filter: invert(1) brightness(1.3);
-  opacity: 1;
-}
-  
-.reportTable thead tr:nth-child(2) th {  
-  background: #1c6b44;  
-}  
-  
-.reportTable thead tr:nth-child(3) th {  
-  background: #2b8055;  
-}  
-  
-.reportTable th:first-child,  
-.reportTable td:first-child {  
-  width: 9%;  
-}  
-  
+ }
 
-.reportTable th:last-child,
-.reportTable td:last-child {
-  width: 6%;
-  min-width: 48px;
-}
-  
-.unitCell {
-  color: var(--login-text);
-  font-weight: 700;
-}
-.totalRow td {
-  background: var(--surface-muted);
-  color: var(--login-text);
-  font-weight: 700;
-}
-  
-.noReportRow td {  
-  background: #ffe9e9;  
-  color: #b42318;  
-  font-weight: 600;  
-}  
-  
-.noReportRow td:first-child {  
-  color: #8f1010;  
-}  
+ .reportTable th {
+   background: #02661c;
+   color: white;
+   border: 1px solid rgba(255, 255, 255, 0.15);
+   font-size: 13px;
+   font-weight: 700;
+   padding: 14px 10px;
+   text-align: center;
+   vertical-align: middle;
+   white-space: normal;
+   word-break: keep-all;
+ }
+
+ .reportTable td {
+   background: var(--surface-card);
+   color: var(--login-text);
+   border: 1px solid var(--login-border);
+   text-align: center;
+   padding: 10px 6px;
+   vertical-align: middl;
+   font-size: 15px;
+   word-wrap: break-word;
+
+ }
+
+ .reportTable thead tr:nth-child(2) th {
+   background: #05ba5ff8;
+ }
+
+ .reportTable thead tr:nth-child(3) th {
+   background: #10874c;
+ }
+
+ .reportTable th:first-child,
+ .reportTable td:first-child {
+   width: 9%;
+ }
 
 
-[data-theme="dark"] .searchWrap {
-  background: var(--surface-card);
-  border: 1px solid var(--login-border);
-}
+ .reportTable th:last-child,
+ .reportTable td:last-child {
+   width: 6%;
+   min-width: 48px;
+ }
 
-[data-theme="dark"] .searchInput {
-  color: var(--login-text);
-  background: transparent;
-}
+ .unitCell {
+   color: var(--login-text);
+   font-weight: 700;
+ }
 
-[data-theme="dark"] .searchInput::placeholder {
-  color: var(--on-surface-muted);
-}
+ .totalRow td {
+   background: var(--surface-muted);
+   color: var(--login-text);
+   font-weight: 700;
+ }
 
-[data-theme="dark"] .searchDivider {
-  background: var(--login-border);
-}
+ .noReportRow td {
+   background: #ffe9e9;
+   color: #b42318;
+   font-weight: 600;
+ }
 
-[data-theme="dark"] .searchIcon {
-  color: var(--on-surface-muted);
-}
+ .noReportRow td:first-child {
+   color: #8f1010;
+ }
 
-[data-theme="dark"] .searchIconBtn:hover .searchIcon {
-  color: var(--primary-color);
-}
+ [data-theme="dark"] .detailBtn {
+   background: rgba(107, 184, 146, 0.15);
+   color: var(--primary-color);
+ }
 
+ [data-theme="dark"] .detailBtn:hover {
+   background: var(--primary-color);
+   color: var(--surface-card);
+ }
 
-[data-theme="dark"] .dateInput {
-  background: var(--surface-card);
-  color: var(--login-text);
-  border-color: var(--login-border);
-}
+ .detailBtn {
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   width: 32px;
+   height: 32px;
+   border: none;
+   border-radius: 8px;
+   background: #e8f4ee;
+   color: #1f5c3f;
+   cursor: pointer;
+   font-size: 15px;
+   transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+   box-shadow: 0 1px 3px rgba(31, 92, 63, 0.1);
+ }
 
-[data-theme="dark"] .dateInput:hover {
-  border-color: var(--primary-color);
-}
+ .detailBtn:hover {
+   background: #1f5c3f;
+   color: #fff;
+   transform: scale(1.08);
+   box-shadow: 0 3px 8px rgba(31, 92, 63, 0.25);
+ }
 
-[data-theme="dark"] .dateInput:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(107, 184, 146, 0.15);
-}
+ .detailBtn:active {
+   transform: scale(0.96);
+ }
 
+ @media (max-width: 768px) {
+   .reportTable th {
+     font-size: 11px;
+     padding: 10px 6px;
+   }
 
-[data-theme="dark"] .detailBtn {
-  background: rgba(107, 184, 146, 0.15);
-  color: var(--primary-color);
-}
+   .reportTable td {
+     padding: 10px 6px;
+     font-size: 12px;
+   }
 
-[data-theme="dark"] .detailBtn:hover {
-  background: var(--primary-color);
-  color: var(--surface-card);
-}
-[data-theme="dark"] .dateInput::-webkit-calendar-picker-indicator {
-  filter: invert(0.7) brightness(1.5) sepia(0.3) hue-rotate(90deg);
-  opacity: 0.8;
-}
-
-.detailBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border: none;
-  border-radius: 8px;
-  background: #e8f4ee;
-  color: #1f5c3f;
-  cursor: pointer;
-  font-size: 15px;
-  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
-  box-shadow: 0 1px 3px rgba(31, 92, 63, 0.1);
-}
-
-.detailBtn:hover {
-  background: #1f5c3f;
-  color: #fff;
-  transform: scale(1.08);
-  box-shadow: 0 3px 8px rgba(31, 92, 63, 0.25);
-}
-
-.detailBtn:active {
-  transform: scale(0.96);
-}
-  
-@media (max-width: 768px) {  
-  .reportTable th {  
-    font-size: 11px;  
-    padding: 10px 6px;  
-  }  
-  
-  .reportTable td {  
-    padding: 10px 6px;  
-    font-size: 12px;  
-  }  
-  
-}
+ }

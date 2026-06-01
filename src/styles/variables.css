@@ -21,16 +21,20 @@
   --border-color: #d7d7d7;
   --shadow-color: rgba(0, 0, 0, 0.2);
 
-  /* --- LAYOUT SIZES --- */
+
+
+
+
+
+
+
   --sidebar-width: 280px;
   --sidebar-collapsed-width: 88px;
 
-  /* --- LOGIN SYSTEM --- */
   --login-text: #1a2e24;
   --login-text-muted: #4a5f54;
   --login-border: #cfd9d3;
 
-  /* --- CORE APP LAYOUT (LIGHT MODE) --- */
   --sidebar-bg-top: #145338;
   --sidebar-bg-bottom: #0d3b28;
   --dashboard-bg: #f0f4f2;
@@ -39,13 +43,11 @@
   --topbar-btn-bg: #ffffff;
   --topbar-btn-hover: #f0f5f2;
 
-  /* --- SURFACES & COMPONENTS (LIGHT MODE) --- */
   --surface-card: #ffffff;
   --surface-muted: #f4f7f5;
   --on-surface: #152a22;
   --on-surface-muted: #3a5248;
 
-  /* --- BADGES & TOOLTIPS (LIGHT MODE) --- */
   --rate-badge-fg: #c2410c;
   --rate-badge-bg: rgba(234, 88, 12, 0.16);
   --rate-badge-border: transparent;
@@ -55,7 +57,6 @@
   --tooltip-muted: #c8d9d0;
   --legend-hover-bg: rgba(31, 92, 63, 0.08);
 
-  /* --- DIALOGS (LIGHT MODE) --- */  
   --dialog-bg: #ffffff;  
   --dialog-overlay-bg: rgba(0, 0, 0, 0.5);  
   --dialog-title-text: #111827;  
@@ -68,7 +69,6 @@
   --dialog-confirm-hover-bg: var(--primary-hover);  
   --dialog-info-icon: var(--primary-color);  
 
-    /* Toast variables - Light mode */  
   --toast-bg: #ffffff;  
   --toast-message-text: #374151;  
   --toast-close-text: #6b7280;  
@@ -82,20 +82,16 @@
 [data-theme="dark"] {
   color-scheme: dark;
 
-  /* --- BRAND COLORS (DARK MODE) --- */
   --primary-color: #6bb892;
   --primary-hover: #5aa67f;
   --gold-color: #d4b85a;
 
-  /* --- GENERAL TEXT --- */
   --text-dark: #d8e4de;
 
-  /* --- LOGIN SYSTEM (DARK MODE) --- */
   --login-text: #d8e4de;
   --login-text-muted: #9fb0a8;
   --login-border: #354840;
 
-  /* --- CORE APP LAYOUT (DARK MODE) --- */
   --sidebar-bg-top: #152820;
   --sidebar-bg-bottom: #101c17;
   --dashboard-bg: #121a16;
@@ -104,13 +100,11 @@
   --topbar-btn-bg: #243029;
   --topbar-btn-hover: #2d3b34;
 
-  /* --- SURFACES & COMPONENTS (DARK MODE) --- */
   --surface-card: #1c2822;
   --surface-muted: #243329;
   --on-surface: #e4ede8;
   --on-surface-muted: #b0c2b8;
 
-  /* --- BADGES & TOOLTIPS (DARK MODE) --- */
   --rate-badge-fg: #fdba74;
   --rate-badge-bg: rgba(251, 146, 60, 0.28);
   --rate-badge-border: rgba(253, 186, 116, 0.45);
@@ -119,8 +113,7 @@
   --tooltip-fg: #eef5f1;
   --tooltip-muted: #b5c9be;
   --legend-hover-bg: rgba(107, 184, 146, 0.14);
-    
-  /* --- DIALOGS (DARK MODE) --- */  
+
   --dialog-bg: #1c2822;  
   --dialog-overlay-bg: rgba(0, 0, 0, 0.7);  
   --dialog-title-text: #d8e4de;  
@@ -132,8 +125,7 @@
   --dialog-confirm-text: #121a16;  
   --dialog-confirm-hover-bg: #5aa882;  
   --dialog-info-icon: var(--primary-color);  
-    
-  /* Toast variables - Dark mode */  
+ 
   --toast-bg-dark: #1c2822;  
   --toast-message-text-dark: #d8e4de;  
   --toast-close-text-dark: #9fb0a8;  

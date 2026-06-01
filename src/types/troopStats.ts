@@ -16,6 +16,14 @@ export type UnitTroopChart = {
   absent: number;
 };
 
+export interface TroopMember {
+  id: string;
+  name: string;
+  rank: string;    // Cấp bậc
+  position: string; // Chức vụ
+  reason: string;  // Lý do vắng
+}
+
 export const ATTENDANCE_META: Record<
   AttendanceKey,
   { label: string; color: string }
@@ -102,6 +110,45 @@ export const CHART_GROUP_LABELS: Record<SubordinateUnitType, string> = {
   regiment: "Trung đoàn",
   battalion: "Tiểu đoàn",
   company: "Đại đội",
+};
+
+export const ABSENT_MEMBERS: Record<string, TroopMember[]> = {
+  e4: [
+    {
+      id: "1",
+      name: "Nguyễn Văn A",
+      rank: "Trung úy",
+      position: "Đại đội trưởng",
+      reason: "Nghỉ phép",
+    },
+    {
+      id: "2",
+      name: "Trần Văn B",
+      rank: "Thượng sĩ",
+      position: "Tiểu đội trưởng",
+      reason: "Công tác",
+    },
+  ],
+
+  e5: [
+    {
+      id: "3",
+      name: "Lê Văn C",
+      rank: "Đại úy",
+      position: "Đại đội phó",
+      reason: "Điều trị bệnh",
+    },
+  ],
+
+  PTM: [
+    {
+      id: "4",
+      name: "Phạm Văn D",
+      rank: "Thiếu tá",
+      position: "Trợ lý tác chiến",
+      reason: "Học tập",
+    },
+  ],
 };
 
 export function getChartSegments(chart: UnitTroopChart): TroopSegment[] {
