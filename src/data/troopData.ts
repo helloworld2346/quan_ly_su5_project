@@ -47,7 +47,7 @@ export const SUBORDINATE_TROOP_CHARTS: UnitTroopChart[] = [
   buildChart("phong-hckt", "Phòng Hậu Cần Kỹ Thuật", "department", 175, 0.912),
   buildChart("ban-tc", "Ban Tài Chính", "department", 85, 0.929),
   // Trung đoàn
-  buildChart("td-4", "Trung đoàn 4", "regiment", 1320, 1),
+  buildChart("td-4", "Trung đoàn 4", "regiment", 1320, 0.8),
   buildChart("td-5", "Trung đoàn 5", "regiment", 1295, 0.935),
   buildChart("td-271", "Trung đoàn 271", "regiment", 1310, 0.932),
   // Tiểu đoàn
