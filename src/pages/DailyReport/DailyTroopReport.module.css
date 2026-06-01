@@ -2,57 +2,59 @@
    width: 100%;
    min-width: 0;
  }
-
- .tableShell {
-   width: 100%;
-   max-width: 100%;
-   overflow-x: hidden;
-   background: white;
-   border-radius: 12px;
-   border: 1px solid var(--login-border);
-   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
- }
+.tableShell {    
+  width: 100%;    
+  max-width: 100%;    
+  overflow-x: auto;    
+  background:#2caa6d;    
+  border-radius: 12px;    
+  border: 1px solid var(--login-border);    
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);    
+}
 
  .reportTable {
    width: 100%;
    max-width: 100%;
    table-layout: fixed;
    border-collapse: collapse;
-
  }
 
- .reportTable th {
-   background: #02661c;
-   color: white;
-   border: 1px solid rgba(255, 255, 255, 0.15);
-   font-size: 13px;
-   font-weight: 700;
-   padding: 14px 10px;
-   text-align: center;
-   vertical-align: middle;
-   white-space: normal;
-   word-break: keep-all;
- }
+ .reportTable thead {  
+  border-bottom: 3px solid var(--comm-report-primary, #1e3a5f);  
+} 
+ .reportTable th {    
+  background: transparent;  
+  color: var(--login-text);  
+  border: 1px solid var(--login-border);  
+  font-size: 12px;   
+  font-weight: 800;  
+  text-transform: uppercase;  
+  letter-spacing: 0.5px;  
+  padding: 14px 8px;  
+  text-align: center;  
+  vertical-align: middle;  
+ 
+}  
+  
+   
+.reportTable td {    
+  background: var(--surface-card);  
+  color: var(--login-text);  
+  border: 1px solid var(--login-border);  
+  padding: 12px 8px;  
+  text-align: center;  
+  vertical-align: middle;  
+  white-space: normal;  
+  word-wrap: break-word;  
+  overflow-wrap: break-word;  
+  white-space: normal;    
+  word-wrap: break-word;    
+  overflow-wrap: break-word;    
+  font-size: 14px;  
+  hyphens: auto;   
+}  
 
- .reportTable td {
-   background: var(--surface-card);
-   color: var(--login-text);
-   border: 1px solid var(--login-border);
-   text-align: center;
-   padding: 10px 6px;
-   vertical-align: middl;
-   font-size: 15px;
-   word-wrap: break-word;
-
- }
-
- .reportTable thead tr:nth-child(2) th {
-   background: #05ba5ff8;
- }
-
- .reportTable thead tr:nth-child(3) th {
-   background: #10874c;
- }
+ 
 
  .reportTable th:first-child,
  .reportTable td:first-child {

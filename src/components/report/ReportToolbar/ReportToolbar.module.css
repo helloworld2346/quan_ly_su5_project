@@ -1,188 +1,140 @@
-.toolbar {    
-  display: flex;    
-  flex-wrap: wrap;    
-  align-items: flex-end;    
-  gap: 12px 16px;    
-  margin-bottom: 20px;    
-}    
-    
-.searchWrap {    
-  display: flex;    
-  align-items: stretch;    
-  flex: 0 0 auto;    
-  width: 380px;    
-  max-width: 100%;    
-  height: 40px;    
-  background: var(--surface-card);    
-  border: 1px solid var(--login-border);    
-  border-radius: 10px;    
-  overflow: hidden;    
-  transition: border-color 0.15s;  
+.toolbar {  
+  display: flex;  
+  flex-wrap: wrap;  
+  align-items: flex-end;  
+  gap: 12px 16px;  
+  margin-bottom: 20px;  
 }  
   
-.searchWrap:focus-within {  
+.searchWrap {  
+  display: flex;  
+  align-items: stretch;  
+  flex: 0 0 auto;  
+  width: 380px;  
+  max-width: 100%;  
+  height: 40px;  
+  background: #fff;  
+  border-radius: 10px;  
+  overflow: hidden;  
+}  
+  
+.searchInput {  
+  flex: 1;  
+  min-width: 0;  
+  height: 100%;  
+  padding: 0 12px 0 14px;  
+  border: none;  
+  outline: none;  
+  font-size: 14px;  
+  color: var(--login-text);  
+  background: transparent;  
+}  
+  
+.searchInput::placeholder {  
+  color: #9a9a9a;  
+}  
+  
+.searchInput:focus::placeholder {  
+  color: transparent;  
+}  
+  
+.searchDivider {  
+  width: 1px;  
+  align-self: stretch;  
+  margin: 7px 0;  
+  background: #c5c5c5;  
+  flex-shrink: 0;  
+}  
+  
+.searchIconBtn {  
+  display: flex;  
+  align-items: center;  
+  justify-content: center;  
+  width: 42px;  
+  flex-shrink: 0;  
+  border: none;  
+  background: transparent;  
+  cursor: pointer;  
+  padding: 0;  
+}  
+  
+.searchIcon {  
+  font-size: 16px;  
+  color: #4a4a4a;  
+}  
+  
+.searchIconBtn:hover .searchIcon {  
+  color: var(--primary-color);  
+}  
+  
+.dateWrap {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 4px;  
+  flex: 0 0 auto;  
+}  
+  
+.dateInput {  
+  height: 40px;  
+  padding: 0 12px;  
+  border: 1px solid var(--login-border);  
+  border-radius: 10px;  
+  font-size: 14px;  
+  font-family: inherit;  
+  color: var(--login-text);  
+  background: #fff;  
+  min-width: 150px;  
+  cursor: pointer;  
+  outline: none;  
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);  
+  transition: border-color 0.15s, box-shadow 0.15s;  
+}  
+  
+.dateInput:hover {  
+  border-color: #a8bdb0;  
+}  
+  
+.dateInput:focus {  
   border-color: var(--primary-color);  
-}    
-    
-.searchInput {    
-  flex: 1;    
-  min-width: 0;    
-  height: 100%;    
-  padding: 0 12px 0 14px;    
-  border: none;    
-  outline: none;    
-  font-size: 14px;    
-  color: var(--login-text);    
-  background: transparent;    
-}    
-    
-.searchInput::placeholder {    
-  color: var(--login-text-muted);    
-}    
-    
-.searchInput:focus::placeholder {    
-  color: transparent;    
-}    
-    
-.searchDivider {    
-  width: 1px;    
-  align-self: stretch;    
-  margin: 7px 0;    
-  background: var(--login-border);    
-  flex-shrink: 0;    
-}    
-    
-.searchIconBtn {    
-  display: flex;    
-  align-items: center;    
-  justify-content: center;    
-  width: 42px;    
-  flex-shrink: 0;    
-  border: none;    
-  background: transparent;    
-  cursor: pointer;    
-  padding: 0;    
-}    
-    
-.searchIcon {    
-  font-size: 16px;    
-  color: var(--on-surface-muted);    
-}    
-    
-.searchIconBtn:hover .searchIcon {    
-  color: var(--primary-color);    
-}    
-    
-.dateWrap {    
-  display: flex;    
-  flex-direction: column;    
-  gap: 4px;    
-  flex: 0 0 auto;    
-}    
-    
-.dateInput {    
-  height: 40px;    
-  padding: 0 12px;    
-  border: 1px solid var(--login-border);    
-  border-radius: 10px;    
-  font-size: 14px;    
-  font-family: inherit;    
-  color: var(--login-text);    
-  background: var(--surface-card);    
-  min-width: 150px;    
-  cursor: pointer;    
-  outline: none;    
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);    
-  transition: border-color 0.15s, box-shadow 0.15s;    
-}    
-    
-.dateInput:hover {    
-  border-color: var(--primary-color);    
-}    
-    
-.dateInput:focus {    
-  border-color: var(--primary-color);    
-  box-shadow: 0 0 0 3px rgba(31, 92, 63, 0.12);    
+  box-shadow: 0 0 0 3px rgba(31, 92, 63, 0.12);  
 }  
   
-[data-theme="dark"] .dateInput:focus {  
-  box-shadow: 0 0 0 3px rgba(107, 184, 146, 0.2);  
-}    
-    
-.exportGroup {    
-  display: flex;    
-  flex-wrap: wrap;    
-  align-items: center;    
-  gap: 10px;    
-  margin-left: auto;    
-}    
-    
-.exportBtn {    
-  height: 40px;    
-  padding: 0 16px;    
-  border-radius: 10px;    
-  font-size: 13px;    
-  font-weight: 700;    
-  font-family: inherit;    
-  cursor: pointer;    
-  border: 1px solid transparent;    
-  white-space: nowrap;    
-  transition: background 0.15s, border-color 0.15s, transform 0.1s;    
-}    
-    
-.exportBtn:hover {    
-  filter: brightness(0.97);    
+.exportGroup {  
+  display: flex;  
+  flex-wrap: wrap;  
+  align-items: center;  
+  gap: 10px;  
+  margin-left: auto;  
 }  
   
-[data-theme="dark"] .exportBtn:hover {  
-  filter: brightness(1.1);  
-}    
-    
-.exportBtn:active {    
-  transform: scale(0.98);    
-}    
-    
-.exportWord {    
-  color: #1a4d8c;    
-  background: #e8f0fb;    
-  border-color: #b8d0f0;    
-}    
-    
-.exportWord:hover {    
-  background: #d9e8f8;    
-  border-color: #1a4d8c;    
+.exportBtn {  
+  height: 40px;  
+  padding: 0 16px;  
+  border-radius: 10px;  
+  font-size: 13px;  
+  font-weight: 700;  
+  font-family: inherit;  
+  cursor: pointer;  
+  border: 1px solid transparent;  
+  white-space: nowrap;  
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;  
 }  
 
   
-[data-theme="dark"] .exportWord {  
-  color: #7eb8f0;  
-  background: rgba(26, 77, 140, 0.2);  
-  border-color: rgba(126, 184, 240, 0.3);  
+.exportBtn:hover {  
+  filter: brightness(0.97);  
 }  
   
-[data-theme="dark"] .exportWord:hover {  
-  background: rgba(26, 77, 140, 0.3);  
-  border-color: #7eb8f0;  
-}    
-    
-.exportExcel {    
-  color: #0d5c2e;    
-  background: #e4f4e9;    
-  border-color: #9dceb0;    
-}    
-    
-.exportExcel:hover {    
-  background: #d4edd9;    
-  border-color: var(--primary-color);    
+.exportBtn:active {  
+  transform: scale(0.98);  
 }  
   
-[data-theme="dark"] .exportExcel {  
-  color: #6bb892;  
-  background: rgba(13, 92, 46, 0.2);  
-  border-color: rgba(107, 184, 146, 0.3);  
+.exportWord {  
+  color: #1a4d8c;  
+  background: #e8f0fb;  
+  border-color: #b8d0f0;  
 }  
   
-<<<<<<< HEAD
 .exportWord:hover {  
   background: #d9e8f8;  
   border-color: #1a4d8c;  
@@ -266,30 +218,4 @@
   }  
 
   
-=======
-[data-theme="dark"] .exportExcel:hover {  
-  background: rgba(13, 92, 46, 0.3);  
-  border-color: #6bb892;  
-}    
-    
-@media (max-width: 768px) {    
-  .toolbar {    
-    flex-direction: column;    
-    align-items: stretch;    
-  }    
-    
-  .searchWrap {    
-    width: 100%;    
-  }    
-    
-  .exportGroup {    
-    margin-left: 0;    
-    width: 100%;    
-  }    
-    
-  .exportBtn {    
-    flex: 1;    
-    min-width: 0;    
-  }    
->>>>>>> f39d810742e569cff1b8e45bc52c7012f4f9294b
 }
