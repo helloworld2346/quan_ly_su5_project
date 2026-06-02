@@ -52,7 +52,7 @@ export const EXECUTIVE_NAV: NavItem = {
   loadingTitle: "Đang tải Dashboard",
   loadingSubtitle: "Đang đồng bộ dữ liệu quân số…",
   component: ExecutiveDashboard,
-  allowedRoles: ["Quản Trị Viên", "Sư đoàn", "Chỉ huy", "Báo cáo"],
+  allowedRoles: ["Quản Trị Viên", "Sư đoàn"],
 };
 
 export const REPORT_NAV_GROUP = {
@@ -134,7 +134,7 @@ export const DUTY_NAV_GROUP = {
       loadingTitle: "Đang tải trực chỉ huy",
       loadingSubtitle: "Đang tải dữ liệu…",
       component: CommandDuty,
-      allowedRoles: ["Quản Trị Viên", "Chỉ huy"],
+      allowedRoles: ["Quản Trị Viên", "Sư đoàn", "Chỉ huy"],
     },
     {
       id: "duty-tactical" as const,
@@ -143,7 +143,7 @@ export const DUTY_NAV_GROUP = {
       loadingTitle: "Đang tải trực ban tác chiến",
       loadingSubtitle: "Đang tải dữ liệu…",
       component: TacticalDuty,
-      allowedRoles: ["Quản Trị Viên", "Chỉ huy"],
+      allowedRoles: ["Quản Trị Viên", "Sư đoàn", "Chỉ huy"],
     },
   ],
 };
@@ -217,7 +217,10 @@ export function getNavItemById(id: NavItemId): NavItem | undefined {
   return ALL_NAV_ITEMS.find((item) => item.id === id);
 }
 
-export function getNavItemsByRole(userRole: string | null): NavItem[] {
+export function getNavItemsByRole(
+  userRole: string | null,
+  isParentUnit: boolean = false,
+): NavItem[] {
   if (!userRole) return [];
 
   // Quản Trị Viên có toàn quyền
@@ -225,7 +228,46 @@ export function getNavItemsByRole(userRole: string | null): NavItem[] {
     return ALL_NAV_ITEMS;
   }
 
-  // Filter theo role
+  // Sư đoàn: Dashboard + Thống kê + Trực ban + Cài đặt
+  if (userRole === "Sư đoàn") {
+    return ALL_NAV_ITEMS.filter(
+      (item) =>
+        item.id === "executive" ||
+        (item.id.startsWith("report-") &&
+          !["report-approval", "report-consolidation"].includes(item.id)) ||
+        item.id.startsWith("duty-") ||
+        item.id === "settings",
+    );
+  }
+
+  // Chỉ huy: Thống kê + Phê duyệt + Trực ban + Cài đặt
+  if (userRole === "Chỉ huy") {
+    return ALL_NAV_ITEMS.filter(
+      (item) =>
+        (item.id.startsWith("report-") && item.id !== "report-consolidation") ||
+        item.id.startsWith("duty-") ||
+        item.id === "settings",
+    );
+  }
+
+  // Báo cáo: phân biệt đơn vị cha/con
+  if (userRole === "Báo cáo") {
+    if (isParentUnit) {
+      // Báo cáo đơn vị cha: Tổng hợp + Cài đặt
+      return ALL_NAV_ITEMS.filter(
+        (item) => item.id === "report-consolidation" || item.id === "settings",
+      );
+    } else {
+      // Báo cáo đơn vị con: Thống kê + Cài đặt
+      return ALL_NAV_ITEMS.filter(
+        (item) =>
+          (item.id.startsWith("report-") &&
+            !["report-approval", "report-consolidation"].includes(item.id)) ||
+          item.id === "settings",
+      );
+    }
+  }
+
   return ALL_NAV_ITEMS.filter((item) => {
     if (!item.allowedRoles) return true;
     return item.allowedRoles.includes(userRole);

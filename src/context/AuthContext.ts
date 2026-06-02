@@ -11,6 +11,7 @@ export interface AuthContextType {
   hasChildUnits: () => boolean;
   getChildUnits: () => DonVi[];
   refreshAccount: () => Promise<void>;
+  clearAuth: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(

@@ -2,14 +2,18 @@ import { useState, useEffect, useCallback, type ReactNode } from "react";
 import { accountService } from "../services/account/accountService";
 import { donviService } from "../services/unit/unitService";
 import { roleService } from "../services/role/roleService";
+import { storage } from "../utils/storage";
 import type { Account, Role, DonVi } from "../types/account";
 import { AuthContext } from "./AuthContext";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const token = storage.getToken();
+
+  // Khởi tạo state dựa trên token ngay từ đầu
   const [account, setAccount] = useState<Account | null>(null);
   const [donVi, setDonVi] = useState<DonVi | null>(null);
   const [roles, setRoles] = useState<Role[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!!token); // Chỉ loading nếu có token
 
   const fetchData = useCallback(async () => {
     try {
@@ -36,13 +40,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Đã sửa: Sử dụng luồng bất đồng bộ cô lập hoàn toàn bên trong effect để linter không bắt lỗi setState
+  // Chỉ fetch data nếu có token
   useEffect(() => {
     let active = true;
 
     const initAuth = async () => {
-      setLoading(true);
-      if (active) {
+      if (token && active) {
         await fetchData();
       }
     };
@@ -52,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       active = false;
     };
-  }, [fetchData]);
+  }, [fetchData, token]);
 
   const hasRole = useCallback(
     (roleName: string): boolean => account?.vaiTro?.tenVaiTro === roleName,
@@ -91,6 +94,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await fetchData();
   }, [fetchData]);
 
+  const clearAuth = useCallback(() => {
+    setAccount(null);
+    setDonVi(null);
+    setRoles([]);
+    setLoading(false);
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -103,6 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         hasChildUnits,
         getChildUnits,
         refreshAccount,
+        clearAuth,
       }}
     >
       {children}

@@ -19,7 +19,12 @@ export default function RequireRole({ children, allowedRoles }: Props) {
 
   const userRole = account.vaiTro?.tenVaiTro;
   if (!userRole || !allowedRoles.includes(userRole)) {
-    return <Navigate to="/dashboard" replace />;
+    // Role có quyền dashboard: Sư đoàn, Quản Trị Viên
+    if (userRole === "Sư đoàn" || userRole === "Quản Trị Viên") {
+      return <Navigate to="/dashboard" replace />;
+    }
+    // Role không có quyền dashboard: Chỉ huy, Báo cáo
+    return <Navigate to="/settings" replace />;
   }
 
   return <>{children}</>;

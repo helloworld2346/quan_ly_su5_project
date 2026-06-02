@@ -1,5 +1,4 @@
-import { useState, useRef } from "react";
-
+import { useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { IconProp } from "@fortawesome/fontawesome-svg-core";
 import {
@@ -9,7 +8,7 @@ import {
   faClipboardList,
   faGear,
   faCheckCircle,
-  faFileLines,
+  faFileExport,
 } from "@fortawesome/free-solid-svg-icons";
 
 import styles from "./Sidebar.module.css";
@@ -50,9 +49,9 @@ export default function Sidebar({
   collapsed = false,
   onExpand,
 }: Props) {
-  const { account } = useAuth();
+  const { account, isParentUnit } = useAuth();
   const userRole = account?.vaiTro?.tenVaiTro || null;
-  const allowedNavItems = getNavItemsByRole(userRole);
+  const allowedNavItems = getNavItemsByRole(userRole, isParentUnit()); // FIX: gọi function
 
   const iconById: Record<NavItemId, IconProp> = {
     executive: faGaugeHigh,
@@ -61,7 +60,7 @@ export default function Sidebar({
     "report-family": faChartColumn,
     "report-communication": faChartColumn,
     "report-approval": faCheckCircle,
-    "report-consolidation": faFileLines,
+    "report-consolidation": faFileExport,
     "duty-command": faClipboardList,
     "duty-tactical": faClipboardList,
     settings: faGear,

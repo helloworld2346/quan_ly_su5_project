@@ -5,6 +5,7 @@ import Login from "../pages/Login/Login";
 import ProtectedRoute from "./ProtectedRoute";
 import RequireRole from "./RequireRole";
 import { ALL_NAV_ITEMS } from "../types/navigation";
+import { useAuth } from "../context/useAuth";
 
 type Props = {
   isAuthenticated: boolean;
@@ -12,11 +13,21 @@ type Props = {
   onLogout: () => void;
 };
 
+function getDefaultRouteByRole(role: string | undefined): string {
+  if (role === "Sư đoàn" || role === "Quản Trị Viên") {
+    return "/dashboard";
+  }
+  return "/settings";
+}
+
 export default function AppRoutes({
   isAuthenticated,
   onLoginSuccess,
   onLogout,
 }: Props) {
+  const { account } = useAuth();
+  const userRole = account?.vaiTro?.tenVaiTro;
+
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />
@@ -25,7 +36,7 @@ export default function AppRoutes({
         path="/login"
         element={
           isAuthenticated ? (
-            <Navigate to="/dashboard" replace />
+            <Navigate to={getDefaultRouteByRole(userRole)} replace />
           ) : (
             <Login onSuccess={onLoginSuccess} />
           )
@@ -53,7 +64,10 @@ export default function AppRoutes({
       <Route
         path="*"
         element={
-          <Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />
+          <Navigate
+            to={isAuthenticated ? getDefaultRouteByRole(userRole) : "/login"}
+            replace
+          />
         }
       />
     </Routes>
