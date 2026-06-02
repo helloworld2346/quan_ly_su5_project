@@ -13,7 +13,8 @@
   width: 380px;  
   max-width: 100%;  
   height: 40px;  
-  background: #fff;  
+  background: var(--input-bg);  
+  border: 1px solid var(--input-border);  
   border-radius: 10px;  
   overflow: hidden;  
 }  
@@ -26,12 +27,12 @@
   border: none;  
   outline: none;  
   font-size: 14px;  
-  color: var(--login-text);  
+  color: var(--input-text);  
   background: transparent;  
 }  
   
 .searchInput::placeholder {  
-  color: #9a9a9a;  
+  color: var(--input-placeholder);  
 }  
   
 .searchInput:focus::placeholder {  
@@ -42,7 +43,7 @@
   width: 1px;  
   align-self: stretch;  
   margin: 7px 0;  
-  background: #c5c5c5;  
+  background: var(--input-divider);  
   flex-shrink: 0;  
 }  
   
@@ -60,7 +61,7 @@
   
 .searchIcon {  
   font-size: 16px;  
-  color: #4a4a4a;  
+  color: var(--input-icon);  
 }  
   
 .searchIconBtn:hover .searchIcon {  
@@ -77,12 +78,12 @@
 .dateInput {  
   height: 40px;  
   padding: 0 12px;  
-  border: 1px solid var(--login-border);  
+  border: 1px solid var(--input-border);  
   border-radius: 10px;  
   font-size: 14px;  
   font-family: inherit;  
-  color: var(--login-text);  
-  background: #fff;  
+  color: var(--input-text);  
+  background: var(--input-bg);  
   min-width: 150px;  
   cursor: pointer;  
   outline: none;  
@@ -91,7 +92,7 @@
 }  
   
 .dateInput:hover {  
-  border-color: #a8bdb0;  
+  border-color: var(--input-date-hover-border);  
 }  
   
 .dateInput:focus {  
@@ -99,12 +100,58 @@
   box-shadow: 0 0 0 3px rgba(31, 92, 63, 0.12);  
 }  
   
-.exportGroup {  
+.actionGroup {  
   display: flex;  
   flex-wrap: wrap;  
   align-items: center;  
   gap: 10px;  
   margin-left: auto;  
+}  
+  
+.actionBtn {  
+  height: 40px;  
+  padding: 0 16px;  
+  border-radius: 10px;  
+  font-size: 13px;  
+  font-weight: 700;  
+  font-family: inherit;  
+  cursor: pointer;  
+  border: 1px solid transparent;  
+  white-space: nowrap;  
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;  
+  display: flex;  
+  align-items: center;  
+  gap: 8px;  
+}  
+  
+.actionBtn:hover {  
+  filter: brightness(0.97);  
+}  
+  
+.actionBtn:active {  
+  transform: scale(0.98);  
+}  
+  
+.addBtn {  
+  color: var(--btn-yellow-fg);  
+  background: var(--btn-yellow-bg);  
+  border-color: var(--btn-yellow-border);  
+}  
+  
+.addBtn:hover {  
+  background: var(--btn-yellow-hover-bg);  
+  border-color: var(--btn-yellow-hover-border);  
+}  
+  
+.addIcon {  
+  font-size: 14px;  
+}  
+  
+.exportGroup {  
+  display: flex;  
+  flex-wrap: wrap;  
+  align-items: center;  
+  gap: 10px;  
 }  
   
 .exportBtn {  
@@ -118,8 +165,10 @@
   border: 1px solid transparent;  
   white-space: nowrap;  
   transition: background 0.15s, border-color 0.15s, transform 0.1s;  
+  display: flex;  
+  align-items: center;  
+  gap: 8px;  
 }  
-
   
 .exportBtn:hover {  
   filter: brightness(0.97);  
@@ -130,95 +179,42 @@
 }  
   
 .exportWord {  
-  color: #1a4d8c;  
-  background: #e8f0fb;  
-  border-color: #b8d0f0;  
+  color: var(--btn-word-fg);  
+  background: var(--btn-word-bg);  
+  border-color: var(--btn-word-border);  
 }  
   
 .exportWord:hover {  
-  background: #d9e8f8;  
-  border-color: #1a4d8c;  
+  background: var(--btn-word-hover-bg);  
+  border-color: var(--btn-word-hover-border);  
 }  
   
 .exportExcel {  
-  color: #0d5c2e;  
-  background: #e4f4e9;  
-  border-color: #9dceb0;  
+  color: var(--btn-excel-fg);  
+  background: var(--btn-excel-bg);  
+  border-color: var(--btn-excel-border);  
 }  
   
 .exportExcel:hover {  
-  background: #d4edd9;  
-  border-color: var(--primary-color);  
-}  
-
-[data-theme="dark"] .searchWrap {
-  background: var(--surface-card);
-  border: 1px solid var(--login-border);
-}
-
-[data-theme="dark"] .searchInput {
-  color: var(--login-text);
-  background: transparent;
-}
-
-[data-theme="dark"] .searchInput::placeholder {
-  color: var(--on-surface-muted);
-}
-
-[data-theme="dark"] .searchDivider {
-  background: var(--login-border);
-}
-
-[data-theme="dark"] .searchIcon {
-  color: var(--on-surface-muted);
-}
-
-[data-theme="dark"] .searchIconBtn:hover .searchIcon {
-  color: var(--primary-color);
-}
-
-[data-theme="dark"] .dateInput {
-  background: var(--surface-card);
-  color: var(--login-text);
-  border-color: var(--login-border);
-}
-
-[data-theme="dark"] .dateInput:hover {
-  border-color: var(--primary-color);
-}
-
-[data-theme="dark"] .dateInput:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(107, 184, 146, 0.15);
-}
-
-[data-theme="dark"] .dateInput::-webkit-calendar-picker-indicator {
-  filter: invert(0.7) brightness(1.5) sepia(0.3) hue-rotate(90deg);
-  opacity: 0.8;
-}
-
-[data-theme="dark"] .exportWord {  
-  color: #6b9bd1;  
-  background: rgba(107, 155, 209, 0.15);  
-  border-color: rgba(107, 155, 209, 0.35);  
+  background: var(--btn-excel-hover-bg);  
+  border-color: var(--btn-excel-hover-border);  
 }  
   
-[data-theme="dark"] .exportWord:hover {  
-  background: rgba(107, 155, 209, 0.25);  
-  border-color: #6b9bd1;  
+/* ==========================================
+   DARK THEME SYSTEM (Chỉ giữ lại icon lịch mặc định)
+   ========================================== */  
+[data-theme="dark"] .dateInput:focus {  
+  box-shadow: 0 0 0 3px rgba(107, 184, 146, 0.15);  
 }  
   
-[data-theme="dark"] .exportExcel {  
-  color: #6bb892;  
-  background: rgba(107, 184, 146, 0.15);  
-  border-color: rgba(107, 184, 146, 0.35);  
+[data-theme="dark"] .dateInput::-webkit-calendar-picker-indicator {  
+  filter: invert(0.7) brightness(1.5) sepia(0.3) hue-rotate(90deg);  
+  opacity: 0.8;  
 }  
   
-[data-theme="dark"] .exportExcel:hover {  
-  background: rgba(107, 184, 146, 0.25);  
-  border-color: var(--primary-color);  
-}
-  
+/* ==========================================
+   RESPONSIVE (MEDIA QUERIES)
+   ========================================== */  
 @media (max-width: 768px) {  
   .toolbar {  
     flex-direction: column;  
@@ -229,15 +225,20 @@
     width: 100%;  
   }  
   
-  .exportGroup {  
+  .actionGroup {  
     margin-left: 0;  
     width: 100%;  
+    flex-direction: column;  
   }  
   
+  .actionBtn,  
   .exportBtn {  
-    flex: 1;  
-    min-width: 0;  
+    width: 100%;  
+    justify-content: center;  
   }  
-
   
+  .exportGroup {  
+    width: 100%;  
+    flex-direction: column;  
+  }  
 }

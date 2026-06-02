@@ -50,7 +50,7 @@ export default function DailyTroopReport() {
   }, [query]);
 
   return (
-    <section className={styles.report} aria-labelledect="dashboard-page-heading">
+    <section className={styles.report} aria-labelledby="dashboard-page-heading">
       <ReportToolbar
         query={query}
         onQueryChange={setQuery}
@@ -62,7 +62,6 @@ export default function DailyTroopReport() {
           <thead>
             <tr>
               <th rowSpan={3}>Đơn vị</th>
-              <th rowSpan={3}>Tổng quân số</th>
               <th rowSpan={3}>Tổng quân số</th>
               <th rowSpan={3}>Hiện diện</th>
               <th rowSpan={3}>Tổng vắng</th>
@@ -107,7 +106,6 @@ export default function DailyTroopReport() {
                   <td className={styles.unitCell}>{row.unit}</td>
 
                   <td>{isNoReport ? "" : row.total1}</td>
-                  <td>{isNoReport ? "" : row.total2}</td>
 
                   {Array.from(
                     { length: FILL_FROM_PRESENT_TO_SIGN_COUNT - 1 },
@@ -124,7 +122,7 @@ export default function DailyTroopReport() {
                       aria-label="Xem chi tiết"
                       onClick={() => setSelectedUnit(row.unit)}
                     >
-                    <FontAwesomeIcon icon={faPenToSquare} />
+                      <FontAwesomeIcon icon={faPenToSquare} />
                     </button>
                   </td>
                 </tr>
@@ -134,26 +132,25 @@ export default function DailyTroopReport() {
             <tr className={styles.totalRow}>
               <td className={styles.unitCell}>Tổng</td>
               <td>7267</td>
-              <td>7267</td>
               {Array.from(
-  { length: FILL_FROM_PRESENT_TO_SIGN_COUNT - 1 },
-  (_, i) => (
-    <td key={i}>Tổng</td>
-  ),
-)}
+                { length: FILL_FROM_PRESENT_TO_SIGN_COUNT - 1 },
+                (_, i) => (
+                  <td key={i}>Tổng</td>
+                ),
+              )}
               <td></td>
             </tr>
           </tbody>
         </table>
       </div>
 
-  {selectedUnit && (
-  <TroopDetailModal
-    unit={selectedUnit}
-    members={ABSENT_MEMBERS[selectedUnit] || []}
-    onClose={() => setSelectedUnit(null)}
-  />
-)}
+      {selectedUnit && (
+        <TroopDetailModal
+          unit={selectedUnit}
+          members={ABSENT_MEMBERS[selectedUnit] || []}
+          onClose={() => setSelectedUnit(null)}
+        />
+      )}
     </section>
   );
 }
