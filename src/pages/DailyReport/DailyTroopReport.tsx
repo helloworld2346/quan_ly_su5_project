@@ -25,6 +25,18 @@ export default function DailyTroopReport() {
   const [reportDate, setReportDate] = useState(todayIsoDate());
   const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
 
+  const handleAddReport = () => {
+    console.log("Kích hoạt tạo báo cáo mới cho ngày:", reportDate);
+  };
+
+  const handleExportWord = () => {
+    console.log("Đang xuất file Word ngày:", reportDate);
+  };
+
+  const handleExportExcel = () => {
+    console.log("Đang xuất file Excel ngày:", reportDate);
+  };
+
   const filteredRows = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return REPORT_ROWS;
@@ -56,7 +68,11 @@ export default function DailyTroopReport() {
         onQueryChange={setQuery}
         reportDate={reportDate}
         onReportDateChange={setReportDate}
+        onAddReport={handleAddReport}
+        onExportWord={handleExportWord}
+        onExportExcel={handleExportExcel}
       />
+      
       <div className={styles.tableShell}>
         <table className={styles.reportTable}>
           <thead>
