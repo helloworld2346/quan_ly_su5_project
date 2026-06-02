@@ -94,6 +94,13 @@ export default function DashboardLayout({
   const isExecutive = activeId === EXECUTIVE_NAV.id;
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { isDark, toggleTheme } = useTheme();
+  
+  useEffect(() => {
+  document.documentElement.style.setProperty(
+    "--modal-offset",
+    sidebarCollapsed ? "0px" : "120px"
+  );
+}, [sidebarCollapsed]);
 
   const groupLabel = getNavGroupLabel(activeId);
   const showBreadcrumb = Boolean(groupLabel);

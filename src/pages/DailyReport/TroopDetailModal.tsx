@@ -8,47 +8,41 @@ type Props = {
   unit: string;
   members: TroopMember[];
   onClose: () => void;
+  sidebarCollapsed?: boolean;
 };
 
 export default function TroopDetailModal({
   unit,
   members,
   onClose,
+  sidebarCollapsed = false,
 }: Props) {
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
-
     document.addEventListener("keydown", handleKey);
-
-    return () => {
-      document.removeEventListener("keydown", handleKey);
-    };
+    return () => document.removeEventListener("keydown", handleKey);
   }, [onClose]);
+
+  useEffect(() => {
+    document.body.style.setProperty(
+      "--current-sidebar-width",
+      sidebarCollapsed
+        ? "var(--sidebar-collapsed-width)"
+        : "var(--sidebar-width)"
+    );
+  }, [sidebarCollapsed]);
 
   return (
     <div className={styles.overlay} onClick={onClose}>
-      <div
-        className={styles.modal}
-        onClick={(e) => e.stopPropagation()}
-      >
-    <div className={styles.header}>
-  <div className={styles.headerContent}>
-    <h2 className={styles.title}>
-      Chi tiết quân số vắng
-    </h2>
-
-    <div className={styles.subTitle}>
-      {unit}
-    </div>
-  </div>
-
-          <button
-            className={styles.closeBtn}
-            onClick={onClose}
-            aria-label="Đóng"
-          >
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.header}>
+          <div className={styles.headerContent}>
+            <h2 className={styles.title}>Chi tiết quân số vắng</h2>
+            <div className={styles.subTitle}>{unit}</div>
+          </div>
+          <button className={styles.closeBtn} onClick={onClose} aria-label="Đóng">
             <FontAwesomeIcon icon={faXmark} />
           </button>
         </div>
@@ -62,35 +56,32 @@ export default function TroopDetailModal({
           </div>
 
           {members.length === 0 ? (
-            <p className={styles.empty}>
-              Không có quân nhân vắng.
-            </p>
+            <p className={styles.empty}>Không có quân nhân vắng.</p>
           ) : (
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>STT</th>
-                  <th>Họ và tên</th>
-                  <th>Cấp bậc</th>
-                  <th>Chức vụ</th>
-                  <th>Lý do vắng</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {members.map((m, i) => (
-                  <tr key={m.id}>
-                    <td>{i + 1}</td>
-                    <td className={styles.nameCell}>
-                      {m.name}
-                    </td>
-                    <td>{m.rank}</td>
-                    <td>{m.position}</td>
-                    <td>{m.reason}</td>
+            <div className={styles.tableWrapper}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>STT</th>
+                    <th>Họ và tên</th>
+                    <th>Cấp bậc</th>
+                    <th>Chức vụ</th>
+                    <th>Lý do vắng</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {members.map((m, i) => (
+                    <tr key={m.id}>
+                      <td>{i + 1}</td>
+                      <td className={styles.nameCell}>{m.name}</td>
+                      <td>{m.rank}</td>
+                      <td>{m.position}</td>
+                      <td>{m.reason}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       </div>
