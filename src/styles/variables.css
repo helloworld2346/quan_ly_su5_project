@@ -1,210 +1,257 @@
-/* src/styles/variables.css */
-:root {
-  color-scheme: light;
-
-  /* --- BRAND COLORS (Hệ màu chủ đạo - Xanh lục) --- */
-  --primary-color: #1f5c3f;
-  --primary-hover: #184a32;
-  --gold-color: #f4d35e;
-
-  /* --- SYSTEM STATS & STATUS (Dùng chung cho cả 2 mode) --- */
-  --dialog-danger-bg: #ef4444;
-  --dialog-danger-hover-bg: #dc2626;
-  --dialog-danger-icon: #ef4444;
-  --dialog-warning-bg: #f59e0b;
-  --dialog-warning-hover-bg: #d97706;
-  --dialog-warning-icon: #f59e0b;
-
-  /* --- GENERAL TEXT & BORDERS --- */
-  --text-white: #ffffff;
-  --text-dark: #1d1d1d;
-  --border-color: #d7d7d7;
-  --shadow-color: rgba(0, 0, 0, 0.2);
-
-  /* --- LAYOUT SIZES --- */
-  --sidebar-width: 280px;
-  --sidebar-collapsed-width: 88px;
-
-  /* --- TABLES --- */
-  --table-row-odd: #ffffff;
-  --table-row-even: #f3f8f5;
-  --surface-table: #19815f;
-
-  /* --- THEME SPECIFIC COLORS (Light Mode) --- */
-  --login-text: #1a2e24;
-  --login-text-muted: #4a5f54;
-  --login-border: #cfd9d3;
-
-  --sidebar-bg-top: #145338;
-  --sidebar-bg-bottom: #0d3b28;
-  --dashboard-bg: #f0f4f2;
+:root {  
+  color-scheme: light;  
   
-  --topbar-bg: rgba(255, 255, 255, 0.92);
-  --topbar-btn-bg: #ffffff;
-  --topbar-btn-hover: #f0f5f2;
-
-  --surface-card: #ffffff;
-  --surface-muted: #f4f7f5;
-  --on-surface: #152a22;
-  --on-surface-muted: #3a5248;
-
-  --rate-badge-fg: #c2410c;
-  --rate-badge-bg: rgba(234, 88, 12, 0.16);
-  --rate-badge-border: transparent;
-
-  /* --- TOOLBAR BUTTONS SYSTEM (Light Mode) --- */
-  /* Nút thêm / Cảnh báo nhẹ (Màu Vàng hổ phách) */
-  --btn-yellow-fg: #b27b00;
-  --btn-yellow-bg: #fffbeb;
-  --btn-yellow-border: #fde68a;
-  --btn-yellow-hover-bg: #fef3c7;
-  --btn-yellow-hover-border: #f59e0b;
-
-  /* Nút Export Word (Màu Xanh dương) */
-  --btn-word-fg: #1a4d8c;
-  --btn-word-bg: #e8f0fb;
-  --btn-word-border: #b8d0f0;
-  --btn-word-hover-bg: #d9e8f8;
-  --btn-word-hover-border: #1a4d8c;
-
-  /* Nút Export Excel (Màu Xanh lá cây) */
-  --btn-excel-fg: #0d5c2e;
-  --btn-excel-bg: #e4f4e9;
-  --btn-excel-border: #9dceb0;
-  --btn-excel-hover-bg: #d4edd9;
-  --btn-excel-hover-border: var(--primary-color);
-
-  /* --- FORM INPUTS SYSTEM (Light Mode) --- */
-  --input-bg: #ffffff;
-  --input-border: var(--login-border);
-  --input-text: var(--login-text);
-  --input-placeholder: #9a9a9a;
-  --input-divider: #c5c5c5;
-  --input-icon: #4a4a4a;
-  --input-date-hover-border: #a8bdb0;
-
-  /* --- TOOLTIPS & LEGENDS --- */
-  --tooltip-bg: #1a2e24;
-  --tooltip-fg: #f5faf7;
-  --tooltip-muted: #c8d9d0;
-  --legend-hover-bg: rgba(31, 92, 63, 0.08);
-
-  /* --- DIALOGS / MODALS (Light Mode) --- */
-  --dialog-bg: #ffffff;  
-  --dialog-overlay-bg: rgba(0, 0, 0, 0.5);  
-  --dialog-title-text: #111827;  
-  --dialog-message-text: #6b7280;  
-  --dialog-cancel-bg: #f3f4f6;  
-  --dialog-cancel-text: #374151;  
-  --dialog-cancel-hover-bg: #e5e7eb;  
-  --dialog-confirm-bg: var(--primary-color);  
-  --dialog-confirm-text: var(--text-white);  
-  --dialog-confirm-hover-bg: var(--primary-hover);  
-  --dialog-info-icon: var(--primary-color);  
-
-  /* --- TOAST NOTIFICATIONS (Light Mode) --- */
-  --toast-bg: #ffffff;  
-  --toast-message-text: #374151;  
-  --toast-close-text: #6b7280;  
-  --toast-close-hover-text: #374151;  
-  --toast-success-color: #10b981;  
-  --toast-error-color: #ef4444;  
-  --toast-warning-color: #f59e0b;  
-  --toast-info-color: #3b82f6;  
-}
-
-/* ==========================================================================
-   DARK THEME SYSTEM
-   ========================================================================== */
-[data-theme="dark"] {
-  color-scheme: dark;
-
-  /* --- BRAND COLORS (Dark Mode) --- */
-  --primary-color: #6bb892;
-  --primary-hover: #5aa67f;
-  --gold-color: #d4b85a;
-
-  /* --- GENERAL TEXT & TABLES (Dark Mode) --- */
-  --text-dark: #d8e4de;
-  --table-row-odd: #1c2822;
-  --table-row-even: #121a16;
-
-  /* --- THEME SPECIFIC COLORS (Dark Mode) --- */
-  --login-text: #d8e4de;
-  --login-text-muted: #9fb0a8;
-  --login-border: #354840;
-
-  --sidebar-bg-top: #152820;
-  --sidebar-bg-bottom: #101c17;
-  --dashboard-bg: #121a16;
+  /* --- BRAND COLORS (Hệ màu chủ đạo - Xanh lục) --- */  
+  --primary-color: #1f5c3f;  
+  --primary-hover: #184a32;  
+  --gold-color: #f4d35e;  
   
-  --topbar-bg: rgba(22, 32, 28, 0.88);
-  --topbar-btn-bg: #243029;
-  --topbar-btn-hover: #2d3b34;
-
-  --surface-card: #1c2822;
-  --surface-muted: #243329;
-  --on-surface: #e4ede8;
-  --on-surface-muted: #b0c2b8;
-
-  --rate-badge-fg: #fdba74;
-  --rate-badge-bg: rgba(251, 146, 60, 0.28);
-  --rate-badge-border: rgba(253, 186, 116, 0.45);
-
-  /* --- TOOLBAR BUTTONS SYSTEM (Dark Mode) --- */
-  /* Nút thêm / Cảnh báo nhẹ (Màu Vàng hổ phách) */
-  --btn-yellow-fg: #fbbf24;
-  --btn-yellow-bg: rgba(245, 158, 11, 0.15);
-  --btn-yellow-border: rgba(245, 158, 11, 0.35);
-  --btn-yellow-hover-bg: rgba(245, 158, 11, 0.25);
-  --btn-yellow-hover-border: #fbbf24;
-
-  /* Nút Export Word (Màu Xanh dương) */
-  --btn-word-fg: #6b9bd1;
-  --btn-word-bg: rgba(107, 155, 209, 0.15);
-  --btn-word-border: rgba(107, 155, 209, 0.35);
-  --btn-word-hover-bg: rgba(107, 155, 209, 0.25);
-  --btn-word-hover-border: #6b9bd1;
-
-  /* Nút Export Excel (Màu Xanh lá cây) */
-  --btn-excel-fg: #6bb892;
-  --btn-excel-bg: rgba(107, 184, 146, 0.15);
-  --btn-excel-border: rgba(107, 184, 146, 0.35);
-  --btn-excel-hover-bg: rgba(107, 184, 146, 0.25);
-  --btn-excel-hover-border: var(--primary-color);
-
-  /* --- FORM INPUTS SYSTEM (Dark Mode) --- */
-  --input-bg: var(--surface-card);
-  --input-border: var(--login-border);
-  --input-text: var(--login-text);
-  --input-placeholder: var(--on-surface-muted);
-  --input-divider: var(--login-border);
-  --input-icon: var(--on-surface-muted);
-  --input-date-hover-border: var(--primary-color);
-
-  /* --- TOOLTIPS & LEGENDS (Dark Mode) --- */
-  --tooltip-bg: #243329;
-  --tooltip-fg: #eef5f1;
-  --tooltip-muted: #b5c9be;
-  --legend-hover-bg: rgba(107, 184, 146, 0.14);
-
-  /* --- DIALOGS / MODALS (Dark Mode) --- */
-  --dialog-bg: #1c2822;  
-  --dialog-overlay-bg: rgba(0, 0, 0, 0.7);  
-  --dialog-title-text: #d8e4de;  
-  --dialog-message-text: #9fb0a8;  
-  --dialog-cancel-bg: #2a3a32;  
-  --dialog-cancel-text: #d8e4de;  
-  --dialog-cancel-hover-bg: #3a4a42;  
-  --dialog-confirm-bg: var(--primary-color);  
-  --dialog-confirm-text: #121a16;  
-  --dialog-confirm-hover-bg: #5aa882;  
+  /* --- SYSTEM STATS & STATUS (Dùng chung cho cả 2 mode) --- */  
+  --dialog-danger-bg: #ef4444;  
+  --dialog-danger-hover-bg: #dc2626;  
+  --dialog-danger-icon: #ef4444;  
+  --dialog-warning-bg: #f59e0b;  
+  --dialog-warning-hover-bg: #d97706;  
+  --dialog-warning-icon: #f59e0b;  
+  
+  /* --- GENERAL TEXT & BORDERS --- */  
+  --text-white: #ffffff;  
+  --text-dark: #1d1d1d;  
+  --border-color: #d7d7d7;  
+  --shadow-color: rgba(0, 0, 0, 0.2);  
+  
+  /* --- LAYOUT SIZES --- */  
+  --sidebar-width: 280px;  
+  --sidebar-collapsed-width: 88px;  
+  
+  /* --- TABLES --- */  
+  --table-row-odd: #ffffff;  
+  --table-row-even: #f3f8f5;  
+  --surface-table: #19815f;  
+  
+  /* --- THEME SPECIFIC COLORS (Light Mode) --- */  
+  --login-text: #1a2e24;  
+  --login-text-muted: #4a5f54;  
+  --login-border: #cfd9d3;  
+  
+  --sidebar-bg-top: #145338;  
+  --sidebar-bg-bottom: #0d3b28;  
+  --dashboard-bg: #f0f4f2;  
+    
+  --topbar-bg: rgba(255, 255, 255, 0.92);  
+  --topbar-btn-bg: #ffffff;  
+  --topbar-btn-hover: #f0f5f2;  
+  
+  --surface-card: #ffffff;  
+  --surface-muted: #f4f7f5;  
+  --on-surface: #152a22;  
+  --on-surface-muted: #3a5248;  
+  
+  --rate-badge-fg: #c2410c;  
+  --rate-badge-bg: rgba(234, 88, 12, 0.16);  
+  --rate-badge-border: transparent;  
+  
+  /* --- TOOLBAR BUTTONS SYSTEM (Light Mode) --- */  
+  /* Nút thêm / Cảnh báo nhẹ (Màu Vàng hổ phách) */  
+  --btn-yellow-fg: #b27b00;  
+  --btn-yellow-bg: #fffbeb;  
+  --btn-yellow-border: #fde68a;  
+  --btn-yellow-hover-bg: #fef3c7;  
+  --btn-yellow-hover-border: #f59e0b;  
+  
+  /* Nút Export Word (Màu Xanh dương) */  
+  --btn-word-fg: #1a4d8c;  
+  --btn-word-bg: #e8f0fb;  
+  --btn-word-border: #b8d0f0;  
+  --btn-word-hover-bg: #d9e8f8;  
+  --btn-word-hover-border: #1a4d8c;  
+  
+  /* Nút Export Excel (Màu Xanh lá cây) */  
+  --btn-excel-fg: #0d5c2e;  
+  --btn-excel-bg: #e4f4e9;  
+  --btn-excel-border: #9dceb0;  
+  --btn-excel-hover-bg: #d4edd9;  
+  --btn-excel-hover-border: var(--primary-color);  
+  
+  /* --- FORM INPUTS SYSTEM (Light Mode) --- */  
+  --input-bg: #ffffff;  
+  --input-border: var(--login-border);  
+  --input-text: var(--login-text);  
+  --input-placeholder: #9a9a9a;  
+  --input-divider: #c5c5c5;  
+  --input-icon: #4a4a4a;  
+  --input-date-hover-border: #a8bdb0;  
+  
+  /* --- TOOLTIPS & LEGENDS --- */  
+  --tooltip-bg: #1a2e24;  
+  --tooltip-fg: #f5faf7;  
+  --tooltip-muted: #c8d9d0;  
+  --legend-hover-bg: rgba(31, 92, 63, 0.08);  
+  
+  /* --- DIALOGS / MODALS (Light Mode) --- */  
+  --dialog-bg: #ffffff;    
+  --dialog-overlay-bg: rgba(0, 0, 0, 0.5);    
+  --dialog-title-text: #111827;    
+  --dialog-message-text: #6b7280;    
+  --dialog-cancel-bg: #f3f4f6;    
+  --dialog-cancel-text: #374151;    
+  --dialog-cancel-hover-bg: #e5e7eb;    
+  --dialog-confirm-bg: var(--primary-color);    
+  --dialog-confirm-text: var(--text-white);    
+  --dialog-confirm-hover-bg: var(--primary-hover);    
   --dialog-info-icon: var(--primary-color);  
-
-  /* --- TOAST NOTIFICATIONS (Dark Mode) --- */
-  --toast-bg-dark: #1c2822;  
-  --toast-message-text-dark: #d8e4de;  
-  --toast-close-text-dark: #9fb0a8;  
-  --toast-close-hover-text-dark: #d8e4de;  
-  --toast-info-color-dark: #6bb892;  
+  
+  /* --- CreateReportModal Specific (Light Mode) --- */  
+  --modal-overlay-bg: rgba(15, 23, 42, 0.6);  
+  --modal-bg: #ffffff;  
+  --modal-border: #e2e8f0;  
+  --modal-section-bg: #f8fafc;  
+  --modal-title-text: #1e293b;  
+  --modal-label-text: #64748b;  
+  --modal-input-bg: #ffffff;  
+  --modal-input-border: #cbd5e1;  
+  --modal-input-text: #1e293b;  
+  --modal-input-placeholder: #94a3b8;  
+  --modal-input-focus-border: #0f766e;  
+  --modal-input-focus-shadow: rgba(15, 118, 110, 0.1);  
+  --modal-card-bg: #f8fafc;  
+  --modal-card-border: #e2e8f0;  
+  --modal-card-title: #334155;  
+  --modal-btn-draft-bg: #f1f5f9;  
+  --modal-btn-draft-text: #475569;  
+  --modal-btn-draft-hover-bg: #e2e8f0;  
+  --modal-btn-submit-bg: #0f766e;  
+  --modal-btn-submit-text: #ffffff;  
+  --modal-btn-submit-hover-bg: #0d5e58;  
+  --modal-btn-submit-shadow: rgba(15, 118, 110, 0.2);  
+  
+  /* --- TOAST NOTIFICATIONS (Light Mode) --- */  
+  --toast-bg: #ffffff;    
+  --toast-message-text: #374151;    
+  --toast-close-text: #6b7280;    
+  --toast-close-hover-text: #374151;    
+  --toast-success-color: #10b981;    
+  --toast-error-color: #ef4444;    
+  --toast-warning-color: #f59e0b;    
+  --toast-info-color: #3b82f6;    
+}  
+  
+/* ==========================================================================  
+   DARK THEME SYSTEM  
+   ========================================================================== */  
+[data-theme="dark"] {  
+  color-scheme: dark;  
+  
+  /* --- BRAND COLORS (Dark Mode) --- */  
+  --primary-color: #6bb892;  
+  --primary-hover: #5aa67f;  
+  --gold-color: #d4b85a;  
+  
+  /* --- GENERAL TEXT & TABLES (Dark Mode) --- */  
+  --text-dark: #d8e4de;  
+  --table-row-odd: #1c2822;  
+  --table-row-even: #121a16;  
+  
+  /* --- THEME SPECIFIC COLORS (Dark Mode) --- */  
+  --login-text: #d8e4de;  
+  --login-text-muted: #9fb0a8;  
+  --login-border: #354840;  
+  
+  --sidebar-bg-top: #152820;  
+  --sidebar-bg-bottom: #101c17;  
+  --dashboard-bg: #121a16;  
+    
+  --topbar-bg: rgba(22, 32, 28, 0.88);  
+  --topbar-btn-bg: #243029;  
+  --topbar-btn-hover: #2d3b34;  
+  
+  --surface-card: #1c2822;  
+  --surface-muted: #243329;  
+  --on-surface: #e4ede8;  
+  --on-surface-muted: #b0c2b8;  
+  
+  --rate-badge-fg: #fdba74;  
+  --rate-badge-bg: rgba(251, 146, 60, 0.28);  
+  --rate-badge-border: rgba(253, 186, 116, 0.45);  
+  
+  /* --- TOOLBAR BUTTONS SYSTEM (Dark Mode) --- */  
+  /* Nút thêm / Cảnh báo nhẹ (Màu Vàng hổ phách) */  
+  --btn-yellow-fg: #fbbf24;  
+  --btn-yellow-bg: rgba(245, 158, 11, 0.15);  
+  --btn-yellow-border: rgba(245, 158, 11, 0.35);  
+  --btn-yellow-hover-bg: rgba(245, 158, 11, 0.25);  
+  --btn-yellow-hover-border: #fbbf24;  
+  
+  /* Nút Export Word (Màu Xanh dương) */  
+  --btn-word-fg: #6b9bd1;  
+  --btn-word-bg: rgba(107, 155, 209, 0.15);  
+  --btn-word-border: rgba(107, 155, 209, 0.35);  
+  --btn-word-hover-bg: rgba(107, 155, 209, 0.25);  
+  --btn-word-hover-border: #6b9bd1;  
+  
+  /* Nút Export Excel (Màu Xanh lá cây) */  
+  --btn-excel-fg: #6bb892;  
+  --btn-excel-bg: rgba(107, 184, 146, 0.15);  
+  --btn-excel-border: rgba(107, 184, 146, 0.35);  
+  --btn-excel-hover-bg: rgba(107, 184, 146, 0.25);  
+  --btn-excel-hover-border: var(--primary-color);  
+  
+  /* --- FORM INPUTS SYSTEM (Dark Mode) --- */  
+  --input-bg: var(--surface-card);  
+  --input-border: var(--login-border);  
+  --input-text: var(--login-text);  
+  --input-placeholder: var(--on-surface-muted);  
+  --input-divider: var(--login-border);  
+  --input-icon: var(--on-surface-muted);  
+  --input-date-hover-border: var(--primary-color);  
+  
+  /* --- TOOLTIPS & LEGENDS (Dark Mode) --- */  
+  --tooltip-bg: #243329;  
+  --tooltip-fg: #eef5f1;  
+  --tooltip-muted: #b5c9be;  
+  --legend-hover-bg: rgba(107, 184, 146, 0.14);  
+  
+  /* --- DIALOGS / MODALS (Dark Mode) --- */  
+  --dialog-bg: #1c2822;    
+  --dialog-overlay-bg: rgba(0, 0, 0, 0.7);    
+  --dialog-title-text: #d8e4de;    
+  --dialog-message-text: #9fb0a8;    
+  --dialog-cancel-bg: #2a3a32;    
+  --dialog-cancel-text: #d8e4de;    
+  --dialog-cancel-hover-bg: #3a4a42;    
+  --dialog-confirm-bg: var(--primary-color);    
+  --dialog-confirm-text: #121a16;    
+  --dialog-confirm-hover-bg: #5aa882;    
+  --dialog-info-icon: var(--primary-color);  
+  
+  /* --- CreateReportModal Specific (Dark Mode) --- */  
+  --modal-overlay-bg: rgba(0, 0, 0, 0.75);  
+  --modal-bg: #1c2822;  
+  --modal-border: #354840;  
+  --modal-section-bg: #243329;  
+  --modal-title-text: #e4ede8;  
+  --modal-label-text: #b0c2b8;  
+  --modal-input-bg: #1c2822;  
+  --modal-input-border: #354840;  
+  --modal-input-text: #e4ede8;  
+  --modal-input-placeholder: #6b7d75;  
+  --modal-input-focus-border: var(--primary-color);  
+  --modal-input-focus-shadow: rgba(107, 184, 146, 0.15);  
+  --modal-card-bg: #243329;  
+  --modal-card-border: #354840;  
+  --modal-card-title: #c8d9d0;  
+  --modal-btn-draft-bg: #2a3a32;  
+  --modal-btn-draft-text: #d8e4de;  
+  --modal-btn-draft-hover-bg: #3a4a42;  
+  --modal-btn-submit-bg: var(--primary-color);  
+  --modal-btn-submit-text: #121a16;  
+  --modal-btn-submit-hover-bg: var(--primary-hover);  
+  --modal-btn-submit-shadow: rgba(107, 184, 146, 0.25);  
+  
+  /* --- TOAST NOTIFICATIONS (Dark Mode) --- */  
+  --toast-bg-dark: #1c2822;    
+  --toast-message-text-dark: #d8e4de;    
+  --toast-close-text-dark: #9fb0a8;    
+  --toast-close-hover-text-dark: #d8e4de;    
+  --toast-info-color-dark: #6bb892;    
 }

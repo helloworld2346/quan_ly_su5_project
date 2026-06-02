@@ -6,9 +6,10 @@ import {
   faEllipsisVertical,
   faEye,
   faPenToSquare,
-} from "@fortawesome/free-solid-svg-icons"; // Import thêm icon cần thiết
+} from "@fortawesome/free-solid-svg-icons";
 import { ABSENT_MEMBERS } from "../../types/troopStats";
 import TroopDetailModal from "./TroopDetailModal";
+import CreateReportModal from "./CreateReportModal";
 import {
   REPORT_ROWS,
   FILL_FROM_PRESENT_TO_SIGN_COUNT,
@@ -28,6 +29,8 @@ export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
   const [reportDate, setReportDate] = useState(todayIsoDate());
   const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [reportData] = useState(REPORT_ROWS);
 
   // State quản lý xem dòng đơn vị nào đang mở menu thao tác (hàng ba chấm)
   const [activeMenuUnit, setActiveMenuUnit] = useState<string | null>(null);
@@ -52,7 +55,12 @@ export default function DailyTroopReport() {
   }, [activeMenuUnit]);
 
   const handleAddReport = () => {
-    console.log("Kích hoạt tạo báo cáo mới cho ngày:", reportDate);
+    setShowCreateModal(true);
+  };
+
+  const handleCreateSuccess = () => {
+    // TODO: Refresh data từ API sau khi tạo báo cáo thành công
+    console.log("Tạo báo cáo thành công, refresh data");
   };
 
   const handleExportWord = () => {
@@ -71,9 +79,9 @@ export default function DailyTroopReport() {
 
   const filteredRows = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return REPORT_ROWS;
+    if (!q) return reportData;
 
-    return REPORT_ROWS.filter((row) => {
+    return reportData.filter((row) => {
       const generatedCols = Array.from(
         { length: FILL_FROM_PRESENT_TO_SIGN_COUNT },
         () => row.unit,
@@ -91,7 +99,7 @@ export default function DailyTroopReport() {
 
       return rowText.includes(q);
     });
-  }, [query]);
+  }, [query, reportData]);
 
   return (
     <section className={styles.report} aria-labelledby="dashboard-page-heading">
@@ -239,6 +247,13 @@ export default function DailyTroopReport() {
           unit={selectedUnit}
           members={ABSENT_MEMBERS[selectedUnit] || []}
           onClose={() => setSelectedUnit(null)}
+        />
+      )}
+
+      {showCreateModal && (
+        <CreateReportModal
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={handleCreateSuccess}
         />
       )}
     </section>
