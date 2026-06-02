@@ -107,7 +107,16 @@ export default function Settings() {
               <label>Vai trò</label>
               <input
                 type="text"
-                value={account.vaiTro?.roleName || "Chưa phân vai trò"}
+                value={account.vaiTro?.tenVaiTro || "Chưa phân vai trò"}
+                disabled
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label>Đơn vị</label>
+              <input
+                type="text"
+                value={account.donVi?.tenDonvi || "Chưa phân đơn vị"}
                 disabled
               />
             </div>

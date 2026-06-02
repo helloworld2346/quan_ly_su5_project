@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import type { FormEvent } from "react";
+import type { AxiosError } from "axios";
 
 import styles from "./Login.module.css";
 
@@ -71,7 +72,7 @@ export default function Login({ onSuccess }: Props) {
         setError(response.message || "Đăng nhập thất bại");
       }
     } catch (err) {
-      const errObj = error as any;
+      const errObj = err as AxiosError;
       if (!errObj.response) {
         showError("Không thể kết nối đến server. Vui lòng thử lại.");
       } else {

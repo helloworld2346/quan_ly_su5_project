@@ -8,7 +8,7 @@ import ToastContainer from "./components/ui/Toast/ToastContainer";
 import ConfirmDialog from "./components/ui/ConfirmDialog/ConfirmDialog";
 import { useConfirmDialog } from "./components/ui/ConfirmDialog/useConfirmDialog";
 import { setToastErrorHandler } from "./services/api";
-
+import { AuthProvider } from "./context/AuthProvider";
 import AppRoutes from "./routes/AppRoutes";
 
 function AppContent() {
@@ -52,11 +52,13 @@ function AppContent() {
   return (
     <>
       <BrowserRouter>
-        <AppRoutes
-          isAuthenticated={isAuthenticated}
-          onLoginSuccess={() => setIsAuthenticated(true)}
-          onLogout={handleLogout}
-        />
+        <AuthProvider>
+          <AppRoutes
+            isAuthenticated={isAuthenticated}
+            onLoginSuccess={() => setIsAuthenticated(true)}
+            onLogout={handleLogout}
+          />
+        </AuthProvider>
       </BrowserRouter>
       <ToastContainer />
       <ConfirmDialog

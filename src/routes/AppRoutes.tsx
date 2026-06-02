@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import Login from "../pages/Login/Login";
 import ProtectedRoute from "./ProtectedRoute";
+import RequireRole from "./RequireRole";
 import { ALL_NAV_ITEMS } from "../types/navigation";
 
 type Props = {
@@ -31,13 +32,19 @@ export default function AppRoutes({
         }
       />
 
-      {ALL_NAV_ITEMS.map(({ path }) => (
+      {ALL_NAV_ITEMS.map(({ path, allowedRoles }) => (
         <Route
           key={path}
           path={path}
           element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
-              <Dashboard onLogout={onLogout} />
+              {allowedRoles ? (
+                <RequireRole allowedRoles={allowedRoles}>
+                  <Dashboard onLogout={onLogout} />
+                </RequireRole>
+              ) : (
+                <Dashboard onLogout={onLogout} />
+              )}
             </ProtectedRoute>
           }
         />

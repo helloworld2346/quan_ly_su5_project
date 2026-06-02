@@ -19,10 +19,13 @@ import {
   DUTY_NAV_GROUP,
   SETTINGS_NAV,
   type NavItemId,
+  getNavItemsByRole,
+  getNavGroupLabelByRole,
 } from "../../../types/navigation";
 import NavGroup from "./NavGroup";
 import { useNavGroupState } from "./useNavGroupState";
 import SidebarTooltip from "./SidebarTooltip";
+import { useAuth } from "../../../context/useAuth";
 
 type Props = {
   activeId: NavItemId;
@@ -44,6 +47,10 @@ export default function Sidebar({
   collapsed = false,
   onExpand,
 }: Props) {
+  const { account } = useAuth();
+  const userRole = account?.vaiTro?.tenVaiTro || null;
+  const allowedNavItems = getNavItemsByRole(userRole);
+
   const iconById: Record<NavItemId, IconProp> = {
     executive: faGaugeHigh,
     "report-troop": faChartColumn,
@@ -56,9 +63,13 @@ export default function Sidebar({
   };
 
   const reportActive = REPORT_NAV_GROUP.items.some(
-    (item) => item.id === activeId,
+    (item) =>
+      item.id === activeId && allowedNavItems.some((nav) => nav.id === item.id),
   );
-  const dutyActive = DUTY_NAV_GROUP.items.some((item) => item.id === activeId);
+  const dutyActive = DUTY_NAV_GROUP.items.some(
+    (item) =>
+      item.id === activeId && allowedNavItems.some((nav) => nav.id === item.id),
+  );
 
   const [reportsOpen, setReportsOpen] = useNavGroupState("reportsOpen");
   const [dutyOpen, setDutyOpen] = useNavGroupState("dutyOpen");
@@ -96,6 +107,17 @@ export default function Sidebar({
     }
   }
 
+  const showExecutive = allowedNavItems.some((nav) => nav.id === "executive");
+  const showReportGroup = REPORT_NAV_GROUP.items.some((item) =>
+    allowedNavItems.some((nav) => nav.id === item.id),
+  );
+  const showDutyGroup = DUTY_NAV_GROUP.items.some((item) =>
+    allowedNavItems.some((nav) => nav.id === item.id),
+  );
+  const showSettings = allowedNavItems.some((nav) => nav.id === "settings");
+
+  const reportLabel = getNavGroupLabelByRole(REPORT_NAV_GROUP.label, userRole);
+
   return (
     <>
       <aside
@@ -116,76 +138,88 @@ export default function Sidebar({
         </div>
 
         <nav className={styles.nav} aria-label="Điều hướng chính">
-          <button
-            ref={executiveRef}
-            type="button"
-            className={
-              activeId === EXECUTIVE_NAV.id
-                ? `${styles.navItem} ${styles.active}`
-                : styles.navItem
-            }
-            onClick={() => onNavigate(EXECUTIVE_NAV.id)}
-            aria-label={collapsed ? EXECUTIVE_NAV.label : undefined}
-            onMouseEnter={() =>
-              handleTooltipEnter(EXECUTIVE_NAV.label, executiveRef)
-            }
-            onMouseLeave={handleTooltipLeave}
-          >
-            <FontAwesomeIcon
-              icon={iconById[EXECUTIVE_NAV.id]}
-              className={styles.navIcon}
+          {showExecutive && (
+            <button
+              ref={executiveRef}
+              type="button"
+              className={
+                activeId === EXECUTIVE_NAV.id
+                  ? `${styles.navItem} ${styles.active}`
+                  : styles.navItem
+              }
+              onClick={() => onNavigate(EXECUTIVE_NAV.id)}
+              aria-label={collapsed ? EXECUTIVE_NAV.label : undefined}
+              onMouseEnter={() =>
+                handleTooltipEnter(EXECUTIVE_NAV.label, executiveRef)
+              }
+              onMouseLeave={handleTooltipLeave}
+            >
+              <FontAwesomeIcon
+                icon={iconById[EXECUTIVE_NAV.id]}
+                className={styles.navIcon}
+              />
+              {!collapsed && EXECUTIVE_NAV.label}
+            </button>
+          )}
+
+          {showReportGroup && (
+            <NavGroup
+              label={reportLabel}
+              icon={faChartColumn}
+              items={REPORT_NAV_GROUP.items.filter((item) =>
+                allowedNavItems.some((nav) => nav.id === item.id),
+              )}
+              isOpen={reportsOpen}
+              onToggle={() => setReportsOpen(!reportsOpen)}
+              activeId={activeId}
+              onNavigate={onNavigate}
+              collapsed={collapsed}
+              onExpand={onExpand}
+              isActive={reportActive}
+              onTooltipEnter={handleTooltipEnter}
+              onTooltipLeave={handleTooltipLeave}
             />
-            {!collapsed && EXECUTIVE_NAV.label}
-          </button>
+          )}
 
-          <NavGroup
-            label={REPORT_NAV_GROUP.label}
-            icon={faChartColumn}
-            items={REPORT_NAV_GROUP.items}
-            isOpen={reportsOpen}
-            onToggle={() => setReportsOpen(!reportsOpen)}
-            activeId={activeId}
-            onNavigate={onNavigate}
-            collapsed={collapsed}
-            onExpand={onExpand}
-            isActive={reportActive}
-            onTooltipEnter={handleTooltipEnter}
-            onTooltipLeave={handleTooltipLeave}
-          />
+          {showDutyGroup && (
+            <NavGroup
+              label={DUTY_NAV_GROUP.label}
+              icon={faClipboardList}
+              items={DUTY_NAV_GROUP.items.filter((item) =>
+                allowedNavItems.some((nav) => nav.id === item.id),
+              )}
+              isOpen={dutyOpen}
+              onToggle={() => setDutyOpen(!dutyOpen)}
+              activeId={activeId}
+              onNavigate={onNavigate}
+              collapsed={collapsed}
+              onExpand={onExpand}
+              isActive={dutyActive}
+              onTooltipEnter={handleTooltipEnter}
+              onTooltipLeave={handleTooltipLeave}
+            />
+          )}
 
-          <NavGroup
-            label={DUTY_NAV_GROUP.label}
-            icon={faClipboardList}
-            items={DUTY_NAV_GROUP.items}
-            isOpen={dutyOpen}
-            onToggle={() => setDutyOpen(!dutyOpen)}
-            activeId={activeId}
-            onNavigate={onNavigate}
-            collapsed={collapsed}
-            onExpand={onExpand}
-            isActive={dutyActive}
-            onTooltipEnter={handleTooltipEnter}
-            onTooltipLeave={handleTooltipLeave}
-          />
-
-          <button
-            ref={settingsRef}
-            type="button"
-            className={
-              activeId === SETTINGS_NAV.id
-                ? `${styles.navItem} ${styles.active}`
-                : styles.navItem
-            }
-            onClick={() => onNavigate(SETTINGS_NAV.id)}
-            aria-label={collapsed ? SETTINGS_NAV.label : undefined}
-            onMouseEnter={() =>
-              handleTooltipEnter(SETTINGS_NAV.label, settingsRef)
-            }
-            onMouseLeave={handleTooltipLeave}
-          >
-            <FontAwesomeIcon icon={faGear} className={styles.navIcon} />
-            {!collapsed && SETTINGS_NAV.label}
-          </button>
+          {showSettings && (
+            <button
+              ref={settingsRef}
+              type="button"
+              className={
+                activeId === SETTINGS_NAV.id
+                  ? `${styles.navItem} ${styles.active}`
+                  : styles.navItem
+              }
+              onClick={() => onNavigate(SETTINGS_NAV.id)}
+              aria-label={collapsed ? SETTINGS_NAV.label : undefined}
+              onMouseEnter={() =>
+                handleTooltipEnter(SETTINGS_NAV.label, settingsRef)
+              }
+              onMouseLeave={handleTooltipLeave}
+            >
+              <FontAwesomeIcon icon={faGear} className={styles.navIcon} />
+              {!collapsed && SETTINGS_NAV.label}
+            </button>
+          )}
         </nav>
 
         {onLogout && (
