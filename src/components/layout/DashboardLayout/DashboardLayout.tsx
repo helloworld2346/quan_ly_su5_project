@@ -15,6 +15,7 @@ import { accountService } from "../../../services/account/accountService";
 import type { Account } from "../../../types/account";
 import { useTheme, ThemeToggle } from "../../../theme";
 
+
 type Props = {
   activeId: NavItemId;
   pageTitle: string;
@@ -45,6 +46,7 @@ function TopBarActions({ isDark, onToggleTheme }: TopBarActionsProps) {
 
     fetchAccount();
   }, []);
+  
 
 const getAvatarText = () => {
   if (!account) return "QT";
@@ -94,14 +96,20 @@ export default function DashboardLayout({
   const isExecutive = activeId === EXECUTIVE_NAV.id;
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { isDark, toggleTheme } = useTheme();
-  
-  useEffect(() => {
+   
+useEffect(() => {
+  document.body.style.setProperty(
+    "--current-sidebar-width",
+    sidebarCollapsed
+      ? "var(--sidebar-collapsed-width)"
+      : "var(--sidebar-width)"
+  );
   document.documentElement.style.setProperty(
     "--modal-offset",
     sidebarCollapsed ? "0px" : "120px"
   );
 }, [sidebarCollapsed]);
-
+  
   const groupLabel = getNavGroupLabel(activeId);
   const showBreadcrumb = Boolean(groupLabel);
   const showPageHeading = !isExecutive;

@@ -13,14 +13,15 @@
 .modal {
   background: var(--dialog-bg);
   border-radius: 16px;
-  width: clamp(300px, 90%, 720px);
+  width: min(720px, calc(100% - 32px));
   max-height: 80vh;
   display: flex;
   flex-direction: column;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
   overflow: hidden;
+  margin-left: min(var(--modal-offset, 0px), calc(100% - 300px));
+  transition: margin-left 0.25s ease;
 }
-
 .header {
   position: relative;
   padding: 20px 24px;
@@ -120,7 +121,6 @@
   font-weight: 700;
 }
 
-
 .tableWrapper {
   width: 100%;
   overflow-x: auto;
@@ -143,6 +143,7 @@
   position: sticky;
   top: 0;
   white-space: nowrap;
+  z-index: 2;
 }
 
 .table th:first-child { border-radius: 8px 0 0 0; }
@@ -160,15 +161,32 @@
   background: var(--dialog-cancel-bg);
 }
 
+.table th:nth-child(1),
+.table td:nth-child(1) {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+}
+.table th:nth-child(1) { background: #218673; }
+.table td:nth-child(1) { background: var(--dialog-bg); }
+.table tr:hover td:nth-child(1) { background: var(--dialog-cancel-bg); }
+
+
 .nameCell {
   font-weight: 600;
 }
 
+
 @media (max-width: 768px) {
+  .overlay {
+    left: 0;
+  }
+
   .modal {
-    max-width: 100%;
+    width: calc(100% - 32px);
     max-height: 90vh;
     border-radius: 12px;
+    margin-left: 0 !important;
   }
 
   .header {
@@ -183,3 +201,6 @@
     font-size: 13px;
   }
 }
+
+
+
