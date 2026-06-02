@@ -1,8 +1,12 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import styles from "./DailyTroopReport.module.css";
 import ReportToolbar from "../../components/report/ReportToolbar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import {
+  faEllipsisVertical,
+  faEye,
+  faPenToSquare,
+} from "@fortawesome/free-solid-svg-icons"; // Import thêm icon cần thiết
 import { ABSENT_MEMBERS } from "../../types/troopStats";
 import TroopDetailModal from "./TroopDetailModal";
 import {
@@ -25,6 +29,28 @@ export default function DailyTroopReport() {
   const [reportDate, setReportDate] = useState(todayIsoDate());
   const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
 
+  // State quản lý xem dòng đơn vị nào đang mở menu thao tác (hàng ba chấm)
+  const [activeMenuUnit, setActiveMenuUnit] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  // Đóng dropdown khi click ra ngoài vùng menu
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setActiveMenuUnit(null);
+      }
+    }
+    if (activeMenuUnit) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [activeMenuUnit]);
+
   const handleAddReport = () => {
     console.log("Kích hoạt tạo báo cáo mới cho ngày:", reportDate);
   };
@@ -35,6 +61,12 @@ export default function DailyTroopReport() {
 
   const handleExportExcel = () => {
     console.log("Đang xuất file Excel ngày:", reportDate);
+  };
+
+  // Hàm xử lý khi click nút "Sửa"
+  const handleEditUnitReport = (unit: string) => {
+    console.log(`Kích hoạt chỉnh sửa báo cáo của đơn vị: ${unit}`);
+    setActiveMenuUnit(null); // Đóng menu sau khi chọn
   };
 
   const filteredRows = useMemo(() => {
@@ -72,7 +104,7 @@ export default function DailyTroopReport() {
         onExportWord={handleExportWord}
         onExportExcel={handleExportExcel}
       />
-      
+
       <div className={styles.tableShell}>
         <table className={styles.reportTable}>
           <thead>
@@ -82,15 +114,15 @@ export default function DailyTroopReport() {
               <th rowSpan={3}>Hiện diện</th>
               <th rowSpan={3}>Tổng vắng</th>
               <th colSpan={13}>Quân số vắng</th>
-              <th rowSpan={3}>TCH</th>
+              <th rowSpan={3}>Trực chỉ huy</th>
               <th rowSpan={3}>Trực ban</th>
-              <th rowSpan={3}>Xem chi tiết</th>
+              <th rowSpan={3}>Thao tác</th>
             </tr>
             <tr>
               <th colSpan={2}>Hội thao</th>
               <th colSpan={2}>Xây dựng</th>
               <th rowSpan={2}>Chờ hưu</th>
-              <th rowSpan={2}>Nghỉ (TT, cuối tuần)</th>
+              <th rowSpan={2}>Nghỉ tranh thủ</th>
               <th rowSpan={2}>Phép</th>
               <th colSpan={2}>Viện</th>
               <th colSpan={2}>Công tác</th>
@@ -98,13 +130,13 @@ export default function DailyTroopReport() {
             </tr>
             <tr>
               <th>Ngoài Sư Đoàn</th>
-              <th>e, f</th>
+              <th>Trung đoàn, Sư đoàn</th>
               <th>Ngoài Sư Đoàn</th>
-              <th>e, f</th>
+              <th>Trung đoàn, Sư đoàn</th>
               <th>Ngoài Sư Đoàn</th>
-              <th>e, f</th>
+              <th>Trung đoàn, Sư đoàn</th>
               <th>Ngoài Sư Đoàn</th>
-              <th>f</th>
+              <th>Sư đoàn</th>
               <th>SQ</th>
               <th>CS</th>
             </tr>
@@ -113,6 +145,7 @@ export default function DailyTroopReport() {
           <tbody>
             {filteredRows.map((row) => {
               const isNoReport = NO_REPORT_UNITS.has(row.unit);
+              const isMenuOpen = activeMenuUnit === row.unit;
 
               return (
                 <tr
@@ -132,14 +165,55 @@ export default function DailyTroopReport() {
                     ),
                   )}
 
-                  <td>
-                    <button
-                      className={styles.detailBtn}
-                      aria-label="Xem chi tiết"
-                      onClick={() => setSelectedUnit(row.unit)}
+                  {/* Cột Thao tác chứa Nút ba chấm (Ellipsis) & Dropdown Menu */}
+                  <td className={styles.actionCell}>
+                    <div
+                      className={styles.actionWrapper}
+                      ref={isMenuOpen ? dropdownRef : null}
                     >
-                      <FontAwesomeIcon icon={faPenToSquare} />
-                    </button>
+                      <button
+                        className={`${styles.ellipsisBtn} ${isMenuOpen ? styles.activeEllipsis : ""}`}
+                        aria-label="Tùy chọn thao tác"
+                        onClick={() =>
+                          setActiveMenuUnit(isMenuOpen ? null : row.unit)
+                        }
+                      >
+                        <FontAwesomeIcon icon={faEllipsisVertical} />
+                      </button>
+
+                      {isMenuOpen && (
+                        <div className={styles.dropdownMenu} role="menu">
+                          <button
+                            type="button"
+                            className={styles.menuItem}
+                            role="menuitem"
+                            onClick={() => {
+                              setSelectedUnit(row.unit);
+                              setActiveMenuUnit(null);
+                            }}
+                          >
+                            <FontAwesomeIcon
+                              icon={faEye}
+                              className={styles.menuIcon}
+                            />
+                            Xem chi tiết quân số vắng
+                          </button>
+
+                          <button
+                            type="button"
+                            className={styles.menuItem}
+                            role="menuitem"
+                            onClick={() => handleEditUnitReport(row.unit)}
+                          >
+                            <FontAwesomeIcon
+                              icon={faPenToSquare}
+                              className={styles.menuIcon}
+                            />
+                            Sửa
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </td>
                 </tr>
               );
