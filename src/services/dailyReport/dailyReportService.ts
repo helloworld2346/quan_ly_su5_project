@@ -1,28 +1,29 @@
-import api from "../api";
+import { apiNoPrefix } from "../api";
 import type {
   CreateReportRequest,
   CreateReportResponse,
+  SearchReportResponse,
 } from "../../types/dailyReport";
 
 export const dailyReportService = {
   createReport: async (
     payload: CreateReportRequest,
   ): Promise<CreateReportResponse> => {
-    const response = await api.post<CreateReportResponse>(
+    const response = await apiNoPrefix.post<CreateReportResponse>(
       "/donbaocao",
       payload,
     );
     return response.data;
   },
 
-  getReports: async (donVi: string, date?: string) => {
-    const params = date ? { ngayBaoCao: date } : {};
-    const response = await api.get(`/donbaocao/${donVi}`, { params });
-    return response.data;
-  },
-
-  getReportById: async (id: string) => {
-    const response = await api.get(`/donbaocao/detail/${id}`);
+  searchReportByUnitAndDate: async (
+    maDonVi: string,
+    ngayLoc: string,
+  ): Promise<SearchReportResponse> => {
+    const response = await apiNoPrefix.get<SearchReportResponse>(
+      `/donbaocao/search/DonVi/${maDonVi}`,
+      { params: { ngayLoc } },
+    );
     return response.data;
   },
 };

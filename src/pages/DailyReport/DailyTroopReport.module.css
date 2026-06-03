@@ -233,3 +233,20 @@
     min-width: 60px;  
   }  
 }
+.loading {  
+  text-align: center;  
+  padding: 60px 20px;  
+  color: var(--text-secondary);  
+  font-size: 16px;  
+}  
+  
+.emptyState {  
+  text-align: center;  
+  padding: 60px 20px;  
+  color: var(--text-secondary);  
+}  
+  
+.emptyState p {  
+  font-size: 16px;  
+  margin: 0;  
+}

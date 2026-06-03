@@ -11,14 +11,13 @@ export interface VangChiTiet {
   phep: number;
   // Viện (2)
   vienNgoaiSuDoan: number;
-  vienF: number;
-  // Công tác (3)
+  vienEF: number;
+  // Công tác (2)
   congTacNgoaiSuDoan: number;
-  congTacSQ: number;
-  congTacCS: number;
+  congTacSuDoan: number;
   // Học (2)
-  hocNgoaiSuDoan: number;
   hocSQ: number;
+  hocCS: number;
 }
 
 export interface CreateReportRequest {
@@ -26,11 +25,42 @@ export interface CreateReportRequest {
   quanSoHienDien: number;
   quanSoVang: number;
   thoiGianBaoCao: string;
-  thongTinVang: string; // JSON string của VangChiTiet
+  thongTinVang: string;
   donVi: string;
 }
 
 export interface CreateReportResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  Result: {
+    idDonBaoCao: string;
+    quanSoHienDien: number;
+    quanSoTong: number;
+    quanSoVang: number;
+    status: string;
+    thoiGianBaoCao: string;
+    thongTinVang: string;
+    donVi: {
+      maDonVi: string;
+      tenDonvi: string;
+    };
+    caTruc: {
+      trucBanTacChien: {
+        capbacNguoitruc: string;
+        chucvuNguoitruc: string;
+        tenNguoitruc: string;
+      };
+      trucChiHuy: {
+        capbacNguoitruc: string;
+        chucvuNguoitruc: string;
+        tenNguoitruc: string;
+      };
+    };
+  };
+}
+
+export interface SearchReportResponse {
   success: boolean;
   code: number;
   message: string;
