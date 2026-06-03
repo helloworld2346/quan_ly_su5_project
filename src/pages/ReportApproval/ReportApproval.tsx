@@ -1,18 +1,19 @@
-import { useMemo, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { useMemo, useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import styles from "./ReportApproval.module.css";
 import ReportToolbar from "../../components/report/ReportToolbar";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faEllipsisVertical,
+  faEye,
+  faPenToSquare,
+} from "@fortawesome/free-solid-svg-icons";
 import ConfirmDialog from "../../components/ui/ConfirmDialog/ConfirmDialog";
 import { useConfirmDialog } from "../../components/ui/ConfirmDialog/useConfirmDialog";
-import {
-  APPROVAL_REPORTS,
-  ReportStatus,
-  ReportType,
-  REPORT_TYPE_LABELS,
-  STATUS_LABELS,
-  type ApprovalReport,
-} from "../../data/approvalData";
+import { dailyReportService } from "../../services/dailyReport/dailyReportService";
+import { useAuth } from "../../context/useAuth";
+import { useToast } from "../../context/useToast";
+import type { VangChiTiet } from "../../types/dailyReport";
 
 function todayIsoDate() {
   const d = new Date();
@@ -23,81 +24,291 @@ function todayIsoDate() {
   ].join("-");
 }
 
+interface ReportRow {
+  idDonBaoCao: string;
+  donVi: string;
+  tenDonVi: string;
+  quanSoTong: number;
+  quanSoHienDien: number;
+  quanSoVang: number;
+  vang: VangChiTiet;
+  trucChiHuy: string;
+  trucBan: string;
+  status: string;
+}
+
 export default function ReportApproval() {
   const [query, setQuery] = useState("");
   const [reportDate, setReportDate] = useState(todayIsoDate());
-  const [filterStatus, setFilterStatus] = useState<ReportStatus | "all">("all");
-  const [filterType, setFilterType] = useState<ReportType | "all">("all");
+  const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
+  const [reportData, setReportData] = useState<ReportRow[]>([]);
+  const [loading, setLoading] = useState(false);
 
+  const [activeMenuUnit, setActiveMenuUnit] = useState<string | null>(null);
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  const { account } = useAuth();
+  const { showSuccess, showError } = useToast();
   const confirmDialog = useConfirmDialog();
 
-  const filteredReports = useMemo(() => {
-    let filtered = [...APPROVAL_REPORTS];
+  const fetchReports = useCallback(async () => {
+    if (!account?.donVi?.maDonVi) return;
 
-    // Filter by search query
-    if (query.trim()) {
-      const q = query.trim().toLowerCase();
-      filtered = filtered.filter(
-        (report) =>
-          report.unitName.toLowerCase().includes(q) ||
-          report.submitter.toLowerCase().includes(q) ||
-          REPORT_TYPE_LABELS[report.reportType].toLowerCase().includes(q),
+    setLoading(true);
+    try {
+      const response = await dailyReportService.searchReportByUnitAndDate(
+        account.donVi.maDonVi,
+        reportDate,
       );
+
+      if (response.success && response.Result) {
+        const data = Array.isArray(response.Result)
+          ? response.Result
+          : [response.Result];
+
+        const mappedData: ReportRow[] = data.map((item) => {
+          let vang: VangChiTiet = {
+            hoiThaiNgoaiSuDoan: 0,
+            hoiThaiEF: 0,
+            xayDungNgoaiSuDoan: 0,
+            xayDungEF: 0,
+            choHuu: 0,
+            nghiTranhThu: 0,
+            phep: 0,
+            vienNgoaiSuDoan: 0,
+            vienEF: 0,
+            congTacNgoaiSuDoan: 0,
+            congTacSuDoan: 0,
+            hocSQ: 0,
+            hocCS: 0,
+          };
+
+          try {
+            vang = JSON.parse(item.thongTinVang) as VangChiTiet;
+          } catch (e) {
+            console.error("Error parsing thongTinVang:", e);
+          }
+
+          return {
+            idDonBaoCao: item.idDonBaoCao,
+            donVi: item.donVi.maDonVi,
+            tenDonVi: item.donVi.tenDonvi,
+            quanSoTong: item.quanSoTong,
+            quanSoHienDien: item.quanSoHienDien,
+            quanSoVang: item.quanSoVang,
+            vang,
+            trucChiHuy: item.caTruc?.trucChiHuy?.tenNguoitruc || "",
+            trucBan: item.caTruc?.trucBanTacChien?.tenNguoitruc || "",
+            status: item.status,
+          };
+        });
+
+        setReportData(mappedData);
+      }
+    } catch (error) {
+      showError("Không thể tải dữ liệu báo cáo");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }, [account, reportDate, showError]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      await fetchReports();
+    };
+    loadData();
+  }, [fetchReports]);
+
+  const handleToggleMenu = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    donViId: string,
+  ) => {
+    event.stopPropagation();
+
+    if (activeMenuUnit === donViId) {
+      setActiveMenuUnit(null);
+    } else {
+      const rect = event.currentTarget.getBoundingClientRect();
+
+      setMenuPosition({
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.right + window.scrollX - 230,
+      });
+      setActiveMenuUnit(donViId);
+    }
+  };
+
+  useEffect(() => {
+    function handleGlobalClose(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setActiveMenuUnit(null);
+      }
     }
 
-    // Filter by status
-    if (filterStatus !== "all") {
-      filtered = filtered.filter((report) => report.status === filterStatus);
+    if (activeMenuUnit) {
+      document.addEventListener("mousedown", handleGlobalClose);
+      window.addEventListener("scroll", handleGlobalClose, { passive: true });
     }
 
-    // Filter by type
-    if (filterType !== "all") {
-      filtered = filtered.filter((report) => report.reportType === filterType);
-    }
+    return () => {
+      document.removeEventListener("mousedown", handleGlobalClose);
+      window.removeEventListener("scroll", handleGlobalClose);
+    };
+  }, [activeMenuUnit]);
 
-    return filtered;
-  }, [query, filterStatus, filterType]);
+  const handleRowClick = (rowId: string) => {
+    setSelectedRowId(rowId);
+  };
 
-  const handleApprove = async (report: ApprovalReport) => {
+  const handleApprove = async () => {
+    if (!selectedRowId) return;
+
+    const selectedRow = reportData.find((r) => r.idDonBaoCao === selectedRowId);
+    if (!selectedRow) return;
+
     const confirmed = await confirmDialog.confirm({
       title: "Phê duyệt báo cáo",
-      message: `Bạn có chắc chắn muốn phê duyệt báo cáo "${REPORT_TYPE_LABELS[report.reportType]}" của đơn vị ${report.unitName}?`,
+      message: `Bạn có chắc chắn muốn phê duyệt báo cáo của đơn vị ${selectedRow.tenDonVi}?`,
       confirmText: "Phê duyệt",
       cancelText: "Hủy",
       type: "info",
     });
 
     if (confirmed) {
-      // TODO: Call API to approve report
-      console.log("Approved report:", report.id);
+      try {
+        await dailyReportService.approveReport(selectedRowId);
+        showSuccess("Phê duyệt báo cáo thành công");
+        setSelectedRowId(null);
+        fetchReports();
+      } catch (error) {
+        showError("Không thể phê duyệt báo cáo");
+        console.error(error);
+      }
     }
   };
 
-  const handleReject = async (report: ApprovalReport) => {
+  const handleReject = async () => {
+    if (!selectedRowId) return;
+
+    const selectedRow = reportData.find((r) => r.idDonBaoCao === selectedRowId);
+    if (!selectedRow) return;
+
     const confirmed = await confirmDialog.confirm({
       title: "Từ chối báo cáo",
-      message: `Bạn có chắc chắn muốn từ chối báo cáo "${REPORT_TYPE_LABELS[report.reportType]}" của đơn vị ${report.unitName}?`,
+      message: `Bạn có chắc chắn muốn từ chối báo cáo của đơn vị ${selectedRow.tenDonVi}?`,
       confirmText: "Từ chối",
       cancelText: "Hủy",
       type: "danger",
     });
 
     if (confirmed) {
-      // TODO: Call API to reject report
-      console.log("Rejected report:", report.id);
+      try {
+        await dailyReportService.refuseReport(selectedRowId);
+        showSuccess("Từ chối báo cáo thành công");
+        setSelectedRowId(null);
+        fetchReports();
+      } catch (error) {
+        showError("Không thể từ chối báo cáo");
+        console.error(error);
+      }
     }
   };
 
-  const getStatusBadgeClass = (status: ReportStatus) => {
+  const filteredRows = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return reportData;
+
+    return reportData.filter((row) => {
+      const rowText = [
+        row.tenDonVi,
+        row.donVi,
+        row.quanSoTong,
+        row.quanSoHienDien,
+        row.quanSoVang,
+        row.vang.hoiThaiNgoaiSuDoan,
+        row.vang.hoiThaiEF,
+        row.vang.xayDungNgoaiSuDoan,
+        row.vang.xayDungEF,
+        row.vang.choHuu,
+        row.vang.nghiTranhThu,
+        row.vang.phep,
+        row.vang.vienNgoaiSuDoan,
+        row.vang.vienEF,
+        row.vang.congTacNgoaiSuDoan,
+        row.vang.congTacSuDoan,
+        row.vang.hocSQ,
+        row.vang.hocCS,
+        row.trucChiHuy,
+        row.trucBan,
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      return rowText.includes(q);
+    });
+  }, [query, reportData]);
+
+  const selectedRow = reportData.find((r) => r.idDonBaoCao === selectedRowId);
+  const canApproveOrReject = selectedRow?.status === "Chờ_Duyệt";
+
+  const totals = useMemo(() => {
+    return reportData.reduce(
+      (acc, row) => ({
+        quanSoTong: acc.quanSoTong + row.quanSoTong,
+        quanSoHienDien: acc.quanSoHienDien + row.quanSoHienDien,
+        quanSoVang: acc.quanSoVang + row.quanSoVang,
+        hoiThaiNgoaiSuDoan:
+          acc.hoiThaiNgoaiSuDoan + row.vang.hoiThaiNgoaiSuDoan,
+        hoiThaiEF: acc.hoiThaiEF + row.vang.hoiThaiEF,
+        xayDungNgoaiSuDoan:
+          acc.xayDungNgoaiSuDoan + row.vang.xayDungNgoaiSuDoan,
+        xayDungEF: acc.xayDungEF + row.vang.xayDungEF,
+        choHuu: acc.choHuu + row.vang.choHuu,
+        nghiTranhThu: acc.nghiTranhThu + row.vang.nghiTranhThu,
+        phep: acc.phep + row.vang.phep,
+        vienNgoaiSuDoan: acc.vienNgoaiSuDoan + row.vang.vienNgoaiSuDoan,
+        vienEF: acc.vienEF + row.vang.vienEF,
+        congTacNgoaiSuDoan:
+          acc.congTacNgoaiSuDoan + row.vang.congTacNgoaiSuDoan,
+        congTacSuDoan: acc.congTacSuDoan + row.vang.congTacSuDoan,
+        hocSQ: acc.hocSQ + row.vang.hocSQ,
+        hocCS: acc.hocCS + row.vang.hocCS,
+      }),
+      {
+        quanSoTong: 0,
+        quanSoHienDien: 0,
+        quanSoVang: 0,
+        hoiThaiNgoaiSuDoan: 0,
+        hoiThaiEF: 0,
+        xayDungNgoaiSuDoan: 0,
+        xayDungEF: 0,
+        choHuu: 0,
+        nghiTranhThu: 0,
+        phep: 0,
+        vienNgoaiSuDoan: 0,
+        vienEF: 0,
+        congTacNgoaiSuDoan: 0,
+        congTacSuDoan: 0,
+        hocSQ: 0,
+        hocCS: 0,
+      },
+    );
+  }, [reportData]);
+
+  const getStatusBadgeClass = (status: string) => {
     switch (status) {
-      case ReportStatus.PENDING:
+      case "Chờ_Duyệt":
         return styles.statusPending;
-      case ReportStatus.APPROVED:
+      case "Đã_Duyệt":
         return styles.statusApproved;
-      case ReportStatus.REJECTED:
+      case "Từ_Chối":
         return styles.statusRejected;
-      case ReportStatus.CONSOLIDATED:
-        return styles.statusConsolidated;
       default:
         return "";
     }
@@ -121,98 +332,207 @@ export default function ReportApproval() {
           <select
             id="status-filter"
             className={styles.filterSelect}
-            value={filterStatus}
-            onChange={(e) =>
-              setFilterStatus(e.target.value as ReportStatus | "all")
-            }
+            value={selectedRow?.status || "all"}
+            onChange={(e) => {
+              const status = e.target.value;
+              const filtered = reportData.filter((r) => r.status === status);
+              if (filtered.length > 0) {
+                setSelectedRowId(filtered[0].idDonBaoCao);
+              }
+            }}
           >
             <option value="all">Tất cả</option>
-            <option value={ReportStatus.PENDING}>Chờ duyệt</option>
-            <option value={ReportStatus.APPROVED}>Đã duyệt</option>
-            <option value={ReportStatus.REJECTED}>Đã từ chối</option>
-            <option value={ReportStatus.CONSOLIDATED}>Đã tổng hợp</option>
+            <option value="Chờ_Duyệt">Chờ duyệt</option>
+            <option value="Đã_Duyệt">Đã duyệt</option>
+            <option value="Từ_Chối">Đã từ chối</option>
           </select>
         </div>
 
-        <div className={styles.filterGroup}>
-          <label htmlFor="type-filter">Loại báo cáo:</label>
-          <select
-            id="type-filter"
-            className={styles.filterSelect}
-            value={filterType}
-            onChange={(e) =>
-              setFilterType(e.target.value as ReportType | "all")
-            }
+        <div className={styles.actionButtons}>
+          <button
+            className={`${styles.actionButton} ${styles.approveButton}`}
+            onClick={handleApprove}
+            disabled={!selectedRowId || !canApproveOrReject}
           >
-            <option value="all">Tất cả</option>
-            <option value={ReportType.DAILY}>Báo ban ngày</option>
-            <option value={ReportType.TRAINING}>
-              Báo ban quân số huấn luyện
-            </option>
-            <option value={ReportType.FAMILY}>
-              Báo ban thân nhân thăm nuôi
-            </option>
-            <option value={ReportType.COMMUNICATION}>
-              Báo ban thông tin liên lạc
-            </option>
-          </select>
+            Phê duyệt
+          </button>
+          <button
+            className={`${styles.actionButton} ${styles.rejectButton}`}
+            onClick={handleReject}
+            disabled={!selectedRowId || !canApproveOrReject}
+          >
+            Từ chối
+          </button>
         </div>
       </div>
 
       <div className={styles.tableShell}>
-        <table className={styles.approvalTable}>
-          <thead>
-            <tr>
-              <th>Đơn vị</th>
-              <th>Loại báo cáo</th>
-              <th>Ngày gửi</th>
-              <th>Người gửi</th>
-              <th>Trạng thái</th>
-              <th>Ghi chú</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredReports.map((report) => (
-              <tr key={report.id}>
-                <td className={styles.unitCell}>{report.unitName}</td>
-                <td>{REPORT_TYPE_LABELS[report.reportType]}</td>
-                <td>{report.submitDate}</td>
-                <td>{report.submitter}</td>
-                <td>
-                  <span
-                    className={`${styles.statusBadge} ${getStatusBadgeClass(report.status)}`}
-                  >
-                    {STATUS_LABELS[report.status]}
-                  </span>
-                </td>
-                <td className={styles.notesCell}>{report.notes || "-"}</td>
-                <td className={styles.actionsCell}>
-                  {report.status === ReportStatus.PENDING ? (
-                    <>
-                      <button
-                        className={`${styles.actionBtn} ${styles.approveBtn}`}
-                        onClick={() => handleApprove(report)}
-                        aria-label="Phê duyệt"
-                      >
-                        <FontAwesomeIcon icon={faCheck} />
-                      </button>
-                      <button
-                        className={`${styles.actionBtn} ${styles.rejectBtn}`}
-                        onClick={() => handleReject(report)}
-                        aria-label="Từ chối"
-                      >
-                        <FontAwesomeIcon icon={faXmark} />
-                      </button>
-                    </>
-                  ) : (
-                    <span className={styles.noAction}>-</span>
-                  )}
-                </td>
+        {loading ? (
+          <div className={styles.loadingState}>Đang tải dữ liệu...</div>
+        ) : (
+          <table className={styles.approvalTable}>
+            <thead>
+              <tr>
+                <th rowSpan={3}>Đơn vị</th>
+                <th rowSpan={3}>Tổng quân số</th>
+                <th rowSpan={3}>Hiện diện</th>
+                <th rowSpan={3}>Tổng vắng</th>
+                <th colSpan={13}>Quân số vắng</th>
+                <th rowSpan={3}>Trực chỉ huy</th>
+                <th rowSpan={3}>Trực ban</th>
+                <th rowSpan={3}>Trạng thái</th>
+                <th rowSpan={3}>Thao tác</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+              <tr>
+                <th colSpan={2}>Hội thao</th>
+                <th colSpan={2}>Xây dựng</th>
+                <th rowSpan={2}>Chờ hưu</th>
+                <th rowSpan={2}>Nghỉ tranh thủ</th>
+                <th rowSpan={2}>Phép</th>
+                <th colSpan={2}>Viện</th>
+                <th colSpan={2}>Công tác</th>
+                <th colSpan={2}>Học</th>
+              </tr>
+              <tr>
+                <th>Ngoài Sư Đoàn</th>
+                <th>Trung đoàn, Sư đoàn</th>
+                <th>Ngoài Sư Đoàn</th>
+                <th>Trung đoàn, Sư đoàn</th>
+                <th>Ngoài Sư Đoàn</th>
+                <th>Trung đoàn, Sư đoàn</th>
+                <th>Ngoài Sư Đoàn</th>
+                <th>Sư đoàn</th>
+                <th>SQ</th>
+                <th>CS</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {filteredRows.map((row) => {
+                const isMenuOpen = activeMenuUnit === row.donVi;
+                const isSelected = selectedRowId === row.idDonBaoCao;
+
+                return (
+                  <tr
+                    key={row.idDonBaoCao}
+                    className={isSelected ? styles.selectedRow : ""}
+                    onClick={() => handleRowClick(row.idDonBaoCao)}
+                  >
+                    <td className={styles.unitCell}>{row.tenDonVi}</td>
+                    <td>{row.quanSoTong}</td>
+                    <td>{row.quanSoHienDien}</td>
+                    <td>{row.quanSoVang}</td>
+                    <td>{row.vang.hoiThaiNgoaiSuDoan}</td>
+                    <td>{row.vang.hoiThaiEF}</td>
+                    <td>{row.vang.xayDungNgoaiSuDoan}</td>
+                    <td>{row.vang.xayDungEF}</td>
+                    <td>{row.vang.choHuu}</td>
+                    <td>{row.vang.nghiTranhThu}</td>
+                    <td>{row.vang.phep}</td>
+                    <td>{row.vang.vienNgoaiSuDoan}</td>
+                    <td>{row.vang.vienEF}</td>
+                    <td>{row.vang.congTacNgoaiSuDoan}</td>
+                    <td>{row.vang.congTacSuDoan}</td>
+                    <td>{row.vang.hocSQ}</td>
+                    <td>{row.vang.hocCS}</td>
+                    <td>{row.trucChiHuy}</td>
+                    <td>{row.trucBan}</td>
+                    <td>
+                      <span
+                        className={`${styles.statusBadge} ${getStatusBadgeClass(row.status)}`}
+                      >
+                        {row.status.replace(/_/g, " ")}
+                      </span>
+                    </td>
+                    <td className={styles.actionCell}>
+                      <div className={styles.actionWrapper}>
+                        <button
+                          type="button"
+                          className={`${styles.ellipsisBtn} ${isMenuOpen ? styles.activeEllipsis : ""}`}
+                          aria-label="Tùy chọn thao tác"
+                          onClick={(e) => handleToggleMenu(e, row.donVi)}
+                        >
+                          <FontAwesomeIcon icon={faEllipsisVertical} />
+                        </button>
+
+                        {isMenuOpen &&
+                          createPortal(
+                            <div
+                              ref={dropdownRef}
+                              className={styles.dropdownMenu}
+                              role="menu"
+                              style={{
+                                top: `${menuPosition.top}px`,
+                                left: `${menuPosition.left}px`,
+                              }}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <button
+                                type="button"
+                                className={styles.menuItem}
+                                role="menuitem"
+                                onClick={() => {
+                                  console.log("Xem chi tiết:", row.idDonBaoCao);
+                                  setActiveMenuUnit(null);
+                                }}
+                              >
+                                <FontAwesomeIcon
+                                  icon={faEye}
+                                  className={styles.menuIcon}
+                                />
+                                Xem chi tiết
+                              </button>
+
+                              <button
+                                type="button"
+                                className={styles.menuItem}
+                                role="menuitem"
+                                onClick={() => {
+                                  console.log("Sửa:", row.idDonBaoCao);
+                                  setActiveMenuUnit(null);
+                                }}
+                              >
+                                <FontAwesomeIcon
+                                  icon={faPenToSquare}
+                                  className={styles.menuIcon}
+                                />
+                                Sửa
+                              </button>
+                            </div>,
+                            document.body,
+                          )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+
+              <tr className={styles.totalRow}>
+                <td className={styles.unitCell}>Tổng</td>
+                <td>{totals.quanSoTong}</td>
+                <td>{totals.quanSoHienDien}</td>
+                <td>{totals.quanSoVang}</td>
+                <td>{totals.hoiThaiNgoaiSuDoan}</td>
+                <td>{totals.hoiThaiEF}</td>
+                <td>{totals.xayDungNgoaiSuDoan}</td>
+                <td>{totals.xayDungEF}</td>
+                <td>{totals.choHuu}</td>
+                <td>{totals.nghiTranhThu}</td>
+                <td>{totals.phep}</td>
+                <td>{totals.vienNgoaiSuDoan}</td>
+                <td>{totals.vienEF}</td>
+                <td>{totals.congTacNgoaiSuDoan}</td>
+                <td>{totals.congTacSuDoan}</td>
+                <td>{totals.hocSQ}</td>
+                <td>{totals.hocCS}</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        )}
       </div>
 
       <ConfirmDialog
