@@ -42,7 +42,11 @@ function setupInterceptors(instance: typeof api) {
         window.location.href = "/login";
       }
 
-      if (toastErrorHandler && error.response?.status !== 401) {
+      if (
+        toastErrorHandler &&
+        error.response?.status !== 401 &&
+        error.response?.status !== 404
+      ) {
         const message =
           error.response?.data?.message || error.message || "Có lỗi xảy ra";
         toastErrorHandler(message);

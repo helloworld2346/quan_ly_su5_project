@@ -27,8 +27,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setRoles(rolesData);
 
         if (accountResponse.Result.donVi?.maDonVi) {
-          const donViData = await donviService.getDonViByMa(
-            accountResponse.Result.donVi.maDonVi,
+          const allDonVi = await donviService.getDonVi();
+          const donViData = allDonVi.find(
+            (dv) => dv.maDonVi === accountResponse.Result.donVi?.maDonVi,
           );
           setDonVi(donViData || null);
         }

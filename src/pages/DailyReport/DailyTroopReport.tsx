@@ -17,6 +17,7 @@ import { dailyReportService } from "../../services/dailyReport/dailyReportServic
 import { useAuth } from "../../context/useAuth";
 import { useToast } from "../../context/useToast";
 import type { VangChiTiet } from "../../types/dailyReport";
+import type { AxiosError } from "axios"; // ← Thêm import này
 
 function todayIsoDate() {
   const d = new Date();
@@ -131,10 +132,21 @@ export default function DailyTroopReport() {
         });
 
         setReportData(mappedData);
+      } else {
+        // Clear data khi response success nhưng không có dữ liệu
+        setReportData([]);
       }
     } catch (error) {
-      showError("Không thể tải dữ liệu báo cáo");
-      console.error(error);
+      // Type guard để kiểm tra AxiosError
+      const axiosError = error as AxiosError<{ message?: string }>;
+
+      // Chỉ show error khi không phải 404 (404 là trường hợp bình thường - không có báo cáo)
+      if (axiosError?.response?.status !== 404) {
+        showError("Không thể tải dữ liệu báo cáo");
+        console.error(error);
+      }
+      // Luôn clear data khi có lỗi
+      setReportData([]);
     } finally {
       setLoading(false);
     }
@@ -166,8 +178,7 @@ export default function DailyTroopReport() {
     }
   };
 
-useEffect(() => {
-   
+  useEffect(() => {
     function handleGlobalClose(event: Event) {
       if (
         dropdownRef.current &&
