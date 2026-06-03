@@ -121,7 +121,7 @@ export default function Settings() {
               />
             </div>
 
-            <div className={styles.formGroup}>
+            {/* <div className={styles.formGroup}>
               <label>Account ID</label>
               <input type="text" value={account.idTaiKhoan} disabled />
             </div>
@@ -142,7 +142,7 @@ export default function Settings() {
                 value={formatDate(account.updatedAt)}
                 disabled
               />
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

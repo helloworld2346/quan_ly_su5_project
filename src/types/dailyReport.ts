@@ -60,6 +60,109 @@ export interface CreateReportResponse {
   };
 }
 
+export interface UpdateReportRequest {
+  quanSoTong: number;
+  quanSoHienDien: number;
+  quanSoVang: number;
+  thoiGianBaoCao: string;
+  thongTinVang: string;
+  account: string;
+  donVi: string;
+}
+
+export interface UpdateReportResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  Result: {
+    idDonBaoCao: string;
+    quanSoHienDien: number;
+    quanSoTong: number;
+    quanSoVang: number;
+    status: string;
+    thoiGianBaoCao: string;
+    thongTinVang: string;
+    donVi: {
+      maDonVi: string;
+      tenDonvi: string;
+    };
+    caTruc: {
+      trucBanTacChien: {
+        capbacNguoitruc: string;
+        chucvuNguoitruc: string;
+        tenNguoitruc: string;
+      };
+      trucChiHuy: {
+        capbacNguoitruc: string;
+        chucvuNguoitruc: string;
+        tenNguoitruc: string;
+      };
+    };
+  };
+}
+
+export interface ApproveResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  Result: {
+    idDonBaoCao: string;
+    quanSoHienDien: number;
+    quanSoTong: number;
+    quanSoVang: number;
+    status: string;
+    thoiGianBaoCao: string;
+    thongTinVang: string;
+    donVi: {
+      maDonVi: string;
+      tenDonvi: string;
+    };
+    caTruc: {
+      trucBanTacChien: {
+        capbacNguoitruc: string;
+        chucvuNguoitruc: string;
+        tenNguoitruc: string;
+      };
+      trucChiHuy: {
+        capbacNguoitruc: string;
+        chucvuNguoitruc: string;
+        tenNguoitruc: string;
+      };
+    };
+  };
+}
+
+export interface RefuseResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  Result: {
+    idDonBaoCao: string;
+    quanSoHienDien: number;
+    quanSoTong: number;
+    quanSoVang: number;
+    status: string;
+    thoiGianBaoCao: string;
+    thongTinVang: string;
+    donVi: {
+      maDonVi: string;
+      tenDonvi: string;
+    };
+    caTruc: {
+      trucBanTacChien: {
+        capbacNguoitruc: string;
+        chucvuNguoitruc: string;
+        tenNguoitruc: string;
+      };
+      trucChiHuy: {
+        capbacNguoitruc: string;
+        chucvuNguoitruc: string;
+        tenNguoitruc: string;
+      };
+    };
+  };
+}
+
 export interface SearchReportResponse {
   success: boolean;
   code: number;

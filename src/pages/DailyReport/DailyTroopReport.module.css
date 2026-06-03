@@ -17,7 +17,7 @@
 .reportTable {  
   width: 100%;  
   min-width: 1050px; 
-  table-layout: fixed;  
+  table-layout: auto;  
   border-collapse: collapse;  
 }  
 
@@ -222,4 +222,59 @@
 .emptyState p {  
   font-size: 16px;  
   margin: 0;  
+}
+
+.emptyCell {  
+  text-align: center;  
+  padding: 40px 20px;  
+  color: var(--text-muted);  
+  font-style: italic;  
+}
+
+
+.statusBadge {  
+  display: inline-block;  
+  padding: 4px 12px;  
+  border-radius: 12px;  
+  font-size: 12px;  
+  font-weight: 600;  
+  text-transform: uppercase;  
+}  
+  
+.statusPending {  
+  background: #fef3c7;  
+  color: #92400e;  
+}  
+  
+.statusApproved {  
+  background: #d1fae5;  
+  color: #065f46;  
+}  
+  
+.statusRejected {  
+  background: #fee2e2;  
+  color: #991b1b;  
+}  
+  
+.menuItemSuccess {  
+  color: #059669;  
+}  
+  
+.menuItemSuccess:hover {  
+  background: #ecfdf5;  
+}  
+  
+.menuItemDanger {  
+  color: #dc2626;  
+}  
+  
+.menuItemDanger:hover {  
+  background: #fef2f2;  
+}  
+  
+.emptyCell {  
+  text-align: center;  
+  padding: 40px 20px;  
+  color: var(--text-muted);  
+  font-style: italic;  
 }

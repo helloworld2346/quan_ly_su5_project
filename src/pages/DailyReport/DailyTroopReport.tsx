@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect, useRef, useCallback } from "react";
-import { createPortal } from "react-dom"; // Dùng Portal để đưa menu ra ngoài vùng overflow
+import { createPortal } from "react-dom";
 import styles from "./DailyTroopReport.module.css";
 import ReportToolbar from "../../components/report/ReportToolbar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -7,6 +7,8 @@ import {
   faEllipsisVertical,
   faEye,
   faPenToSquare,
+  faCheck,
+  faBan,
 } from "@fortawesome/free-solid-svg-icons";
 import { ABSENT_MEMBERS } from "../../types/troopStats";
 import TroopDetailModal from "./TroopDetailModal";
@@ -38,11 +40,21 @@ interface ReportRow {
   status: string;
 }
 
+type EditModalData = {
+  reportId: string;
+  initialData: VangChiTiet;
+  ngayBaoCao: string;
+  tongQuanSo: number;
+};
+
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
   const [reportDate, setReportDate] = useState(todayIsoDate());
   const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editModalData, setEditModalData] = useState<EditModalData | null>(
+    null,
+  );
   const [reportData, setReportData] = useState<ReportRow[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -52,7 +64,7 @@ export default function DailyTroopReport() {
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const { account } = useAuth();
-  const { showError } = useToast();
+  const { showError, showSuccess } = useToast();
 
   const fetchReports = useCallback(async () => {
     if (!account?.donVi?.maDonVi) return;
@@ -183,17 +195,46 @@ export default function DailyTroopReport() {
     fetchReports();
   };
 
+  const handleEditReport = (row: ReportRow) => {
+    setEditModalData({
+      reportId: row.idDonBaoCao,
+      initialData: row.vang,
+      ngayBaoCao: reportDate,
+      tongQuanSo: row.quanSoTong,
+    });
+    setActiveMenuUnit(null);
+  };
+
+  const handleApproveReport = async (reportId: string) => {
+    try {
+      await dailyReportService.approveReport(reportId);
+      showSuccess("Phê duyệt báo cáo thành công");
+      fetchReports();
+    } catch (error) {
+      showError("Không thể phê duyệt báo cáo");
+      console.error(error);
+    }
+    setActiveMenuUnit(null);
+  };
+
+  const handleRefuseReport = async (reportId: string) => {
+    try {
+      await dailyReportService.refuseReport(reportId);
+      showSuccess("Từ chối báo cáo thành công");
+      fetchReports();
+    } catch (error) {
+      showError("Không thể từ chối báo cáo");
+      console.error(error);
+    }
+    setActiveMenuUnit(null);
+  };
+
   const handleExportWord = () => {
     console.log("Xuất file Word");
   };
 
   const handleExportExcel = () => {
     console.log("Xuất file Excel");
-  };
-
-  const handleEditUnitReport = (unit: string) => {
-    console.log(`Chỉnh sửa báo cáo: ${unit}`);
-    setActiveMenuUnit(null);
   };
 
   const filteredRows = useMemo(() => {
@@ -274,6 +315,24 @@ export default function DailyTroopReport() {
     );
   }, [reportData]);
 
+  const getStatusBadge = (status: string) => {
+    const statusMap: Record<string, { text: string; className: string }> = {
+      Chờ_Duyệt: { text: "Chờ duyệt", className: styles.statusPending },
+      Đã_Duyệt: { text: "Đã duyệt", className: styles.statusApproved },
+      Từ_Chối: { text: "Từ chối", className: styles.statusRejected },
+    };
+    const statusInfo = statusMap[status] || { text: status, className: "" };
+    return (
+      <span className={`${styles.statusBadge} ${statusInfo.className}`}>
+        {statusInfo.text}
+      </span>
+    );
+  };
+
+  const userRole = account?.vaiTro?.tenVaiTro;
+  const isCommander = userRole === "Chỉ huy";
+  const isReporter = userRole === "Báo cáo";
+
   return (
     <section className={styles.report} aria-labelledby="dashboard-page-heading">
       <ReportToolbar
@@ -289,8 +348,6 @@ export default function DailyTroopReport() {
       <div className={styles.tableShell}>
         {loading ? (
           <div className={styles.loadingState}>Đang tải dữ liệu...</div>
-        ) : reportData.length === 0 ? (
-          <div className={styles.emptyState}>Không có dữ liệu báo cáo</div>
         ) : (
           <table className={styles.reportTable}>
             <thead>
@@ -302,6 +359,7 @@ export default function DailyTroopReport() {
                 <th colSpan={13}>Quân số vắng</th>
                 <th rowSpan={3}>Trực chỉ huy</th>
                 <th rowSpan={3}>Trực ban</th>
+                <th rowSpan={3}>Trạng thái</th>
                 <th rowSpan={3}>Thao tác</th>
               </tr>
               <tr>
@@ -329,90 +387,137 @@ export default function DailyTroopReport() {
             </thead>
 
             <tbody>
-              {filteredRows.map((row) => {
-                const isMenuOpen = activeMenuUnit === row.donVi;
+              {filteredRows.length === 0 ? (
+                <tr>
+                  <td colSpan={20} className={styles.emptyCell}>
+                    Không có dữ liệu báo cáo
+                  </td>
+                </tr>
+              ) : (
+                filteredRows.map((row) => {
+                  const isMenuOpen = activeMenuUnit === row.donVi;
+                  const canEdit = isReporter && row.status === "Từ_Chối";
+                  const canApprove = isCommander && row.status === "Chờ_Duyệt";
+                  const canRefuse = isCommander && row.status === "Chờ_Duyệt";
 
-                return (
-                  <tr key={row.idDonBaoCao}>
-                    <td className={styles.unitCell}>{row.tenDonVi}</td>
-                    <td>{row.quanSoTong}</td>
-                    <td>{row.quanSoHienDien}</td>
-                    <td>{row.quanSoVang}</td>
-                    <td>{row.vang.hoiThaiNgoaiSuDoan}</td>
-                    <td>{row.vang.hoiThaiEF}</td>
-                    <td>{row.vang.xayDungNgoaiSuDoan}</td>
-                    <td>{row.vang.xayDungEF}</td>
-                    <td>{row.vang.choHuu}</td>
-                    <td>{row.vang.nghiTranhThu}</td>
-                    <td>{row.vang.phep}</td>
-                    <td>{row.vang.vienNgoaiSuDoan}</td>
-                    <td>{row.vang.vienEF}</td>
-                    <td>{row.vang.congTacNgoaiSuDoan}</td>
-                    <td>{row.vang.congTacSuDoan}</td>
-                    <td>{row.vang.hocSQ}</td>
-                    <td>{row.vang.hocCS}</td>
-                    <td>{row.trucChiHuy}</td>
-                    <td>{row.trucBan}</td>
-                    <td className={styles.actionCell}>
-                      <div className={styles.actionWrapper}>
-                        <button
-                          type="button"
-                          className={`${styles.ellipsisBtn} ${isMenuOpen ? styles.activeEllipsis : ""}`}
-                          aria-label="Tùy chọn thao tác"
-                          onClick={(e) => handleToggleMenu(e, row.donVi)}
-                        >
-                          <FontAwesomeIcon icon={faEllipsisVertical} />
-                        </button>
+                  return (
+                    <tr key={row.idDonBaoCao}>
+                      <td className={styles.unitCell}>{row.tenDonVi}</td>
+                      <td>{row.quanSoTong}</td>
+                      <td>{row.quanSoHienDien}</td>
+                      <td>{row.quanSoVang}</td>
+                      <td>{row.vang.hoiThaiNgoaiSuDoan}</td>
+                      <td>{row.vang.hoiThaiEF}</td>
+                      <td>{row.vang.xayDungNgoaiSuDoan}</td>
+                      <td>{row.vang.xayDungEF}</td>
+                      <td>{row.vang.choHuu}</td>
+                      <td>{row.vang.nghiTranhThu}</td>
+                      <td>{row.vang.phep}</td>
+                      <td>{row.vang.vienNgoaiSuDoan}</td>
+                      <td>{row.vang.vienEF}</td>
+                      <td>{row.vang.congTacNgoaiSuDoan}</td>
+                      <td>{row.vang.congTacSuDoan}</td>
+                      <td>{row.vang.hocSQ}</td>
+                      <td>{row.vang.hocCS}</td>
+                      <td>{row.trucChiHuy}</td>
+                      <td>{row.trucBan}</td>
+                      <td>{getStatusBadge(row.status)}</td>
+                      <td className={styles.actionCell}>
+                        <div className={styles.actionWrapper}>
+                          <button
+                            type="button"
+                            className={`${styles.ellipsisBtn} ${isMenuOpen ? styles.activeEllipsis : ""}`}
+                            aria-label="Tùy chọn thao tác"
+                            onClick={(e) => handleToggleMenu(e, row.donVi)}
+                          >
+                            <FontAwesomeIcon icon={faEllipsisVertical} />
+                          </button>
 
-                        {/* SỬ DỤNG PORTAL: Đưa dropdownMenu ra ngoài body để đè đè hoàn toàn lên tableShell */}
-                        {isMenuOpen &&
-                          createPortal(
-                            <div
-                              ref={dropdownRef}
-                              className={styles.dropdownMenu}
-                              role="menu"
-                              style={{
-                                top: `${menuPosition.top}px`,
-                                left: `${menuPosition.left}px`,
-                              }}
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <button
-                                type="button"
-                                className={styles.menuItem}
-                                role="menuitem"
-                                onClick={() => {
-                                  setSelectedUnit(row.tenDonVi);
-                                  setActiveMenuUnit(null);
+                          {isMenuOpen &&
+                            createPortal(
+                              <div
+                                ref={dropdownRef}
+                                className={styles.dropdownMenu}
+                                role="menu"
+                                style={{
+                                  top: `${menuPosition.top}px`,
+                                  left: `${menuPosition.left}px`,
                                 }}
+                                onClick={(e) => e.stopPropagation()}
                               >
-                                <FontAwesomeIcon
-                                  icon={faEye}
-                                  className={styles.menuIcon}
-                                />
-                                Xem chi tiết
-                              </button>
+                                <button
+                                  type="button"
+                                  className={styles.menuItem}
+                                  role="menuitem"
+                                  onClick={() => {
+                                    setSelectedUnit(row.tenDonVi);
+                                    setActiveMenuUnit(null);
+                                  }}
+                                >
+                                  <FontAwesomeIcon
+                                    icon={faEye}
+                                    className={styles.menuIcon}
+                                  />
+                                  Xem chi tiết
+                                </button>
 
-                              <button
-                                type="button"
-                                className={styles.menuItem}
-                                role="menuitem"
-                                onClick={() => handleEditUnitReport(row.donVi)}
-                              >
-                                <FontAwesomeIcon
-                                  icon={faPenToSquare}
-                                  className={styles.menuIcon}
-                                />
-                                Sửa
-                              </button>
-                            </div>,
-                            document.body, // Chỉ định kết xuất trực tiếp vào thẻ body của ứng dụng
-                          )}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+                                {canEdit && (
+                                  <button
+                                    type="button"
+                                    className={styles.menuItem}
+                                    role="menuitem"
+                                    onClick={() => handleEditReport(row)}
+                                  >
+                                    <FontAwesomeIcon
+                                      icon={faPenToSquare}
+                                      className={styles.menuIcon}
+                                    />
+                                    Sửa
+                                  </button>
+                                )}
+
+                                {canApprove && (
+                                  <button
+                                    type="button"
+                                    className={`${styles.menuItem} ${styles.menuItemSuccess}`}
+                                    role="menuitem"
+                                    onClick={() =>
+                                      handleApproveReport(row.idDonBaoCao)
+                                    }
+                                  >
+                                    <FontAwesomeIcon
+                                      icon={faCheck}
+                                      className={styles.menuIcon}
+                                    />
+                                    Phê duyệt
+                                  </button>
+                                )}
+
+                                {canRefuse && (
+                                  <button
+                                    type="button"
+                                    className={`${styles.menuItem} ${styles.menuItemDanger}`}
+                                    role="menuitem"
+                                    onClick={() =>
+                                      handleRefuseReport(row.idDonBaoCao)
+                                    }
+                                  >
+                                    <FontAwesomeIcon
+                                      icon={faBan}
+                                      className={styles.menuIcon}
+                                    />
+                                    Từ chối
+                                  </button>
+                                )}
+                              </div>,
+                              document.body,
+                            )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
 
               <tr className={styles.totalRow}>
                 <td className={styles.unitCell}>Tổng</td>
@@ -435,6 +540,7 @@ export default function DailyTroopReport() {
                 <td></td>
                 <td></td>
                 <td></td>
+                <td></td>
               </tr>
             </tbody>
           </table>
@@ -452,6 +558,18 @@ export default function DailyTroopReport() {
       {showCreateModal && (
         <CreateReportModal
           onClose={() => setShowCreateModal(false)}
+          onSuccess={handleCreateSuccess}
+        />
+      )}
+
+      {editModalData && (
+        <CreateReportModal
+          mode="edit"
+          reportId={editModalData.reportId}
+          initialData={editModalData.initialData}
+          ngayBaoCao={editModalData.ngayBaoCao}
+          tongQuanSo={editModalData.tongQuanSo}
+          onClose={() => setEditModalData(null)}
           onSuccess={handleCreateSuccess}
         />
       )}

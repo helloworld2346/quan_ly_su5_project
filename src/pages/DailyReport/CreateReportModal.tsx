@@ -10,6 +10,11 @@ import styles from "./CreateReportModal.module.css";
 type Props = {
   onClose: () => void;
   onSuccess?: () => void;
+  mode?: "create" | "edit";
+  reportId?: string;
+  initialData?: VangChiTiet;
+  ngayBaoCao?: string;
+  tongQuanSo?: number;
 };
 
 function todayIsoDate() {
@@ -21,31 +26,39 @@ function todayIsoDate() {
   ].join("-");
 }
 
-export default function CreateReportModal({ onClose, onSuccess }: Props) {
+export default function CreateReportModal({
+  onClose,
+  onSuccess,
+  mode = "create",
+  reportId,
+  initialData,
+  ngayBaoCao: initialNgayBaoCao,
+  tongQuanSo: initialTongQuanSo,
+}: Props) {
   const [formData, setFormData] = useState({
-    ngayBaoCao: todayIsoDate(),
-    tongQuanSo: 0,
+    ngayBaoCao: initialNgayBaoCao || todayIsoDate(),
+    tongQuanSo: initialTongQuanSo || 0,
     hienDien: 0,
     tongVang: 0,
     // Hội thao
-    hoiThaiNgoaiSuDoan: 0,
-    hoiThaiEF: 0,
+    hoiThaiNgoaiSuDoan: initialData?.hoiThaiNgoaiSuDoan || 0,
+    hoiThaiEF: initialData?.hoiThaiEF || 0,
     // Xây dựng
-    xayDungNgoaiSuDoan: 0,
-    xayDungEF: 0,
+    xayDungNgoaiSuDoan: initialData?.xayDungNgoaiSuDoan || 0,
+    xayDungEF: initialData?.xayDungEF || 0,
     // Khác
-    choHuu: 0,
-    nghiTranhThu: 0,
-    phep: 0,
+    choHuu: initialData?.choHuu || 0,
+    nghiTranhThu: initialData?.nghiTranhThu || 0,
+    phep: initialData?.phep || 0,
     // Viện
-    vienNgoaiSuDoan: 0,
-    vienEF: 0,
+    vienNgoaiSuDoan: initialData?.vienNgoaiSuDoan || 0,
+    vienEF: initialData?.vienEF || 0,
     // Công tác
-    congTacNgoaiSuDoan: 0,
-    congTacSuDoan: 0,
+    congTacNgoaiSuDoan: initialData?.congTacNgoaiSuDoan || 0,
+    congTacSuDoan: initialData?.congTacSuDoan || 0,
     // Học
-    hocSQ: 0,
-    hocCS: 0,
+    hocSQ: initialData?.hocSQ || 0,
+    hocCS: initialData?.hocCS || 0,
   });
 
   const [loading, setLoading] = useState(false);
@@ -119,21 +132,39 @@ export default function CreateReportModal({ onClose, onSuccess }: Props) {
         hocCS: formData.hocCS,
       };
 
-      const payload = {
-        quanSoTong: formData.tongQuanSo,
-        quanSoHienDien: formData.hienDien,
-        quanSoVang: formData.tongVang,
-        thoiGianBaoCao: new Date().toISOString(),
-        thongTinVang: JSON.stringify(vangChiTiet),
-        donVi: account?.donVi?.maDonVi || "",
-      };
+      if (mode === "edit" && reportId) {
+        const payload = {
+          quanSoTong: formData.tongQuanSo,
+          quanSoHienDien: formData.hienDien,
+          quanSoVang: formData.tongVang,
+          thoiGianBaoCao: new Date().toISOString(),
+          thongTinVang: JSON.stringify(vangChiTiet),
+          account: account?.idTaiKhoan || "",
+          donVi: account?.donVi?.maDonVi || "",
+        };
+        await dailyReportService.updateReport(reportId, payload);
+        showSuccess("Cập nhật báo cáo thành công");
+      } else {
+        const payload = {
+          quanSoTong: formData.tongQuanSo,
+          quanSoHienDien: formData.hienDien,
+          quanSoVang: formData.tongVang,
+          thoiGianBaoCao: new Date().toISOString(),
+          thongTinVang: JSON.stringify(vangChiTiet),
+          donVi: account?.donVi?.maDonVi || "",
+        };
+        await dailyReportService.createReport(payload);
+        showSuccess("Tạo báo cáo thành công");
+      }
 
-      await dailyReportService.createReport(payload);
-      showSuccess("Tạo báo cáo thành công");
       onSuccess?.();
       onClose();
     } catch (error) {
-      showError("Có lỗi xảy ra khi tạo báo cáo");
+      showError(
+        mode === "edit"
+          ? "Có lỗi xảy ra khi cập nhật báo cáo"
+          : "Có lỗi xảy ra khi tạo báo cáo",
+      );
       console.error(error);
     } finally {
       setLoading(false);
@@ -144,7 +175,11 @@ export default function CreateReportModal({ onClose, onSuccess }: Props) {
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Nhập báo cáo quân số</h2>
+          <h2 className={styles.title}>
+            {mode === "edit"
+              ? "Cập nhật báo cáo quân số"
+              : "Nhập báo cáo quân số"}
+          </h2>
           <button className={styles.closeBtn} onClick={onClose}>
             <FontAwesomeIcon icon={faXmark} />
           </button>
@@ -412,7 +447,7 @@ export default function CreateReportModal({ onClose, onSuccess }: Props) {
             onClick={handleSubmit}
             disabled={loading}
           >
-            Nộp báo cáo
+            {mode === "edit" ? "Cập nhật" : "Nộp báo cáo"}
           </button>
         </div>
       </div>
