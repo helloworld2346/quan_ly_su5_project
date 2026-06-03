@@ -24,8 +24,8 @@ export function setToastErrorHandler(handler: ToastErrorHandler) {
   toastErrorHandler = handler;
 }
 
-function setupInterceptors(axiosInstance: typeof api) {
-  axiosInstance.interceptors.request.use((config) => {
+function setupInterceptors(instance: typeof api) {
+  instance.interceptors.request.use((config) => {
     const token = storage.getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -33,7 +33,7 @@ function setupInterceptors(axiosInstance: typeof api) {
     return config;
   });
 
-  axiosInstance.interceptors.response.use(
+  instance.interceptors.response.use(
     (response) => response,
     (error) => {
       if (error.response?.status === 401 && storage.getToken()) {

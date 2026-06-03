@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom"; // Dùng Portal để đưa menu ra ngoài vùng overflow
 import styles from "./DailyTroopReport.module.css";
 import ReportToolbar from "../../components/report/ReportToolbar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -31,11 +32,10 @@ interface ReportRow {
   quanSoTong: number;
   quanSoHienDien: number;
   quanSoVang: number;
-  status: string;
-  thoiGianBaoCao: string;
   vang: VangChiTiet;
   trucChiHuy: string;
   trucBan: string;
+  status: string;
 }
 
 export default function DailyTroopReport() {
@@ -46,69 +46,83 @@ export default function DailyTroopReport() {
   const [reportData, setReportData] = useState<ReportRow[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const { account } = useAuth();
-  const { showError } = useToast();
-
   const [activeMenuUnit, setActiveMenuUnit] = useState<string | null>(null);
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setActiveMenuUnit(null);
-      }
-    }
-    if (activeMenuUnit) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [activeMenuUnit]);
+  const { account } = useAuth();
+  const { showError } = useToast();
 
   const fetchReports = useCallback(async () => {
     if (!account?.donVi?.maDonVi) return;
 
     setLoading(true);
     try {
-      const response = await dailyReportService.searchReportByUnitAndDate(
-        account.donVi.maDonVi,
-        reportDate,
-      );
+      const maDonVi = account.donVi.maDonVi;
+      let response;
+
+      const isParentUnit = maDonVi.split(".").length <= 3;
+
+      if (isParentUnit) {
+        response = await dailyReportService.searchChildrenReports(
+          maDonVi,
+          reportDate,
+        );
+      } else {
+        response = await dailyReportService.searchReportByUnitAndDate(
+          maDonVi,
+          reportDate,
+        );
+      }
 
       if (response.success && response.Result) {
-        const vangParsed: VangChiTiet = JSON.parse(
-          response.Result.thongTinVang || "{}",
-        );
+        const data = Array.isArray(response.Result)
+          ? response.Result
+          : [response.Result];
 
-        const mappedData: ReportRow[] = [
-          {
-            idDonBaoCao: response.Result.idDonBaoCao,
-            donVi: response.Result.donVi.maDonVi,
-            tenDonVi: response.Result.donVi.tenDonvi,
-            quanSoTong: response.Result.quanSoTong,
-            quanSoHienDien: response.Result.quanSoHienDien,
-            quanSoVang: response.Result.quanSoVang,
-            status: response.Result.status,
-            thoiGianBaoCao: response.Result.thoiGianBaoCao,
-            vang: vangParsed,
-            trucChiHuy: response.Result.caTruc?.trucChiHuy?.tenNguoitruc || "",
-            trucBan:
-              response.Result.caTruc?.trucBanTacChien?.tenNguoitruc || "",
-          },
-        ];
+        const mappedData: ReportRow[] = data.map((item) => {
+          let vang: VangChiTiet = {
+            hoiThaiNgoaiSuDoan: 0,
+            hoiThaiEF: 0,
+            xayDungNgoaiSuDoan: 0,
+            xayDungEF: 0,
+            choHuu: 0,
+            nghiTranhThu: 0,
+            phep: 0,
+            vienNgoaiSuDoan: 0,
+            vienEF: 0,
+            congTacNgoaiSuDoan: 0,
+            congTacSuDoan: 0,
+            hocSQ: 0,
+            hocCS: 0,
+          };
+
+          try {
+            vang = JSON.parse(item.thongTinVang) as VangChiTiet;
+          } catch (e) {
+            console.error("Error parsing thongTinVang:", e);
+          }
+
+          return {
+            idDonBaoCao: item.idDonBaoCao,
+            donVi: item.donVi.maDonVi,
+            tenDonVi: item.donVi.tenDonvi,
+            quanSoTong: item.quanSoTong,
+            quanSoHienDien: item.quanSoHienDien,
+            quanSoVang: item.quanSoVang,
+            vang,
+            trucChiHuy: item.caTruc?.trucChiHuy?.tenNguoitruc || "",
+            trucBan: item.caTruc?.trucBanTacChien?.tenNguoitruc || "",
+            status: item.status,
+          };
+        });
 
         setReportData(mappedData);
-      } else {
-        setReportData([]);
       }
     } catch (error) {
       showError("Không thể tải dữ liệu báo cáo");
       console.error(error);
-      setReportData([]);
     } finally {
       setLoading(false);
     }
@@ -120,6 +134,46 @@ export default function DailyTroopReport() {
     };
     loadData();
   }, [fetchReports]);
+
+  const handleToggleMenu = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    donViId: string,
+  ) => {
+    event.stopPropagation();
+
+    if (activeMenuUnit === donViId) {
+      setActiveMenuUnit(null);
+    } else {
+      const rect = event.currentTarget.getBoundingClientRect();
+
+      setMenuPosition({
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.right + window.scrollX - 230,
+      });
+      setActiveMenuUnit(donViId);
+    }
+  };
+
+  useEffect(() => {
+    function handleGlobalClose(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setActiveMenuUnit(null);
+      }
+    }
+
+    if (activeMenuUnit) {
+      document.addEventListener("mousedown", handleGlobalClose);
+      window.addEventListener("scroll", handleGlobalClose, { passive: true });
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleGlobalClose);
+      window.removeEventListener("scroll", handleGlobalClose);
+    };
+  }, [activeMenuUnit]);
 
   const handleAddReport = () => {
     setShowCreateModal(true);
@@ -148,8 +202,8 @@ export default function DailyTroopReport() {
 
     return reportData.filter((row) => {
       const rowText = [
-        row.donVi,
         row.tenDonVi,
+        row.donVi,
         row.quanSoTong,
         row.quanSoHienDien,
         row.quanSoVang,
@@ -166,6 +220,8 @@ export default function DailyTroopReport() {
         row.vang.congTacSuDoan,
         row.vang.hocSQ,
         row.vang.hocCS,
+        row.trucChiHuy,
+        row.trucBan,
       ]
         .join(" ")
         .toLowerCase();
@@ -232,11 +288,9 @@ export default function DailyTroopReport() {
 
       <div className={styles.tableShell}>
         {loading ? (
-          <div className={styles.loading}>Đang tải dữ liệu...</div>
+          <div className={styles.loadingState}>Đang tải dữ liệu...</div>
         ) : reportData.length === 0 ? (
-          <div className={styles.emptyState}>
-            <p>Không có dữ liệu báo cáo cho ngày {reportDate}</p>
-          </div>
+          <div className={styles.emptyState}>Không có dữ liệu báo cáo</div>
         ) : (
           <table className={styles.reportTable}>
             <thead>
@@ -262,11 +316,11 @@ export default function DailyTroopReport() {
               </tr>
               <tr>
                 <th>Ngoài Sư Đoàn</th>
-                <th>e, f</th>
+                <th>Trung đoàn, Sư đoàn</th>
                 <th>Ngoài Sư Đoàn</th>
-                <th>e, f</th>
+                <th>Trung đoàn, Sư đoàn</th>
                 <th>Ngoài Sư Đoàn</th>
-                <th>e, f</th>
+                <th>Trung đoàn, Sư đoàn</th>
                 <th>Ngoài Sư Đoàn</th>
                 <th>Sư đoàn</th>
                 <th>SQ</th>
@@ -300,52 +354,60 @@ export default function DailyTroopReport() {
                     <td>{row.trucChiHuy}</td>
                     <td>{row.trucBan}</td>
                     <td className={styles.actionCell}>
-                      <div
-                        className={styles.actionWrapper}
-                        ref={isMenuOpen ? dropdownRef : null}
-                      >
+                      <div className={styles.actionWrapper}>
                         <button
+                          type="button"
                           className={`${styles.ellipsisBtn} ${isMenuOpen ? styles.activeEllipsis : ""}`}
                           aria-label="Tùy chọn thao tác"
-                          onClick={() =>
-                            setActiveMenuUnit(isMenuOpen ? null : row.donVi)
-                          }
+                          onClick={(e) => handleToggleMenu(e, row.donVi)}
                         >
                           <FontAwesomeIcon icon={faEllipsisVertical} />
                         </button>
 
-                        {isMenuOpen && (
-                          <div className={styles.dropdownMenu} role="menu">
-                            <button
-                              type="button"
-                              className={styles.menuItem}
-                              role="menuitem"
-                              onClick={() => {
-                                setSelectedUnit(row.donVi);
-                                setActiveMenuUnit(null);
+                        {/* SỬ DỤNG PORTAL: Đưa dropdownMenu ra ngoài body để đè đè hoàn toàn lên tableShell */}
+                        {isMenuOpen &&
+                          createPortal(
+                            <div
+                              ref={dropdownRef}
+                              className={styles.dropdownMenu}
+                              role="menu"
+                              style={{
+                                top: `${menuPosition.top}px`,
+                                left: `${menuPosition.left}px`,
                               }}
+                              onClick={(e) => e.stopPropagation()}
                             >
-                              <FontAwesomeIcon
-                                icon={faEye}
-                                className={styles.menuIcon}
-                              />
-                              Xem chi tiết quân số vắng
-                            </button>
+                              <button
+                                type="button"
+                                className={styles.menuItem}
+                                role="menuitem"
+                                onClick={() => {
+                                  setSelectedUnit(row.tenDonVi);
+                                  setActiveMenuUnit(null);
+                                }}
+                              >
+                                <FontAwesomeIcon
+                                  icon={faEye}
+                                  className={styles.menuIcon}
+                                />
+                                Xem chi tiết
+                              </button>
 
-                            <button
-                              type="button"
-                              className={styles.menuItem}
-                              role="menuitem"
-                              onClick={() => handleEditUnitReport(row.donVi)}
-                            >
-                              <FontAwesomeIcon
-                                icon={faPenToSquare}
-                                className={styles.menuIcon}
-                              />
-                              Sửa
-                            </button>
-                          </div>
-                        )}
+                              <button
+                                type="button"
+                                className={styles.menuItem}
+                                role="menuitem"
+                                onClick={() => handleEditUnitReport(row.donVi)}
+                              >
+                                <FontAwesomeIcon
+                                  icon={faPenToSquare}
+                                  className={styles.menuIcon}
+                                />
+                                Sửa
+                              </button>
+                            </div>,
+                            document.body, // Chỉ định kết xuất trực tiếp vào thẻ body của ứng dụng
+                          )}
                       </div>
                     </td>
                   </tr>

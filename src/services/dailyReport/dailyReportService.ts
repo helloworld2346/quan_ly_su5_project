@@ -3,6 +3,7 @@ import type {
   CreateReportRequest,
   CreateReportResponse,
   SearchReportResponse,
+  SearchChildrenResponse,
 } from "../../types/dailyReport";
 
 export const dailyReportService = {
@@ -22,6 +23,17 @@ export const dailyReportService = {
   ): Promise<SearchReportResponse> => {
     const response = await apiNoPrefix.get<SearchReportResponse>(
       `/donbaocao/search/DonVi/${maDonVi}`,
+      { params: { ngayLoc } },
+    );
+    return response.data;
+  },
+
+  searchChildrenReports: async (
+    maDonVi: string,
+    ngayLoc: string,
+  ): Promise<SearchChildrenResponse> => {
+    const response = await apiNoPrefix.get<SearchChildrenResponse>(
+      `/donbaocao/search/DonVi/${maDonVi}/children`,
       { params: { ngayLoc } },
     );
     return response.data;

@@ -90,3 +90,34 @@ export interface SearchReportResponse {
     };
   };
 }
+
+export interface SearchChildrenResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  Result: Array<{
+    idDonBaoCao: string;
+    quanSoHienDien: number;
+    quanSoTong: number;
+    quanSoVang: number;
+    status: string;
+    thoiGianBaoCao: string;
+    thongTinVang: string;
+    donVi: {
+      maDonVi: string;
+      tenDonvi: string;
+    };
+    caTruc: {
+      trucBanTacChien: {
+        capbacNguoitruc: string;
+        chucvuNguoitruc: string;
+        tenNguoitruc: string;
+      };
+      trucChiHuy: {
+        capbacNguoitruc: string;
+        chucvuNguoitruc: string;
+        tenNguoitruc: string;
+      };
+    };
+  }>;
+}
