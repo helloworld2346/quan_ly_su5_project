@@ -36,7 +36,7 @@ export default function AppRoutes({
         path="/login"
         element={
           isAuthenticated ? (
-            <Navigate to={getDefaultRouteByRole(userRole)} replace />
+            <Navigate to={getDefaultRouteByRole(userRole??undefined)} replace />
           ) : (
             <Login onSuccess={onLoginSuccess} />
           )
@@ -65,7 +65,7 @@ export default function AppRoutes({
         path="*"
         element={
           <Navigate
-            to={isAuthenticated ? getDefaultRouteByRole(userRole) : "/login"}
+            to={isAuthenticated ? getDefaultRouteByRole(userRole??undefined) : "/login"}
             replace
           />
         }

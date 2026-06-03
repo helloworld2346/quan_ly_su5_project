@@ -1,7 +1,7 @@
 export type ReportSeed = {
   unit: string;
   total1: number;
-  total2: number;
+  
 };
 
 export const REPORT_ROWS: ReportSeed[] = [

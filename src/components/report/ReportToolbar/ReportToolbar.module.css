@@ -200,9 +200,7 @@
   border-color: var(--btn-excel-hover-border);  
 }  
   
-/* ==========================================
-   DARK THEME SYSTEM (Chỉ giữ lại icon lịch mặc định)
-   ========================================== */  
+
 [data-theme="dark"] .dateInput:focus {  
   box-shadow: 0 0 0 3px rgba(107, 184, 146, 0.15);  
 }  

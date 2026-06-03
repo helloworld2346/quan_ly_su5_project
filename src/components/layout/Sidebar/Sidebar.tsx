@@ -35,11 +35,13 @@ type Props = {
   onLogout?: () => void;
   collapsed?: boolean;
   onExpand?: () => void;
+  
 };
 
+// FIX 1: Nới lỏng kiểu dữ liệu targetRef để chấp nhận 'null' giống như bản chất các React Ref
 type TooltipState = {
   text: string;
-  targetRef: React.RefObject<HTMLElement>;
+  targetRef: React.RefObject<HTMLElement | null>;
 };
 
 export default function Sidebar({
@@ -51,7 +53,7 @@ export default function Sidebar({
 }: Props) {
   const { account, isParentUnit } = useAuth();
   const userRole = account?.vaiTro?.tenVaiTro || null;
-  const allowedNavItems = getNavItemsByRole(userRole, isParentUnit()); // FIX: gọi function
+  const allowedNavItems = getNavItemsByRole(userRole, isParentUnit());
 
   const iconById: Record<NavItemId, IconProp> = {
     executive: faGaugeHigh,
@@ -92,7 +94,7 @@ export default function Sidebar({
 
   const handleTooltipEnter = (
     text: string,
-    ref: React.RefObject<HTMLElement>,
+    ref: React.RefObject<HTMLElement | null>,
   ) => {
     if (collapsed) {
       setTooltip({ text, targetRef: ref });
@@ -187,7 +189,8 @@ export default function Sidebar({
               isOpen={reportsOpen}
               onToggle={() => setReportsOpen(!reportsOpen)}
               activeId={activeId}
-              onNavigate={onNavigate}
+              // FIX 2: Ép kiểu string từ NavGroup về NavItemId khi kích hoạt định tuyến điều hướng
+              onNavigate={(id) => onNavigate(id as NavItemId)}
               collapsed={collapsed}
               onExpand={onExpand}
               isActive={reportActive}
@@ -206,7 +209,8 @@ export default function Sidebar({
               isOpen={approvalOpen}
               onToggle={() => setApprovalOpen(!approvalOpen)}
               activeId={activeId}
-              onNavigate={onNavigate}
+              // FIX 2: Tương tự ép kiểu dữ liệu callback an toàn
+              onNavigate={(id) => onNavigate(id as NavItemId)}
               collapsed={collapsed}
               onExpand={onExpand}
               isActive={approvalActive}
@@ -225,7 +229,8 @@ export default function Sidebar({
               isOpen={dutyOpen}
               onToggle={() => setDutyOpen(!dutyOpen)}
               activeId={activeId}
-              onNavigate={onNavigate}
+              // FIX 2: Tương tự ép kiểu dữ liệu callback an toàn
+              onNavigate={(id) => onNavigate(id as NavItemId)}
               collapsed={collapsed}
               onExpand={onExpand}
               isActive={dutyActive}

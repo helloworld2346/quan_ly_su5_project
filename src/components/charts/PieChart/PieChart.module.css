@@ -18,10 +18,11 @@
   box-shadow: 0 8px 24px rgba(31, 92, 63, 0.1);  
 }  
   
-.large {  
-  padding: 28px;  
-  border-top: 4px solid var(--primary-color);  
-}  
+.large {
+  padding: 28px;
+  width: 100%;
+  border-top: 4px solid var(--primary-color);
+}
   
 .hero {  
   padding: 36px;  
@@ -40,13 +41,17 @@
 }  
   
 .title {  
-  display: flex;  
-  justify-content: center;  
-  margin: 0;  
-  font-size: 14px;  
-  font-weight: 700;  
-  line-height: 1.4;  
-  color: var(--on-surface, var(--login-text));  
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--primary-color);
+  background: rgba(31, 92, 63, 0.08);
+  border: 1px solid rgba(31, 92, 63, 0.2);
+  text-align: center;
+  width: fit-content;
+  margin: 0 auto;
 }  
   
 .titleContainer {  
@@ -62,7 +67,7 @@
   
 .headerMeta {  
   display: flex;  
-  justify-content: space-between;  
+  justify-content: center;  
   align-items: center;  
   width: 100%;  
   gap: 12px;  
@@ -71,10 +76,11 @@
 .badge {  
   padding: 3px 8px;  
   border-radius: 6px;  
-  font-size: 11px;  
+  font-size: 15px;  
   font-weight: 600;  
   color: var(--primary-color);  
   background: rgba(31, 92, 63, 0.1);  
+
 }  
   
 .hero .badge {  
@@ -84,16 +90,18 @@
   color: white;  
 }  
   
-.rateBadge {  
-  padding: 3px 8px;  
-  border-radius: 6px;  
-  font-size: 11px;  
-  font-weight: 600;  
-  color: var(--rate-badge-fg, #c2410c);  
-  background: var(--rate-badge-bg, rgba(234, 88, 12, 0.16));  
-  border: 1px solid var(--rate-badge-border, transparent);  
-}  
+
   
+.large .badge {
+  padding: 6px 20px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  background: linear-gradient(135deg, var(--primary-color), #2d7a52);
+  color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(31, 92, 63, 0.3);
+}
 .large .rateBadge {  
   font-size: 12px;  
 }  
@@ -114,8 +122,7 @@
   justify-content: flex-end;  
   margin-bottom: 8px;  
 }  
-  
-/* Layout chart lớn: donut trái — legend phải (GIỮ NGUYÊN) */  
+
 .large .body {  
   display: grid;  
   grid-template-columns: auto 1fr;  
@@ -146,13 +153,13 @@
   
 .chart {  
   display: block;  
-  width: 148px;  
-  height: 148px;  
+  width: 175px;  
+  height: 175px;  
 }  
   
 .large .chart {  
-  width: 240px;  
-  height: 240px;  
+  width: 280px;  
+  height: 280px;  
 }  
   
 .heroChart {  
@@ -188,7 +195,7 @@
 }  
   
 .centerValue {  
-  font-size: 17px;  
+  font-size: 20px;  
   font-weight: 700;  
   color: var(--primary-color);  
   line-height: 1.2;  
@@ -204,7 +211,7 @@
   
 .centerCaption {  
   margin-top: 2px;  
-  font-size: 10px;  
+  font-size: 13px;  
   font-weight: 600;  
   color: var(--on-surface-muted, var(--login-text-muted));  
   text-align: center;  
@@ -278,39 +285,47 @@
   list-style: none;  
   margin: 0;  
   padding: 0;  
-  width: 100%;  
+  width: 95%;  
   display: flex;  
   flex-direction: column;  
   gap: 4px;  
-}  
+} 
+
+.legendPercent {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--on-surface-muted, #3a5248);
+}
   
 .large .legend {  
-  align-self: center;  
+  align-self: center;
+  margin-left: 0;
+  width: 100%;
+  min-width: 0;
 }  
   
 .hero .legend {  
   align-self: center;  
 }  
   
-.legendBtn {  
-  width: 100%;  
-  display: grid;  
-  grid-template-columns: 10px 1fr auto;  
-  align-items: center;  
-  gap: 8px;  
-  padding: 8px 10px;  
-  border: 1px solid transparent;  
-  border-radius: 8px;  
-  background: transparent;  
-  font-family: inherit;  
-  font-size: 12px;  
-  cursor: pointer;  
-  transition:  
-    background 0.15s,  
-    border-color 0.15s;  
-}  
+.legendBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 6px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
   
-/* Chỉ đổi hover — không nền trắng #f0f5f2 */  
+ 
 .legendBtn:hover,  
 .legendBtnActive {  
   background: var(--legend-hover-bg, rgba(31, 92, 63, 0.08));  
@@ -323,19 +338,34 @@
   border-radius: 50%;  
 }  
   
-/* Hiện diện / Vắng — rõ trên dark */  
-.legendLabel {  
-  text-align: left;  
-  font-size: 13px;  
-  font-weight: 700;  
-  color: var(--on-surface-muted, #3a5248);  
-}  
+.legendLabel {
+  flex: 1; 
+  text-align: left;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--on-surface-muted, #3a5248);
+  white-space: nowrap;
+}
   
-.legendValue {  
-  font-size: 14px;  
-  font-weight: 800;  
-  color: var(--on-surface, #152a22);  
-}  
+.legendValue {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--on-surface, #152a22);
+  font-variant-numeric: tabular-nums;
+ text-align: center;  
+  width: 52px;  
+  flex-shrink: 0;
+}
+
+.legendPercent {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--on-surface-muted, #3a5248);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  width: 52px; 
+  flex-shrink: 0;
+}
   
 .legendBtn:hover .legendLabel,  
 .legendBtnActive .legendLabel {  
@@ -344,6 +374,11 @@
   
 .legendBtn:hover .legendValue,  
 .legendBtnActive .legendValue {  
+  color: var(--on-surface, #0f1f18);  
+}  
+
+.legendBtn:hover .legendPercent,  
+.legendBtnActive .legendPercent {  
   color: var(--on-surface, #0f1f18);  
 }  
   

@@ -42,10 +42,11 @@ export const DIVISION_TROOP_CHART = buildChart(
 /** Đơn vị trực thuộc Sư đoàn 5 — sắp theo: phòng/ban → trung đoàn → tiểu đoàn → đại đội */
 export const SUBORDINATE_TROOP_CHARTS: UnitTroopChart[] = [
   // Phòng, ban trực thuộc
-  buildChart("phong-ct", "Phòng Chính Trị", "department", 95, 0.921),
+
   buildChart("phong-tm", "Phòng Tham Mưu", "department", 110, 0.918),
+  buildChart("phong-ct", "Phòng Chính Trị", "department", 95, 0.921),
   buildChart("phong-hckt", "Phòng Hậu Cần Kỹ Thuật", "department", 175, 0.912),
-  buildChart("ban-tc", "Ban Tài Chính", "department", 85, 0.929),
+
   // Trung đoàn
   buildChart("td-4", "Trung đoàn 4", "regiment", 1320, 0.8),
   buildChart("td-5", "Trung đoàn 5", "regiment", 1295, 0.935),

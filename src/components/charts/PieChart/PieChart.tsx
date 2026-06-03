@@ -7,10 +7,9 @@ import { PRESENT_GRADIENTS } from "../../../constants/chartColors";
 import type { AttendanceKey, TroopSegment } from "../../../types/troopStats";
 import {
   getChartSegments,
-  getPresentRate,
-  type UnitTroopChart,
 } from "../../../data/troopData";
 
+import type { UnitTroopChart } from "../../../types/troopStats";
 type Props = {
   chart: UnitTroopChart;
   size?: "hero" | "large" | "small";
@@ -45,14 +44,14 @@ export default function PieChart({
 
   const segments = useMemo(() => getChartSegments(chart), [chart]);
   const sized = useMemo(() => getSegmentOffsets(segments), [segments]);
-  const presentRate = getPresentRate(chart);
+  
 
   const [hovered, setHovered] = useState<AttendanceKey | null>(null);
 
   const isHero = size === "hero";
   const isLarge = size === "large";
-  const radius = isHero ? 120 : isLarge ? 92 : 62;
-  const stroke = isHero ? 40 : isLarge ? 30 : 20;
+  const radius = isHero ? 120 : isLarge ? 108 : 72;
+  const stroke = isHero ? 40 : isLarge ? 44 : 26;
   const viewSize = (radius + stroke) * 2;
   const center = viewSize / 2;
   const circumference = 2 * Math.PI * radius;
@@ -88,14 +87,14 @@ export default function PieChart({
       >
         <div className={styles.titleContainer}>
           {!isLarge && !isHero && (
-            <h3 className={styles.title}>{chart.name}</h3>
+            <div className={styles.title}>{chart.name}</div> 
           )}
           {badge && (
             <div className={styles.headerMeta}>
               <span className={styles.badge}>{badge}</span>
-              <span className={styles.rateBadge}>
-                {presentRate.toFixed(1)}% hiện diện
-              </span>
+
+
+
             </div>
           )}
         </div>
@@ -214,14 +213,18 @@ export default function PieChart({
                   style={
                     segment.key === "present"
                       ? {
-                          background: `linear-gradient(135deg, ${gStart}, ${gEnd})`,
-                        }
+                        background: `linear-gradient(135deg, ${gStart}, ${gEnd})`,
+                      }
                       : { background: segment.color }
                   }
                 />
                 <span className={styles.legendLabel}>{segment.label}</span>
                 <span className={styles.legendValue}>
+
                   {formatNumber(segment.value)}
+                </span>
+                <span className={styles.legendPercent}>
+                  {((segment.value / chart.total) * 100).toFixed(1)}%
                 </span>
               </button>
             </li>

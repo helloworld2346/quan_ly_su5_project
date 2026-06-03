@@ -47,7 +47,7 @@ export default function NavGroup({
 
   const handleGroupMouseEnter = () => {
     if (collapsed && onTooltipEnter) {
-      onTooltipEnter(label, groupToggleRef);
+      onTooltipEnter(label, groupToggleRef as React.RefObject<HTMLElement>);
     }
   };
 

@@ -166,8 +166,9 @@ export default function DailyTroopReport() {
     }
   };
 
-  useEffect(() => {
-    function handleGlobalClose(event: MouseEvent) {
+useEffect(() => {
+   
+    function handleGlobalClose(event: Event) {
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)

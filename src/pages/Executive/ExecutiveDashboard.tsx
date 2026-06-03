@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faFilter,
-  faTrophy,
-  faExclamationTriangle,
+  faFilter, faTrophy, faExclamationTriangle,
+  faChevronLeft, faChevronRight, faCalendarAlt,
 } from "@fortawesome/free-solid-svg-icons";
 
 import PieChart from "../../components/charts/PieChart/PieChart";
@@ -14,7 +13,6 @@ import {
   CHART_GROUP_ORDER,
   DIVISION_TROOP_CHART,
   SUBORDINATE_TROOP_CHARTS,
-  UNIT_TYPE_LABELS,
   getChartsByGroup,
   getDivisionSummary,
   getPresentRate,
@@ -32,7 +30,7 @@ const FILTER_OPTIONS: { key: FilterKey; label: string }[] = [
   { key: "company", label: "Đại đội" },
 ];
 
-const SUBORDINATE_COUNT = SUBORDINATE_TROOP_CHARTS.length;
+
 
 // Mock data cho so sánh số người vắng
 const COMPARISON_DATA = [
@@ -93,11 +91,32 @@ function formatDate() {
   return `${day}/${month}/${year}`;
 }
 
+function formatFullDate(date: Date) {
+  const days = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+  const d = String(date.getDate()).padStart(2, "0");
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const y = date.getFullYear();
+  return `${days[date.getDay()]}, ${d}/${m}/${y}`;
+}
+
+function shiftDay(date: Date, delta: number) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + delta);
+  return d;
+}
+
+function formatRate(rate: number) {
+  return Number.isInteger(rate) ? `${rate}%` : `${rate.toFixed(1)}%`;
+}
+
 export default function ExecutiveDashboard() {
   const [filter, setFilter] = useState<FilterKey>("all");
   const summary = getDivisionSummary();
   const visibleGroups = getVisibleGroups(filter);
   const topUnits = getTopUnits();
+  const SUBORDINATE_COUNT = SUBORDINATE_TROOP_CHARTS.length;
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+   const dateInputRef = useRef<HTMLInputElement>(null); 
 
   return (
     <section className={styles.section} aria-labelledby="troop-charts-title">
@@ -144,7 +163,45 @@ export default function ExecutiveDashboard() {
           </div>
         </dl>
       </header>
+      {/* Date picker bar */}
+      <div className={styles.datebar}>
+        <div className={styles.dateNav}>
+          <button
+            className={styles.dateNavBtn}
+            onClick={() => setSelectedDate((d) => shiftDay(d, -1))}
+            aria-label="Ngày trước"
+          >
+            <FontAwesomeIcon icon={faChevronLeft} />
+          </button>
+          <span className={styles.dateLabel}>{formatFullDate(selectedDate)}</span>
+          <button
+            className={styles.dateNavBtn}
+            onClick={() => setSelectedDate((d) => shiftDay(d, 1))}
+            aria-label="Ngày sau"
+          >
+            <FontAwesomeIcon icon={faChevronRight} />
+          </button>
+        </div>
 
+   <div
+  className={styles.datePicker}
+  onClick={() => dateInputRef.current?.showPicker()}
+>
+  <FontAwesomeIcon icon={faCalendarAlt} className={styles.datePickerIcon} />
+  <input
+    ref={dateInputRef}
+    type="date"
+    className={styles.datePickerInput}
+    value={selectedDate.toISOString().split("T")[0]}
+    onChange={(e) => {
+      if (e.target.value) setSelectedDate(new Date(e.target.value));
+    }}
+  />
+  <span className={styles.datePickerPlaceholder}>Chọn ngày</span>
+  <span style={{ flex: 1 }} />
+  <FontAwesomeIcon icon={faChevronRight} className={styles.datePickerArrow} style={{ transform: "rotate(90deg)" }} />
+</div>
+</div>
       <div className={styles.chartSection}>
         <div className={styles.chartSectionHead}>
           <div>
@@ -221,7 +278,7 @@ export default function ExecutiveDashboard() {
                     {topUnits.highestPresent?.name}
                   </div>
                   <div className={styles.highlightRate}>
-                    {getPresentRate(topUnits.highestPresent!).toFixed(1)}%
+                   {formatRate(getPresentRate(topUnits.highestPresent!))}
                   </div>
                 </div>
               </div>
@@ -238,7 +295,7 @@ export default function ExecutiveDashboard() {
                     {topUnits.highestAbsent?.name}
                   </div>
                   <div className={styles.highlightRate}>
-                    {getPresentRate(topUnits.highestAbsent!).toFixed(1)}%
+                      {formatRate(getPresentRate(topUnits.highestAbsent!))}
                   </div>
                 </div>
               </div>
@@ -309,7 +366,7 @@ export default function ExecutiveDashboard() {
                   <PieChart
                     key={chart.id}
                     chart={chart}
-                    badge={UNIT_TYPE_LABELS[chart.unitType]}
+
                   />
                 ))}
               </div>

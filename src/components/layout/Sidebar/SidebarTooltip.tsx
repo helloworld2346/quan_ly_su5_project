@@ -4,7 +4,7 @@ import styles from "./SidebarTooltip.module.css";
 type Props = {
   text: string;
   visible: boolean;
-  targetRef: React.RefObject<HTMLElement>;
+  targetRef: React.RefObject<HTMLElement | null>;
 };
 
 export default function SidebarTooltip({ text, visible, targetRef }: Props) {
