@@ -53,10 +53,54 @@ export default function CreateReportModal({ onClose, onSuccess }: Props) {
   const { showSuccess, showError } = useToast();
 
   const handleChange = (field: string, value: number | string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormData((prev) => {
+      const newData = { ...prev, [field]: value };
+
+      // Tính toán tổng vắng và hiện diện khi các field vắng hoặc tổng quân số thay đổi
+      const vangFields = [
+        "hoiThaiNgoaiSuDoan",
+        "hoiThaiEF",
+        "xayDungNgoaiSuDoan",
+        "xayDungEF",
+        "choHuu",
+        "nghiTranhThu",
+        "phep",
+        "vienNgoaiSuDoan",
+        "vienEF",
+        "congTacNgoaiSuDoan",
+        "congTacSuDoan",
+        "hocSQ",
+        "hocCS",
+        "tongQuanSo",
+      ];
+
+      if (vangFields.includes(field)) {
+        const tongVang =
+          newData.hoiThaiNgoaiSuDoan +
+          newData.hoiThaiEF +
+          newData.xayDungNgoaiSuDoan +
+          newData.xayDungEF +
+          newData.choHuu +
+          newData.nghiTranhThu +
+          newData.phep +
+          newData.vienNgoaiSuDoan +
+          newData.vienEF +
+          newData.congTacNgoaiSuDoan +
+          newData.congTacSuDoan +
+          newData.hocSQ +
+          newData.hocCS;
+
+        const hienDien = newData.tongQuanSo - tongVang;
+
+        newData.tongVang = tongVang;
+        newData.hienDien = hienDien >= 0 ? hienDien : 0;
+      }
+
+      return newData;
+    });
   };
 
-  const handleSubmit = async (isDraft: boolean) => {
+  const handleSubmit = async () => {
     setLoading(true);
     try {
       const vangChiTiet: VangChiTiet = {
@@ -127,7 +171,7 @@ export default function CreateReportModal({ onClose, onSuccess }: Props) {
                   className={styles.input}
                   value={formData.tongQuanSo}
                   onChange={(e) =>
-                    handleChange("tongQuanSo", Number(e.target.value))
+                    handleChange("tongQuanSo", parseInt(e.target.value) || 0)
                   }
                 />
               </div>
@@ -137,9 +181,7 @@ export default function CreateReportModal({ onClose, onSuccess }: Props) {
                   type="number"
                   className={styles.input}
                   value={formData.hienDien}
-                  onChange={(e) =>
-                    handleChange("hienDien", Number(e.target.value))
-                  }
+                  disabled
                 />
               </div>
               <div className={styles.field}>
@@ -148,9 +190,7 @@ export default function CreateReportModal({ onClose, onSuccess }: Props) {
                   type="number"
                   className={styles.input}
                   value={formData.tongVang}
-                  onChange={(e) =>
-                    handleChange("tongVang", Number(e.target.value))
-                  }
+                  disabled
                 />
               </div>
             </div>
@@ -170,7 +210,10 @@ export default function CreateReportModal({ onClose, onSuccess }: Props) {
                     className={styles.input}
                     value={formData.hoiThaiNgoaiSuDoan}
                     onChange={(e) =>
-                      handleChange("hoiThaiNgoaiSuDoan", Number(e.target.value))
+                      handleChange(
+                        "hoiThaiNgoaiSuDoan",
+                        parseInt(e.target.value) || 0,
+                      )
                     }
                   />
                 </div>
@@ -181,7 +224,7 @@ export default function CreateReportModal({ onClose, onSuccess }: Props) {
                     className={styles.input}
                     value={formData.hoiThaiEF}
                     onChange={(e) =>
-                      handleChange("hoiThaiEF", Number(e.target.value))
+                      handleChange("hoiThaiEF", parseInt(e.target.value) || 0)
                     }
                   />
                 </div>
@@ -198,7 +241,10 @@ export default function CreateReportModal({ onClose, onSuccess }: Props) {
                     className={styles.input}
                     value={formData.xayDungNgoaiSuDoan}
                     onChange={(e) =>
-                      handleChange("xayDungNgoaiSuDoan", Number(e.target.value))
+                      handleChange(
+                        "xayDungNgoaiSuDoan",
+                        parseInt(e.target.value) || 0,
+                      )
                     }
                   />
                 </div>
@@ -209,7 +255,7 @@ export default function CreateReportModal({ onClose, onSuccess }: Props) {
                     className={styles.input}
                     value={formData.xayDungEF}
                     onChange={(e) =>
-                      handleChange("xayDungEF", Number(e.target.value))
+                      handleChange("xayDungEF", parseInt(e.target.value) || 0)
                     }
                   />
                 </div>
@@ -226,7 +272,7 @@ export default function CreateReportModal({ onClose, onSuccess }: Props) {
                     className={styles.input}
                     value={formData.choHuu}
                     onChange={(e) =>
-                      handleChange("choHuu", Number(e.target.value))
+                      handleChange("choHuu", parseInt(e.target.value) || 0)
                     }
                   />
                 </div>
@@ -237,7 +283,10 @@ export default function CreateReportModal({ onClose, onSuccess }: Props) {
                     className={styles.input}
                     value={formData.nghiTranhThu}
                     onChange={(e) =>
-                      handleChange("nghiTranhThu", Number(e.target.value))
+                      handleChange(
+                        "nghiTranhThu",
+                        parseInt(e.target.value) || 0,
+                      )
                     }
                   />
                 </div>
@@ -248,7 +297,7 @@ export default function CreateReportModal({ onClose, onSuccess }: Props) {
                     className={styles.input}
                     value={formData.phep}
                     onChange={(e) =>
-                      handleChange("phep", Number(e.target.value))
+                      handleChange("phep", parseInt(e.target.value) || 0)
                     }
                   />
                 </div>
@@ -265,7 +314,10 @@ export default function CreateReportModal({ onClose, onSuccess }: Props) {
                     className={styles.input}
                     value={formData.vienNgoaiSuDoan}
                     onChange={(e) =>
-                      handleChange("vienNgoaiSuDoan", Number(e.target.value))
+                      handleChange(
+                        "vienNgoaiSuDoan",
+                        parseInt(e.target.value) || 0,
+                      )
                     }
                   />
                 </div>
@@ -276,7 +328,7 @@ export default function CreateReportModal({ onClose, onSuccess }: Props) {
                     className={styles.input}
                     value={formData.vienEF}
                     onChange={(e) =>
-                      handleChange("vienEF", Number(e.target.value))
+                      handleChange("vienEF", parseInt(e.target.value) || 0)
                     }
                   />
                 </div>
@@ -293,7 +345,10 @@ export default function CreateReportModal({ onClose, onSuccess }: Props) {
                     className={styles.input}
                     value={formData.congTacNgoaiSuDoan}
                     onChange={(e) =>
-                      handleChange("congTacNgoaiSuDoan", Number(e.target.value))
+                      handleChange(
+                        "congTacNgoaiSuDoan",
+                        parseInt(e.target.value) || 0,
+                      )
                     }
                   />
                 </div>
@@ -304,7 +359,10 @@ export default function CreateReportModal({ onClose, onSuccess }: Props) {
                     className={styles.input}
                     value={formData.congTacSuDoan}
                     onChange={(e) =>
-                      handleChange("congTacSuDoan", Number(e.target.value))
+                      handleChange(
+                        "congTacSuDoan",
+                        parseInt(e.target.value) || 0,
+                      )
                     }
                   />
                 </div>
@@ -321,7 +379,7 @@ export default function CreateReportModal({ onClose, onSuccess }: Props) {
                     className={styles.input}
                     value={formData.hocSQ}
                     onChange={(e) =>
-                      handleChange("hocSQ", Number(e.target.value))
+                      handleChange("hocSQ", parseInt(e.target.value) || 0)
                     }
                   />
                 </div>
@@ -332,7 +390,7 @@ export default function CreateReportModal({ onClose, onSuccess }: Props) {
                     className={styles.input}
                     value={formData.hocCS}
                     onChange={(e) =>
-                      handleChange("hocCS", Number(e.target.value))
+                      handleChange("hocCS", parseInt(e.target.value) || 0)
                     }
                   />
                 </div>
@@ -344,14 +402,14 @@ export default function CreateReportModal({ onClose, onSuccess }: Props) {
         <div className={styles.footer}>
           <button
             className={`${styles.btn} ${styles.btnDraft}`}
-            onClick={() => handleSubmit(true)}
+            onClick={handleSubmit}
             disabled={loading}
           >
             Lưu nháp
           </button>
           <button
             className={`${styles.btn} ${styles.btnSubmit}`}
-            onClick={() => handleSubmit(false)}
+            onClick={handleSubmit}
             disabled={loading}
           >
             Nộp báo cáo
