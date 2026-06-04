@@ -1,15 +1,17 @@
 import { useMemo, useState } from "react";
 import ReportToolbar from "../../components/report/ReportToolbar";
 import styles from "./TrainingReport.module.css";
+import EditModal from "./EditModal";
+import DetailModal from "./DetailModal";
 
 import {
   TRAINING_REPORT_ROWS,
   TRAINING_REPORT_TOTAL,
+  type TrainingReportRow,
 } from "../../data/trainingdata";
 
 function todayIsoDate() {
   const d = new Date();
-
   return [
     d.getFullYear(),
     String(d.getMonth() + 1).padStart(2, "0"),
@@ -20,12 +22,13 @@ function todayIsoDate() {
 export default function TrainingReport() {
   const [query, setQuery] = useState("");
   const [reportDate, setReportDate] = useState(todayIsoDate());
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [editRow, setEditRow] = useState<TrainingReportRow | null>(null);
+  const [detailRow, setDetailRow] = useState<TrainingReportRow | null>(null);
 
   const filteredRows = useMemo(() => {
     const q = query.trim().toLowerCase();
-
     if (!q) return TRAINING_REPORT_ROWS;
-
     return TRAINING_REPORT_ROWS.filter((row) =>
       row.unit.toLowerCase().includes(q),
     );
@@ -46,15 +49,13 @@ export default function TrainingReport() {
             <tr>
               <th rowSpan={3}>STT</th>
               <th rowSpan={3}>ĐƠN VỊ</th>
-
-              <th colSpan={5}>QUÂN SỐ PHÂN HUẤN LUYỆN</th>
-
+              <th rowSpan={3}>QUÂN SỐ HIỆN DIỆN</th>
+              <th colSpan={5}>QUÂN SỐ PHẢI HUẤN LUYỆN</th>
               <th colSpan={5}>QUÂN SỐ THAM GIA HUẤN LUYỆN</th>
-
               <th colSpan={5}>VẮNG HUẤN LUYỆN</th>
-
               <th rowSpan={3}>TỶ LỆ THAM GIA</th>
               <th rowSpan={3}>TRẠNG THÁI</th>
+              <th rowSpan={3}>THAO TÁC</th>
             </tr>
 
             <tr>
@@ -77,10 +78,8 @@ export default function TrainingReport() {
             <tr>
               <th>Năm 1</th>
               <th>Năm 2</th>
-
               <th>Năm 1</th>
               <th>Năm 2</th>
-
               <th>Năm 1</th>
               <th>Năm 2</th>
             </tr>
@@ -110,11 +109,11 @@ export default function TrainingReport() {
                 <tr key={row.unit}>
                   <td>{index + 1}</td>
 
-                  <td className={styles.unitCell}>
-                    {row.unit}
-                  </td>
+                  <td className={styles.unitCell}>{row.unit}</td>
 
-                  {/* Phân huấn luyện */}
+                  <td>{row.presentCount}</td>
+
+                  {/* Phải huấn luyện */}
                   <td>{row.training.sq}</td>
                   <td>{row.training.qncn}</td>
                   <td>{row.training.year1}</td>
@@ -139,17 +138,50 @@ export default function TrainingReport() {
 
                   <td>
                     <span
-                      className={`${styles.status} ${row.status === "Tốt"
+                      className={`${styles.status} ${
+                        row.status === "Tốt"
                           ? styles.good
                           : row.status === "Khá"
-                            ? styles.fair
-                            : row.status === "Trung bình"
-                              ? styles.average
-                              : styles.bad
-                        }`}
+                          ? styles.fair
+                          : row.status === "Trung bình"
+                          ? styles.average
+                          : styles.bad
+                      }`}
                     >
                       {row.status}
                     </span>
+                  </td>
+
+                  <td className={styles.actionCell}>
+                    <button
+                      className={styles.actionBtn}
+                      onClick={() =>
+                        setOpenMenuId(openMenuId === row.unit ? null : row.unit)
+                      }
+                    >
+                      ⋮
+                    </button>
+
+                    {openMenuId === row.unit && (
+                      <div className={styles.dropdown}>
+                        <button
+                          onClick={() => {
+                            setDetailRow(row);
+                            setOpenMenuId(null);
+                          }}
+                        >
+                           Xem chi tiết
+                        </button>
+                        <button
+                          onClick={() => {
+                            setEditRow(row);
+                            setOpenMenuId(null);
+                          }}
+                        >
+                           Sửa
+                        </button>
+                      </div>
+                    )}
                   </td>
                 </tr>
               );
@@ -157,6 +189,8 @@ export default function TrainingReport() {
 
             <tr className={styles.totalRow}>
               <td colSpan={2}>TỔNG CỘNG</td>
+
+              <td>{TRAINING_REPORT_TOTAL.presentCount}</td>
 
               <td>{TRAINING_REPORT_TOTAL.training.sq}</td>
               <td>{TRAINING_REPORT_TOTAL.training.qncn}</td>
@@ -189,6 +223,14 @@ export default function TrainingReport() {
           </tbody>
         </table>
       </div>
+
+      {detailRow && (
+        <DetailModal row={detailRow} onClose={() => setDetailRow(null)} />
+      )}
+
+      {editRow && (
+        <EditModal row={editRow} onClose={() => setEditRow(null)} />
+      )}
     </section>
   );
 }

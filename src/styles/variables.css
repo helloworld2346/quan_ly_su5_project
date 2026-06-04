@@ -136,6 +136,30 @@
   --toast-error-color: #ef4444;
   --toast-warning-color: #f59e0b;
   --toast-info-color: #3b82f6;
+
+  /* --- CHART COLORS (Training Dashboard) --- */
+--chart-green: #22c55e;
+--chart-red: #ef4444;
+--chart-blue: #3b82f6;
+--chart-purple: #a855f7;
+--chart-orange: #f97316;
+--chart-yellow: #eab308;
+--chart-cyan: #06b6d4;
+--chart-pink: #ec4899;
+
+/* Loại quân */
+--chart-sq: #3b82f6;        /* Sĩ quan - Xanh dương */
+--chart-qncn: #a855f7;      /* QNCN - Tím */
+--chart-hsn1: #22c55e;      /* HSQ-CS Năm 1 - Xanh lá */
+--chart-hsn2: #f97316;      /* HSQ-CS Năm 2 - Cam */
+
+/* Tham gia / Vắng */
+--chart-present: #22c55e;
+--chart-absent: #ef4444;
+
+/* Bar chart */
+--bar-bg: rgba(59, 130, 246, 0.12);
+--bar-hover: rgba(59, 130, 246, 0.2);
 }
 
 /* ==========================================================================  
@@ -258,4 +282,25 @@
   --toast-close-text-dark: #9fb0a8;
   --toast-close-hover-text-dark: #d8e4de;
   --toast-info-color-dark: #6bb892;
+
+  /* --- CHART COLORS (Dark Mode) --- */
+--chart-green: #4ade80;
+--chart-red: #f87171;
+--chart-blue: #60a5fa;
+--chart-purple: #c084fc;
+--chart-orange: #fb923c;
+--chart-yellow: #facc15;
+--chart-cyan: #22d3ee;
+--chart-pink: #f472b6;
+
+--chart-sq: #60a5fa;
+--chart-qncn: #c084fc;
+--chart-hsn1: #4ade80;
+--chart-hsn2: #fb923c;
+
+--chart-present: #4ade80;
+--chart-absent: #f87171;
+
+--bar-bg: rgba(96, 165, 250, 0.15);
+--bar-hover: rgba(96, 165, 250, 0.25);
 }
