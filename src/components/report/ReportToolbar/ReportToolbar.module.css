@@ -142,6 +142,17 @@
   background: var(--btn-yellow-hover-bg);  
   border-color: var(--btn-yellow-hover-border);  
 }  
+
+.disabledBtn,
+.disabledBtn:hover,
+.disabledBtn:active {
+  background-color: var(--modal-input-disabled-bg, #e2e8f0) !important;
+  border-color: var(--modal-border, #cbd5e1) !important;
+  color: var(--modal-input-disabled-text, #94a3b8) !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  filter: none !important;
+}
   
 .addIcon {  
   font-size: 14px;  
@@ -200,7 +211,6 @@
   border-color: var(--btn-excel-hover-border);  
 }  
   
-
 [data-theme="dark"] .dateInput:focus {  
   box-shadow: 0 0 0 3px rgba(107, 184, 146, 0.15);  
 }  

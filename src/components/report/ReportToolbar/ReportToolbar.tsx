@@ -5,7 +5,7 @@ import {
   faPlus,
   faFileWord,
   faFileExcel,
-} from "@fortawesome/free-solid-svg-icons"; // Import thêm icon Word và Excel
+} from "@fortawesome/free-solid-svg-icons";
 
 import styles from "./ReportToolbar.module.css";
 
@@ -18,6 +18,8 @@ type Props = {
   onExportExcel?: () => void;
   onAddReport?: () => void;
   maxDate?: string;
+  // 🌟 BỔ SUNG: Thuộc tính kiểm tra xem ngày hiện tại đã tồn tại báo cáo chưa
+  hasReport?: boolean;
 };
 
 function todayIsoDate() {
@@ -38,6 +40,7 @@ export default function ReportToolbar({
   onExportExcel,
   onAddReport,
   maxDate = todayIsoDate(),
+  hasReport = false,
 }: Props) {
   const searchId = useId();
   const dateId = useId();
@@ -83,11 +86,12 @@ export default function ReportToolbar({
         {onAddReport && (
           <button
             type="button"
-            className={`${styles.actionBtn} ${styles.addBtn}`}
+            className={`${styles.actionBtn} ${styles.addBtn} ${hasReport ? styles.disabledBtn : ""}`}
             onClick={onAddReport}
+            disabled={hasReport}
           >
             <FontAwesomeIcon icon={faPlus} className={styles.addIcon} />
-            Thêm báo cáo
+            {hasReport ? "Ngày này đã có báo cáo" : "Thêm báo cáo"}
           </button>
         )}
 
@@ -97,7 +101,7 @@ export default function ReportToolbar({
             className={`${styles.exportBtn} ${styles.exportWord}`}
             onClick={onExportWord}
           >
-            <FontAwesomeIcon icon={faFileWord} /> {/* Icon Word */}
+            <FontAwesomeIcon icon={faFileWord} />
             Xuất File Word
           </button>
           <button
@@ -105,7 +109,7 @@ export default function ReportToolbar({
             className={`${styles.exportBtn} ${styles.exportExcel}`}
             onClick={onExportExcel}
           >
-            <FontAwesomeIcon icon={faFileExcel} /> {/* Icon Excel */}
+            <FontAwesomeIcon icon={faFileExcel} />
             Xuất File Excel
           </button>
         </div>

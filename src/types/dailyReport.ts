@@ -14,12 +14,22 @@ export interface VangChiTiet {
   hocCS: number;
 }
 
+export interface AbsentRow {
+  id: string;
+  hoTen: string;
+  capBac: string;
+  chucVu: string;
+  lyDoVang: keyof VangChiTiet;
+  ghiChu: string;
+}
+
 export interface CreateReportRequest {
   quanSoTong: number;
   quanSoHienDien: number;
   quanSoVang: number;
   thoiGianBaoCao: string;
   thongTinVang: string;
+  chiTietVang: string;
   donVi: string;
 }
 
@@ -32,23 +42,41 @@ export interface CreateReportResponse {
     quanSoHienDien: number;
     quanSoTong: number;
     quanSoVang: number;
+    ghiChu: string | null;
     status: string;
     thoiGianBaoCao: string;
     thongTinVang: string;
+    chiTietVang: string | null;
     donVi: {
       maDonVi: string;
       tenDonvi: string;
     };
     caTruc: {
+      idCatruc: string;
+      ngaytruc: string;
+      matkhau: string;
+      ghichu: string;
       trucBanTacChien: {
+        createdAt: string;
+        updatedAt: string;
+        isDeleted: boolean;
+        deletedAt: string | null;
+        idNguoitruc: string;
+        tenNguoitruc: string;
         capbacNguoitruc: string;
         chucvuNguoitruc: string;
-        tenNguoitruc: string;
+        sodienthoai: string;
       };
       trucChiHuy: {
+        createdAt: string;
+        updatedAt: string;
+        isDeleted: boolean;
+        deletedAt: string | null;
+        idNguoitruc: string;
+        tenNguoitruc: string;
         capbacNguoitruc: string;
         chucvuNguoitruc: string;
-        tenNguoitruc: string;
+        sodienthoai: string;
       };
     };
   };
@@ -60,137 +88,20 @@ export interface UpdateReportRequest {
   quanSoVang: number;
   thoiGianBaoCao: string;
   thongTinVang: string;
+  chiTietVang: string;
   account: string;
   donVi: string;
 }
 
-export interface UpdateReportResponse {
-  success: boolean;
-  code: number;
-  message: string;
-  Result: {
-    idDonBaoCao: string;
-    quanSoHienDien: number;
-    quanSoTong: number;
-    quanSoVang: number;
-    status: string;
-    thoiGianBaoCao: string;
-    thongTinVang: string;
-    donVi: {
-      maDonVi: string;
-      tenDonvi: string;
-    };
-    caTruc: {
-      trucBanTacChien: {
-        capbacNguoitruc: string;
-        chucvuNguoitruc: string;
-        tenNguoitruc: string;
-      };
-      trucChiHuy: {
-        capbacNguoitruc: string;
-        chucvuNguoitruc: string;
-        tenNguoitruc: string;
-      };
-    };
-  };
-}
-
-export interface ApproveResponse {
-  success: boolean;
-  code: number;
-  message: string;
-  Result: {
-    idDonBaoCao: string;
-    quanSoHienDien: number;
-    quanSoTong: number;
-    quanSoVang: number;
-    status: string;
-    thoiGianBaoCao: string;
-    thongTinVang: string;
-    donVi: {
-      maDonVi: string;
-      tenDonvi: string;
-    };
-    caTruc: {
-      trucBanTacChien: {
-        capbacNguoitruc: string;
-        chucvuNguoitruc: string;
-        tenNguoitruc: string;
-      };
-      trucChiHuy: {
-        capbacNguoitruc: string;
-        chucvuNguoitruc: string;
-        tenNguoitruc: string;
-      };
-    };
-  };
-}
+export type UpdateReportResponse = CreateReportResponse;
+export type ApproveResponse = CreateReportResponse;
+export type SearchReportResponse = CreateReportResponse;
 
 export interface RefuseRequest {
   ghiChu: string;
-}  
-export interface RefuseResponse {
-  success: boolean;
-  code: number;
-  message: string;
-  Result: {
-    idDonBaoCao: string;
-    quanSoHienDien: number;
-    quanSoTong: number;
-    quanSoVang: number;
-    ghiChu: string;
-    status: string;
-    thoiGianBaoCao: string;
-    thongTinVang: string;
-    donVi: {
-      maDonVi: string;
-      tenDonvi: string;
-    };
-    caTruc: {
-      trucBanTacChien: {
-        capbacNguoitruc: string;
-        chucvuNguoitruc: string;
-        tenNguoitruc: string;
-      };
-      trucChiHuy: {
-        capbacNguoitruc: string;
-        chucvuNguoitruc: string;
-        tenNguoitruc: string;
-      };
-    };
-  };
 }
 
-export interface SearchReportResponse {
-  success: boolean;
-  code: number;
-  message: string;
-  Result: {
-    idDonBaoCao: string;
-    quanSoHienDien: number;
-    quanSoTong: number;
-    quanSoVang: number;
-    status: string;
-    thoiGianBaoCao: string;
-    thongTinVang: string;
-    donVi: {
-      maDonVi: string;
-      tenDonvi: string;
-    };
-    caTruc: {
-      trucBanTacChien: {
-        capbacNguoitruc: string;
-        chucvuNguoitruc: string;
-        tenNguoitruc: string;
-      };
-      trucChiHuy: {
-        capbacNguoitruc: string;
-        chucvuNguoitruc: string;
-        tenNguoitruc: string;
-      };
-    };
-  };
-}
+export type RefuseResponse = CreateReportResponse;
 
 export interface SearchChildrenResponse {
   success: boolean;
@@ -201,24 +112,51 @@ export interface SearchChildrenResponse {
     quanSoHienDien: number;
     quanSoTong: number;
     quanSoVang: number;
+    ghiChu: string | null;
     status: string;
     thoiGianBaoCao: string;
     thongTinVang: string;
+    chiTietVang: string | null;
     donVi: {
       maDonVi: string;
       tenDonvi: string;
     };
     caTruc: {
+      idCatruc: string;
+      ngaytruc: string;
+      matkhau: string;
+      ghichu: string;
       trucBanTacChien: {
+        createdAt: string;
+        updatedAt: string;
+        isDeleted: boolean;
+        deletedAt: string | null;
+        idNguoitruc: string;
+        tenNguoitruc: string;
         capbacNguoitruc: string;
         chucvuNguoitruc: string;
-        tenNguoitruc: string;
+        sodienthoai: string;
       };
       trucChiHuy: {
+        createdAt: string;
+        updatedAt: string;
+        isDeleted: boolean;
+        deletedAt: string | null;
+        idNguoitruc: string;
+        tenNguoitruc: string;
         capbacNguoitruc: string;
         chucvuNguoitruc: string;
-        tenNguoitruc: string;
+        sodienthoai: string;
       };
     };
   }>;
+}
+
+export interface ChiTietVangQuanNhan {
+  id: string;
+  hoTen: string;
+  capBac: string;
+  chucVu: string;
+  lyDoVang: string;
+  ghiChu: string;
 }

@@ -10,17 +10,49 @@ import {
   faCheck,
   faBan,
 } from "@fortawesome/free-solid-svg-icons";
-import { ABSENT_MEMBERS } from "../../types/troopStats";
 import TroopDetailModal from "./TroopDetailModal";
 import CreateReportModal from "./CreateReportModal";
 import RefuseDialog from "../../components/ui/RefuseDialog/RefuseDialog";
 import { dailyReportService } from "../../services/dailyReport/dailyReportService";
 import { useAuth } from "../../context/useAuth";
 import { useToast } from "../../context/useToast";
-import type { VangChiTiet } from "../../types/dailyReport";
+import type {
+  VangChiTiet,
+  CreateReportResponse,
+  UpdateReportRequest,
+} from "../../types/dailyReport";
 import { handleApiError } from "../../utils/errorHandler";
-
 import ReportStatusBadge from "../../components/ui/ReportStatusBadge/ReportStatusBadge";
+
+export interface ChiTietVangQuanNhan {
+  id: string;
+  hoTen: string;
+  capBac: string;
+  chucVu: string;
+  lyDoVang: string;
+  ghiChu: string;
+}
+
+interface ReportRow {
+  idDonBaoCao: string;
+  donVi: string;
+  tenDonVi: string;
+  quanSoTong: number;
+  quanSoHienDien: number;
+  quanSoVang: number;
+  vang: VangChiTiet;
+  chiTietVangList: ChiTietVangQuanNhan[];
+  trucChiHuy: string;
+  trucBan: string;
+  status: string;
+  ghiChu: string;
+  rawItem: CreateReportResponse["Result"];
+}
+
+type EditModalData = {
+  reportId: string;
+  ngayBaoCao: string;
+};
 
 function todayIsoDate() {
   const d = new Date();
@@ -33,47 +65,22 @@ function todayIsoDate() {
 
 function normalizeRoleName(role: string | null | undefined): string {
   if (!role) return "";
-
-  if (role.includes("Báo cáo") || role.includes("Báo Ban")) {
-    return "Báo cáo";
-  }
-  if (role.includes("Chỉ huy")) {
-    return "Chỉ huy";
-  }
-  if (role.includes("Sư đoàn")) {
-    return "Sư đoàn";
-  }
-  if (role.includes("Quản Trị") || role.includes("Admin")) {
+  if (role.includes("Báo cáo") || role.includes("Báo Ban")) return "Báo cáo";
+  if (role.includes("Chỉ huy")) return "Chỉ huy";
+  if (role.includes("Sư đoàn")) return "Sư đoàn";
+  if (role.includes("Quản Trị") || role.includes("Admin"))
     return "Quản Trị Viên";
-  }
   return role;
 }
-
-interface ReportRow {
-  idDonBaoCao: string;
-  donVi: string;
-  tenDonVi: string;
-  quanSoTong: number;
-  quanSoHienDien: number;
-  quanSoVang: number;
-  vang: VangChiTiet;
-  trucChiHuy: string;
-  trucBan: string;
-  status: string;
-  ghiChu: string;
-}
-
-type EditModalData = {
-  reportId: string;
-  initialData: VangChiTiet;
-  ngayBaoCao: string;
-  tongQuanSo: number;
-};
 
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
   const [reportDate, setReportDate] = useState(todayIsoDate());
-  const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
+
+  const [selectedReportRow, setSelectedReportRow] = useState<ReportRow | null>(
+    null,
+  );
+
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editModalData, setEditModalData] = useState<EditModalData | null>(
     null,
@@ -136,11 +143,22 @@ export default function DailyTroopReport() {
             hocSQ: 0,
             hocCS: 0,
           };
+          let chiTietVangList: ChiTietVangQuanNhan[] = [];
 
           try {
             vang = JSON.parse(item.thongTinVang) as VangChiTiet;
           } catch (e) {
             console.error("Error parsing thongTinVang:", e);
+          }
+
+          try {
+            if (item.chiTietVang) {
+              chiTietVangList = JSON.parse(
+                item.chiTietVang,
+              ) as ChiTietVangQuanNhan[];
+            }
+          } catch (e) {
+            console.error("Error parsing chiTietVang string JSON:", e);
           }
 
           return {
@@ -151,10 +169,12 @@ export default function DailyTroopReport() {
             quanSoHienDien: item.quanSoHienDien,
             quanSoVang: item.quanSoVang,
             vang,
+            chiTietVangList,
             trucChiHuy: item.caTruc?.trucChiHuy?.tenNguoitruc || "",
             trucBan: item.caTruc?.trucBanTacChien?.tenNguoitruc || "",
             status: item.status,
             ghiChu: item.ghiChu || "",
+            rawItem: item,
           };
         });
 
@@ -174,11 +194,18 @@ export default function DailyTroopReport() {
   }, [account, reportDate, showError]);
 
   useEffect(() => {
-    const loadData = async () => {
-      await fetchReports();
+    let isCurrent = true;
+
+    if (isCurrent && account?.donVi?.maDonVi) {
+      Promise.resolve().then(() => {
+        fetchReports();
+      });
+    }
+
+    return () => {
+      isCurrent = false;
     };
-    loadData();
-  }, [fetchReports]);
+  }, [fetchReports, account?.donVi?.maDonVi]);
 
   const handleToggleMenu = (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -190,7 +217,6 @@ export default function DailyTroopReport() {
       setActiveMenuUnit(null);
     } else {
       const rect = event.currentTarget.getBoundingClientRect();
-
       setMenuPosition({
         top: rect.bottom + window.scrollY + 4,
         left: rect.right + window.scrollX - 230,
@@ -220,7 +246,40 @@ export default function DailyTroopReport() {
     };
   }, [activeMenuUnit]);
 
+  const checkIfDateHasReport = useMemo(() => {
+    if (!account?.donVi?.maDonVi) return false;
+
+    const selectedDate = new Date(reportDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const isPastDate = selectedDate < today;
+    if (isPastDate) return true;
+
+    const currentUnit = account.donVi.maDonVi;
+    return reportData.some(
+      (report) =>
+        report.donVi === currentUnit &&
+        report.status !== "Từ_Chối" &&
+        report.status !== "Từ chối",
+    );
+  }, [reportData, account?.donVi?.maDonVi, reportDate]);
+
   const handleAddReport = () => {
+    const selectedDate = new Date(reportDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (selectedDate < today) {
+      showError("Không thể tạo báo cáo cho ngày trong quá khứ!");
+      return;
+    }
+
+    if (checkIfDateHasReport) {
+      showError("Ngày này đã tồn tại báo cáo hoặc không hợp lệ!");
+      return;
+    }
+
     setShowCreateModal(true);
   };
 
@@ -231,9 +290,7 @@ export default function DailyTroopReport() {
   const handleEditReport = (row: ReportRow) => {
     setEditModalData({
       reportId: row.idDonBaoCao,
-      initialData: row.vang,
       ngayBaoCao: reportDate,
-      tongQuanSo: row.quanSoTong,
     });
     setActiveMenuUnit(null);
   };
@@ -375,6 +432,14 @@ export default function DailyTroopReport() {
   const isCommander = normalizedRole === "Chỉ huy";
   const isReporter = normalizedRole === "Báo cáo";
 
+  const currentEditingReport = useMemo(() => {
+    if (!editModalData) return null;
+    const found = reportData.find(
+      (r) => r.idDonBaoCao === editModalData.reportId,
+    );
+    return found ? found.rawItem : null;
+  }, [editModalData, reportData]);
+
   return (
     <section className={styles.report} aria-labelledby="dashboard-page-heading">
       <ReportToolbar
@@ -385,6 +450,7 @@ export default function DailyTroopReport() {
         onAddReport={handleAddReport}
         onExportWord={handleExportWord}
         onExportExcel={handleExportExcel}
+        hasReport={checkIfDateHasReport}
       />
 
       <div className={styles.tableShell}>
@@ -431,17 +497,17 @@ export default function DailyTroopReport() {
 
             <tbody>
               {filteredRows.length === 0 ? (
-                <tr>
-                  <td colSpan={21} className={styles.emptyCell}>
-                    Không có dữ liệu báo cáo
-                  </td>
+                <tr className={styles.noReportRow}>
+                  <td colSpan={23}>Không có dữ liệu báo cáo</td>
                 </tr>
               ) : (
                 filteredRows.map((row) => {
                   const isMenuOpen = activeMenuUnit === row.donVi;
                   const canEdit =
                     isReporter &&
-                    (row.status === "Từ_Chối" || row.status === "Từ chối");
+                    (row.status === "Từ_Chối" ||
+                      row.status === "Từ chối" ||
+                      row.status === "Chờ_Duyệt");
                   const canApprove = isCommander && row.status === "Chờ_Duyệt";
                   const canRefuse = isCommander && row.status === "Chờ_Duyệt";
 
@@ -466,11 +532,9 @@ export default function DailyTroopReport() {
                       <td>{row.vang.hocCS}</td>
                       <td>{row.trucChiHuy}</td>
                       <td>{row.trucBan}</td>
-
                       <td>
                         <ReportStatusBadge status={row.status} />
                       </td>
-
                       <td className={styles.noteCell}>{row.ghiChu}</td>
                       <td className={styles.actionCell}>
                         <div className={styles.actionWrapper}>
@@ -500,7 +564,7 @@ export default function DailyTroopReport() {
                                   className={styles.menuItem}
                                   role="menuitem"
                                   onClick={() => {
-                                    setSelectedUnit(row.tenDonVi);
+                                    setSelectedReportRow(row);
                                     setActiveMenuUnit(null);
                                   }}
                                 >
@@ -596,30 +660,68 @@ export default function DailyTroopReport() {
         )}
       </div>
 
-      {selectedUnit && (
+      {selectedReportRow && (
         <TroopDetailModal
-          unit={selectedUnit}
-          members={ABSENT_MEMBERS[selectedUnit] || []}
-          onClose={() => setSelectedUnit(null)}
+          unit={selectedReportRow.tenDonVi}
+          members={selectedReportRow.chiTietVangList.map((m) => ({
+            id: m.id,
+            name: m.hoTen,
+            rank: m.capBac,
+            position: m.chucVu,
+            reason: m.lyDoVang,
+          }))}
+          onClose={() => setSelectedReportRow(null)}
         />
       )}
 
       {showCreateModal && (
         <CreateReportModal
+          isOpen={showCreateModal}
           onClose={() => setShowCreateModal(false)}
-          onSuccess={handleCreateSuccess}
+          onSubmit={async (payload) => {
+            try {
+              await dailyReportService.createReport(payload);
+              showSuccess("Tạo báo cáo quân số thành công");
+              handleCreateSuccess();
+              setShowCreateModal(false);
+            } catch (error) {
+              handleApiError(error, {
+                showError,
+                errorMessage: "Không thể tạo báo cáo",
+              });
+            }
+          }}
+          maDonViCurrent={account?.donVi?.maDonVi}
         />
       )}
 
+      {/* MODAL CHỈNH SỬA BÁO CÁO */}
       {editModalData && (
         <CreateReportModal
-          mode="edit"
-          reportId={editModalData.reportId}
-          initialData={editModalData.initialData}
-          ngayBaoCao={editModalData.ngayBaoCao}
-          tongQuanSo={editModalData.tongQuanSo}
+          isOpen={Boolean(editModalData)}
           onClose={() => setEditModalData(null)}
-          onSuccess={handleCreateSuccess}
+          initialData={currentEditingReport}
+          onSubmit={async (payload) => {
+            try {
+              const updatePayload: UpdateReportRequest = {
+                ...payload,
+                account: account?.tenTaiKhoan || "",
+              };
+              await dailyReportService.updateReport(
+                editModalData.reportId,
+                updatePayload,
+              );
+              showSuccess("Cập nhật báo cáo quân số thành công");
+              handleCreateSuccess();
+              setEditModalData(null);
+            } catch (error) {
+              handleApiError(error, {
+                showError,
+                errorMessage: "Không thể cập nhật báo cáo",
+              });
+            }
+          }}
+          maDonViCurrent={account?.donVi?.maDonVi}
         />
       )}
 
