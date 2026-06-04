@@ -224,14 +224,6 @@
   margin: 0;  
 }
 
-.emptyCell {  
-  text-align: center;  
-  padding: 40px 20px;  
-  color: var(--text-muted);  
-  font-style: italic;  
-}
-
-
 .statusBadge {  
   display: inline-block;  
   padding: 4px 12px;  

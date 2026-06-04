@@ -15,6 +15,8 @@ import { useToast } from "../../context/useToast";
 import type { VangChiTiet } from "../../types/dailyReport";
 import { handleApiError } from "../../utils/errorHandler";
 
+import ReportStatusBadge from "../../components/ui/ReportStatusBadge/ReportStatusBadge";
+
 function todayIsoDate() {
   const d = new Date();
   return [
@@ -308,19 +310,6 @@ export default function ReportApproval() {
     );
   }, [reportData]);
 
-  const getStatusBadgeClass = (status: string) => {
-    switch (status) {
-      case "Chờ_Duyệt":
-        return styles.statusPending;
-      case "Đã_Duyệt":
-        return styles.statusApproved;
-      case "Từ_Chối":
-        return styles.statusRejected;
-      default:
-        return "";
-    }
-  };
-
   return (
     <section
       className={styles.approval}
@@ -445,13 +434,11 @@ export default function ReportApproval() {
                     <td>{row.vang.hocCS}</td>
                     <td>{row.trucChiHuy}</td>
                     <td>{row.trucBan}</td>
+
                     <td>
-                      <span
-                        className={`${styles.statusBadge} ${getStatusBadgeClass(row.status)}`}
-                      >
-                        {row.status.replace(/_/g, " ")}
-                      </span>
+                      <ReportStatusBadge status={row.status} />
                     </td>
+
                     <td className={styles.noteCell}>{row.ghiChu}</td>
                     <td className={styles.actionCell}>
                       <div className={styles.actionWrapper}>

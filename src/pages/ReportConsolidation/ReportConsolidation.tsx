@@ -12,6 +12,9 @@ import { useToast } from "../../context/useToast";
 import { handleApiError } from "../../utils/errorHandler";
 import type { VangChiTiet } from "../../types/dailyReport";
 
+import ReportStatusBadge from "../../components/ui/ReportStatusBadge/ReportStatusBadge";
+import { isPendingStatus, isRejectedStatus } from "../../utils/reportStatus";
+
 function todayIsoDate() {
   const d = new Date();
   return [
@@ -60,19 +63,16 @@ function totalsFromRows(rows: ReportRow[]) {
       quanSoTong: acc.quanSoTong + row.quanSoTong,
       quanSoHienDien: acc.quanSoHienDien + row.quanSoHienDien,
       quanSoVang: acc.quanSoVang + row.quanSoVang,
-      hoiThaiNgoaiSuDoan:
-        acc.hoiThaiNgoaiSuDoan + row.vang.hoiThaiNgoaiSuDoan,
+      hoiThaiNgoaiSuDoan: acc.hoiThaiNgoaiSuDoan + row.vang.hoiThaiNgoaiSuDoan,
       hoiThaiEF: acc.hoiThaiEF + row.vang.hoiThaiEF,
-      xayDungNgoaiSuDoan:
-        acc.xayDungNgoaiSuDoan + row.vang.xayDungNgoaiSuDoan,
+      xayDungNgoaiSuDoan: acc.xayDungNgoaiSuDoan + row.vang.xayDungNgoaiSuDoan,
       xayDungEF: acc.xayDungEF + row.vang.xayDungEF,
       choHuu: acc.choHuu + row.vang.choHuu,
       nghiTranhThu: acc.nghiTranhThu + row.vang.nghiTranhThu,
       phep: acc.phep + row.vang.phep,
       vienNgoaiSuDoan: acc.vienNgoaiSuDoan + row.vang.vienNgoaiSuDoan,
       vienEF: acc.vienEF + row.vang.vienEF,
-      congTacNgoaiSuDoan:
-        acc.congTacNgoaiSuDoan + row.vang.congTacNgoaiSuDoan,
+      congTacNgoaiSuDoan: acc.congTacNgoaiSuDoan + row.vang.congTacNgoaiSuDoan,
       congTacSuDoan: acc.congTacSuDoan + row.vang.congTacSuDoan,
       hocSQ: acc.hocSQ + row.vang.hocSQ,
       hocCS: acc.hocCS + row.vang.hocCS,
@@ -116,10 +116,6 @@ function totalsToVang(totals: RowTotals): VangChiTiet {
   };
 }
 
-function isRejectedStatus(status: string) {
-  return status === "Từ_Chối" || status === "Từ chối";
-}
-
 function mapReportItem(item: {
   idDonBaoCao: string;
   quanSoTong: number;
@@ -127,7 +123,7 @@ function mapReportItem(item: {
   quanSoVang: number;
   status: string;
   thongTinVang: string;
-  donVi: { maDonVi: string; tenDonvi: string };
+  donVi: { maDonVi: string; appendToReport?: unknown; tenDonvi: string };
   caTruc?: {
     trucChiHuy?: { tenNguoitruc?: string };
     trucBanTacChien?: { tenNguoitruc?: string };
@@ -156,12 +152,6 @@ function mapReportItem(item: {
 
 function mapSubmitResult(result: ReportSubmitResult): ReportRow {
   return mapReportItem(result);
-}
-
-function getStatusClass(status: string) {
-  if (status === "Đã_Duyệt") return styles.statusApproved;
-  if (status === "Từ_Chối" || status === "Từ chối") return styles.statusRejected;
-  return styles.statusPending;
 }
 
 export default function ReportConsolidation() {
@@ -292,13 +282,11 @@ export default function ReportConsolidation() {
       return;
     }
 
-    const hasPendingChildren = childReports.some(
-      (r) => r.status === "Chờ_Duyệt",
+    const hasPendingChildren = childReports.some((r) =>
+      isPendingStatus(r.status),
     );
     if (hasPendingChildren) {
-      showError(
-        "Vui lòng chờ tất cả đơn vị con được duyệt trước khi nộp",
-      );
+      showError("Vui lòng chờ tất cả đơn vị con được duyệt trước khi nộp");
       return;
     }
 
@@ -352,11 +340,11 @@ export default function ReportConsolidation() {
       <td>{row.vang.hocCS}</td>
       <td>{row.trucChiHuy}</td>
       <td>{row.trucBan}</td>
+
       <td>
-        <span className={`${styles.statusBadge} ${getStatusClass(row.status)}`}>
-          {row.status.replace(/_/g, " ")}
-        </span>
+        <ReportStatusBadge status={row.status} />
       </td>
+
       <td>
         <button
           className={styles.detailBtn}
@@ -384,20 +372,6 @@ export default function ReportConsolidation() {
         onAddReport={canSubmitReport ? handleAddReport : undefined}
       />
 
-      {parentReport && (
-        <div className={styles.ownReportBanner}>
-          <span>
-            Báo cáo tổng hợp đơn vị:{" "}
-            <strong>{parentReport.status.replace(/_/g, " ")}</strong>
-          </span>
-          {isRejectedStatus(parentReport.status) && (
-            <button type="button" onClick={handleAddReport}>
-              Sửa báo cáo
-            </button>
-          )}
-        </div>
-      )}
-
       <div className={styles.tableShell}>
         {loading ? (
           <div className={styles.loading}>Đang tải dữ liệu...</div>
@@ -412,7 +386,7 @@ export default function ReportConsolidation() {
                 <th rowSpan={3}>Hiện diện</th>
                 <th rowSpan={3}>Tổng vắng</th>
                 <th colSpan={13}>Quân số vắng</th>
-                <th rowSpan={3}>TCH</th>
+                <th rowSpan={3}>Trực chỉ huy</th>
                 <th rowSpan={3}>Trực ban</th>
                 <th rowSpan={3}>Trạng thái</th>
                 <th rowSpan={3}>Xem chi tiết</th>
@@ -421,7 +395,7 @@ export default function ReportConsolidation() {
                 <th colSpan={2}>Hội thao</th>
                 <th colSpan={2}>Xây dựng</th>
                 <th rowSpan={2}>Chờ hưu</th>
-                <th rowSpan={2}>Nghỉ (TT, cuối tuần)</th>
+                <th rowSpan={2}>Nghỉ tranh thủ</th>
                 <th rowSpan={2}>Phép</th>
                 <th colSpan={2}>Viện</th>
                 <th colSpan={2}>Công tác</th>
@@ -429,13 +403,13 @@ export default function ReportConsolidation() {
               </tr>
               <tr>
                 <th>Ngoài Sư Đoàn</th>
-                <th>e, f</th>
+                <th>Trung đoàn, Sư đoàn</th>
                 <th>Ngoài Sư Đoàn</th>
-                <th>e, f</th>
+                <th>Trung đoàn, Sư đoàn</th>
                 <th>Ngoài Sư Đoàn</th>
-                <th>e, f</th>
+                <th>Trung đoàn, Sư đoàn</th>
                 <th>Ngoài Sư Đoàn</th>
-                <th>f</th>
+                <th>Sư đoàn</th>
                 <th>SQ</th>
                 <th>CS</th>
               </tr>
@@ -445,7 +419,9 @@ export default function ReportConsolidation() {
               {filteredChildRows.map((row) => (
                 <tr
                   key={row.idDonBaoCao}
-                  className={hasSubmittedParent ? styles.childRowDimmed : undefined}
+                  className={
+                    hasSubmittedParent ? styles.childRowDimmed : undefined
+                  }
                 >
                   {renderReportCells(row)}
                 </tr>

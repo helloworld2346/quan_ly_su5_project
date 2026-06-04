@@ -20,6 +20,8 @@ import { useToast } from "../../context/useToast";
 import type { VangChiTiet } from "../../types/dailyReport";
 import { handleApiError } from "../../utils/errorHandler";
 
+import ReportStatusBadge from "../../components/ui/ReportStatusBadge/ReportStatusBadge";
+
 function todayIsoDate() {
   const d = new Date();
   return [
@@ -368,20 +370,6 @@ export default function DailyTroopReport() {
     );
   }, [reportData]);
 
-  const getStatusBadge = (status: string) => {
-    const statusMap: Record<string, { text: string; className: string }> = {
-      Chờ_Duyệt: { text: "Chờ duyệt", className: styles.statusPending },
-      Đã_Duyệt: { text: "Đã duyệt", className: styles.statusApproved },
-      Từ_Chối: { text: "Từ chối", className: styles.statusRejected },
-    };
-    const statusInfo = statusMap[status] || { text: status, className: "" };
-    return (
-      <span className={`${styles.statusBadge} ${statusInfo.className}`}>
-        {statusInfo.text}
-      </span>
-    );
-  };
-
   const userRole = account?.vaiTro?.tenVaiTro;
   const normalizedRole = normalizeRoleName(userRole);
   const isCommander = normalizedRole === "Chỉ huy";
@@ -478,7 +466,11 @@ export default function DailyTroopReport() {
                       <td>{row.vang.hocCS}</td>
                       <td>{row.trucChiHuy}</td>
                       <td>{row.trucBan}</td>
-                      <td>{getStatusBadge(row.status)}</td>
+
+                      <td>
+                        <ReportStatusBadge status={row.status} />
+                      </td>
+
                       <td className={styles.noteCell}>{row.ghiChu}</td>
                       <td className={styles.actionCell}>
                         <div className={styles.actionWrapper}>

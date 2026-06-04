@@ -34,7 +34,7 @@
   
 .tableShell {  
   width: 100%;  
-  overflow-x: auto;  
+  overflow-x: fixed;  
   -webkit-overflow-scrolling: touch;  
   background: #218673;  
   border-radius: 12px;  
@@ -45,7 +45,7 @@
 .consolidationTable {  
   width: 100%;  
   min-width: 1000px;  
-  table-layout: fixed;  
+  table-layout: auto;  
   border-collapse: collapse;  
 }  
   
