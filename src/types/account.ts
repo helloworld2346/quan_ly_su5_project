@@ -1,6 +1,7 @@
 export interface Role {
   idVaiTro: string | null;
   tenVaiTro: string | null;
+  tenChucnang?: string[];
 }
 
 export interface DonVi {
@@ -47,6 +48,13 @@ export interface RoleResponse {
   code: number;
   message: string;
   Result: Role[];
+}
+
+export interface RoleByIdResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  Result: Role;
 }
 
 export interface DonViResponse {

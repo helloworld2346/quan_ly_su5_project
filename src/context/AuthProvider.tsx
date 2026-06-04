@@ -9,22 +9,32 @@ import { AuthContext } from "./AuthContext";
 export function AuthProvider({ children }: { children: ReactNode }) {
   const token = storage.getToken();
 
-  // Khởi tạo state dựa trên token ngay từ đầu
   const [account, setAccount] = useState<Account | null>(null);
   const [donVi, setDonVi] = useState<DonVi | null>(null);
   const [roles, setRoles] = useState<Role[]>([]);
-  const [loading, setLoading] = useState(!!token); // Chỉ loading nếu có token
+  const [loading, setLoading] = useState(!!token);
 
   const fetchData = useCallback(async () => {
     try {
-      const [accountResponse, rolesData] = await Promise.all([
-        accountService.getAccount(),
-        roleService.getRoles(),
-      ]);
+      const accountResponse = await accountService.getAccount();
 
       if (accountResponse.success) {
         setAccount(accountResponse.Result);
-        setRoles(rolesData);
+
+        if (accountResponse.Result.vaiTro?.idVaiTro) {
+          const roleData = await roleService.getRoleById(
+            accountResponse.Result.vaiTro.idVaiTro,
+          );
+          setAccount((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  vaiTro: roleData,
+                }
+              : null,
+          );
+          setRoles([roleData]);
+        }
 
         if (accountResponse.Result.donVi?.maDonVi) {
           const allDonVi = await donviService.getDonVi();
@@ -36,12 +46,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch (error) {
       console.error("Failed to fetch auth data:", error);
+      storage.removeToken();
+      setAccount(null);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Chỉ fetch data nếu có token
   useEffect(() => {
     let active = true;
 

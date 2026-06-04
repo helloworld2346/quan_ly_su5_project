@@ -217,19 +217,40 @@ export function getNavItemById(id: NavItemId): NavItem | undefined {
   return ALL_NAV_ITEMS.find((item) => item.id === id);
 }
 
+// Helper function để normalize role name từ API
+function normalizeRoleName(role: string): string {
+  // Map các role từ API về role chuẩn trong hệ thống
+  if (role.includes("Báo cáo") || role.includes("Báo Ban")) {
+    return "Báo cáo";
+  }
+  if (role.includes("Chỉ huy")) {
+    return "Chỉ huy";
+  }
+  if (role.includes("Sư đoàn")) {
+    return "Sư đoàn";
+  }
+  if (role.includes("Quản Trị Viên") || role.includes("Admin")) {
+    return "Quản Trị Viên";
+  }
+  return role; // Trả về nguyên bản nếu không match
+}
+
 export function getNavItemsByRole(
   userRole: string | null,
   isParentUnit: boolean = false,
 ): NavItem[] {
   if (!userRole) return [];
 
+  // Normalize role name
+  const normalizedRole = normalizeRoleName(userRole);
+
   // Quản Trị Viên có toàn quyền
-  if (userRole === "Quản Trị Viên") {
+  if (normalizedRole === "Quản Trị Viên") {
     return ALL_NAV_ITEMS;
   }
 
   // Sư đoàn: Dashboard + Thống kê + Trực ban + Cài đặt
-  if (userRole === "Sư đoàn") {
+  if (normalizedRole === "Sư đoàn") {
     return ALL_NAV_ITEMS.filter(
       (item) =>
         item.id === "executive" ||
@@ -241,7 +262,7 @@ export function getNavItemsByRole(
   }
 
   // Chỉ huy: Thống kê + Phê duyệt + Trực ban + Cài đặt
-  if (userRole === "Chỉ huy") {
+  if (normalizedRole === "Chỉ huy") {
     return ALL_NAV_ITEMS.filter(
       (item) =>
         (item.id.startsWith("report-") && item.id !== "report-consolidation") ||
@@ -251,7 +272,7 @@ export function getNavItemsByRole(
   }
 
   // Báo cáo: phân biệt đơn vị cha/con
-  if (userRole === "Báo cáo") {
+  if (normalizedRole === "Báo cáo") {
     if (isParentUnit) {
       // Báo cáo đơn vị cha: Tổng hợp + Cài đặt
       return ALL_NAV_ITEMS.filter(
@@ -270,7 +291,7 @@ export function getNavItemsByRole(
 
   return ALL_NAV_ITEMS.filter((item) => {
     if (!item.allowedRoles) return true;
-    return item.allowedRoles.includes(userRole);
+    return item.allowedRoles.includes(normalizedRole);
   });
 }
 

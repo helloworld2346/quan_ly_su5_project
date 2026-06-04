@@ -13,9 +13,37 @@ type Props = {
   onLogout: () => void;
 };
 
+function normalizeRoleName(role: string | undefined): string {
+  if (!role) return "";
+
+  if (role.includes("Báo cáo") || role.includes("Báo Ban")) {
+    return "Báo cáo";
+  }
+  if (role.includes("Chỉ huy")) {
+    return "Chỉ huy";
+  }
+  if (role.includes("Sư đoàn")) {
+    return "Sư đoàn";
+  }
+  if (role.includes("Quản Trị Viên") || role.includes("Admin")) {
+    return "Quản Trị Viên";
+  }
+  return role;
+}
+
 function getDefaultRouteByRole(role: string | undefined): string {
-  if (role === "Sư đoàn" || role === "Quản Trị Viên") {
+  if (!role) return "/settings";
+
+  const normalizedRole = normalizeRoleName(role);
+
+  if (normalizedRole === "Sư đoàn" || normalizedRole === "Quản Trị Viên") {
     return "/dashboard";
+  }
+  if (normalizedRole === "Báo cáo") {
+    return "/daily-report";
+  }
+  if (normalizedRole === "Chỉ huy") {
+    return "/report-approval";
   }
   return "/settings";
 }

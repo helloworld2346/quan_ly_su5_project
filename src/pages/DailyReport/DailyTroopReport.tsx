@@ -28,6 +28,24 @@ function todayIsoDate() {
   ].join("-");
 }
 
+function normalizeRoleName(role: string | null | undefined): string {
+  if (!role) return "";
+
+  if (role.includes("Báo cáo") || role.includes("Báo Ban")) {
+    return "Báo cáo";
+  }
+  if (role.includes("Chỉ huy")) {
+    return "Chỉ huy";
+  }
+  if (role.includes("Sư đoàn")) {
+    return "Sư đoàn";
+  }
+  if (role.includes("Quản Trị") || role.includes("Admin")) {
+    return "Quản Trị Viên";
+  }
+  return role;
+}
+
 interface ReportRow {
   idDonBaoCao: string;
   donVi: string;
@@ -341,8 +359,9 @@ export default function DailyTroopReport() {
   };
 
   const userRole = account?.vaiTro?.tenVaiTro;
-  const isCommander = userRole === "Chỉ huy";
-  const isReporter = userRole === "Báo cáo";
+  const normalizedRole = normalizeRoleName(userRole);
+  const isCommander = normalizedRole === "Chỉ huy";
+  const isReporter = normalizedRole === "Báo cáo";
 
   return (
     <section className={styles.report} aria-labelledby="dashboard-page-heading">
@@ -407,7 +426,9 @@ export default function DailyTroopReport() {
               ) : (
                 filteredRows.map((row) => {
                   const isMenuOpen = activeMenuUnit === row.donVi;
-                  const canEdit = isReporter && row.status === "Từ_Chối";
+                  const canEdit =
+                    isReporter &&
+                    (row.status === "Từ_Chối" || row.status === "Từ chối");
                   const canApprove = isCommander && row.status === "Chờ_Duyệt";
                   const canRefuse = isCommander && row.status === "Chờ_Duyệt";
 

@@ -38,7 +38,6 @@ export default function ReportConsolidation() {
       const rowText = [
         row.unit,
         row.total1,
-        row.total2,
         ...generatedCols,
         NO_REPORT_UNITS.has(row.unit) ? "khong bao cao" : "",
       ]
@@ -111,7 +110,6 @@ export default function ReportConsolidation() {
                   <td className={styles.unitCell}>{row.unit}</td>
 
                   <td>{isNoReport ? "" : row.total1}</td>
-                  <td>{isNoReport ? "" : row.total2}</td>
 
                   {Array.from(
                     { length: FILL_FROM_PRESENT_TO_SIGN_COUNT - 1 },

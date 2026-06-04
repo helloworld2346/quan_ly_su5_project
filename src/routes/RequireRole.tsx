@@ -6,6 +6,24 @@ type Props = {
   allowedRoles: string[];
 };
 
+function normalizeRoleName(role: string | undefined): string {
+  if (!role) return "";
+
+  if (role.includes("Báo cáo") || role.includes("Báo Ban")) {
+    return "Báo cáo";
+  }
+  if (role.includes("Chỉ huy")) {
+    return "Chỉ huy";
+  }
+  if (role.includes("Sư đoàn")) {
+    return "Sư đoàn";
+  }
+  if (role.includes("Quản Trị Viên") || role.includes("Admin")) {
+    return "Quản Trị Viên";
+  }
+  return role;
+}
+
 export default function RequireRole({ children, allowedRoles }: Props) {
   const { account, loading } = useAuth();
 
@@ -18,12 +36,12 @@ export default function RequireRole({ children, allowedRoles }: Props) {
   }
 
   const userRole = account.vaiTro?.tenVaiTro;
-  if (!userRole || !allowedRoles.includes(userRole)) {
-    // Role có quyền dashboard: Sư đoàn, Quản Trị Viên
-    if (userRole === "Sư đoàn" || userRole === "Quản Trị Viên") {
+  const normalizedRole = normalizeRoleName(userRole);
+
+  if (!userRole || !allowedRoles.includes(normalizedRole)) {
+    if (normalizedRole === "Sư đoàn" || normalizedRole === "Quản Trị Viên") {
       return <Navigate to="/dashboard" replace />;
     }
-    // Role không có quyền dashboard: Chỉ huy, Báo cáo
     return <Navigate to="/settings" replace />;
   }
 
