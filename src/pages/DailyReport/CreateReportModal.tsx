@@ -6,6 +6,7 @@ import { useAuth } from "../../context/useAuth";
 import { useToast } from "../../context/useToast";
 import type { VangChiTiet } from "../../types/dailyReport";
 import styles from "./CreateReportModal.module.css";
+import { handleApiError } from "../../utils/errorHandler";
 
 type Props = {
   onClose: () => void;
@@ -40,23 +41,17 @@ export default function CreateReportModal({
     tongQuanSo: initialTongQuanSo || 0,
     hienDien: 0,
     tongVang: 0,
-    // Hội thao
     hoiThaiNgoaiSuDoan: initialData?.hoiThaiNgoaiSuDoan || 0,
     hoiThaiEF: initialData?.hoiThaiEF || 0,
-    // Xây dựng
     xayDungNgoaiSuDoan: initialData?.xayDungNgoaiSuDoan || 0,
     xayDungEF: initialData?.xayDungEF || 0,
-    // Khác
     choHuu: initialData?.choHuu || 0,
     nghiTranhThu: initialData?.nghiTranhThu || 0,
     phep: initialData?.phep || 0,
-    // Viện
     vienNgoaiSuDoan: initialData?.vienNgoaiSuDoan || 0,
     vienEF: initialData?.vienEF || 0,
-    // Công tác
     congTacNgoaiSuDoan: initialData?.congTacNgoaiSuDoan || 0,
     congTacSuDoan: initialData?.congTacSuDoan || 0,
-    // Học
     hocSQ: initialData?.hocSQ || 0,
     hocCS: initialData?.hocCS || 0,
   });
@@ -69,7 +64,6 @@ export default function CreateReportModal({
     setFormData((prev) => {
       const newData = { ...prev, [field]: value };
 
-      // Tính toán tổng vắng và hiện diện khi các field vắng hoặc tổng quân số thay đổi
       const vangFields = [
         "hoiThaiNgoaiSuDoan",
         "hoiThaiEF",
@@ -160,12 +154,13 @@ export default function CreateReportModal({
       onSuccess?.();
       onClose();
     } catch (error) {
-      showError(
-        mode === "edit"
-          ? "Có lỗi xảy ra khi cập nhật báo cáo"
-          : "Có lỗi xảy ra khi tạo báo cáo",
-      );
-      console.error(error);
+      handleApiError(error, {
+        showError,
+        errorMessage:
+          mode === "edit"
+            ? "Có lỗi xảy ra khi cập nhật báo cáo"
+            : "Có lỗi xảy ra khi tạo báo cáo",
+      });
     } finally {
       setLoading(false);
     }

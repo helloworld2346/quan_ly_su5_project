@@ -17,7 +17,7 @@ import { dailyReportService } from "../../services/dailyReport/dailyReportServic
 import { useAuth } from "../../context/useAuth";
 import { useToast } from "../../context/useToast";
 import type { VangChiTiet } from "../../types/dailyReport";
-import type { AxiosError } from "axios"; // ← Thêm import này
+import { handleApiError } from "../../utils/errorHandler";
 
 function todayIsoDate() {
   const d = new Date();
@@ -137,16 +137,11 @@ export default function DailyTroopReport() {
         setReportData([]);
       }
     } catch (error) {
-      // Type guard để kiểm tra AxiosError
-      const axiosError = error as AxiosError<{ message?: string }>;
-
-      // Chỉ show error khi không phải 404 (404 là trường hợp bình thường - không có báo cáo)
-      if (axiosError?.response?.status !== 404) {
-        showError("Không thể tải dữ liệu báo cáo");
-        console.error(error);
-      }
-      // Luôn clear data khi có lỗi
-      setReportData([]);
+      handleApiError(error, {
+        showError,
+        errorMessage: "Không thể tải dữ liệu báo cáo",
+        clearData: () => setReportData([]),
+      });
     } finally {
       setLoading(false);
     }
@@ -223,8 +218,10 @@ export default function DailyTroopReport() {
       showSuccess("Phê duyệt báo cáo thành công");
       fetchReports();
     } catch (error) {
-      showError("Không thể phê duyệt báo cáo");
-      console.error(error);
+      handleApiError(error, {
+        showError,
+        errorMessage: "Không thể phê duyệt báo cáo",
+      });
     }
     setActiveMenuUnit(null);
   };
@@ -235,8 +232,10 @@ export default function DailyTroopReport() {
       showSuccess("Từ chối báo cáo thành công");
       fetchReports();
     } catch (error) {
-      showError("Không thể từ chối báo cáo");
-      console.error(error);
+      handleApiError(error, {
+        showError,
+        errorMessage: "Không thể từ chối báo cáo",
+      });
     }
     setActiveMenuUnit(null);
   };
