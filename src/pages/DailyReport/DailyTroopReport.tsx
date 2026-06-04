@@ -93,7 +93,7 @@ export default function DailyTroopReport() {
       const maDonVi = account.donVi.maDonVi;
       let response;
 
-      const isParentUnit = maDonVi.split(".").length <= 3;
+      const isParentUnit = maDonVi.split(".").length < 3;
 
       if (isParentUnit) {
         response = await dailyReportService.searchChildrenReports(

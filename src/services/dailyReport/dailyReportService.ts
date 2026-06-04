@@ -62,7 +62,7 @@ export const dailyReportService = {
     ngayLoc: string,
   ): Promise<SearchChildrenResponse> => {
     const response = await apiNoPrefix.get<SearchChildrenResponse>(
-      `/donbaocao/search/DonVi/${maDonVi}`,
+      `/donbaocao/search/DonVi/${maDonVi}/children`,
       { params: { ngayLoc } },
     );
     return response.data;
