@@ -8,9 +8,27 @@ import type { VangChiTiet } from "../../types/dailyReport";
 import styles from "./CreateReportModal.module.css";
 import { handleApiError } from "../../utils/errorHandler";
 
+export type ReportSubmitResult = {
+  idDonBaoCao: string;
+  quanSoHienDien: number;
+  quanSoTong: number;
+  quanSoVang: number;
+  status: string;
+  thoiGianBaoCao: string;
+  thongTinVang: string;
+  donVi: {
+    maDonVi: string;
+    tenDonvi: string;
+  };
+  caTruc?: {
+    trucBanTacChien?: { tenNguoitruc?: string };
+    trucChiHuy?: { tenNguoitruc?: string };
+  };
+};
+
 type Props = {
   onClose: () => void;
-  onSuccess?: () => void;
+  onSuccess?: (result?: ReportSubmitResult) => void;
   mode?: "create" | "edit";
   reportId?: string;
   initialData?: VangChiTiet;
@@ -27,20 +45,13 @@ function todayIsoDate() {
   ].join("-");
 }
 
-export default function CreateReportModal({
-  onClose,
-  onSuccess,
-  mode = "create",
-  reportId,
-  initialData,
-  ngayBaoCao: initialNgayBaoCao,
-  tongQuanSo: initialTongQuanSo,
-}: Props) {
-  const [formData, setFormData] = useState({
-    ngayBaoCao: initialNgayBaoCao || todayIsoDate(),
-    tongQuanSo: initialTongQuanSo || 0,
-    hienDien: 0,
-    tongVang: 0,
+function buildInitialForm(
+  initialData: VangChiTiet | undefined,
+  initialNgayBaoCao: string | undefined,
+  initialTongQuanSo: number | undefined,
+) {
+  const tongQuanSo = initialTongQuanSo || 0;
+  const vang = {
     hoiThaiNgoaiSuDoan: initialData?.hoiThaiNgoaiSuDoan || 0,
     hoiThaiEF: initialData?.hoiThaiEF || 0,
     xayDungNgoaiSuDoan: initialData?.xayDungNgoaiSuDoan || 0,
@@ -54,7 +65,32 @@ export default function CreateReportModal({
     congTacSuDoan: initialData?.congTacSuDoan || 0,
     hocSQ: initialData?.hocSQ || 0,
     hocCS: initialData?.hocCS || 0,
-  });
+  };
+
+  const tongVang = Object.values(vang).reduce((a, b) => a + b, 0);
+  const hienDien = Math.max(0, tongQuanSo - tongVang);
+
+  return {
+    ngayBaoCao: initialNgayBaoCao || todayIsoDate(),
+    tongQuanSo,
+    hienDien,
+    tongVang,
+    ...vang,
+  };
+}
+
+export default function CreateReportModal({
+  onClose,
+  onSuccess,
+  mode = "create",
+  reportId,
+  initialData,
+  ngayBaoCao: initialNgayBaoCao,
+  tongQuanSo: initialTongQuanSo,
+}: Props) {
+  const [formData, setFormData] = useState(() =>
+    buildInitialForm(initialData, initialNgayBaoCao, initialTongQuanSo),
+  );
 
   const [loading, setLoading] = useState(false);
   const { account } = useAuth();
@@ -136,8 +172,12 @@ export default function CreateReportModal({
           account: account?.idTaiKhoan || "",
           donVi: account?.donVi?.maDonVi || "",
         };
-        await dailyReportService.updateReport(reportId, payload);
+        const response = await dailyReportService.updateReport(
+          reportId,
+          payload,
+        );
         showSuccess("Cập nhật báo cáo thành công");
+        onSuccess?.(response.Result);
       } else {
         const payload = {
           quanSoTong: formData.tongQuanSo,
@@ -147,11 +187,11 @@ export default function CreateReportModal({
           thongTinVang: JSON.stringify(vangChiTiet),
           donVi: account?.donVi?.maDonVi || "",
         };
-        await dailyReportService.createReport(payload);
+        const response = await dailyReportService.createReport(payload);
         showSuccess("Tạo báo cáo thành công");
+        onSuccess?.(response.Result);
       }
 
-      onSuccess?.();
       onClose();
     } catch (error) {
       handleApiError(error, {
