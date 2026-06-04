@@ -278,3 +278,15 @@
   color: var(--text-muted);  
   font-style: italic;  
 }
+
+.noteCell {  
+  text-align: left;  
+  min-width: 120px;  
+  padding: 12px 16px;  
+  font-size: 13px;  
+  color: #6b7280;  
+  word-break: break-word;  
+  overflow-wrap: break-word;  
+  line-height: 1.5;  
+  vertical-align: top;  
+} 

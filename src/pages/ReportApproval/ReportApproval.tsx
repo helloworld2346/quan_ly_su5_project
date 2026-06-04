@@ -8,8 +8,7 @@ import {
   faEye,
   faPenToSquare,
 } from "@fortawesome/free-solid-svg-icons";
-import ConfirmDialog from "../../components/ui/ConfirmDialog/ConfirmDialog";
-import { useConfirmDialog } from "../../components/ui/ConfirmDialog/useConfirmDialog";
+import RefuseDialog from "../../components/ui/RefuseDialog/RefuseDialog";
 import { dailyReportService } from "../../services/dailyReport/dailyReportService";
 import { useAuth } from "../../context/useAuth";
 import { useToast } from "../../context/useToast";
@@ -36,6 +35,7 @@ interface ReportRow {
   trucChiHuy: string;
   trucBan: string;
   status: string;
+  ghiChu: string;
 }
 
 export default function ReportApproval() {
@@ -48,11 +48,13 @@ export default function ReportApproval() {
   const [activeMenuUnit, setActiveMenuUnit] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
 
+  const [showRefuseDialog, setShowRefuseDialog] = useState(false);
+  const [refuseUnitName, setRefuseUnitName] = useState("");
+
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const { account } = useAuth();
   const { showSuccess, showError } = useToast();
-  const confirmDialog = useConfirmDialog();
 
   const fetchReports = useCallback(async () => {
     if (!account?.donVi?.maDonVi) return;
@@ -103,6 +105,7 @@ export default function ReportApproval() {
             trucChiHuy: item.caTruc?.trucChiHuy?.tenNguoitruc || "",
             trucBan: item.caTruc?.trucBanTacChien?.tenNguoitruc || "",
             status: item.status,
+            ghiChu: item.ghiChu || "",
           };
         });
         setReportData(mappedData);
@@ -177,56 +180,50 @@ export default function ReportApproval() {
     const selectedRow = reportData.find((r) => r.idDonBaoCao === selectedRowId);
     if (!selectedRow) return;
 
-    const confirmed = await confirmDialog.confirm({
-      title: "Phê duyệt báo cáo",
-      message: `Bạn có chắc chắn muốn phê duyệt báo cáo của đơn vị ${selectedRow.tenDonVi}?`,
-      confirmText: "Phê duyệt",
-      cancelText: "Hủy",
-      type: "info",
-    });
-
-    if (confirmed) {
-      try {
-        await dailyReportService.approveReport(selectedRowId);
-        showSuccess("Phê duyệt báo cáo thành công");
-        setSelectedRowId(null);
-        fetchReports();
-      } catch (error) {
-        handleApiError(error, {
-          showError,
-          errorMessage: "Không thể phê duyệt báo cáo",
-        });
-      }
+    try {
+      await dailyReportService.approveReport(selectedRowId);
+      showSuccess("Phê duyệt báo cáo thành công");
+      setSelectedRowId(null);
+      fetchReports();
+    } catch (error) {
+      handleApiError(error, {
+        showError,
+        errorMessage: "Không thể phê duyệt báo cáo",
+      });
     }
   };
 
-  const handleReject = async () => {
+  const handleRejectClick = () => {
     if (!selectedRowId) return;
 
     const selectedRow = reportData.find((r) => r.idDonBaoCao === selectedRowId);
     if (!selectedRow) return;
 
-    const confirmed = await confirmDialog.confirm({
-      title: "Từ chối báo cáo",
-      message: `Bạn có chắc chắn muốn từ chối báo cáo của đơn vị ${selectedRow.tenDonVi}?`,
-      confirmText: "Từ chối",
-      cancelText: "Hủy",
-      type: "danger",
-    });
+    setRefuseUnitName(selectedRow.tenDonVi);
+    setShowRefuseDialog(true);
+  };
 
-    if (confirmed) {
-      try {
-        await dailyReportService.refuseReport(selectedRowId);
-        showSuccess("Từ chối báo cáo thành công");
-        setSelectedRowId(null);
-        fetchReports();
-      } catch (error) {
-        handleApiError(error, {
-          showError,
-          errorMessage: "Không thể từ chối báo cáo",
-        });
-      }
+  const handleRefuseConfirm = async (reason: string) => {
+    if (!selectedRowId) return;
+
+    try {
+      await dailyReportService.refuseReport(selectedRowId, { ghiChu: reason });
+      showSuccess("Từ chối báo cáo thành công");
+      setShowRefuseDialog(false);
+      setRefuseUnitName("");
+      setSelectedRowId(null);
+      fetchReports();
+    } catch (error) {
+      handleApiError(error, {
+        showError,
+        errorMessage: "Không thể từ chối báo cáo",
+      });
     }
+  };
+
+  const handleRefuseCancel = () => {
+    setShowRefuseDialog(false);
+    setRefuseUnitName("");
   };
 
   const filteredRows = useMemo(() => {
@@ -255,6 +252,7 @@ export default function ReportApproval() {
         row.vang.hocCS,
         row.trucChiHuy,
         row.trucBan,
+        row.ghiChu,
       ]
         .join(" ")
         .toLowerCase();
@@ -367,7 +365,7 @@ export default function ReportApproval() {
           </button>
           <button
             className={`${styles.actionButton} ${styles.rejectButton}`}
-            onClick={handleReject}
+            onClick={handleRejectClick}
             disabled={!selectedRowId || !canApproveOrReject}
           >
             Từ chối
@@ -390,6 +388,7 @@ export default function ReportApproval() {
                 <th rowSpan={3}>Trực chỉ huy</th>
                 <th rowSpan={3}>Trực ban</th>
                 <th rowSpan={3}>Trạng thái</th>
+                <th rowSpan={3}>Ghi chú</th>
                 <th rowSpan={3}>Thao tác</th>
               </tr>
               <tr>
@@ -453,6 +452,7 @@ export default function ReportApproval() {
                         {row.status.replace(/_/g, " ")}
                       </span>
                     </td>
+                    <td className={styles.noteCell}>{row.ghiChu}</td>
                     <td className={styles.actionCell}>
                       <div className={styles.actionWrapper}>
                         <button
@@ -538,21 +538,18 @@ export default function ReportApproval() {
                 <td></td>
                 <td></td>
                 <td></td>
+                <td></td>
               </tr>
             </tbody>
           </table>
         )}
       </div>
 
-      <ConfirmDialog
-        isOpen={confirmDialog.isOpen}
-        title={confirmDialog.options.title}
-        message={confirmDialog.options.message}
-        confirmText={confirmDialog.options.confirmText}
-        cancelText={confirmDialog.options.cancelText}
-        type={confirmDialog.options.type}
-        onConfirm={confirmDialog.onConfirm}
-        onCancel={confirmDialog.onCancel}
+      <RefuseDialog
+        isOpen={showRefuseDialog}
+        unitName={refuseUnitName}
+        onConfirm={handleRefuseConfirm}
+        onCancel={handleRefuseCancel}
       />
     </section>
   );

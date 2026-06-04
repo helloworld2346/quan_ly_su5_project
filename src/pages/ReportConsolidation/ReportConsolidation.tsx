@@ -1,6 +1,6 @@
-import { useMemo, useState, useCallback, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenToSquare, faEye } from "@fortawesome/free-solid-svg-icons";
+import { faEye } from "@fortawesome/free-solid-svg-icons";
 import styles from "./ReportConsolidation.module.css";
 import ReportToolbar from "../../components/report/ReportToolbar";
 import { dailyReportService } from "../../services/dailyReport/dailyReportService";
@@ -39,78 +39,93 @@ export default function ReportConsolidation() {
   const [loading, setLoading] = useState(false);
 
   const { account } = useAuth();
-  const { showError, showSuccess } = useToast();
-
-  const fetchChildrenReports = useCallback(async () => {
-    if (!account?.donVi?.maDonVi) return;
-
-    setLoading(true);
-    try {
-      const response = await dailyReportService.searchChildrenReports(
-        account.donVi.maDonVi,
-        reportDate,
-      );
-
-      if (response.success && response.Result) {
-        const data = Array.isArray(response.Result)
-          ? response.Result
-          : [response.Result];
-
-        const mappedData: ReportRow[] = data.map((item) => {
-          let vang: VangChiTiet = {
-            hoiThaiNgoaiSuDoan: 0,
-            hoiThaiEF: 0,
-            xayDungNgoaiSuDoan: 0,
-            xayDungEF: 0,
-            choHuu: 0,
-            nghiTranhThu: 0,
-            phep: 0,
-            vienNgoaiSuDoan: 0,
-            vienEF: 0,
-            congTacNgoaiSuDoan: 0,
-            congTacSuDoan: 0,
-            hocSQ: 0,
-            hocCS: 0,
-          };
-
-          try {
-            vang = JSON.parse(item.thongTinVang) as VangChiTiet;
-          } catch (e) {
-            console.error("Error parsing thongTinVang:", e);
-          }
-
-          return {
-            idDonBaoCao: item.idDonBaoCao,
-            donVi: item.donVi.maDonVi,
-            tenDonVi: item.donVi.tenDonvi,
-            quanSoTong: item.quanSoTong,
-            quanSoHienDien: item.quanSoHienDien,
-            quanSoVang: item.quanSoVang,
-            vang,
-            trucChiHuy: item.caTruc?.trucChiHuy?.tenNguoitruc || "",
-            trucBan: item.caTruc?.trucBanTacChien?.tenNguoitruc || "",
-            status: item.status,
-          };
-        });
-
-        setReportData(mappedData);
-      } else {
-        setReportData([]);
-      }
-    } catch (error) {
-      handleApiError(error, {
-        showError,
-        errorMessage: "Không thể tải dữ liệu báo cáo đơn vị con",
-        clearData: () => setReportData([]),
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [account, reportDate, showError]);
+  const { showError } = useToast();
 
   useEffect(() => {
-    fetchChildrenReports();
-  }, [fetchChildrenReports]);
+    let isMounted = true;
+
+    const fetchData = async () => {
+      if (!account?.donVi?.maDonVi) return;
+
+      if (isMounted) {
+        setLoading(true);
+      }
+
+      try {
+        const response = await dailyReportService.searchChildrenReports(
+          account.donVi.maDonVi,
+          reportDate,
+        );
+
+        if (isMounted) {
+          if (response.success && response.Result) {
+            const data = Array.isArray(response.Result)
+              ? response.Result
+              : [response.Result];
+
+            const mappedData: ReportRow[] = data.map((item) => {
+              let vang: VangChiTiet = {
+                hoiThaiNgoaiSuDoan: 0,
+                hoiThaiEF: 0,
+                xayDungNgoaiSuDoan: 0,
+                xayDungEF: 0,
+                choHuu: 0,
+                nghiTranhThu: 0,
+                phep: 0,
+                vienNgoaiSuDoan: 0,
+                vienEF: 0,
+                congTacNgoaiSuDoan: 0,
+                congTacSuDoan: 0,
+                hocSQ: 0,
+                hocCS: 0,
+              };
+
+              try {
+                vang = JSON.parse(item.thongTinVang) as VangChiTiet;
+              } catch (e) {
+                console.error("Error parsing thongTinVang:", e);
+              }
+
+              return {
+                idDonBaoCao: item.idDonBaoCao,
+                donVi: item.donVi.maDonVi,
+                tenDonVi: item.donVi.tenDonvi,
+                quanSoTong: item.quanSoTong,
+                quanSoHienDien: item.quanSoHienDien,
+                quanSoVang: item.quanSoVang,
+                vang,
+                trucChiHuy: item.caTruc?.trucChiHuy?.tenNguoitruc || "",
+                trucBan: item.caTruc?.trucBanTacChien?.tenNguoitruc || "",
+                status: item.status,
+              };
+            });
+
+            setReportData(mappedData);
+          } else {
+            setReportData([]);
+          }
+        }
+      } catch (error) {
+        if (isMounted) {
+          handleApiError(error, {
+            showError,
+            errorMessage: "Không thể tải dữ liệu báo cáo đơn vị con",
+            clearData: () => setReportData([]),
+          });
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [account, reportDate, showError]);
 
   const filteredRows = useMemo(() => {
     const q = query.trim().toLowerCase();

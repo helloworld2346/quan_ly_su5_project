@@ -13,6 +13,7 @@ import {
 import { ABSENT_MEMBERS } from "../../types/troopStats";
 import TroopDetailModal from "./TroopDetailModal";
 import CreateReportModal from "./CreateReportModal";
+import RefuseDialog from "../../components/ui/RefuseDialog/RefuseDialog";
 import { dailyReportService } from "../../services/dailyReport/dailyReportService";
 import { useAuth } from "../../context/useAuth";
 import { useToast } from "../../context/useToast";
@@ -57,6 +58,7 @@ interface ReportRow {
   trucChiHuy: string;
   trucBan: string;
   status: string;
+  ghiChu: string;
 }
 
 type EditModalData = {
@@ -79,6 +81,10 @@ export default function DailyTroopReport() {
 
   const [activeMenuUnit, setActiveMenuUnit] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+
+  const [showRefuseDialog, setShowRefuseDialog] = useState(false);
+  const [refuseReportId, setRefuseReportId] = useState<string | null>(null);
+  const [refuseUnitName, setRefuseUnitName] = useState("");
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
@@ -146,12 +152,12 @@ export default function DailyTroopReport() {
             trucChiHuy: item.caTruc?.trucChiHuy?.tenNguoitruc || "",
             trucBan: item.caTruc?.trucBanTacChien?.tenNguoitruc || "",
             status: item.status,
+            ghiChu: item.ghiChu || "",
           };
         });
 
         setReportData(mappedData);
       } else {
-        // Clear data khi response success nhưng không có dữ liệu
         setReportData([]);
       }
     } catch (error) {
@@ -244,10 +250,22 @@ export default function DailyTroopReport() {
     setActiveMenuUnit(null);
   };
 
-  const handleRefuseReport = async (reportId: string) => {
+  const handleRefuseReportClick = (row: ReportRow) => {
+    setRefuseReportId(row.idDonBaoCao);
+    setRefuseUnitName(row.tenDonVi);
+    setShowRefuseDialog(true);
+    setActiveMenuUnit(null);
+  };
+
+  const handleRefuseConfirm = async (reason: string) => {
+    if (!refuseReportId) return;
+
     try {
-      await dailyReportService.refuseReport(reportId);
+      await dailyReportService.refuseReport(refuseReportId, { ghiChu: reason });
       showSuccess("Từ chối báo cáo thành công");
+      setShowRefuseDialog(false);
+      setRefuseReportId(null);
+      setRefuseUnitName("");
       fetchReports();
     } catch (error) {
       handleApiError(error, {
@@ -255,7 +273,12 @@ export default function DailyTroopReport() {
         errorMessage: "Không thể từ chối báo cáo",
       });
     }
-    setActiveMenuUnit(null);
+  };
+
+  const handleRefuseCancel = () => {
+    setShowRefuseDialog(false);
+    setRefuseReportId(null);
+    setRefuseUnitName("");
   };
 
   const handleExportWord = () => {
@@ -292,6 +315,7 @@ export default function DailyTroopReport() {
         row.vang.hocCS,
         row.trucChiHuy,
         row.trucBan,
+        row.ghiChu,
       ]
         .join(" ")
         .toLowerCase();
@@ -390,6 +414,7 @@ export default function DailyTroopReport() {
                 <th rowSpan={3}>Trực chỉ huy</th>
                 <th rowSpan={3}>Trực ban</th>
                 <th rowSpan={3}>Trạng thái</th>
+                <th rowSpan={3}>Ghi chú</th>
                 <th rowSpan={3}>Thao tác</th>
               </tr>
               <tr>
@@ -419,7 +444,7 @@ export default function DailyTroopReport() {
             <tbody>
               {filteredRows.length === 0 ? (
                 <tr>
-                  <td colSpan={20} className={styles.emptyCell}>
+                  <td colSpan={21} className={styles.emptyCell}>
                     Không có dữ liệu báo cáo
                   </td>
                 </tr>
@@ -454,6 +479,7 @@ export default function DailyTroopReport() {
                       <td>{row.trucChiHuy}</td>
                       <td>{row.trucBan}</td>
                       <td>{getStatusBadge(row.status)}</td>
+                      <td className={styles.noteCell}>{row.ghiChu}</td>
                       <td className={styles.actionCell}>
                         <div className={styles.actionWrapper}>
                           <button
@@ -530,9 +556,7 @@ export default function DailyTroopReport() {
                                     type="button"
                                     className={`${styles.menuItem} ${styles.menuItemDanger}`}
                                     role="menuitem"
-                                    onClick={() =>
-                                      handleRefuseReport(row.idDonBaoCao)
-                                    }
+                                    onClick={() => handleRefuseReportClick(row)}
                                   >
                                     <FontAwesomeIcon
                                       icon={faBan}
@@ -573,6 +597,7 @@ export default function DailyTroopReport() {
                 <td></td>
                 <td></td>
                 <td></td>
+                <td></td>
               </tr>
             </tbody>
           </table>
@@ -605,6 +630,13 @@ export default function DailyTroopReport() {
           onSuccess={handleCreateSuccess}
         />
       )}
+
+      <RefuseDialog
+        isOpen={showRefuseDialog}
+        unitName={refuseUnitName}
+        onConfirm={handleRefuseConfirm}
+        onCancel={handleRefuseCancel}
+      />
     </section>
   );
 }

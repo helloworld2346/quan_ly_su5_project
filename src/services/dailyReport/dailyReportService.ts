@@ -6,6 +6,7 @@ import type {
   UpdateReportResponse,
   ApproveResponse,
   RefuseResponse,
+  RefuseRequest,
   SearchReportResponse,
   SearchChildrenResponse,
 } from "../../types/dailyReport";
@@ -39,9 +40,13 @@ export const dailyReportService = {
     return response.data;
   },
 
-  refuseReport: async (id: string): Promise<RefuseResponse> => {
+  refuseReport: async (
+    id: string,
+    payload: RefuseRequest,
+  ): Promise<RefuseResponse> => {
     const response = await apiNoPrefix.put<RefuseResponse>(
       `/donbaocao/refuse/${id}`,
+      payload,
     );
     return response.data;
   },
