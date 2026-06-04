@@ -17,6 +17,7 @@ import { dailyReportService } from "../../services/dailyReport/dailyReportServic
 import { useAuth } from "../../context/useAuth";
 import { useToast } from "../../context/useToast";
 import type { VangChiTiet } from "../../types/dailyReport";
+import { handleApiError } from "../../utils/errorHandler";
 
 function todayIsoDate() {
   const d = new Date();
@@ -131,10 +132,16 @@ export default function DailyTroopReport() {
         });
 
         setReportData(mappedData);
+      } else {
+        // Clear data khi response success nhưng không có dữ liệu
+        setReportData([]);
       }
     } catch (error) {
-      showError("Không thể tải dữ liệu báo cáo");
-      console.error(error);
+      handleApiError(error, {
+        showError,
+        errorMessage: "Không thể tải dữ liệu báo cáo",
+        clearData: () => setReportData([]),
+      });
     } finally {
       setLoading(false);
     }
@@ -166,8 +173,7 @@ export default function DailyTroopReport() {
     }
   };
 
-useEffect(() => {
-   
+  useEffect(() => {
     function handleGlobalClose(event: Event) {
       if (
         dropdownRef.current &&
@@ -212,8 +218,10 @@ useEffect(() => {
       showSuccess("Phê duyệt báo cáo thành công");
       fetchReports();
     } catch (error) {
-      showError("Không thể phê duyệt báo cáo");
-      console.error(error);
+      handleApiError(error, {
+        showError,
+        errorMessage: "Không thể phê duyệt báo cáo",
+      });
     }
     setActiveMenuUnit(null);
   };
@@ -224,8 +232,10 @@ useEffect(() => {
       showSuccess("Từ chối báo cáo thành công");
       fetchReports();
     } catch (error) {
-      showError("Không thể từ chối báo cáo");
-      console.error(error);
+      handleApiError(error, {
+        showError,
+        errorMessage: "Không thể từ chối báo cáo",
+      });
     }
     setActiveMenuUnit(null);
   };

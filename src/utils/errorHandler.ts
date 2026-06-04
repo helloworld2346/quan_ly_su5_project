@@ -34,3 +34,50 @@ export function getErrorMessage(error: unknown): string {
 
   return "Có lỗi xảy ra. Vui lòng thử lại.";
 }
+
+export interface ErrorHandlerOptions {
+  showError?: (message: string) => void;
+  errorMessage?: string;
+  clearData?: () => void;
+  logError?: boolean;
+}
+
+export function handleApiError(
+  error: unknown,
+  options: ErrorHandlerOptions = {},
+): boolean {
+  const {
+    showError,
+    errorMessage = "Có lỗi xảy ra",
+    clearData,
+    logError = true,
+  } = options;
+
+  const axiosError = error as AxiosError<{ message?: string }>;
+  const status = axiosError?.response?.status;
+
+  if (status === 404) {
+    if (clearData) {
+      clearData();
+    }
+    return true;
+  }
+
+  if (logError) {
+    console.error(error);
+  }
+
+  if (showError) {
+    const message =
+      axiosError?.response?.data?.message ||
+      axiosError?.message ||
+      errorMessage;
+    showError(message);
+  }
+
+  if (clearData) {
+    clearData();
+  }
+
+  return false;
+}

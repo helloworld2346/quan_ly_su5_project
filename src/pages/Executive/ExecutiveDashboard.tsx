@@ -86,13 +86,13 @@ export default function ExecutiveDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const dateInputRef = useRef<HTMLInputElement>(null);
- const today = new Date();
-today.setHours(0, 0, 0, 0);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-const selectedDay = new Date(selectedDate);
-selectedDay.setHours(0, 0, 0, 0);
+  const selectedDay = new Date(selectedDate);
+  selectedDay.setHours(0, 0, 0, 0);
 
-const isToday = selectedDay.getTime() === today.getTime();
+  const isToday = selectedDay.getTime() === today.getTime();
 
   useEffect(() => {
     setLoading(true);
@@ -265,9 +265,13 @@ const isToday = selectedDay.getTime() === today.getTime();
                     </div>
                     <div className={styles.highlightContent}>
                       <div className={styles.highlightLabel}>Hiện diện cao nhất</div>
-                      <div className={styles.highlightValue}>{data.donViTieuBieu.hienDienCaoNhat.ten}</div>
+                      <div className={styles.highlightValue}>
+                        {data.donViTieuBieu.hienDienCaoNhat?.ten ?? "—"}
+                      </div>
                       <div className={styles.highlightRate}>
-                        {formatRate(data.donViTieuBieu.hienDienCaoNhat.tyLe)}
+                        {data.donViTieuBieu.hienDienCaoNhat?.tyLe != null
+                          ? formatRate(data.donViTieuBieu.hienDienCaoNhat.tyLe)
+                          : "—"}
                       </div>
                     </div>
                   </div>
@@ -277,9 +281,13 @@ const isToday = selectedDay.getTime() === today.getTime();
                     </div>
                     <div className={styles.highlightContent}>
                       <div className={styles.highlightLabel}>Vắng cao nhất</div>
-                      <div className={styles.highlightValue}>{data.donViTieuBieu.vangCaoNhat.ten}</div>
+                      <div className={styles.highlightValue}>
+                        {data.donViTieuBieu.vangCaoNhat?.ten ?? "—"}
+                      </div>
                       <div className={styles.highlightRate}>
-                        {formatRate(data.donViTieuBieu.vangCaoNhat.tyLe)}
+                        {data.donViTieuBieu.vangCaoNhat?.tyLe != null
+                          ? formatRate(data.donViTieuBieu.vangCaoNhat.tyLe)
+                          : "—"}
                       </div>
                     </div>
                   </div>
