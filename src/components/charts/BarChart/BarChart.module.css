@@ -14,11 +14,16 @@
   display: block;
   width: 100%;
   overflow: visible;
+  font-family: inherit;
 }
 
 .bar {
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: opacity 0.15s, filter 0.15s;
+}
+
+.bar:hover {
+  filter: brightness(1.04);
 }
 
 .tooltip {

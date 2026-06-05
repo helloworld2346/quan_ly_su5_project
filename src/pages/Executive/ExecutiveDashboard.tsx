@@ -9,6 +9,7 @@ import PieChart from "../../components/charts/PieChart/PieChart";
 import type { SubordinateUnitType } from "../../types/troopStats";
 import { CHART_GROUP_LABELS, CHART_GROUP_ORDER } from "../../data/troopData";
 import { troopStatsService, type ThongKeQuanSoResult, type DonViItem } from "../../services/troopStats";
+import Trainningstatistical from "../TrainingReport/Trainningstatistical"
 import styles from "./ExecutiveDashboard.module.css";
 
 type FilterKey = "all" | SubordinateUnitType;
@@ -378,9 +379,7 @@ export default function ExecutiveDashboard() {
         </div>
       ) : (
         <div key="huanluyen" className={styles.tabContent}>
-          <p className={styles.filterNote} style={{ padding: "60px 0", textAlign: "center" }}>
-            Tính năng huấn luyện đang được phát triển
-          </p>
+            <Trainningstatistical />
         </div>
       )}
     </section>
