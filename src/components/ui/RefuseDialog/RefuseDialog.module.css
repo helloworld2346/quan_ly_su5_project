@@ -4,7 +4,7 @@
   left: 0;  
   right: 0;  
   bottom: 0;  
-  background-color: rgba(0, 0, 0, 0.5);  
+  background-color: var(--dialog-overlay-bg);  
   display: flex;  
   align-items: center;  
   justify-content: center;  
@@ -12,7 +12,7 @@
 }  
   
 .dialog {  
-  background: white;  
+  background: var(--dialog-bg);  
   border-radius: 8px;  
   padding: 2rem;  
   max-width: 500px;  
@@ -28,7 +28,7 @@
   
 .icon {  
   font-size: 3rem;  
-  color: #ef4444;  
+  color: var(--dialog-danger-icon);  
 }  
   
 .title {  
@@ -36,12 +36,12 @@
   font-weight: 600;  
   text-align: center;  
   margin: 0 0 1rem 0;  
-  color: #1f2937;  
+  color: var(--dialog-title-text);  
 }  
   
 .message {  
   text-align: center;  
-  color: #6b7280;  
+  color: var(--dialog-message-text);  
   margin: 0 0 1.5rem 0;  
 }  
   
@@ -53,23 +53,30 @@
   display: block;  
   font-weight: 500;  
   margin-bottom: 0.5rem;  
-  color: #374151;  
+  color: var(--dialog-cancel-text);  
 }  
   
 .textarea {  
   width: 100%;  
   padding: 0.75rem;  
-  border: 1px solid #d1d5db;  
+  border: 1px solid var(--login-border);  
   border-radius: 6px;  
   font-size: 1rem;  
   font-family: inherit;  
   resize: vertical;  
+  background: var(--modal-input-bg);  
+  color: var(--modal-input-text);  
+  box-sizing: border-box;  
+}  
+  
+.textarea::placeholder {  
+  color: var(--modal-input-placeholder);  
 }  
   
 .textarea:focus {  
   outline: none;  
-  border-color: #3b82f6;  
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);  
+  border-color: var(--primary-color);  
+  box-shadow: 0 0 0 3px var(--modal-input-focus-shadow);  
 }  
   
 .actions {  
@@ -80,24 +87,24 @@
   
 .cancelButton {  
   padding: 0.75rem 1.5rem;  
-  border: 1px solid #d1d5db;  
+  border: 1px solid var(--login-border);  
   border-radius: 6px;  
-  background: white;  
-  color: #374151;  
+  background: var(--dialog-cancel-bg);  
+  color: var(--dialog-cancel-text);  
   font-weight: 500;  
   cursor: pointer;  
   transition: all 0.2s;  
 }  
   
 .cancelButton:hover {  
-  background: #f9fafb;  
+  background: var(--dialog-cancel-hover-bg);  
 }  
   
 .confirmButton {  
   padding: 0.75rem 1.5rem;  
   border: none;  
   border-radius: 6px;  
-  background: #ef4444;  
+  background: var(--dialog-danger-bg);  
   color: white;  
   font-weight: 500;  
   cursor: pointer;  
@@ -105,7 +112,7 @@
 }  
   
 .confirmButton:hover:not(:disabled) {  
-  background: #dc2626;  
+  background: var(--dialog-danger-hover-bg);  
 }  
   
 .confirmButton:disabled {  

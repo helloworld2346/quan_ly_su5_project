@@ -1,491 +1,382 @@
-import { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
-import { dailyReportService } from "../../services/dailyReport/dailyReportService";
-import { useAuth } from "../../context/useAuth";
-import { useToast } from "../../context/useToast";
-import type { VangChiTiet } from "../../types/dailyReport";
+import React, { useState, useMemo } from "react";
 import styles from "./CreateReportModal.module.css";
-import { handleApiError } from "../../utils/errorHandler";
+import type {
+  AbsentRow,
+  VangChiTiet,
+  CreateReportRequest,
+  CreateReportResponse,
+} from "../../types/dailyReport";
 
-export type ReportSubmitResult = {
-  idDonBaoCao: string;
-  quanSoHienDien: number;
-  quanSoTong: number;
-  quanSoVang: number;
-  status: string;
-  thoiGianBaoCao: string;
-  thongTinVang: string;
-  donVi: {
-    maDonVi: string;
-    tenDonvi: string;
-  };
-  caTruc?: {
-    trucBanTacChien?: { tenNguoitruc?: string };
-    trucChiHuy?: { tenNguoitruc?: string };
-  };
-};
+const LY_DO_OPTIONS: { value: keyof VangChiTiet; label: string }[] = [
+  { value: "hoiThaiNgoaiSuDoan", label: "Hội thao - Ngoài Sư Đoàn" },
+  { value: "hoiThaiEF", label: "Hội thao - e, f" },
+  { value: "xayDungNgoaiSuDoan", label: "Xây dựng - Ngoài Sư Đoàn" },
+  { value: "xayDungEF", label: "Xây dựng - e, f" },
+  { value: "vienNgoaiSuDoan", label: "Viện - Ngoài Sư Đoàn" },
+  { value: "vienEF", label: "Viện - e, f" },
+  { value: "congTacNgoaiSuDoan", label: "Công tác - Ngoài Sư Đoàn" },
+  { value: "congTacSuDoan", label: "Công tác - Sư Đoàn" },
+  { value: "hocSQ", label: "Học - Sĩ quan" },
+  { value: "hocCS", label: "Học - Chiến sĩ" },
+  { value: "choHuu", label: "Chờ hưu" },
+  { value: "nghiTranhThu", label: "Nghỉ tranh thủ" },
+  { value: "phep", label: "Phép" },
+];
 
-type Props = {
+const CAP_BAC_OPTIONS = [
+  "Binh nhì",
+  "Binh nhất",
+  "Hạ sĩ",
+  "Trung sĩ",
+  "Thượng sĩ",
+  "Thiếu úy",
+  "Trung úy",
+  "Thượng úy",
+  "Đại úy",
+  "Thiếu tá",
+  "Trung tá",
+  "Thượng tá",
+];
+
+const CHUC_VU_OPTIONS = [
+  "Chiến sĩ",
+  "Tiểu đội trưởng",
+  "Phó trung đội trưởng",
+  "Trung đội trưởng",
+  "Phó đại đội trưởng",
+  "Đại đội trưởng",
+  "Chính trị viên ĐĐ",
+  "Phó tiểu đoàn trưởng",
+  "Tiểu đoàn trưởng",
+];
+
+interface CreateReportModalProps {
+  isOpen: boolean;
   onClose: () => void;
-  onSuccess?: (result?: ReportSubmitResult) => void;
-  mode?: "create" | "edit";
-  reportId?: string;
-  initialData?: VangChiTiet;
-  ngayBaoCao?: string;
-  tongQuanSo?: number;
-};
-
-function todayIsoDate() {
-  const d = new Date();
-  return [
-    d.getFullYear(),
-    String(d.getMonth() + 1).padStart(2, "0"),
-    String(d.getDate()).padStart(2, "0"),
-  ].join("-");
+  onSubmit: (payload: CreateReportRequest) => void;
+  initialData?: CreateReportResponse["Result"] | null;
+  maDonViCurrent?: string;
+  tongQuanSoBienChe?: number;
 }
 
-function buildInitialForm(
-  initialData: VangChiTiet | undefined,
-  initialNgayBaoCao: string | undefined,
-  initialTongQuanSo: number | undefined,
-) {
-  const tongQuanSo = initialTongQuanSo || 0;
-  const vang = {
-    hoiThaiNgoaiSuDoan: initialData?.hoiThaiNgoaiSuDoan || 0,
-    hoiThaiEF: initialData?.hoiThaiEF || 0,
-    xayDungNgoaiSuDoan: initialData?.xayDungNgoaiSuDoan || 0,
-    xayDungEF: initialData?.xayDungEF || 0,
-    choHuu: initialData?.choHuu || 0,
-    nghiTranhThu: initialData?.nghiTranhThu || 0,
-    phep: initialData?.phep || 0,
-    vienNgoaiSuDoan: initialData?.vienNgoaiSuDoan || 0,
-    vienEF: initialData?.vienEF || 0,
-    congTacNgoaiSuDoan: initialData?.congTacNgoaiSuDoan || 0,
-    congTacSuDoan: initialData?.congTacSuDoan || 0,
-    hocSQ: initialData?.hocSQ || 0,
-    hocCS: initialData?.hocCS || 0,
-  };
-
-  const tongVang = Object.values(vang).reduce((a, b) => a + b, 0);
-  const hienDien = Math.max(0, tongQuanSo - tongVang);
-
-  return {
-    ngayBaoCao: initialNgayBaoCao || todayIsoDate(),
-    tongQuanSo,
-    hienDien,
-    tongVang,
-    ...vang,
-  };
-}
-
-export default function CreateReportModal({
+export const CreateReportModal: React.FC<CreateReportModalProps> = ({
+  isOpen,
   onClose,
-  onSuccess,
-  mode = "create",
-  reportId,
+  onSubmit,
   initialData,
-  ngayBaoCao: initialNgayBaoCao,
-  tongQuanSo: initialTongQuanSo,
-}: Props) {
-  const [formData, setFormData] = useState(() =>
-    buildInitialForm(initialData, initialNgayBaoCao, initialTongQuanSo),
-  );
+  maDonViCurrent,
+  tongQuanSoBienChe,
+}) => {
+const [ngayBaoCao] = useState<string>(() => {
+  if (initialData?.thoiGianBaoCao) {
+    return initialData.thoiGianBaoCao.split("T")[0];
+  }
+  return new Date().toISOString().split("T")[0];
+});
 
-  const [loading, setLoading] = useState(false);
-  const { account } = useAuth();
-  const { showSuccess, showError } = useToast();
+const [tongQuanSo] = useState<number>(() => {
+  if (initialData?.quanSoTong) return initialData.quanSoTong;
+  if (tongQuanSoBienChe) return tongQuanSoBienChe;
+  return 0;
+});
 
-  const handleChange = (field: string, value: number | string) => {
-    setFormData((prev) => {
-      const newData = { ...prev, [field]: value };
-
-      const vangFields = [
-        "hoiThaiNgoaiSuDoan",
-        "hoiThaiEF",
-        "xayDungNgoaiSuDoan",
-        "xayDungEF",
-        "choHuu",
-        "nghiTranhThu",
-        "phep",
-        "vienNgoaiSuDoan",
-        "vienEF",
-        "congTacNgoaiSuDoan",
-        "congTacSuDoan",
-        "hocSQ",
-        "hocCS",
-        "tongQuanSo",
-      ];
-
-      if (vangFields.includes(field)) {
-        const tongVang =
-          newData.hoiThaiNgoaiSuDoan +
-          newData.hoiThaiEF +
-          newData.xayDungNgoaiSuDoan +
-          newData.xayDungEF +
-          newData.choHuu +
-          newData.nghiTranhThu +
-          newData.phep +
-          newData.vienNgoaiSuDoan +
-          newData.vienEF +
-          newData.congTacNgoaiSuDoan +
-          newData.congTacSuDoan +
-          newData.hocSQ +
-          newData.hocCS;
-
-        const hienDien = newData.tongQuanSo - tongVang;
-
-        newData.tongVang = tongVang;
-        newData.hienDien = hienDien >= 0 ? hienDien : 0;
+  const [absentRows, setAbsentRows] = useState<AbsentRow[]>(() => {
+    if (initialData?.chiTietVang) {
+      try {
+        return JSON.parse(initialData.chiTietVang) as AbsentRow[];
+      } catch {
+        return [];
       }
-
-      return newData;
-    });
-  };
-
-  const handleSubmit = async () => {
-    setLoading(true);
-    try {
-      const vangChiTiet: VangChiTiet = {
-        hoiThaiNgoaiSuDoan: formData.hoiThaiNgoaiSuDoan,
-        hoiThaiEF: formData.hoiThaiEF,
-        xayDungNgoaiSuDoan: formData.xayDungNgoaiSuDoan,
-        xayDungEF: formData.xayDungEF,
-        choHuu: formData.choHuu,
-        nghiTranhThu: formData.nghiTranhThu,
-        phep: formData.phep,
-        vienNgoaiSuDoan: formData.vienNgoaiSuDoan,
-        vienEF: formData.vienEF,
-        congTacNgoaiSuDoan: formData.congTacNgoaiSuDoan,
-        congTacSuDoan: formData.congTacSuDoan,
-        hocSQ: formData.hocSQ,
-        hocCS: formData.hocCS,
-      };
-
-      if (mode === "edit" && reportId) {
-        const payload = {
-          quanSoTong: formData.tongQuanSo,
-          quanSoHienDien: formData.hienDien,
-          quanSoVang: formData.tongVang,
-          thoiGianBaoCao: new Date().toISOString(),
-          thongTinVang: JSON.stringify(vangChiTiet),
-          account: account?.idTaiKhoan || "",
-          donVi: account?.donVi?.maDonVi || "",
-        };
-        const response = await dailyReportService.updateReport(
-          reportId,
-          payload,
-        );
-        showSuccess("Cập nhật báo cáo thành công");
-        onSuccess?.(response.Result);
-      } else {
-        const payload = {
-          quanSoTong: formData.tongQuanSo,
-          quanSoHienDien: formData.hienDien,
-          quanSoVang: formData.tongVang,
-          thoiGianBaoCao: new Date().toISOString(),
-          thongTinVang: JSON.stringify(vangChiTiet),
-          donVi: account?.donVi?.maDonVi || "",
-        };
-        const response = await dailyReportService.createReport(payload);
-        showSuccess("Tạo báo cáo thành công");
-        onSuccess?.(response.Result);
-      }
-
-      onClose();
-    } catch (error) {
-      handleApiError(error, {
-        showError,
-        errorMessage:
-          mode === "edit"
-            ? "Có lỗi xảy ra khi cập nhật báo cáo"
-            : "Có lỗi xảy ra khi tạo báo cáo",
-      });
-    } finally {
-      setLoading(false);
     }
+    return [];
+  });
+
+  const quanSoVang = absentRows.length;
+  const quanSoHienDien = useMemo(() => {
+    const result = tongQuanSo - quanSoVang;
+    return result >= 0 ? result : 0;
+  }, [tongQuanSo, quanSoVang]);
+
+  const handleAddRow = () => {
+    const lastRow = absentRows[absentRows.length - 1];
+
+    const newRow: AbsentRow = {
+      id: crypto.randomUUID(),
+      hoTen: "",
+      capBac: lastRow ? lastRow.capBac : CAP_BAC_OPTIONS[0],
+      chucVu: lastRow ? lastRow.chucVu : CHUC_VU_OPTIONS[0],
+      lyDoVang: lastRow ? lastRow.lyDoVang : LY_DO_OPTIONS[0].value,
+      ghiChu: "",
+    };
+
+    setAbsentRows((prev) => [...prev, newRow]);
   };
+
+  const handleUpdateRow = (
+    id: string,
+    field: keyof AbsentRow,
+    value: string,
+  ) => {
+    setAbsentRows((prev) =>
+      prev.map((row) => (row.id === id ? { ...row, [field]: value } : row)),
+    );
+  };
+
+  const handleRemoveRow = (id: string) => {
+    setAbsentRows((prev) => prev.filter((row) => row.id !== id));
+  };
+
+  const handleLocalSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const thongTinVangObj: VangChiTiet = {
+      hoiThaiNgoaiSuDoan: 0,
+      hoiThaiEF: 0,
+      xayDungNgoaiSuDoan: 0,
+      xayDungEF: 0,
+      choHuu: 0,
+      nghiTranhThu: 0,
+      phep: 0,
+      vienNgoaiSuDoan: 0,
+      vienEF: 0,
+      congTacNgoaiSuDoan: 0,
+      congTacSuDoan: 0,
+      hocSQ: 0,
+      hocCS: 0,
+    };
+
+    absentRows.forEach((row) => {
+      if (row.lyDoVang in thongTinVangObj) {
+        thongTinVangObj[row.lyDoVang]++;
+      }
+    });
+
+    const payload: CreateReportRequest = {
+      quanSoTong: tongQuanSo,
+      quanSoHienDien: quanSoHienDien,
+      quanSoVang: quanSoVang,
+      thoiGianBaoCao: new Date(`${ngayBaoCao}T12:00:00.000Z`).toISOString(),
+      chiTietVang: JSON.stringify(absentRows),
+      thongTinVang: JSON.stringify(thongTinVangObj),
+      donVi: initialData?.donVi?.maDonVi || maDonViCurrent || "",
+    };
+
+    onSubmit(payload);
+  };
+
+  if (!isOpen) return null;
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+    <div className={styles.overlay}>
+      <form className={styles.modal} onSubmit={handleLocalSubmit}>
         <div className={styles.header}>
           <h2 className={styles.title}>
-            {mode === "edit"
-              ? "Cập nhật báo cáo quân số"
-              : "Nhập báo cáo quân số"}
+            {initialData
+              ? "CẬP NHẬT BÁO CÁO QUÂN SỐ"
+              : "TẠO BÁO CÁO QUÂN SỐ HẰNG NGÀY"}
           </h2>
-          <button className={styles.closeBtn} onClick={onClose}>
-            <FontAwesomeIcon icon={faXmark} />
+          <button type="button" className={styles.closeBtn} onClick={onClose}>
+            &times;
           </button>
         </div>
 
         <div className={styles.body}>
-          {/* Core Info */}
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>Thông tin cơ bản</h3>
-            <div className={styles.gridCore}>
-              <div className={styles.field}>
-                <label className={styles.label}>Ngày báo cáo</label>
-                <input
-                  type="date"
-                  className={styles.input}
-                  value={formData.ngayBaoCao}
-                  onChange={(e) => handleChange("ngayBaoCao", e.target.value)}
-                />
-              </div>
-              <div className={styles.field}>
-                <label className={styles.label}>Tổng quân số</label>
-                <input
-                  type="number"
-                  className={styles.input}
-                  value={formData.tongQuanSo}
-                  onChange={(e) =>
-                    handleChange("tongQuanSo", parseInt(e.target.value) || 0)
-                  }
-                />
-              </div>
-              <div className={styles.field}>
-                <label className={styles.label}>Hiện diện</label>
-                <input
-                  type="number"
-                  className={styles.input}
-                  value={formData.hienDien}
-                  disabled
-                />
-              </div>
-              <div className={styles.field}>
-                <label className={styles.label}>Tổng vắng</label>
-                <input
-                  type="number"
-                  className={styles.input}
-                  value={formData.tongVang}
-                  disabled
-                />
-              </div>
+          <div className={styles.coreGrid}>
+            <div className={styles.field}>
+              <label className={styles.label}>Ngày báo cáo</label>
+              <input
+                type="date"
+                className={styles.input}
+                value={ngayBaoCao}
+                readOnly
+                disabled
+                required
+              />
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label}>
+                Tổng quân số biên chế
+                {tongQuanSoBienChe ? (
+                  <span className={styles.labelNote}> (từ hệ thống)</span>
+                ) : null}
+              </label>
+              <input
+                type="number"
+                className={`${styles.input} ${styles.inputDisabled}`}
+                value={tongQuanSo || ""}
+                readOnly
+                disabled
+                required
+                min={0}
+              />
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label}>Quân số hiện diện</label>
+              <input
+                type="number"
+                className={styles.input}
+                value={quanSoHienDien}
+                disabled
+              />
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label}>Tổng vắng</label>
+              <input
+                type="number"
+                className={styles.input}
+                value={quanSoVang}
+                disabled
+              />
             </div>
           </div>
 
-          {/* Quân số vắng */}
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>Chi tiết quân số vắng</h3>
+          <hr className={styles.divider} />
 
-            <div className={styles.absentCard}>
-              <h4 className={styles.cardTitle}>Hội thao</h4>
-              <div className={styles.absentGrid}>
-                <div className={styles.field}>
-                  <label className={styles.label}>Ngoài Sư Đoàn</label>
-                  <input
-                    type="number"
-                    className={styles.input}
-                    value={formData.hoiThaiNgoaiSuDoan}
-                    onChange={(e) =>
-                      handleChange(
-                        "hoiThaiNgoaiSuDoan",
-                        parseInt(e.target.value) || 0,
-                      )
-                    }
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label className={styles.label}>e, f</label>
-                  <input
-                    type="number"
-                    className={styles.input}
-                    value={formData.hoiThaiEF}
-                    onChange={(e) =>
-                      handleChange("hoiThaiEF", parseInt(e.target.value) || 0)
-                    }
-                  />
-                </div>
-              </div>
-            </div>
+          <div className={styles.sectionHeader}>
+            <h3 className={styles.sectionTitle}>
+              Danh sách chi tiết quân nhân vắng mặt trong ngày
+            </h3>
+            <button
+              type="button"
+              className={styles.btnAddRow}
+              onClick={handleAddRow}
+            >
+              + Thêm quân nhân vắng
+            </button>
+          </div>
 
-            <div className={styles.absentCard}>
-              <h4 className={styles.cardTitle}>Xây dựng</h4>
-              <div className={styles.absentGrid}>
-                <div className={styles.field}>
-                  <label className={styles.label}>Ngoài Sư Đoàn</label>
-                  <input
-                    type="number"
-                    className={styles.input}
-                    value={formData.xayDungNgoaiSuDoan}
-                    onChange={(e) =>
-                      handleChange(
-                        "xayDungNgoaiSuDoan",
-                        parseInt(e.target.value) || 0,
-                      )
-                    }
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label className={styles.label}>e, f</label>
-                  <input
-                    type="number"
-                    className={styles.input}
-                    value={formData.xayDungEF}
-                    onChange={(e) =>
-                      handleChange("xayDungEF", parseInt(e.target.value) || 0)
-                    }
-                  />
-                </div>
+          <div className={styles.tableContainer}>
+            {absentRows.length === 0 ? (
+              <div className={styles.emptyState}>
+                Không có quân nhân vắng mặt. Bấm nút "+ Thêm quân nhân vắng" để
+                bắt đầu nhập liệu.
               </div>
-            </div>
-
-            <div className={styles.absentCard}>
-              <h4 className={styles.cardTitle}>Khác</h4>
-              <div className={styles.gridStats}>
-                <div className={styles.field}>
-                  <label className={styles.label}>Chờ hưu</label>
-                  <input
-                    type="number"
-                    className={styles.input}
-                    value={formData.choHuu}
-                    onChange={(e) =>
-                      handleChange("choHuu", parseInt(e.target.value) || 0)
-                    }
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label className={styles.label}>Nghỉ tranh thu</label>
-                  <input
-                    type="number"
-                    className={styles.input}
-                    value={formData.nghiTranhThu}
-                    onChange={(e) =>
-                      handleChange(
-                        "nghiTranhThu",
-                        parseInt(e.target.value) || 0,
-                      )
-                    }
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label className={styles.label}>Phép</label>
-                  <input
-                    type="number"
-                    className={styles.input}
-                    value={formData.phep}
-                    onChange={(e) =>
-                      handleChange("phep", parseInt(e.target.value) || 0)
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.absentCard}>
-              <h4 className={styles.cardTitle}>Viện</h4>
-              <div className={styles.absentGrid}>
-                <div className={styles.field}>
-                  <label className={styles.label}>Ngoài Sư Đoàn</label>
-                  <input
-                    type="number"
-                    className={styles.input}
-                    value={formData.vienNgoaiSuDoan}
-                    onChange={(e) =>
-                      handleChange(
-                        "vienNgoaiSuDoan",
-                        parseInt(e.target.value) || 0,
-                      )
-                    }
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label className={styles.label}>e, f</label>
-                  <input
-                    type="number"
-                    className={styles.input}
-                    value={formData.vienEF}
-                    onChange={(e) =>
-                      handleChange("vienEF", parseInt(e.target.value) || 0)
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.absentCard}>
-              <h4 className={styles.cardTitle}>Công tác</h4>
-              <div className={styles.absentGrid}>
-                <div className={styles.field}>
-                  <label className={styles.label}>Ngoài Sư Đoàn</label>
-                  <input
-                    type="number"
-                    className={styles.input}
-                    value={formData.congTacNgoaiSuDoan}
-                    onChange={(e) =>
-                      handleChange(
-                        "congTacNgoaiSuDoan",
-                        parseInt(e.target.value) || 0,
-                      )
-                    }
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label className={styles.label}>Sư đoàn</label>
-                  <input
-                    type="number"
-                    className={styles.input}
-                    value={formData.congTacSuDoan}
-                    onChange={(e) =>
-                      handleChange(
-                        "congTacSuDoan",
-                        parseInt(e.target.value) || 0,
-                      )
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.absentCard}>
-              <h4 className={styles.cardTitle}>Học</h4>
-              <div className={styles.absentGrid}>
-                <div className={styles.field}>
-                  <label className={styles.label}>SQ (Sĩ quan)</label>
-                  <input
-                    type="number"
-                    className={styles.input}
-                    value={formData.hocSQ}
-                    onChange={(e) =>
-                      handleChange("hocSQ", parseInt(e.target.value) || 0)
-                    }
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label className={styles.label}>CS (Chiến sĩ)</label>
-                  <input
-                    type="number"
-                    className={styles.input}
-                    value={formData.hocCS}
-                    onChange={(e) =>
-                      handleChange("hocCS", parseInt(e.target.value) || 0)
-                    }
-                  />
-                </div>
-              </div>
-            </div>
+            ) : (
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th style={{ width: "60px" }} className={styles.textCenter}>
+                      STT
+                    </th>
+                    <th style={{ minWidth: "200px" }}>Họ và tên</th>
+                    <th style={{ width: "150px" }}>Cấp bậc</th>
+                    <th style={{ width: "180px" }}>Chức vụ</th>
+                    <th style={{ width: "240px" }}>Lý do vắng</th>
+                    <th style={{ minWidth: "200px" }}>Ghi chú chi tiết</th>
+                    <th style={{ width: "60px" }} className={styles.textCenter}>
+                      Xóa
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {absentRows.map((row, index) => (
+                    <tr key={row.id}>
+                      <td className={styles.textCenter}>{index + 1}</td>
+                      <td>
+                        <input
+                          type="text"
+                          className={styles.tableInput}
+                          value={row.hoTen}
+                          onChange={(e) =>
+                            handleUpdateRow(row.id, "hoTen", e.target.value)
+                          }
+                          placeholder="Nhập họ và tên..."
+                          required
+                        />
+                      </td>
+                      <td>
+                        <select
+                          className={styles.tableSelect}
+                          value={row.capBac}
+                          onChange={(e) =>
+                            handleUpdateRow(row.id, "capBac", e.target.value)
+                          }
+                        >
+                          {CAP_BAC_OPTIONS.map((cb) => (
+                            <option key={cb} value={cb}>
+                              {cb}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+                      <td>
+                        <select
+                          className={styles.tableSelect}
+                          value={row.chucVu}
+                          onChange={(e) =>
+                            handleUpdateRow(row.id, "chucVu", e.target.value)
+                          }
+                        >
+                          {CHUC_VU_OPTIONS.map((cv) => (
+                            <option key={cv} value={cv}>
+                              {cv}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+                      <td>
+                        <select
+                          className={styles.tableSelect}
+                          value={row.lyDoVang}
+                          onChange={(e) =>
+                            handleUpdateRow(
+                              row.id,
+                              "lyDoVang",
+                              e.target.value as keyof VangChiTiet,
+                            )
+                          }
+                        >
+                          {LY_DO_OPTIONS.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          className={styles.tableInput}
+                          value={row.ghiChu}
+                          onChange={(e) =>
+                            handleUpdateRow(row.id, "ghiChu", e.target.value)
+                          }
+                          placeholder="Nơi đi công tác, bệnh xá, học viện..."
+                        />
+                      </td>
+                      <td className={styles.textCenter}>
+                        <button
+                          type="button"
+                          className={styles.btnDeleteRow}
+                          onClick={() => handleRemoveRow(row.id)}
+                          title="Xóa dòng"
+                        >
+                          🗑️
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
 
         <div className={styles.footer}>
           <button
-            className={`${styles.btn} ${styles.btnDraft}`}
-            onClick={handleSubmit}
-            disabled={loading}
+            type="button"
+            className={`${styles.btn} ${styles.btnCancel}`}
+            onClick={onClose}
           >
-            Lưu nháp
+            Hủy bỏ
           </button>
-          <button
-            className={`${styles.btn} ${styles.btnSubmit}`}
-            onClick={handleSubmit}
-            disabled={loading}
-          >
-            {mode === "edit" ? "Cập nhật" : "Nộp báo cáo"}
+          <button type="submit" className={`${styles.btn} ${styles.btnSubmit}`}>
+            {initialData ? "Cập nhật báo cáo" : "Nộp báo cáo quân số"}
           </button>
         </div>
-      </div>
+      </form>
     </div>
   );
-}
+};
+
+export default CreateReportModal;

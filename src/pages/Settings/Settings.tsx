@@ -1,42 +1,99 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserCog } from "@fortawesome/free-solid-svg-icons";
 
 import { accountService } from "../../services/account/accountService";
-import type { Account } from "../../types/account";
+import { donviService } from "../../services/unit/unitService";
+import { useToast } from "../../context/useToast";
+import type { Account, DonVi } from "../../types/account";
 
 import styles from "./Settings.module.css";
 
 export default function Settings() {
   const [account, setAccount] = useState<Account | null>(null);
+  const [donVi, setDonVi] = useState<DonVi | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [quanSoHsqBs, setQuanSoHsqBs] = useState(0);
+  const [quanSoSiQuan, setQuanSoSiQuan] = useState(0);
+  const [quanSoQncn, setQuanSoQncn] = useState(0);
+  const [saving, setSaving] = useState(false);
+
+  const { showError } = useToast();
+
+  const quanSoTong = useMemo(
+    () => quanSoSiQuan + quanSoHsqBs + quanSoQncn,
+    [quanSoSiQuan, quanSoHsqBs, quanSoQncn],
+  );
+
   useEffect(() => {
-    const fetchAccount = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await accountService.getAccount();
-        if (response.success) {
-          setAccount(response.Result);
-        } else {
-          setError(response.message || "Không thể tải thông tin tài khoản");
+
+        const accountRes = await accountService.getAccount();
+        if (!accountRes.success) {
+          setError(accountRes.message || "Không thể tải thông tin tài khoản");
+          return;
+        }
+
+        const acc = accountRes.Result;
+        setAccount(acc);
+
+        if (acc.donVi?.maDonVi) {
+          const allUnits = await donviService.getDonVi();
+          const unit = allUnits.find((u) => u.maDonVi === acc.donVi!.maDonVi);
+          if (unit) {
+            setDonVi(unit);
+            setQuanSoHsqBs(unit.quanSoHsqBs);
+            setQuanSoSiQuan(unit.quanSoSiQuan);
+            setQuanSoQncn(unit.quanSoQncn);
+          }
         }
       } catch (err) {
-        setError("Có lỗi xảy ra khi tải thông tin tài khoản");
-        console.error("Failed to fetch account:", err);
+        setError("Có lỗi xảy ra khi tải thông tin");
+        console.error("Failed to fetch data:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchAccount();
+    fetchData();
   }, []);
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString("vi-VN");
+  const handleUpdateDonVi = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!donVi) return;
+
+    setSaving(true);
+    try {
+      const response = await donviService.updateDonVi(donVi.maDonVi, {
+        quanSoTong,
+        quanSoHsqBs,
+        quanSoSiQuan,
+        quanSoQncn,
+        createdAt: donVi.createdAt,
+        updatedAt: new Date().toISOString(),
+        isDeleted: donVi.isDeleted,
+        deletedAt: donVi.deletedAt,
+      });
+
+      if (response.success) {
+        setDonVi(response.Result);
+        setQuanSoHsqBs(response.Result.quanSoHsqBs);
+        setQuanSoSiQuan(response.Result.quanSoSiQuan);
+        setQuanSoQncn(response.Result.quanSoQncn);
+      } else {
+        showError(response.message || "Cập nhật thất bại");
+      }
+    } catch (err) {
+      showError("Có lỗi xảy ra khi cập nhật đơn vị");
+      console.error("Failed to update unit:", err);
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) {
@@ -86,6 +143,7 @@ export default function Settings() {
         </div>
       </div>
 
+      {/* Card 1: Thông tin cá nhân */}
       <div className={styles.card}>
         <div className={styles.cardHeader}>
           <h2 className={styles.cardTitle}>Thông tin cá nhân</h2>
@@ -120,32 +178,84 @@ export default function Settings() {
                 disabled
               />
             </div>
-
-            {/* <div className={styles.formGroup}>
-              <label>Account ID</label>
-              <input type="text" value={account.idTaiKhoan} disabled />
-            </div>
-
-            <div className={styles.formGroup}>
-              <label>Ngày tạo</label>
-              <input
-                type="text"
-                value={formatDate(account.createdAt)}
-                disabled
-              />
-            </div>
-
-            <div className={styles.formGroup}>
-              <label>Ngày cập nhật</label>
-              <input
-                type="text"
-                value={formatDate(account.updatedAt)}
-                disabled
-              />
-            </div> */}
           </div>
         </div>
       </div>
+
+      {donVi && (
+        <div className={styles.cardSection}>
+          <div className={styles.cardHeader}>
+            <div className={styles.cardTitleRow}>
+              <h2 className={styles.cardTitle}>
+                Cập nhật thông tin đơn vị — {donVi.tenDonvi}
+              </h2>
+            </div>
+          </div>
+
+          <form className={styles.form} onSubmit={handleUpdateDonVi}>
+            <div className={styles.infoGrid}>
+              <div className={styles.formGroup}>
+                <label>Tổng quân số biên chế</label>
+                <input
+                  type="number"
+                  value={quanSoTong}
+                  readOnly
+                  disabled
+                  className={styles.inputDisabled}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Quân số Sĩ quan</label>
+                <input
+                  type="number"
+                  min={0}
+                  value={quanSoSiQuan || ""}
+                  onChange={(e) =>
+                    setQuanSoSiQuan(parseInt(e.target.value, 10) || 0)
+                  }
+                  required
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Quân số HSQ-BS</label>
+                <input
+                  type="number"
+                  min={0}
+                  value={quanSoHsqBs || ""}
+                  onChange={(e) =>
+                    setQuanSoHsqBs(parseInt(e.target.value, 10) || 0)
+                  }
+                  required
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Quân số QNCN</label>
+                <input
+                  type="number"
+                  min={0}
+                  value={quanSoQncn || ""}
+                  onChange={(e) =>
+                    setQuanSoQncn(parseInt(e.target.value, 10) || 0)
+                  }
+                  required
+                />
+              </div>
+            </div>
+
+            <div className={styles.formActions}>
+              <button
+                type="submit"
+                className={styles.saveBtn}
+                disabled={saving}
+              >
+                {saving ? "Đang lưu..." : "Lưu thay đổi"}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 }

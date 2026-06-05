@@ -63,3 +63,21 @@ export interface DonViResponse {
   message: string;
   Result: DonVi[];
 }
+
+export interface UpdateDonViRequest {
+  quanSoTong: number;
+  quanSoHsqBs: number;
+  quanSoSiQuan: number;
+  quanSoQncn: number;
+  createdAt: string;
+  updatedAt: string;
+  isDeleted: boolean;
+  deletedAt: string | null;
+}
+
+export interface UpdateDonViResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  Result: DonVi;
+}

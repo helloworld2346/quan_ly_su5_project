@@ -14,12 +14,22 @@ export interface VangChiTiet {
   hocCS: number;
 }
 
+export interface AbsentRow {
+  id: string;
+  hoTen: string;
+  capBac: string;
+  chucVu: string;
+  lyDoVang: keyof VangChiTiet;
+  ghiChu: string;
+}
+
 export interface CreateReportRequest {
   quanSoTong: number;
   quanSoHienDien: number;
   quanSoVang: number;
   thoiGianBaoCao: string;
   thongTinVang: string;
+  chiTietVang?: string;
   donVi: string;
 }
 
@@ -32,9 +42,11 @@ export interface CreateReportResponse {
     quanSoHienDien: number;
     quanSoTong: number;
     quanSoVang: number;
+    ghiChu?: string;
     status: string;
     thoiGianBaoCao: string;
     thongTinVang: string;
+    chiTietVang?: string;
     donVi: {
       maDonVi: string;
       tenDonvi: string;
@@ -60,6 +72,7 @@ export interface UpdateReportRequest {
   quanSoVang: number;
   thoiGianBaoCao: string;
   thongTinVang: string;
+  chiTietVang?: string;
   account: string;
   donVi: string;
 }
@@ -76,6 +89,7 @@ export interface UpdateReportResponse {
     status: string;
     thoiGianBaoCao: string;
     thongTinVang: string;
+    chiTietVang?: string;
     donVi: {
       maDonVi: string;
       tenDonvi: string;
@@ -128,7 +142,8 @@ export interface ApproveResponse {
 
 export interface RefuseRequest {
   ghiChu: string;
-}  
+}
+
 export interface RefuseResponse {
   success: boolean;
   code: number;
@@ -173,6 +188,7 @@ export interface SearchReportResponse {
     status: string;
     thoiGianBaoCao: string;
     thongTinVang: string;
+    chiTietVang?: string;
     donVi: {
       maDonVi: string;
       tenDonvi: string;
@@ -204,6 +220,7 @@ export interface SearchChildrenResponse {
     status: string;
     thoiGianBaoCao: string;
     thongTinVang: string;
+    chiTietVang?: string;
     donVi: {
       maDonVi: string;
       tenDonvi: string;
