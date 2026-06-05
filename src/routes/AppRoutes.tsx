@@ -13,55 +13,12 @@ type Props = {
   onLogout: () => void;
 };
 
-function normalizeRoleName(role: string | undefined): string {
-  if (!role) return "";
-
-  if (role.includes("Báo cáo") || role.includes("Báo Ban")) {
-    return "Báo cáo";
-  }
-  if (role.includes("Chỉ huy")) {
-    return "Chỉ huy";
-  }
-  if (role.includes("Sư đoàn")) {
-    return "Sư đoàn";
-  }
-  if (role.includes("Quản Trị Viên") || role.includes("Admin")) {
-    return "Quản Trị Viên";
-  }
-  return role;
-}
-
-function getDefaultRouteByRole(
-  role: string | undefined,
-  isParentUnit = false,
-): string {
-  if (!role) return "/settings";
-
-  const normalizedRole = normalizeRoleName(role);
-
-  if (normalizedRole === "Sư đoàn" || normalizedRole === "Quản Trị Viên") {
-    return "/dashboard";
-  }
-  if (normalizedRole === "Báo cáo") {
-    return isParentUnit ? "/report-consolidation" : "/daily-report";
-  }
-  if (normalizedRole === "Chỉ huy") {
-    return "/report-approval";
-  }
-  return "/settings";
-}
-
 export default function AppRoutes({
   isAuthenticated,
   onLoginSuccess,
   onLogout,
 }: Props) {
-  const { account, isParentUnit } = useAuth();
-  const userRole = account?.vaiTro?.tenVaiTro;
-  const defaultRoute = getDefaultRouteByRole(
-    userRole ?? undefined,
-    isParentUnit(),
-  );
+  const { account } = useAuth();
 
   return (
     <Routes>
@@ -71,7 +28,7 @@ export default function AppRoutes({
         path="/login"
         element={
           isAuthenticated && account ? (
-            <Navigate to={defaultRoute} replace />
+            <Navigate to="/settings" replace />
           ) : (
             <Login onSuccess={onLoginSuccess} />
           )
@@ -99,10 +56,7 @@ export default function AppRoutes({
       <Route
         path="*"
         element={
-          <Navigate
-            to={isAuthenticated ? defaultRoute : "/login"}
-            replace
-          />
+          <Navigate to={isAuthenticated ? "/settings" : "/login"} replace />
         }
       />
     </Routes>

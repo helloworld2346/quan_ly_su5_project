@@ -7,8 +7,6 @@ import {
   faChartColumn,
   faClipboardList,
   faGear,
-  faCheckCircle,
-  faFileExport,
 } from "@fortawesome/free-solid-svg-icons";
 
 import styles from "./Sidebar.module.css";
@@ -17,7 +15,6 @@ import logo from "../../../assets/images/logo-su5.png";
 import {
   EXECUTIVE_NAV,
   REPORT_NAV_GROUP,
-  APPROVAL_NAV_GROUP,
   DUTY_NAV_GROUP,
   SETTINGS_NAV,
   type NavItemId,
@@ -35,10 +32,8 @@ type Props = {
   onLogout?: () => void;
   collapsed?: boolean;
   onExpand?: () => void;
-  
 };
 
-// FIX 1: Nới lỏng kiểu dữ liệu targetRef để chấp nhận 'null' giống như bản chất các React Ref
 type TooltipState = {
   text: string;
   targetRef: React.RefObject<HTMLElement | null>;
@@ -61,8 +56,6 @@ export default function Sidebar({
     "report-training": faChartColumn,
     "report-family": faChartColumn,
     "report-communication": faChartColumn,
-    "report-approval": faCheckCircle,
-    "report-consolidation": faFileExport,
     "duty-command": faClipboardList,
     "duty-tactical": faClipboardList,
     settings: faGear,
@@ -72,17 +65,12 @@ export default function Sidebar({
     (item) =>
       item.id === activeId && allowedNavItems.some((nav) => nav.id === item.id),
   );
-  const approvalActive = APPROVAL_NAV_GROUP.items.some(
-    (item) =>
-      item.id === activeId && allowedNavItems.some((nav) => nav.id === item.id),
-  );
   const dutyActive = DUTY_NAV_GROUP.items.some(
     (item) =>
       item.id === activeId && allowedNavItems.some((nav) => nav.id === item.id),
   );
 
   const [reportsOpen, setReportsOpen] = useNavGroupState("reportsOpen");
-  const [approvalOpen, setApprovalOpen] = useNavGroupState("approvalOpen");
   const [dutyOpen, setDutyOpen] = useNavGroupState("dutyOpen");
 
   const [prevCollapsed, setPrevCollapsed] = useState(collapsed);
@@ -112,9 +100,6 @@ export default function Sidebar({
       if (!reportActive) {
         setReportsOpen(false);
       }
-      if (!approvalActive) {
-        setApprovalOpen(false);
-      }
       if (!dutyActive) {
         setDutyOpen(false);
       }
@@ -123,9 +108,6 @@ export default function Sidebar({
 
   const showExecutive = allowedNavItems.some((nav) => nav.id === "executive");
   const showReportGroup = REPORT_NAV_GROUP.items.some((item) =>
-    allowedNavItems.some((nav) => nav.id === item.id),
-  );
-  const showApprovalGroup = APPROVAL_NAV_GROUP.items.some((item) =>
     allowedNavItems.some((nav) => nav.id === item.id),
   );
   const showDutyGroup = DUTY_NAV_GROUP.items.some((item) =>
@@ -189,31 +171,10 @@ export default function Sidebar({
               isOpen={reportsOpen}
               onToggle={() => setReportsOpen(!reportsOpen)}
               activeId={activeId}
-              // FIX 2: Ép kiểu string từ NavGroup về NavItemId khi kích hoạt định tuyến điều hướng
               onNavigate={(id) => onNavigate(id as NavItemId)}
               collapsed={collapsed}
               onExpand={onExpand}
               isActive={reportActive}
-              onTooltipEnter={handleTooltipEnter}
-              onTooltipLeave={handleTooltipLeave}
-            />
-          )}
-
-          {showApprovalGroup && (
-            <NavGroup
-              label={APPROVAL_NAV_GROUP.label}
-              icon={faCheckCircle}
-              items={APPROVAL_NAV_GROUP.items.filter((item) =>
-                allowedNavItems.some((nav) => nav.id === item.id),
-              )}
-              isOpen={approvalOpen}
-              onToggle={() => setApprovalOpen(!approvalOpen)}
-              activeId={activeId}
-              // FIX 2: Tương tự ép kiểu dữ liệu callback an toàn
-              onNavigate={(id) => onNavigate(id as NavItemId)}
-              collapsed={collapsed}
-              onExpand={onExpand}
-              isActive={approvalActive}
               onTooltipEnter={handleTooltipEnter}
               onTooltipLeave={handleTooltipLeave}
             />
@@ -229,7 +190,6 @@ export default function Sidebar({
               isOpen={dutyOpen}
               onToggle={() => setDutyOpen(!dutyOpen)}
               activeId={activeId}
-              // FIX 2: Tương tự ép kiểu dữ liệu callback an toàn
               onNavigate={(id) => onNavigate(id as NavItemId)}
               collapsed={collapsed}
               onExpand={onExpand}
