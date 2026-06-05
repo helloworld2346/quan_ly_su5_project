@@ -14,10 +14,11 @@ import TroopDetailModal from "./TroopDetailModal";
 import CreateReportModal from "./CreateReportModal";
 import RefuseDialog from "../../components/ui/RefuseDialog/RefuseDialog";
 import { dailyReportService } from "../../services/dailyReport/dailyReportService";
-import { donviService } from "../../services/unit/unitService"; // [THÊM]
+import { donviService } from "../../services/unit/unitService";
 import { useAuth } from "../../context/useAuth";
 import { useToast } from "../../context/useToast";
 import type {
+  AbsentRow,
   VangChiTiet,
   CreateReportResponse,
   UpdateReportRequest,
@@ -43,8 +44,6 @@ interface ReportRow {
   quanSoVang: number;
   vang: VangChiTiet;
   chiTietVangList: ChiTietVangQuanNhan[];
-  trucChiHuy: string;
-  trucBan: string;
   status: string;
   ghiChu: string;
   rawItem: CreateReportResponse["Result"];
@@ -74,6 +73,22 @@ function normalizeRoleName(role: string | null | undefined): string {
   return role;
 }
 
+const EMPTY_VANG: VangChiTiet = {
+  hoiThaiNgoaiSuDoan: 0,
+  hoiThaiEF: 0,
+  xayDungNgoaiSuDoan: 0,
+  xayDungEF: 0,
+  choHuu: 0,
+  nghiTranhThu: 0,
+  phep: 0,
+  vienNgoaiSuDoan: 0,
+  vienEF: 0,
+  congTacNgoaiSuDoan: 0,
+  congTacSuDoan: 0,
+  hocSQ: 0,
+  hocCS: 0,
+};
+
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
   const [reportDate, setReportDate] = useState(todayIsoDate());
@@ -83,6 +98,7 @@ export default function DailyTroopReport() {
   );
 
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showConsolidateModal, setShowConsolidateModal] = useState(false);
   const [editModalData, setEditModalData] = useState<EditModalData | null>(
     null,
   );
@@ -103,24 +119,28 @@ export default function DailyTroopReport() {
   const { account } = useAuth();
   const { showError, showSuccess } = useToast();
 
+  const maDonViCurrent = account?.donVi?.maDonVi;
+
+  // Tính isParentUnit ở scope component để dùng trong JSX
+  const isParentUnit = useMemo(() => {
+    return maDonViCurrent ? maDonViCurrent.split(".").length < 3 : false;
+  }, [maDonViCurrent]);
+
   const fetchReports = useCallback(async () => {
-    if (!account?.donVi?.maDonVi) return;
+    if (!maDonViCurrent) return;
 
     setLoading(true);
     try {
-      const maDonVi = account.donVi.maDonVi;
       let response;
-
-      const isParentUnit = maDonVi.split(".").length < 3;
 
       if (isParentUnit) {
         response = await dailyReportService.searchChildrenReports(
-          maDonVi,
+          maDonViCurrent,
           reportDate,
         );
       } else {
         response = await dailyReportService.searchReportByUnitAndDate(
-          maDonVi,
+          maDonViCurrent,
           reportDate,
         );
       }
@@ -131,21 +151,7 @@ export default function DailyTroopReport() {
           : [response.Result];
 
         const mappedData: ReportRow[] = data.map((item) => {
-          let vang: VangChiTiet = {
-            hoiThaiNgoaiSuDoan: 0,
-            hoiThaiEF: 0,
-            xayDungNgoaiSuDoan: 0,
-            xayDungEF: 0,
-            choHuu: 0,
-            nghiTranhThu: 0,
-            phep: 0,
-            vienNgoaiSuDoan: 0,
-            vienEF: 0,
-            congTacNgoaiSuDoan: 0,
-            congTacSuDoan: 0,
-            hocSQ: 0,
-            hocCS: 0,
-          };
+          let vang: VangChiTiet = { ...EMPTY_VANG };
           let chiTietVangList: ChiTietVangQuanNhan[] = [];
 
           try {
@@ -173,8 +179,6 @@ export default function DailyTroopReport() {
             quanSoVang: item.quanSoVang,
             vang,
             chiTietVangList,
-            trucChiHuy: item.caTruc?.trucChiHuy?.tenNguoitruc || "",
-            trucBan: item.caTruc?.trucBanTacChien?.tenNguoitruc || "",
             status: item.status,
             ghiChu: item.ghiChu || "",
             rawItem: item,
@@ -194,12 +198,12 @@ export default function DailyTroopReport() {
     } finally {
       setLoading(false);
     }
-  }, [account, reportDate, showError]);
+  }, [maDonViCurrent, isParentUnit, reportDate, showError]);
 
   useEffect(() => {
     let isCurrent = true;
 
-    if (isCurrent && account?.donVi?.maDonVi) {
+    if (isCurrent && maDonViCurrent) {
       Promise.resolve().then(() => {
         fetchReports();
       });
@@ -208,10 +212,9 @@ export default function DailyTroopReport() {
     return () => {
       isCurrent = false;
     };
-  }, [fetchReports, account?.donVi?.maDonVi]);
+  }, [fetchReports, maDonViCurrent]);
 
-  const maDonViCurrent = account?.donVi?.maDonVi;
-
+  // Fetch quanSoTong từ thông tin đơn vị
   useEffect(() => {
     const fetchDonViInfo = async () => {
       if (!maDonViCurrent) return;
@@ -227,6 +230,65 @@ export default function DailyTroopReport() {
     };
     fetchDonViInfo();
   }, [maDonViCurrent]);
+
+  // Tính tổng hợp từ báo cáo đơn vị con (chỉ dùng cho đơn vị cha)
+  const consolidatedData = useMemo(() => {
+    if (!isParentUnit || reportData.length === 0) return null;
+
+    const submittedReports = reportData.filter(
+      (r) => r.status !== "Chưa_Nộp" && r.status !== "Chưa nộp",
+    );
+
+    const quanSoTong = submittedReports.reduce(
+      (sum, r) => sum + r.quanSoTong,
+      0,
+    );
+    const quanSoVang = submittedReports.reduce(
+      (sum, r) => sum + r.quanSoVang,
+      0,
+    );
+    const quanSoHienDien = quanSoTong - quanSoVang;
+
+    const thongTinVang: VangChiTiet = submittedReports.reduce(
+      (acc, r) => ({
+        hoiThaiNgoaiSuDoan: acc.hoiThaiNgoaiSuDoan + r.vang.hoiThaiNgoaiSuDoan,
+        hoiThaiEF: acc.hoiThaiEF + r.vang.hoiThaiEF,
+        xayDungNgoaiSuDoan: acc.xayDungNgoaiSuDoan + r.vang.xayDungNgoaiSuDoan,
+        xayDungEF: acc.xayDungEF + r.vang.xayDungEF,
+        choHuu: acc.choHuu + r.vang.choHuu,
+        nghiTranhThu: acc.nghiTranhThu + r.vang.nghiTranhThu,
+        phep: acc.phep + r.vang.phep,
+        vienNgoaiSuDoan: acc.vienNgoaiSuDoan + r.vang.vienNgoaiSuDoan,
+        vienEF: acc.vienEF + r.vang.vienEF,
+        congTacNgoaiSuDoan: acc.congTacNgoaiSuDoan + r.vang.congTacNgoaiSuDoan,
+        congTacSuDoan: acc.congTacSuDoan + r.vang.congTacSuDoan,
+        hocSQ: acc.hocSQ + r.vang.hocSQ,
+        hocCS: acc.hocCS + r.vang.hocCS,
+      }),
+      { ...EMPTY_VANG },
+    );
+
+    const absentRows: AbsentRow[] = submittedReports.flatMap((r) =>
+      r.chiTietVangList.map((m) => ({
+        id: crypto.randomUUID(),
+        hoTen: m.hoTen,
+        capBac: m.capBac,
+        chucVu: m.chucVu,
+        lyDoVang: m.lyDoVang as keyof VangChiTiet,
+        ghiChu: m.ghiChu,
+      })),
+    );
+
+    return {
+      quanSoTong,
+      quanSoVang,
+      quanSoHienDien,
+      thongTinVang,
+      absentRows,
+      submittedCount: submittedReports.length,
+      totalCount: reportData.length,
+    };
+  }, [isParentUnit, reportData]);
 
   const handleToggleMenu = (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -268,7 +330,7 @@ export default function DailyTroopReport() {
   }, [activeMenuUnit]);
 
   const checkIfDateHasReport = useMemo(() => {
-    if (!account?.donVi?.maDonVi) return false;
+    if (!maDonViCurrent) return false;
 
     const selectedDate = new Date(reportDate);
     const today = new Date();
@@ -277,14 +339,13 @@ export default function DailyTroopReport() {
     const isPastDate = selectedDate < today;
     if (isPastDate) return true;
 
-    const currentUnit = account.donVi.maDonVi;
     return reportData.some(
       (report) =>
-        report.donVi === currentUnit &&
+        report.donVi === maDonViCurrent &&
         report.status !== "Từ_Chối" &&
         report.status !== "Từ chối",
     );
-  }, [reportData, account?.donVi?.maDonVi, reportDate]);
+  }, [reportData, maDonViCurrent, reportDate]);
 
   const handleAddReport = () => {
     const selectedDate = new Date(reportDate);
@@ -369,6 +430,10 @@ export default function DailyTroopReport() {
     console.log("Xuất file Excel");
   };
 
+  const handleConsolidate = () => {
+    setShowConsolidateModal(true);
+  };
+
   const filteredRows = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return reportData;
@@ -393,8 +458,6 @@ export default function DailyTroopReport() {
         row.vang.congTacSuDoan,
         row.vang.hocSQ,
         row.vang.hocCS,
-        row.trucChiHuy,
-        row.trucBan,
         row.ghiChu,
       ]
         .join(" ")
@@ -448,6 +511,10 @@ export default function DailyTroopReport() {
     );
   }, [reportData]);
 
+  const caTrucInfo = useMemo(() => {
+    return reportData.length > 0 ? reportData[0].rawItem.caTruc : null;
+  }, [reportData]);
+
   const userRole = account?.vaiTro?.tenVaiTro;
   const normalizedRole = normalizeRoleName(userRole);
   const isCommander = normalizedRole === "Chỉ huy";
@@ -468,7 +535,16 @@ export default function DailyTroopReport() {
         onQueryChange={setQuery}
         reportDate={reportDate}
         onReportDateChange={setReportDate}
-        onAddReport={isCommander ? undefined : handleAddReport}
+        onAddReport={isCommander || isParentUnit ? undefined : handleAddReport}
+        onConsolidate={isParentUnit ? handleConsolidate : undefined}
+        consolidateDisabled={
+          !consolidatedData || consolidatedData.submittedCount === 0
+        }
+        consolidateLabel={
+          consolidatedData && consolidatedData.submittedCount > 0
+            ? `Tổng hợp (${consolidatedData.submittedCount}/${consolidatedData.totalCount} đơn vị)`
+            : "Chưa có báo cáo con"
+        }
         onExportWord={handleExportWord}
         onExportExcel={handleExportExcel}
         hasReport={checkIfDateHasReport}
@@ -486,8 +562,6 @@ export default function DailyTroopReport() {
                 <th rowSpan={3}>Hiện diện</th>
                 <th rowSpan={3}>Tổng vắng</th>
                 <th colSpan={13}>Quân số vắng</th>
-                <th rowSpan={3}>Trực chỉ huy</th>
-                <th rowSpan={3}>Trực ban</th>
                 <th rowSpan={3}>Trạng thái</th>
                 <th rowSpan={3}>Ghi chú</th>
                 <th rowSpan={3}>Thao tác</th>
@@ -519,13 +593,14 @@ export default function DailyTroopReport() {
             <tbody>
               {filteredRows.length === 0 ? (
                 <tr className={styles.noReportRow}>
-                  <td colSpan={23}>Không có dữ liệu báo cáo</td>
+                  <td colSpan={21}>Không có dữ liệu báo cáo</td>
                 </tr>
               ) : (
                 filteredRows.map((row) => {
                   const isMenuOpen = activeMenuUnit === row.donVi;
                   const canEdit =
                     isReporter &&
+                    !isParentUnit &&
                     (row.status === "Từ_Chối" ||
                       row.status === "Từ chối" ||
                       row.status === "Chờ_Duyệt");
@@ -551,8 +626,6 @@ export default function DailyTroopReport() {
                       <td>{row.vang.congTacSuDoan}</td>
                       <td>{row.vang.hocSQ}</td>
                       <td>{row.vang.hocCS}</td>
-                      <td>{row.trucChiHuy}</td>
-                      <td>{row.trucBan}</td>
                       <td>
                         <ReportStatusBadge status={row.status} />
                       </td>
@@ -673,13 +746,63 @@ export default function DailyTroopReport() {
                 <td></td>
                 <td></td>
                 <td></td>
-                <td></td>
-                <td></td>
               </tr>
             </tbody>
           </table>
         )}
       </div>
+
+      {caTrucInfo && (
+        <div className={styles.caTrucSection}>
+          <div className={styles.caTrucHeader}>Thông tin ca trực</div>{" "}
+          <div className={styles.caTrucNgay}>
+            {caTrucInfo.ngaytruc
+              ? new Date(caTrucInfo.ngaytruc).toLocaleDateString("vi-VN", {
+                  weekday: "long",
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })
+              : ""}
+          </div>
+          <div className={styles.caTrucBody}>
+            <div className={styles.caTrucLeft}>
+              <div className={styles.caTrucPerson}>
+                <span className={styles.caTrucRole}>Trực chỉ huy</span>
+                <span className={styles.caTrucName}>
+                  {[
+                    caTrucInfo.trucChiHuy?.capbacNguoitruc,
+                    caTrucInfo.trucChiHuy?.chucvuNguoitruc,
+                    caTrucInfo.trucChiHuy?.tenNguoitruc,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </span>
+              </div>
+              <div className={styles.caTrucDivider} />
+              <div className={styles.caTrucPerson}>
+                <span className={styles.caTrucRole}>Trực ban tác chiến</span>
+                <span className={styles.caTrucName}>
+                  {[
+                    caTrucInfo.trucBanTacChien?.capbacNguoitruc,
+                    caTrucInfo.trucBanTacChien?.chucvuNguoitruc,
+                    caTrucInfo.trucBanTacChien?.tenNguoitruc,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </span>
+              </div>
+            </div>
+
+            <div className={styles.caTrucRight}>
+              <span className={styles.caTrucMatKhauLabel}>Mật khẩu</span>
+              <span className={styles.caTrucMatKhau}>
+                {caTrucInfo.matkhau || "—"}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {selectedReportRow && (
         <TroopDetailModal
@@ -712,7 +835,7 @@ export default function DailyTroopReport() {
               });
             }
           }}
-          maDonViCurrent={account?.donVi?.maDonVi}
+          maDonViCurrent={maDonViCurrent}
           tongQuanSoBienChe={donViQuanSoTong || undefined}
         />
       )}
@@ -742,8 +865,32 @@ export default function DailyTroopReport() {
               });
             }
           }}
-          maDonViCurrent={account?.donVi?.maDonVi}
+          maDonViCurrent={maDonViCurrent}
           tongQuanSoBienChe={donViQuanSoTong || undefined}
+        />
+      )}
+
+      {/* Modal tổng hợp báo cáo — chỉ cho đơn vị cha */}
+      {showConsolidateModal && consolidatedData && (
+        <CreateReportModal
+          isOpen={showConsolidateModal}
+          onClose={() => setShowConsolidateModal(false)}
+          maDonViCurrent={maDonViCurrent}
+          tongQuanSoBienChe={consolidatedData.quanSoTong}
+          consolidatedAbsentRows={consolidatedData.absentRows}
+          onSubmit={async (payload) => {
+            try {
+              await dailyReportService.createReport(payload);
+              showSuccess("Tạo báo cáo tổng hợp thành công");
+              handleCreateSuccess();
+              setShowConsolidateModal(false);
+            } catch (error) {
+              handleApiError(error, {
+                showError,
+                errorMessage: "Không thể tạo báo cáo tổng hợp",
+              });
+            }
+          }}
         />
       )}
 

@@ -45,7 +45,7 @@
   margin: 7px 0;  
   background: var(--input-divider);  
   flex-shrink: 0;  
-}  
+} 
   
 .searchIconBtn {  
   display: flex;  
@@ -219,10 +219,7 @@
   filter: invert(0.7) brightness(1.5) sepia(0.3) hue-rotate(90deg);  
   opacity: 0.8;  
 }  
-  
-/* ==========================================
-   RESPONSIVE (MEDIA QUERIES)
-   ========================================== */  
+
 @media (max-width: 768px) {  
   .toolbar {  
     flex-direction: column;  
@@ -249,4 +246,15 @@
     width: 100%;  
     flex-direction: column;  
   }  
+}
+
+.consolidateBtn {  
+  color: var(--text-white);  
+  background: var(--primary-color);  
+  border-color: var(--primary-color);  
+}  
+  
+.consolidateBtn:hover:not(:disabled) {  
+  background: var(--primary-hover);  
+  border-color: var(--primary-hover);  
 }

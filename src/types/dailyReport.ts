@@ -33,6 +33,22 @@ export interface CreateReportRequest {
   donVi: string;
 }
 
+interface CaTruc {
+  ngaytruc?: string;
+  matkhau?: string;
+  ghichu?: string;
+  trucBanTacChien: {
+    capbacNguoitruc: string;
+    chucvuNguoitruc: string;
+    tenNguoitruc: string;
+  };
+  trucChiHuy: {
+    capbacNguoitruc: string;
+    chucvuNguoitruc: string;
+    tenNguoitruc: string;
+  };
+}
+
 export interface CreateReportResponse {
   success: boolean;
   code: number;
@@ -51,18 +67,7 @@ export interface CreateReportResponse {
       maDonVi: string;
       tenDonvi: string;
     };
-    caTruc: {
-      trucBanTacChien: {
-        capbacNguoitruc: string;
-        chucvuNguoitruc: string;
-        tenNguoitruc: string;
-      };
-      trucChiHuy: {
-        capbacNguoitruc: string;
-        chucvuNguoitruc: string;
-        tenNguoitruc: string;
-      };
-    };
+    caTruc: CaTruc;
   };
 }
 
@@ -94,18 +99,7 @@ export interface UpdateReportResponse {
       maDonVi: string;
       tenDonvi: string;
     };
-    caTruc: {
-      trucBanTacChien: {
-        capbacNguoitruc: string;
-        chucvuNguoitruc: string;
-        tenNguoitruc: string;
-      };
-      trucChiHuy: {
-        capbacNguoitruc: string;
-        chucvuNguoitruc: string;
-        tenNguoitruc: string;
-      };
-    };
+    caTruc: CaTruc;
   };
 }
 
@@ -125,18 +119,7 @@ export interface ApproveResponse {
       maDonVi: string;
       tenDonvi: string;
     };
-    caTruc: {
-      trucBanTacChien: {
-        capbacNguoitruc: string;
-        chucvuNguoitruc: string;
-        tenNguoitruc: string;
-      };
-      trucChiHuy: {
-        capbacNguoitruc: string;
-        chucvuNguoitruc: string;
-        tenNguoitruc: string;
-      };
-    };
+    caTruc: CaTruc;
   };
 }
 
@@ -161,18 +144,7 @@ export interface RefuseResponse {
       maDonVi: string;
       tenDonvi: string;
     };
-    caTruc: {
-      trucBanTacChien: {
-        capbacNguoitruc: string;
-        chucvuNguoitruc: string;
-        tenNguoitruc: string;
-      };
-      trucChiHuy: {
-        capbacNguoitruc: string;
-        chucvuNguoitruc: string;
-        tenNguoitruc: string;
-      };
-    };
+    caTruc: CaTruc;
   };
 }
 
@@ -193,18 +165,7 @@ export interface SearchReportResponse {
       maDonVi: string;
       tenDonvi: string;
     };
-    caTruc: {
-      trucBanTacChien: {
-        capbacNguoitruc: string;
-        chucvuNguoitruc: string;
-        tenNguoitruc: string;
-      };
-      trucChiHuy: {
-        capbacNguoitruc: string;
-        chucvuNguoitruc: string;
-        tenNguoitruc: string;
-      };
-    };
+    caTruc: CaTruc;
   };
 }
 
@@ -225,17 +186,6 @@ export interface SearchChildrenResponse {
       maDonVi: string;
       tenDonvi: string;
     };
-    caTruc: {
-      trucBanTacChien: {
-        capbacNguoitruc: string;
-        chucvuNguoitruc: string;
-        tenNguoitruc: string;
-      };
-      trucChiHuy: {
-        capbacNguoitruc: string;
-        chucvuNguoitruc: string;
-        tenNguoitruc: string;
-      };
-    };
+    caTruc: CaTruc;
   }>;
 }

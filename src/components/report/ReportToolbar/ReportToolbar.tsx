@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMagnifyingGlass,
   faPlus,
+  faLayerGroup,
   faFileWord,
   faFileExcel,
 } from "@fortawesome/free-solid-svg-icons";
@@ -17,8 +18,10 @@ type Props = {
   onExportWord?: () => void;
   onExportExcel?: () => void;
   onAddReport?: () => void;
+  onConsolidate?: () => void;
+  consolidateDisabled?: boolean;
+  consolidateLabel?: string;
   maxDate?: string;
-  // 🌟 BỔ SUNG: Thuộc tính kiểm tra xem ngày hiện tại đã tồn tại báo cáo chưa
   hasReport?: boolean;
 };
 
@@ -39,6 +42,9 @@ export default function ReportToolbar({
   onExportWord,
   onExportExcel,
   onAddReport,
+  onConsolidate,
+  consolidateDisabled = false,
+  consolidateLabel = "Tổng hợp báo cáo",
   maxDate = todayIsoDate(),
   hasReport = false,
 }: Props) {
@@ -92,6 +98,18 @@ export default function ReportToolbar({
           >
             <FontAwesomeIcon icon={faPlus} className={styles.addIcon} />
             {hasReport ? "Ngày này đã có báo cáo" : "Thêm báo cáo"}
+          </button>
+        )}
+
+        {onConsolidate && (
+          <button
+            type="button"
+            className={`${styles.actionBtn} ${styles.consolidateBtn} ${consolidateDisabled ? styles.disabledBtn : ""}`}
+            onClick={onConsolidate}
+            disabled={consolidateDisabled}
+          >
+            <FontAwesomeIcon icon={faLayerGroup} className={styles.addIcon} />
+            {consolidateLabel}
           </button>
         )}
 

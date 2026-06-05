@@ -42,19 +42,22 @@
   color: var(--login-text-muted);  
 }  
   
-/* Card dùng chung */  
-.card,  
-.cardSection {  
-  background: var(--text-white);  
+.card {  
+  background: var(--surface-card);  
   border: 1px solid var(--login-border);  
   border-top: 4px solid var(--primary-color);  
   border-radius: 14px;  
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);  
+  box-shadow: 0 4px 16px var(--shadow-color);  
   padding: 28px 32px;  
 }  
   
-/* Card thứ 2 trở đi có khoảng cách phía trên */  
 .cardSection {  
+  background: var(--surface-card);  
+  border: 1px solid var(--login-border);  
+  border-top: 4px solid var(--primary-color);  
+  border-radius: 14px;  
+  box-shadow: 0 4px 16px var(--shadow-color);  
+  padding: 28px 32px;  
   margin-top: 32px;  
 }  
   
@@ -113,20 +116,24 @@
   font-size: 15px;  
   font-family: inherit;  
   color: var(--login-text);  
-  background: #f8faf9;  
+  background: var(--input-bg);  
   outline: none;  
-  transition: border-color 0.15s, background 0.15s;  
+  transition:  
+    border-color 0.15s,  
+    background 0.15s;  
 }  
   
 .formGroup input:focus {  
   border-color: var(--primary-color);  
-  background: var(--text-white);  
-  box-shadow: 0 0 0 3px rgba(31, 92, 63, 0.12);  
+  background: var(--surface-card);  
+  box-shadow: 0 0 0 3px var(--modal-input-focus-shadow);  
 }  
   
 .formGroup input:disabled {  
   cursor: not-allowed;  
-  opacity: 0.7;  
+  opacity: 0.85;  
+  background: var(--modal-input-disabled-bg);  
+  color: var(--modal-input-disabled-text);  
 }  
   
 .infoGrid {  
@@ -139,7 +146,6 @@
   grid-column: 1 / -1;  
 }  
   
-/* Dòng kiểm tra tổng quân số */  
 .quanSoCheckError,  
 .quanSoCheckOk {  
   padding: 10px 16px;  
@@ -149,18 +155,29 @@
 }  
   
 .quanSoCheckError {  
-  background: #fef2f2;  
-  border: 1px solid #fecaca;  
+  background: rgba(239, 68, 68, 0.1);  
+  border: 1px solid rgba(239, 68, 68, 0.35);  
   color: #dc2626;  
 }  
   
 .quanSoCheckOk {  
-  background: #f0fdf4;  
-  border: 1px solid #bbf7d0;  
+  background: rgba(22, 163, 74, 0.1);  
+  border: 1px solid rgba(22, 163, 74, 0.35);  
   color: #16a34a;  
 }  
   
-/* Nút lưu */  
+[data-theme="dark"] .quanSoCheckError {  
+  background: rgba(239, 68, 68, 0.15);  
+  border-color: rgba(239, 68, 68, 0.4);  
+  color: #f87171;  
+}  
+  
+[data-theme="dark"] .quanSoCheckOk {  
+  background: rgba(74, 222, 128, 0.12);  
+  border-color: rgba(74, 222, 128, 0.35);  
+  color: #4ade80;  
+}  
+  
 .formActions {  
   display: flex;  
   justify-content: flex-end;  
@@ -176,7 +193,9 @@
   font-size: 0.95rem;  
   font-weight: 600;  
   cursor: pointer;  
-  transition: background-color 0.2s, opacity 0.2s;  
+  transition:  
+    background-color 0.2s,  
+    opacity 0.2s;  
 }  
   
 .saveBtn:hover:not(:disabled) {  
@@ -188,7 +207,6 @@
   cursor: not-allowed;  
 }  
   
-/* Loading & Error */  
 .loading {  
   display: flex;  
   flex-direction: column;  
@@ -220,10 +238,10 @@
   
 .error {  
   padding: 16px 20px;  
-  background: #fee2e2;  
-  border: 1px solid #fecaca;  
+  background: var(--dialog-danger-bg);  
+  border: 1px solid rgba(239, 68, 68, 0.4);  
   border-radius: 12px;  
-  color: #dc2626;  
+  color: var(--text-white);  
   font-size: 15px;  
   text-align: center;  
 }  
@@ -232,6 +250,13 @@
   display: block;  
   font-size: 32px;  
   margin-bottom: 12px;  
+}  
+  
+.inputDisabled {  
+  background-color: var(--modal-input-disabled-bg) !important;  
+  color: var(--modal-input-disabled-text) !important;  
+  cursor: not-allowed;  
+  opacity: 1;  
 }  
   
 @media (max-width: 768px) {  
@@ -268,11 +293,4 @@
     height: 44px;  
     font-size: 14px;  
   }  
-}
-
-.inputDisabled {  
-  background-color: #e5e7eb;  
-  color: #6b7280;  
-  cursor: not-allowed;  
-  opacity: 1;  
 }

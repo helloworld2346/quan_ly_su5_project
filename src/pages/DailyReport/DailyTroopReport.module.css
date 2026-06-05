@@ -282,3 +282,130 @@
     line-height: 1.5;  
     vertical-align: top;  
   } 
+
+.caTrucSection {  
+  margin-top: 20px;  
+  padding: 20px 28px;  
+  background: var(--table-row-odd);  
+  border: 1px solid var(--login-border);  
+  border-radius: 14px;  
+  display: flex;  
+  flex-direction: column;  
+  align-items: center;  
+  gap: 5px;  
+}  
+
+.caTrucHeader {  
+  font-size: 18px;  
+  font-weight: 700;  
+  text-transform: uppercase;  
+  letter-spacing: 1px;  
+  color: var(--login-text-muted);  
+  margin-bottom: 2px;  
+}
+  
+.caTrucNgay {  
+  font-size: 12px;  
+  font-weight: 600;  
+  text-transform: uppercase;  
+  letter-spacing: 1px;  
+  color: var(--login-text-muted);  
+}  
+  
+.caTrucBody {  
+  display: flex;  
+  align-items: center;  
+  justify-content: center;  
+  gap: 48px;  
+  width: 100%;  
+  max-width: 800px;  
+}  
+  
+.caTrucLeft {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 0;  
+  flex: 1;  
+}  
+  
+.caTrucPerson {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 2px;  
+  padding: 10px 0;  
+}  
+  
+.caTrucRole {  
+  font-size: 10px;  
+  font-weight: 700;  
+  text-transform: uppercase;  
+  letter-spacing: 0.8px;  
+  color: var(--primary-color);  
+}  
+  
+.caTrucName {  
+  font-size: 15px;  
+  font-weight: 600;  
+  color: var(--login-text);  
+}  
+  
+.caTrucDivider {  
+  height: 1px;  
+  background: var(--login-border);  
+  width: 100%;  
+}  
+  
+.caTrucRight {  
+  display: flex;  
+  flex-direction: column;  
+  align-items: center;  
+  gap: 6px;  
+  padding: 16px 28px;  
+  border: 1.5px dashed var(--login-border);  
+  border-radius: 12px;  
+  min-width: 220px;  
+  background: var(--table-row-even);  
+}  
+  
+.caTrucMatKhauLabel {  
+  font-size: 10px;  
+  font-weight: 700;  
+  text-transform: uppercase;  
+  letter-spacing: 1px;  
+  color: var(--login-text-muted);  
+}  
+  
+.caTrucMatKhau {  
+  font-size: 22px;  
+  font-weight: 800;  
+  color: var(--login-text);  
+  letter-spacing: 0.5px;  
+  text-align: center;  
+  line-height: 1.3;  
+}  
+  
+@media (max-width: 768px) {  
+  .caTrucBody {  
+    flex-direction: column;  
+    gap: 16px;  
+  }  
+  .caTrucRight {  
+    width: 100%;  
+  }  
+}
+
+.consolidateBtn {  
+  padding: 9px 20px;  
+  background-color: var(--primary-color);  
+  color: var(--text-white);  
+  border: none;  
+  border-radius: 8px;  
+  font-size: 14px;  
+  font-weight: 600;  
+  cursor: pointer;  
+  transition: background-color 0.2s;  
+}  
+  
+.consolidateBtn:hover {  
+  background-color: var(--primary-hover);  
+}

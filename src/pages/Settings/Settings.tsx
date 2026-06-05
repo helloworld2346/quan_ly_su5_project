@@ -111,7 +111,6 @@ export default function Settings() {
     return (
       <div className={styles.container}>
         <div className={styles.error}>
-          <span className={styles.errorIcon}>⚠️</span>
           {error}
         </div>
       </div>
@@ -122,7 +121,6 @@ export default function Settings() {
     return (
       <div className={styles.container}>
         <div className={styles.error}>
-          <span className={styles.errorIcon}>⚠️</span>
           Không tìm thấy thông tin tài khoản
         </div>
       </div>
@@ -143,7 +141,6 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* Card 1: Thông tin cá nhân */}
       <div className={styles.card}>
         <div className={styles.cardHeader}>
           <h2 className={styles.cardTitle}>Thông tin cá nhân</h2>

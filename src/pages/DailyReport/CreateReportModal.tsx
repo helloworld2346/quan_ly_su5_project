@@ -57,6 +57,7 @@ interface CreateReportModalProps {
   initialData?: CreateReportResponse["Result"] | null;
   maDonViCurrent?: string;
   tongQuanSoBienChe?: number;
+  consolidatedAbsentRows?: AbsentRow[]; // dùng khi tổng hợp từ đơn vị con
 }
 
 export const CreateReportModal: React.FC<CreateReportModalProps> = ({
@@ -66,21 +67,27 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   initialData,
   maDonViCurrent,
   tongQuanSoBienChe,
+  consolidatedAbsentRows,
 }) => {
-const [ngayBaoCao] = useState<string>(() => {
-  if (initialData?.thoiGianBaoCao) {
-    return initialData.thoiGianBaoCao.split("T")[0];
-  }
-  return new Date().toISOString().split("T")[0];
-});
+  const [ngayBaoCao] = useState<string>(() => {
+    if (initialData?.thoiGianBaoCao) {
+      return initialData.thoiGianBaoCao.split("T")[0];
+    }
+    return new Date().toISOString().split("T")[0];
+  });
 
-const [tongQuanSo] = useState<number>(() => {
-  if (initialData?.quanSoTong) return initialData.quanSoTong;
-  if (tongQuanSoBienChe) return tongQuanSoBienChe;
-  return 0;
-});
+  const [tongQuanSo] = useState<number>(() => {
+    if (initialData?.quanSoTong) return initialData.quanSoTong;
+    if (tongQuanSoBienChe) return tongQuanSoBienChe;
+    return 0;
+  });
 
   const [absentRows, setAbsentRows] = useState<AbsentRow[]>(() => {
+    // Ưu tiên 1: danh sách tổng hợp từ đơn vị con (khi tổng hợp báo cáo)
+    if (consolidatedAbsentRows && consolidatedAbsentRows.length > 0) {
+      return consolidatedAbsentRows;
+    }
+    // Ưu tiên 2: dữ liệu từ báo cáo đang edit
     if (initialData?.chiTietVang) {
       try {
         return JSON.parse(initialData.chiTietVang) as AbsentRow[];
@@ -166,14 +173,18 @@ const [tongQuanSo] = useState<number>(() => {
 
   if (!isOpen) return null;
 
+  const isConsolidation = !!consolidatedAbsentRows;
+
   return (
     <div className={styles.overlay}>
       <form className={styles.modal} onSubmit={handleLocalSubmit}>
         <div className={styles.header}>
           <h2 className={styles.title}>
-            {initialData
-              ? "CẬP NHẬT BÁO CÁO QUÂN SỐ"
-              : "TẠO BÁO CÁO QUÂN SỐ HẰNG NGÀY"}
+            {isConsolidation
+              ? "TỔNG HỢP BÁO CÁO QUÂN SỐ"
+              : initialData
+                ? "CẬP NHẬT BÁO CÁO QUÂN SỐ"
+                : "TẠO BÁO CÁO QUÂN SỐ HẰNG NGÀY"}
           </h2>
           <button type="button" className={styles.closeBtn} onClick={onClose}>
             &times;
@@ -194,12 +205,7 @@ const [tongQuanSo] = useState<number>(() => {
               />
             </div>
             <div className={styles.field}>
-              <label className={styles.label}>
-                Tổng quân số biên chế
-                {tongQuanSoBienChe ? (
-                  <span className={styles.labelNote}> (từ hệ thống)</span>
-                ) : null}
-              </label>
+              <label className={styles.label}>Tổng quân số biên chế</label>
               <input
                 type="number"
                 className={`${styles.input} ${styles.inputDisabled}`}
@@ -234,7 +240,9 @@ const [tongQuanSo] = useState<number>(() => {
 
           <div className={styles.sectionHeader}>
             <h3 className={styles.sectionTitle}>
-              Danh sách chi tiết quân nhân vắng mặt trong ngày
+              {isConsolidation
+                ? "Danh sách tổng hợp quân nhân vắng mặt (từ các đơn vị con)"
+                : "Danh sách chi tiết quân nhân vắng mặt trong ngày"}
             </h3>
             <button
               type="button"
@@ -371,7 +379,11 @@ const [tongQuanSo] = useState<number>(() => {
             Hủy bỏ
           </button>
           <button type="submit" className={`${styles.btn} ${styles.btnSubmit}`}>
-            {initialData ? "Cập nhật báo cáo" : "Nộp báo cáo quân số"}
+            {isConsolidation
+              ? "Nộp báo cáo tổng hợp"
+              : initialData
+                ? "Cập nhật báo cáo"
+                : "Nộp báo cáo quân số"}
           </button>
         </div>
       </form>
