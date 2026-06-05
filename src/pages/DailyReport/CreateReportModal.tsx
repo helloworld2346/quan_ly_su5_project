@@ -56,6 +56,7 @@ interface CreateReportModalProps {
   onSubmit: (payload: CreateReportRequest) => void;
   initialData?: CreateReportResponse["Result"] | null;
   maDonViCurrent?: string;
+  tongQuanSoBienChe?: number;
 }
 
 export const CreateReportModal: React.FC<CreateReportModalProps> = ({
@@ -64,17 +65,20 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   onSubmit,
   initialData,
   maDonViCurrent,
+  tongQuanSoBienChe,
 }) => {
-  const [ngayBaoCao, setNgayBaoCao] = useState<string>(() => {
-    if (initialData?.thoiGianBaoCao) {
-      return initialData.thoiGianBaoCao.split("T")[0];
-    }
-    return new Date().toISOString().split("T")[0];
-  });
+const [ngayBaoCao] = useState<string>(() => {
+  if (initialData?.thoiGianBaoCao) {
+    return initialData.thoiGianBaoCao.split("T")[0];
+  }
+  return new Date().toISOString().split("T")[0];
+});
 
-  const [tongQuanSo, setTongQuanSo] = useState<number>(() => {
-    return initialData?.quanSoTong || 0;
-  });
+const [tongQuanSo] = useState<number>(() => {
+  if (initialData?.quanSoTong) return initialData.quanSoTong;
+  if (tongQuanSoBienChe) return tongQuanSoBienChe;
+  return 0;
+});
 
   const [absentRows, setAbsentRows] = useState<AbsentRow[]>(() => {
     if (initialData?.chiTietVang) {
@@ -184,20 +188,24 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                 type="date"
                 className={styles.input}
                 value={ngayBaoCao}
-                onChange={(e) => setNgayBaoCao(e.target.value)}
+                readOnly
+                disabled
                 required
               />
             </div>
             <div className={styles.field}>
-              <label className={styles.label}>Tổng quân số biên chế</label>
+              <label className={styles.label}>
+                Tổng quân số biên chế
+                {tongQuanSoBienChe ? (
+                  <span className={styles.labelNote}> (từ hệ thống)</span>
+                ) : null}
+              </label>
               <input
                 type="number"
-                className={styles.input}
+                className={`${styles.input} ${styles.inputDisabled}`}
                 value={tongQuanSo || ""}
-                onChange={(e) =>
-                  setTongQuanSo(parseInt(e.target.value, 10) || 0)
-                }
-                placeholder="Nhập tổng quân số"
+                readOnly
+                disabled
                 required
                 min={0}
               />

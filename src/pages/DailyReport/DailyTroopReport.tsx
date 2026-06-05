@@ -14,6 +14,7 @@ import TroopDetailModal from "./TroopDetailModal";
 import CreateReportModal from "./CreateReportModal";
 import RefuseDialog from "../../components/ui/RefuseDialog/RefuseDialog";
 import { dailyReportService } from "../../services/dailyReport/dailyReportService";
+import { donviService } from "../../services/unit/unitService"; // [THÊM]
 import { useAuth } from "../../context/useAuth";
 import { useToast } from "../../context/useToast";
 import type {
@@ -87,6 +88,8 @@ export default function DailyTroopReport() {
   );
   const [reportData, setReportData] = useState<ReportRow[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const [donViQuanSoTong, setDonViQuanSoTong] = useState<number>(0); // [THÊM]
 
   const [activeMenuUnit, setActiveMenuUnit] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
@@ -206,6 +209,23 @@ export default function DailyTroopReport() {
       isCurrent = false;
     };
   }, [fetchReports, account?.donVi?.maDonVi]);
+
+  // [THÊM] Fetch quanSoTong từ thông tin đơn vị
+  useEffect(() => {
+    const fetchDonViInfo = async () => {
+      if (!account?.donVi?.maDonVi) return;
+      try {
+        const allUnits = await donviService.getDonVi();
+        const unit = allUnits.find((u) => u.maDonVi === account.donVi!.maDonVi);
+        if (unit) {
+          setDonViQuanSoTong(unit.quanSoTong);
+        }
+      } catch (err) {
+        console.error("Không thể tải thông tin đơn vị:", err);
+      }
+    };
+    fetchDonViInfo();
+  }, [account?.donVi?.maDonVi]);
 
   const handleToggleMenu = (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -692,10 +712,10 @@ export default function DailyTroopReport() {
             }
           }}
           maDonViCurrent={account?.donVi?.maDonVi}
+          tongQuanSoBienChe={donViQuanSoTong || undefined}
         />
       )}
 
-      {/* MODAL CHỈNH SỬA BÁO CÁO */}
       {editModalData && (
         <CreateReportModal
           isOpen={Boolean(editModalData)}
@@ -722,6 +742,7 @@ export default function DailyTroopReport() {
             }
           }}
           maDonViCurrent={account?.donVi?.maDonVi}
+          tongQuanSoBienChe={donViQuanSoTong || undefined}
         />
       )}
 

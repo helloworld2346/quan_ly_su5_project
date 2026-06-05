@@ -279,3 +279,17 @@
   border: none;  
   box-shadow: 0 2px 4px var(--modal-btn-submit-shadow);
 }
+
+.labelNote {  
+  font-size: 11px;  
+  font-weight: 400;  
+  color: #6b7280;  
+  font-style: italic;  
+}
+
+.inputDisabled {  
+  background-color: #e5e7eb;  
+  color: #6b7280;  
+  cursor: not-allowed;  
+  opacity: 1;
+}

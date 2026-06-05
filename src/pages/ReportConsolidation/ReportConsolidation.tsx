@@ -3,14 +3,17 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
 import styles from "./ReportConsolidation.module.css";
 import ReportToolbar from "../../components/report/ReportToolbar";
-import CreateReportModal, {
-  type ReportSubmitResult,
-} from "../DailyReport/CreateReportModal";
+import CreateReportModal from "../DailyReport/CreateReportModal";
 import { dailyReportService } from "../../services/dailyReport/dailyReportService";
 import { useAuth } from "../../context/useAuth";
 import { useToast } from "../../context/useToast";
 import { handleApiError } from "../../utils/errorHandler";
-import type { VangChiTiet } from "../../types/dailyReport";
+import type {
+  VangChiTiet,
+  CreateReportRequest,
+  CreateReportResponse,
+  UpdateReportRequest,
+} from "../../types/dailyReport";
 
 import ReportStatusBadge from "../../components/ui/ReportStatusBadge/ReportStatusBadge";
 import { isPendingStatus, isRejectedStatus } from "../../utils/reportStatus";
@@ -98,6 +101,7 @@ function totalsFromRows(rows: ReportRow[]) {
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function totalsToVang(totals: RowTotals): VangChiTiet {
   return {
     hoiThaiNgoaiSuDoan: totals.hoiThaiNgoaiSuDoan,
@@ -150,10 +154,6 @@ function mapReportItem(item: {
   };
 }
 
-function mapSubmitResult(result: ReportSubmitResult): ReportRow {
-  return mapReportItem(result);
-}
-
 export default function ReportConsolidation() {
   const [query, setQuery] = useState("");
   const [reportDate, setReportDate] = useState(todayIsoDate());
@@ -164,13 +164,7 @@ export default function ReportConsolidation() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editModalData, setEditModalData] = useState<{
     reportId: string;
-    initialData: VangChiTiet;
-    ngayBaoCao: string;
-    tongQuanSo: number;
-  } | null>(null);
-  const [createModalData, setCreateModalData] = useState<{
-    initialData: VangChiTiet;
-    tongQuanSo: number;
+    initialData: CreateReportResponse["Result"];
   } | null>(null);
   const [refreshToken, setRefreshToken] = useState(0);
 
@@ -265,11 +259,6 @@ export default function ReportConsolidation() {
     [childReports],
   );
 
-  const approvedTotals = useMemo(() => {
-    const approvedRows = childReports.filter((r) => r.status === "Đã_Duyệt");
-    return totalsFromRows(approvedRows);
-  }, [childReports]);
-
   const hasSubmittedParent =
     !!parentReport && !isRejectedStatus(parentReport.status);
 
@@ -296,27 +285,87 @@ export default function ReportConsolidation() {
     }
 
     if (parentReport && isRejectedStatus(parentReport.status)) {
+      // Chế độ sửa: build initialData từ parentReport
       setEditModalData({
         reportId: parentReport.idDonBaoCao,
-        initialData: parentReport.vang,
-        ngayBaoCao: reportDate,
-        tongQuanSo: parentReport.quanSoTong,
+        initialData: {
+          idDonBaoCao: parentReport.idDonBaoCao,
+          quanSoTong: parentReport.quanSoTong,
+          quanSoHienDien: parentReport.quanSoHienDien,
+          quanSoVang: parentReport.quanSoVang,
+          status: parentReport.status,
+          thoiGianBaoCao: `${reportDate}T00:00:00.000Z`,
+          thongTinVang: JSON.stringify(parentReport.vang),
+          chiTietVang: "",
+          donVi: {
+            maDonVi: parentReport.donVi,
+            tenDonvi: parentReport.tenDonVi,
+          },
+          caTruc: {
+            trucBanTacChien: {
+              capbacNguoitruc: "",
+              chucvuNguoitruc: "",
+              tenNguoitruc: parentReport.trucBan,
+            },
+            trucChiHuy: {
+              capbacNguoitruc: "",
+              chucvuNguoitruc: "",
+              tenNguoitruc: parentReport.trucChiHuy,
+            },
+          },
+        },
       });
       return;
     }
 
-    setCreateModalData({
-      initialData: totalsToVang(approvedTotals),
-      tongQuanSo: approvedTotals.quanSoTong,
-    });
+    // Chế độ tạo mới
     setShowCreateModal(true);
   };
 
-  const handleCreateSuccess = (result?: ReportSubmitResult) => {
-    if (result) {
-      setParentReport(mapSubmitResult(result));
+  const handleCreate = async (payload: CreateReportRequest) => {
+    try {
+      const response = await dailyReportService.createReport(payload);
+      if (response.Result) {
+        setParentReport(mapReportItem(response.Result));
+      }
+      setShowCreateModal(false);
+      setRefreshToken((t) => t + 1);
+    } catch (error) {
+      handleApiError(error, {
+        showError,
+        errorMessage: "Có lỗi xảy ra khi tạo báo cáo",
+      });
     }
-    setRefreshToken((t) => t + 1);
+  };
+
+  const handleEdit = async (payload: CreateReportRequest) => {
+    if (!editModalData) return;
+    try {
+      const updatePayload: UpdateReportRequest = {
+        quanSoTong: payload.quanSoTong,
+        quanSoHienDien: payload.quanSoHienDien,
+        quanSoVang: payload.quanSoVang,
+        thoiGianBaoCao: payload.thoiGianBaoCao,
+        thongTinVang: payload.thongTinVang,
+        chiTietVang: payload.chiTietVang,
+        account: account?.idTaiKhoan || "",
+        donVi: payload.donVi,
+      };
+      const response = await dailyReportService.updateReport(
+        editModalData.reportId,
+        updatePayload,
+      );
+      if (response.Result) {
+        setParentReport(mapReportItem(response.Result));
+      }
+      setEditModalData(null);
+      setRefreshToken((t) => t + 1);
+    } catch (error) {
+      handleApiError(error, {
+        showError,
+        errorMessage: "Có lỗi xảy ra khi cập nhật báo cáo",
+      });
+    }
   };
 
   const renderReportCells = (row: ReportRow) => (
@@ -501,28 +550,22 @@ export default function ReportConsolidation() {
         </div>
       )}
 
-      {showCreateModal && createModalData && (
+      {showCreateModal && (
         <CreateReportModal
-          initialData={createModalData.initialData}
-          tongQuanSo={createModalData.tongQuanSo}
-          ngayBaoCao={reportDate}
-          onClose={() => {
-            setShowCreateModal(false);
-            setCreateModalData(null);
-          }}
-          onSuccess={handleCreateSuccess}
+          isOpen={showCreateModal}
+          initialData={null}
+          maDonViCurrent={account?.donVi?.maDonVi}
+          onClose={() => setShowCreateModal(false)}
+          onSubmit={handleCreate}
         />
       )}
 
       {editModalData && (
         <CreateReportModal
-          mode="edit"
-          reportId={editModalData.reportId}
+          isOpen={!!editModalData}
           initialData={editModalData.initialData}
-          ngayBaoCao={editModalData.ngayBaoCao}
-          tongQuanSo={editModalData.tongQuanSo}
           onClose={() => setEditModalData(null)}
-          onSuccess={handleCreateSuccess}
+          onSubmit={handleEdit}
         />
       )}
     </section>
