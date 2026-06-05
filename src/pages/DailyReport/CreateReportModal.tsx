@@ -57,7 +57,7 @@ interface CreateReportModalProps {
   initialData?: CreateReportResponse["Result"] | null;
   maDonViCurrent?: string;
   tongQuanSoBienChe?: number;
-  consolidatedAbsentRows?: AbsentRow[]; // dùng khi tổng hợp từ đơn vị con
+  consolidatedAbsentRows?: AbsentRow[];
 }
 
 export const CreateReportModal: React.FC<CreateReportModalProps> = ({
@@ -83,11 +83,9 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   });
 
   const [absentRows, setAbsentRows] = useState<AbsentRow[]>(() => {
-    // Ưu tiên 1: danh sách tổng hợp từ đơn vị con (khi tổng hợp báo cáo)
     if (consolidatedAbsentRows && consolidatedAbsentRows.length > 0) {
       return consolidatedAbsentRows;
     }
-    // Ưu tiên 2: dữ liệu từ báo cáo đang edit
     if (initialData?.chiTietVang) {
       try {
         return JSON.parse(initialData.chiTietVang) as AbsentRow[];

@@ -22,6 +22,8 @@ import type {
   VangChiTiet,
   CreateReportResponse,
   UpdateReportRequest,
+  ReportItemInput,
+  CaTrucInfo,
 } from "../../types/dailyReport";
 import { handleApiError } from "../../utils/errorHandler";
 import ReportStatusBadge from "../../components/ui/ReportStatusBadge/ReportStatusBadge";
@@ -89,6 +91,39 @@ const EMPTY_VANG: VangChiTiet = {
   hocCS: 0,
 };
 
+function mapItemToRow(item: ReportItemInput): ReportRow {
+  let vang: VangChiTiet = { ...EMPTY_VANG };
+  let chiTietVangList: ChiTietVangQuanNhan[] = [];
+
+  try {
+    vang = JSON.parse(item.thongTinVang) as VangChiTiet;
+  } catch (e) {
+    console.error("Error parsing thongTinVang:", e);
+  }
+
+  try {
+    if (item.chiTietVang) {
+      chiTietVangList = JSON.parse(item.chiTietVang) as ChiTietVangQuanNhan[];
+    }
+  } catch (e) {
+    console.error("Error parsing chiTietVang:", e);
+  }
+
+  return {
+    idDonBaoCao: item.idDonBaoCao,
+    donVi: item.donVi.maDonVi,
+    tenDonVi: item.donVi.tenDonvi,
+    quanSoTong: item.quanSoTong,
+    quanSoHienDien: item.quanSoHienDien,
+    quanSoVang: item.quanSoVang,
+    vang,
+    chiTietVangList,
+    status: item.status,
+    ghiChu: (item.ghiChu ?? "") || "",
+    rawItem: item as unknown as CreateReportResponse["Result"],
+  };
+}
+
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
   const [reportDate, setReportDate] = useState(todayIsoDate());
@@ -98,11 +133,15 @@ export default function DailyTroopReport() {
   );
 
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showConsolidateModal, setShowConsolidateModal] = useState(false);
   const [editModalData, setEditModalData] = useState<EditModalData | null>(
     null,
   );
   const [reportData, setReportData] = useState<ReportRow[]>([]);
+  const [parentReportData, setParentReportData] = useState<ReportRow | null>(
+    null,
+  );
+  const [showConsolidateModal, setShowConsolidateModal] = useState(false);
+
   const [loading, setLoading] = useState(false);
 
   const [donViQuanSoTong, setDonViQuanSoTong] = useState<number>(0);
@@ -121,7 +160,6 @@ export default function DailyTroopReport() {
 
   const maDonViCurrent = account?.donVi?.maDonVi;
 
-  // Tính isParentUnit ở scope component để dùng trong JSX
   const isParentUnit = useMemo(() => {
     return maDonViCurrent ? maDonViCurrent.split(".").length < 3 : false;
   }, [maDonViCurrent]);
@@ -138,11 +176,26 @@ export default function DailyTroopReport() {
           maDonViCurrent,
           reportDate,
         );
+
+        try {
+          const parentRes = await dailyReportService.searchReportByUnitAndDate(
+            maDonViCurrent,
+            reportDate,
+          );
+          if (parentRes.success && parentRes.Result) {
+            setParentReportData(mapItemToRow(parentRes.Result));
+          } else {
+            setParentReportData(null);
+          }
+        } catch {
+          setParentReportData(null);
+        }
       } else {
         response = await dailyReportService.searchReportByUnitAndDate(
           maDonViCurrent,
           reportDate,
         );
+        setParentReportData(null);
       }
 
       if (response.success && response.Result) {
@@ -150,41 +203,7 @@ export default function DailyTroopReport() {
           ? response.Result
           : [response.Result];
 
-        const mappedData: ReportRow[] = data.map((item) => {
-          let vang: VangChiTiet = { ...EMPTY_VANG };
-          let chiTietVangList: ChiTietVangQuanNhan[] = [];
-
-          try {
-            vang = JSON.parse(item.thongTinVang) as VangChiTiet;
-          } catch (e) {
-            console.error("Error parsing thongTinVang:", e);
-          }
-
-          try {
-            if (item.chiTietVang) {
-              chiTietVangList = JSON.parse(
-                item.chiTietVang,
-              ) as ChiTietVangQuanNhan[];
-            }
-          } catch (e) {
-            console.error("Error parsing chiTietVang string JSON:", e);
-          }
-
-          return {
-            idDonBaoCao: item.idDonBaoCao,
-            donVi: item.donVi.maDonVi,
-            tenDonVi: item.donVi.tenDonvi,
-            quanSoTong: item.quanSoTong,
-            quanSoHienDien: item.quanSoHienDien,
-            quanSoVang: item.quanSoVang,
-            vang,
-            chiTietVangList,
-            status: item.status,
-            ghiChu: item.ghiChu || "",
-            rawItem: item,
-          };
-        });
-
+        const mappedData: ReportRow[] = data.map((item) => mapItemToRow(item));
         setReportData(mappedData);
       } else {
         setReportData([]);
@@ -214,7 +233,6 @@ export default function DailyTroopReport() {
     };
   }, [fetchReports, maDonViCurrent]);
 
-  // Fetch quanSoTong từ thông tin đơn vị
   useEffect(() => {
     const fetchDonViInfo = async () => {
       if (!maDonViCurrent) return;
@@ -231,7 +249,6 @@ export default function DailyTroopReport() {
     fetchDonViInfo();
   }, [maDonViCurrent]);
 
-  // Tính tổng hợp từ báo cáo đơn vị con (chỉ dùng cho đơn vị cha)
   const consolidatedData = useMemo(() => {
     if (!isParentUnit || reportData.length === 0) return null;
 
@@ -292,11 +309,11 @@ export default function DailyTroopReport() {
 
   const handleToggleMenu = (
     event: React.MouseEvent<HTMLButtonElement>,
-    donViId: string,
+    menuKey: string,
   ) => {
     event.stopPropagation();
 
-    if (activeMenuUnit === donViId) {
+    if (activeMenuUnit === menuKey) {
       setActiveMenuUnit(null);
     } else {
       const rect = event.currentTarget.getBoundingClientRect();
@@ -304,7 +321,7 @@ export default function DailyTroopReport() {
         top: rect.bottom + window.scrollY + 4,
         left: rect.right + window.scrollX - 230,
       });
-      setActiveMenuUnit(donViId);
+      setActiveMenuUnit(menuKey);
     }
   };
 
@@ -512,8 +529,15 @@ export default function DailyTroopReport() {
   }, [reportData]);
 
   const caTrucInfo = useMemo(() => {
-    return reportData.length > 0 ? reportData[0].rawItem.caTruc : null;
-  }, [reportData]);
+    if (isParentUnit) {
+      return parentReportData
+        ? (parentReportData.rawItem.caTruc as CaTrucInfo)
+        : null;
+    }
+    return reportData.length > 0
+      ? (reportData[0].rawItem.caTruc as CaTrucInfo)
+      : null;
+  }, [isParentUnit, parentReportData, reportData]);
 
   const userRole = account?.vaiTro?.tenVaiTro;
   const normalizedRole = normalizeRoleName(userRole);
@@ -522,11 +546,158 @@ export default function DailyTroopReport() {
 
   const currentEditingReport = useMemo(() => {
     if (!editModalData) return null;
-    const found = reportData.find(
+    const childRow = reportData.find(
       (r) => r.idDonBaoCao === editModalData.reportId,
     );
-    return found ? found.rawItem : null;
-  }, [editModalData, reportData]);
+    if (childRow) return childRow.rawItem;
+    if (
+      parentReportData &&
+      parentReportData.idDonBaoCao === editModalData.reportId
+    ) {
+      return parentReportData.rawItem;
+    }
+    return null;
+  }, [editModalData, reportData, parentReportData]);
+
+  const renderReportRow = (row: ReportRow, isConsolidatedRow = false) => {
+    const menuKey = isConsolidatedRow ? `parent-${row.idDonBaoCao}` : row.donVi;
+    const isMenuOpen = activeMenuUnit === menuKey;
+    const canEdit =
+      isReporter &&
+      !isParentUnit &&
+      (row.status === "Từ_Chối" ||
+        row.status === "Từ chối" ||
+        row.status === "Chờ_Duyệt");
+    const canEditParent =
+      isReporter &&
+      isParentUnit &&
+      isConsolidatedRow &&
+      (row.status === "Từ_Chối" ||
+        row.status === "Từ chối" ||
+        row.status === "Chờ_Duyệt");
+    const canApprove = isCommander && row.status === "Chờ_Duyệt";
+    const canRefuse = isCommander && row.status === "Chờ_Duyệt";
+
+    return (
+      <tr
+        key={row.idDonBaoCao}
+        className={
+          isConsolidatedRow
+            ? styles.consolidatedRow
+            : isParentUnit
+              ? styles.childRow
+              : undefined
+        }
+      >
+        <td className={styles.unitCell}>{row.tenDonVi}</td>
+        <td>{row.quanSoTong}</td>
+        <td>{row.quanSoHienDien}</td>
+        <td>{row.quanSoVang}</td>
+        <td>{row.vang.hoiThaiNgoaiSuDoan}</td>
+        <td>{row.vang.hoiThaiEF}</td>
+        <td>{row.vang.xayDungNgoaiSuDoan}</td>
+        <td>{row.vang.xayDungEF}</td>
+        <td>{row.vang.choHuu}</td>
+        <td>{row.vang.nghiTranhThu}</td>
+        <td>{row.vang.phep}</td>
+        <td>{row.vang.vienNgoaiSuDoan}</td>
+        <td>{row.vang.vienEF}</td>
+        <td>{row.vang.congTacNgoaiSuDoan}</td>
+        <td>{row.vang.congTacSuDoan}</td>
+        <td>{row.vang.hocSQ}</td>
+        <td>{row.vang.hocCS}</td>
+        <td>
+          <ReportStatusBadge status={row.status} />
+        </td>
+        <td className={styles.noteCell}>{row.ghiChu}</td>
+        <td className={styles.actionCell}>
+          <div className={styles.actionWrapper}>
+            <button
+              type="button"
+              className={`${styles.ellipsisBtn} ${isMenuOpen ? styles.activeEllipsis : ""}`}
+              aria-label="Tùy chọn thao tác"
+              onClick={(e) => handleToggleMenu(e, menuKey)}
+            >
+              <FontAwesomeIcon icon={faEllipsisVertical} />
+            </button>
+
+            {isMenuOpen &&
+              createPortal(
+                <div
+                  ref={dropdownRef}
+                  className={styles.dropdownMenu}
+                  role="menu"
+                  style={{
+                    top: `${menuPosition.top}px`,
+                    left: `${menuPosition.left}px`,
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    type="button"
+                    className={styles.menuItem}
+                    role="menuitem"
+                    onClick={() => {
+                      setSelectedReportRow(row);
+                      setActiveMenuUnit(null);
+                    }}
+                  >
+                    <FontAwesomeIcon icon={faEye} className={styles.menuIcon} />
+                    Xem chi tiết
+                  </button>
+
+                  {(canEdit || canEditParent) && (
+                    <button
+                      type="button"
+                      className={styles.menuItem}
+                      role="menuitem"
+                      onClick={() => handleEditReport(row)}
+                    >
+                      <FontAwesomeIcon
+                        icon={faPenToSquare}
+                        className={styles.menuIcon}
+                      />
+                      Sửa
+                    </button>
+                  )}
+
+                  {canApprove && (
+                    <button
+                      type="button"
+                      className={`${styles.menuItem} ${styles.menuItemSuccess}`}
+                      role="menuitem"
+                      onClick={() => handleApproveReport(row.idDonBaoCao)}
+                    >
+                      <FontAwesomeIcon
+                        icon={faCheck}
+                        className={styles.menuIcon}
+                      />
+                      Phê duyệt
+                    </button>
+                  )}
+
+                  {canRefuse && (
+                    <button
+                      type="button"
+                      className={`${styles.menuItem} ${styles.menuItemDanger}`}
+                      role="menuitem"
+                      onClick={() => handleRefuseReportClick(row)}
+                    >
+                      <FontAwesomeIcon
+                        icon={faBan}
+                        className={styles.menuIcon}
+                      />
+                      Từ chối
+                    </button>
+                  )}
+                </div>,
+                document.body,
+              )}
+          </div>
+        </td>
+      </tr>
+    );
+  };
 
   return (
     <section className={styles.report} aria-labelledby="dashboard-page-heading">
@@ -538,12 +709,16 @@ export default function DailyTroopReport() {
         onAddReport={isCommander || isParentUnit ? undefined : handleAddReport}
         onConsolidate={isParentUnit ? handleConsolidate : undefined}
         consolidateDisabled={
-          !consolidatedData || consolidatedData.submittedCount === 0
+          !consolidatedData ||
+          consolidatedData.submittedCount === 0 ||
+          parentReportData !== null
         }
         consolidateLabel={
-          consolidatedData && consolidatedData.submittedCount > 0
-            ? `Tổng hợp (${consolidatedData.submittedCount}/${consolidatedData.totalCount} đơn vị)`
-            : "Chưa có báo cáo con"
+          parentReportData !== null
+            ? "Đã tổng hợp"
+            : consolidatedData && consolidatedData.submittedCount > 0
+              ? `Tổng hợp (${consolidatedData.submittedCount}/${consolidatedData.totalCount} đơn vị)`
+              : "Chưa có báo cáo con"
         }
         onExportWord={handleExportWord}
         onExportExcel={handleExportExcel}
@@ -591,162 +766,65 @@ export default function DailyTroopReport() {
             </thead>
 
             <tbody>
-              {filteredRows.length === 0 ? (
+              {filteredRows.length === 0 && !parentReportData ? (
                 <tr className={styles.noReportRow}>
                   <td colSpan={21}>Không có dữ liệu báo cáo</td>
                 </tr>
               ) : (
-                filteredRows.map((row) => {
-                  const isMenuOpen = activeMenuUnit === row.donVi;
-                  const canEdit =
-                    isReporter &&
-                    !isParentUnit &&
-                    (row.status === "Từ_Chối" ||
-                      row.status === "Từ chối" ||
-                      row.status === "Chờ_Duyệt");
-                  const canApprove = isCommander && row.status === "Chờ_Duyệt";
-                  const canRefuse = isCommander && row.status === "Chờ_Duyệt";
-
-                  return (
-                    <tr key={row.idDonBaoCao}>
-                      <td className={styles.unitCell}>{row.tenDonVi}</td>
-                      <td>{row.quanSoTong}</td>
-                      <td>{row.quanSoHienDien}</td>
-                      <td>{row.quanSoVang}</td>
-                      <td>{row.vang.hoiThaiNgoaiSuDoan}</td>
-                      <td>{row.vang.hoiThaiEF}</td>
-                      <td>{row.vang.xayDungNgoaiSuDoan}</td>
-                      <td>{row.vang.xayDungEF}</td>
-                      <td>{row.vang.choHuu}</td>
-                      <td>{row.vang.nghiTranhThu}</td>
-                      <td>{row.vang.phep}</td>
-                      <td>{row.vang.vienNgoaiSuDoan}</td>
-                      <td>{row.vang.vienEF}</td>
-                      <td>{row.vang.congTacNgoaiSuDoan}</td>
-                      <td>{row.vang.congTacSuDoan}</td>
-                      <td>{row.vang.hocSQ}</td>
-                      <td>{row.vang.hocCS}</td>
-                      <td>
-                        <ReportStatusBadge status={row.status} />
-                      </td>
-                      <td className={styles.noteCell}>{row.ghiChu}</td>
-                      <td className={styles.actionCell}>
-                        <div className={styles.actionWrapper}>
-                          <button
-                            type="button"
-                            className={`${styles.ellipsisBtn} ${isMenuOpen ? styles.activeEllipsis : ""}`}
-                            aria-label="Tùy chọn thao tác"
-                            onClick={(e) => handleToggleMenu(e, row.donVi)}
-                          >
-                            <FontAwesomeIcon icon={faEllipsisVertical} />
-                          </button>
-
-                          {isMenuOpen &&
-                            createPortal(
-                              <div
-                                ref={dropdownRef}
-                                className={styles.dropdownMenu}
-                                role="menu"
-                                style={{
-                                  top: `${menuPosition.top}px`,
-                                  left: `${menuPosition.left}px`,
-                                }}
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <button
-                                  type="button"
-                                  className={styles.menuItem}
-                                  role="menuitem"
-                                  onClick={() => {
-                                    setSelectedReportRow(row);
-                                    setActiveMenuUnit(null);
-                                  }}
-                                >
-                                  <FontAwesomeIcon
-                                    icon={faEye}
-                                    className={styles.menuIcon}
-                                  />
-                                  Xem chi tiết
-                                </button>
-
-                                {canEdit && (
-                                  <button
-                                    type="button"
-                                    className={styles.menuItem}
-                                    role="menuitem"
-                                    onClick={() => handleEditReport(row)}
-                                  >
-                                    <FontAwesomeIcon
-                                      icon={faPenToSquare}
-                                      className={styles.menuIcon}
-                                    />
-                                    Sửa
-                                  </button>
-                                )}
-
-                                {canApprove && (
-                                  <button
-                                    type="button"
-                                    className={`${styles.menuItem} ${styles.menuItemSuccess}`}
-                                    role="menuitem"
-                                    onClick={() =>
-                                      handleApproveReport(row.idDonBaoCao)
-                                    }
-                                  >
-                                    <FontAwesomeIcon
-                                      icon={faCheck}
-                                      className={styles.menuIcon}
-                                    />
-                                    Phê duyệt
-                                  </button>
-                                )}
-
-                                {canRefuse && (
-                                  <button
-                                    type="button"
-                                    className={`${styles.menuItem} ${styles.menuItemDanger}`}
-                                    role="menuitem"
-                                    onClick={() => handleRefuseReportClick(row)}
-                                  >
-                                    <FontAwesomeIcon
-                                      icon={faBan}
-                                      className={styles.menuIcon}
-                                    />
-                                    Từ chối
-                                  </button>
-                                )}
-                              </div>,
-                              document.body,
-                            )}
-                        </div>
-                      </td>
+                <>
+                  {/* Dòng separator "Báo cáo đơn vị con" - chỉ hiện khi isParentUnit */}
+                  {isParentUnit && filteredRows.length > 0 && (
+                    <tr className={styles.separatorRow}>
+                      <td colSpan={21}>Báo cáo đơn vị con</td>
                     </tr>
-                  );
-                })
-              )}
+                  )}
 
-              <tr className={styles.totalRow}>
-                <td className={styles.unitCell}>Tổng</td>
-                <td>{totals.quanSoTong}</td>
-                <td>{totals.quanSoHienDien}</td>
-                <td>{totals.quanSoVang}</td>
-                <td>{totals.hoiThaiNgoaiSuDoan}</td>
-                <td>{totals.hoiThaiEF}</td>
-                <td>{totals.xayDungNgoaiSuDoan}</td>
-                <td>{totals.xayDungEF}</td>
-                <td>{totals.choHuu}</td>
-                <td>{totals.nghiTranhThu}</td>
-                <td>{totals.phep}</td>
-                <td>{totals.vienNgoaiSuDoan}</td>
-                <td>{totals.vienEF}</td>
-                <td>{totals.congTacNgoaiSuDoan}</td>
-                <td>{totals.congTacSuDoan}</td>
-                <td>{totals.hocSQ}</td>
-                <td>{totals.hocCS}</td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
+                  {/* Các dòng báo cáo con */}
+                  {filteredRows.map((row) => renderReportRow(row, false))}
+
+                  {/* Dòng tổng (chỉ hiện khi có dữ liệu) */}
+                  {filteredRows.length > 0 && (
+                    <tr className={styles.totalRow}>
+                      <td className={styles.unitCell}>Tổng</td>
+                      <td>{totals.quanSoTong}</td>
+                      <td>{totals.quanSoHienDien}</td>
+                      <td>{totals.quanSoVang}</td>
+                      <td>{totals.hoiThaiNgoaiSuDoan}</td>
+                      <td>{totals.hoiThaiEF}</td>
+                      <td>{totals.xayDungNgoaiSuDoan}</td>
+                      <td>{totals.xayDungEF}</td>
+                      <td>{totals.choHuu}</td>
+                      <td>{totals.nghiTranhThu}</td>
+                      <td>{totals.phep}</td>
+                      <td>{totals.vienNgoaiSuDoan}</td>
+                      <td>{totals.vienEF}</td>
+                      <td>{totals.congTacNgoaiSuDoan}</td>
+                      <td>{totals.congTacSuDoan}</td>
+                      <td>{totals.hocSQ}</td>
+                      <td>{totals.hocCS}</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                  )}
+
+                  {/* Dòng separator "Báo cáo tổng hợp" - chỉ hiện khi isParentUnit */}
+                  {isParentUnit && (
+                    <tr className={styles.separatorRow}>
+                      <td colSpan={21}>Báo cáo tổng hợp</td>
+                    </tr>
+                  )}
+
+                  {/* Dòng báo cáo tổng hợp của đơn vị cha */}
+                  {isParentUnit && parentReportData
+                    ? renderReportRow(parentReportData, true)
+                    : isParentUnit && (
+                        <tr className={styles.noConsolidatedRow}>
+                          <td colSpan={21}>Chưa có báo cáo tổng hợp</td>
+                        </tr>
+                      )}
+                </>
+              )}
             </tbody>
           </table>
         )}
@@ -835,7 +913,7 @@ export default function DailyTroopReport() {
               });
             }
           }}
-          maDonViCurrent={maDonViCurrent}
+          maDonViCurrent={account?.donVi?.maDonVi}
           tongQuanSoBienChe={donViQuanSoTong || undefined}
         />
       )}
@@ -865,17 +943,16 @@ export default function DailyTroopReport() {
               });
             }
           }}
-          maDonViCurrent={maDonViCurrent}
+          maDonViCurrent={account?.donVi?.maDonVi}
           tongQuanSoBienChe={donViQuanSoTong || undefined}
         />
       )}
 
-      {/* Modal tổng hợp báo cáo — chỉ cho đơn vị cha */}
       {showConsolidateModal && consolidatedData && (
         <CreateReportModal
           isOpen={showConsolidateModal}
           onClose={() => setShowConsolidateModal(false)}
-          maDonViCurrent={maDonViCurrent}
+          maDonViCurrent={account?.donVi?.maDonVi}
           tongQuanSoBienChe={consolidatedData.quanSoTong}
           consolidatedAbsentRows={consolidatedData.absentRows}
           onSubmit={async (payload) => {

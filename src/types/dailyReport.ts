@@ -1,3 +1,20 @@
+export interface CaTrucInfo {
+  idCatruc?: string;
+  matkhau?: string;
+  ghichu?: string;
+  ngaytruc?: string;
+  trucChiHuy?: {
+    capbacNguoitruc: string;
+    chucvuNguoitruc: string;
+    tenNguoitruc: string;
+  };
+  trucBanTacChien?: {
+    capbacNguoitruc: string;
+    chucvuNguoitruc: string;
+    tenNguoitruc: string;
+  };
+}
+
 export interface VangChiTiet {
   hoiThaiNgoaiSuDoan: number;
   hoiThaiEF: number;
@@ -23,6 +40,20 @@ export interface AbsentRow {
   ghiChu: string;
 }
 
+export type ReportItemInput = {
+  idDonBaoCao: string;
+  quanSoHienDien: number;
+  quanSoTong: number;
+  quanSoVang: number;
+  status: string;
+  thoiGianBaoCao: string;
+  thongTinVang: string;
+  chiTietVang?: string;
+  ghiChu?: string | null;
+  donVi: { maDonVi: string; tenDonvi: string };
+  caTruc: CaTrucInfo;
+};
+
 export interface CreateReportRequest {
   quanSoTong: number;
   quanSoHienDien: number;
@@ -32,23 +63,6 @@ export interface CreateReportRequest {
   chiTietVang?: string;
   donVi: string;
 }
-
-interface CaTruc {
-  ngaytruc?: string;
-  matkhau?: string;
-  ghichu?: string;
-  trucBanTacChien: {
-    capbacNguoitruc: string;
-    chucvuNguoitruc: string;
-    tenNguoitruc: string;
-  };
-  trucChiHuy: {
-    capbacNguoitruc: string;
-    chucvuNguoitruc: string;
-    tenNguoitruc: string;
-  };
-}
-
 export interface CreateReportResponse {
   success: boolean;
   code: number;
@@ -67,7 +81,7 @@ export interface CreateReportResponse {
       maDonVi: string;
       tenDonvi: string;
     };
-    caTruc: CaTruc;
+    caTruc: CaTrucInfo;
   };
 }
 
@@ -99,7 +113,7 @@ export interface UpdateReportResponse {
       maDonVi: string;
       tenDonvi: string;
     };
-    caTruc: CaTruc;
+    caTruc: CaTrucInfo;
   };
 }
 
@@ -119,7 +133,7 @@ export interface ApproveResponse {
       maDonVi: string;
       tenDonvi: string;
     };
-    caTruc: CaTruc;
+    caTruc: CaTrucInfo;
   };
 }
 
@@ -144,7 +158,7 @@ export interface RefuseResponse {
       maDonVi: string;
       tenDonvi: string;
     };
-    caTruc: CaTruc;
+    caTruc: CaTrucInfo;
   };
 }
 
@@ -158,6 +172,7 @@ export interface SearchReportResponse {
     quanSoTong: number;
     quanSoVang: number;
     status: string;
+    ghiChu?: string | null;
     thoiGianBaoCao: string;
     thongTinVang: string;
     chiTietVang?: string;
@@ -165,7 +180,7 @@ export interface SearchReportResponse {
       maDonVi: string;
       tenDonvi: string;
     };
-    caTruc: CaTruc;
+    caTruc: CaTrucInfo;
   };
 }
 
@@ -179,6 +194,7 @@ export interface SearchChildrenResponse {
     quanSoTong: number;
     quanSoVang: number;
     status: string;
+    ghiChu?: string | null;
     thoiGianBaoCao: string;
     thongTinVang: string;
     chiTietVang?: string;
@@ -186,6 +202,6 @@ export interface SearchChildrenResponse {
       maDonVi: string;
       tenDonvi: string;
     };
-    caTruc: CaTruc;
+    caTruc: CaTrucInfo;
   }>;
 }
