@@ -3,7 +3,7 @@
   max-width: 900px;  
   margin: 0 auto;  
 }  
-  
+
 .header {  
   display: flex;  
   align-items: center;  
@@ -12,7 +12,7 @@
   border-bottom: 1px solid var(--login-border);  
   margin-bottom: 24px;  
 }  
-  
+
 .headerIcon {  
   width: 48px;  
   height: 48px;  
@@ -24,18 +24,18 @@
   color: var(--text-white);  
   font-size: 20px;  
 }  
-  
+
 .headerContent {  
   flex: 1;  
 }  
-  
+
 .title {  
   margin: 0 0 4px;  
   font-size: 24px;  
   font-weight: 700;  
   color: var(--login-text);  
 }  
-  
+
 .subtitle {  
   margin: 0;  
   font-size: 14px;  
@@ -69,37 +69,25 @@
   padding-bottom: 16px;  
   border-bottom: 1px solid var(--login-border);  
 }  
-  
-.cardTitleRow {  
-  display: flex;  
-  align-items: center;  
-  gap: 10px;  
-}  
-  
-.cardIcon {  
-  color: var(--primary-color);  
-  font-size: 1.1rem;  
-}  
-  
 .cardTitle {  
   margin: 0;  
   font-size: 18px;  
   font-weight: 700;  
   color: var(--primary-color);  
 }  
-  
+
 .form {  
   display: flex;  
   flex-direction: column;  
   gap: 20px;  
 }  
-  
+
 .formGroup {  
   display: flex;  
   flex-direction: column;  
   gap: 8px;  
 }  
-  
+
 .formGroup label {  
   font-size: 14px;  
   font-weight: 600;  
@@ -107,7 +95,7 @@
   text-transform: uppercase;  
   letter-spacing: 0.3px;  
 }  
-  
+
 .formGroup input {  
   height: 48px;  
   padding: 0 16px;  
@@ -122,26 +110,26 @@
     border-color 0.15s,  
     background 0.15s;  
 }  
-  
+
 .formGroup input:focus {  
   border-color: var(--primary-color);  
   background: var(--surface-card);  
   box-shadow: 0 0 0 3px var(--modal-input-focus-shadow);  
 }  
-  
+
 .formGroup input:disabled {  
   cursor: not-allowed;  
   opacity: 0.85;  
   background: var(--modal-input-disabled-bg);  
   color: var(--modal-input-disabled-text);  
 }  
-  
+
 .infoGrid {  
   display: grid;  
   grid-template-columns: repeat(2, 1fr);  
   gap: 20px;  
 }  
-  
+
 .fullWidth {  
   grid-column: 1 / -1;  
 }  
@@ -215,7 +203,7 @@
   padding: 80px 20px;  
   gap: 16px;  
 }  
-  
+
 .loadingSpinner {  
   width: 40px;  
   height: 40px;  
@@ -224,18 +212,16 @@
   border-radius: 50%;  
   animation: spin 0.8s linear infinite;  
 }  
-  
+
 @keyframes spin {  
-  to {  
-    transform: rotate(360deg);  
-  }  
+  to { transform: rotate(360deg); }  
 }  
-  
+
 .loadingText {  
   font-size: 15px;  
   color: var(--login-text-muted);  
 }  
-  
+
 .error {  
   padding: 16px 20px;  
   background: var(--dialog-danger-bg);  
@@ -245,7 +231,7 @@
   font-size: 15px;  
   text-align: center;  
 }  
-  
+
 .errorIcon {  
   display: block;  
   font-size: 32px;  
@@ -260,35 +246,26 @@
 }  
   
 @media (max-width: 768px) {  
-  .container {  
-    padding: 0;  
-  }  
-  
+  .container { padding: 0; }  
+
   .header {  
     flex-direction: column;  
     text-align: center;  
     gap: 12px;  
   }  
-  
-  .title {  
-    font-size: 20px;  
-  }  
-  
-  .card,  
-  .cardSection {  
+
+  .title { font-size: 20px; }  
+
+  .card {  
     padding: 20px;  
     border-radius: 12px;  
   }  
-  
-  .cardSection {  
-    margin-top: 24px;  
-  }  
-  
+
   .infoGrid {  
     grid-template-columns: 1fr;  
     gap: 16px;  
   }  
-  
+
   .formGroup input {  
     height: 44px;  
     font-size: 14px;  

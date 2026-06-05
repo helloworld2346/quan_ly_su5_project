@@ -47,14 +47,13 @@ export default function BarChart({
     const isVertical = orientation === "vertical";
 
 
-    const paddingTop = 24;
-    const paddingBottom = isVertical ? 40 : 20;
-    const paddingLeft = isVertical ? 32 : 120;
-    const paddingRight = 24;
+    const paddingTop = height <= 220 ? 42 : 34;
+    const paddingBottom = isVertical ? (height <= 220 ? 52 : 44) : 20;
+    const paddingLeft = isVertical ? (height <= 220 ? 46 : 42) : 120;
+    const paddingRight = height <= 220 ? 30 : 24;
     const svgWidth = "100%";
     const svgHeight = height;
-
-    const barGroupGap = 0.3;
+    const barGroupGap = height <= 220 ? 0.5 : 0.42;
     const barGap = 0.1;
 
     return (
@@ -65,7 +64,7 @@ export default function BarChart({
                     height={svgHeight}
                     className={styles.svg}
                     viewBox={`0 0 600 ${height}`}
-                    preserveAspectRatio="none"
+                    preserveAspectRatio="xMidYMid meet"
                 >
                     {isVertical ? (
                         <VerticalBars
@@ -182,12 +181,12 @@ function VerticalBars({
                         <line
                             x1={paddingLeft} y1={y}
                             x2={svgWidth - paddingRight} y2={y}
-                            stroke="var(--login-border)" strokeWidth={0.8} strokeDasharray="4 3"
+                            stroke="var(--chart-grid-color, #d6deea)" strokeWidth={0.8} strokeDasharray="5 4"
                         />
                         <text
-                            x={paddingLeft - 6} y={y + 4}
-                            textAnchor="end" fontSize={10}
-                            fill="var(--login-text-muted)"
+                            x={paddingLeft - 8} y={y + 4}
+                            textAnchor="end" fontSize={12} fontWeight={700}
+                            fill="var(--chart-axis-muted, #52627c)"
                         >
                             {Math.round(val)}
                         </text>
@@ -212,7 +211,7 @@ function VerticalBars({
                                         width={barW} height={barH}
                                         fill={ds.color}
                                         opacity={hovered && !isHov ? 0.35 : 1}
-                                        rx={3}
+                                        rx={4}
                                         className={styles.bar}
                                         onMouseEnter={(e) => {
                                             setHovered({ datasetIdx: dsIdx, barIdx });
@@ -225,25 +224,30 @@ function VerticalBars({
                                         }}
                                         onMouseLeave={() => setHovered(null)}
                                     />
-                                    {showValues && barH > 16 && (
-                                        <text
-                                            x={barX + barW / 2} y={barY + 14}
-                                            textAnchor="middle" fontSize={10} fontWeight={700}
-                                            fill="#fff"
-                                        >
-                                            {ds.data[barIdx]}{unit}
-                                        </text>
-                                    )}
+                             {showValues && (
+    <text
+        x={barX + barW / 2}
+        y={Math.max(14, barY - 8)}
+        textAnchor="middle"
+        fontSize={13}
+        fontWeight={800}
+        fill="var(--chart-value-color, #071b6f)"
+    >
+        {ds.data[barIdx]}{unit}
+    </text>
+)}
                                 </g>
                             );
                         })}
 
-                        <text
-                            x={groupX + barGroupW / 2}
-                            y={svgHeight - paddingBottom + 16}
-                            textAnchor="middle" fontSize={11}
-                            fill="var(--login-text-muted)"
-                        >
+                    <text
+    x={groupX + barGroupW / 2}
+    y={svgHeight - paddingBottom + 20}
+    textAnchor="middle"
+    fontSize={12}
+    fontWeight={800}
+    fill="var(--chart-axis-color, #071b6f)"
+>
                             {label}
                         </text>
                     </g>
@@ -253,7 +257,7 @@ function VerticalBars({
             <line
                 x1={paddingLeft} y1={paddingTop + chartH}
                 x2={svgWidth - paddingRight} y2={paddingTop + chartH}
-                stroke="var(--login-border)" strokeWidth={1}
+                stroke="var(--chart-grid-color, #cbd5e4)" strokeWidth={1}
             />
         </>
     );
