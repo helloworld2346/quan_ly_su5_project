@@ -168,9 +168,14 @@ export function getNavGroupLabel(activeId: NavItemId): string | null {
 export function getNavGroupLabelByRole(
   groupLabel: string,
   userRole: string | null,
+  isParentUnit: boolean = false,
 ): string {
-  if (groupLabel === "Thống kê báo cáo" && userRole === "Báo cáo") {
-    return "Báo ban";
+  const normalized = userRole ? normalizeRoleName(userRole) : null;
+  if (groupLabel === "Thống kê báo cáo" && normalized === "Báo cáo") {
+    return isParentUnit ? "Tổng Hợp - Báo Ban" : "Báo Ban";
+  }
+  if (groupLabel === "Thống kê báo cáo" && normalized === "Chỉ huy") {
+    return "Phê duyệt báo ban";
   }
   return groupLabel;
 }

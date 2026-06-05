@@ -89,7 +89,7 @@ export default function DailyTroopReport() {
   const [reportData, setReportData] = useState<ReportRow[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const [donViQuanSoTong, setDonViQuanSoTong] = useState<number>(0); // [THÊM]
+  const [donViQuanSoTong, setDonViQuanSoTong] = useState<number>(0);
 
   const [activeMenuUnit, setActiveMenuUnit] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
@@ -210,13 +210,14 @@ export default function DailyTroopReport() {
     };
   }, [fetchReports, account?.donVi?.maDonVi]);
 
-  // [THÊM] Fetch quanSoTong từ thông tin đơn vị
+  const maDonViCurrent = account?.donVi?.maDonVi;
+
   useEffect(() => {
     const fetchDonViInfo = async () => {
-      if (!account?.donVi?.maDonVi) return;
+      if (!maDonViCurrent) return;
       try {
         const allUnits = await donviService.getDonVi();
-        const unit = allUnits.find((u) => u.maDonVi === account.donVi!.maDonVi);
+        const unit = allUnits.find((u) => u.maDonVi === maDonViCurrent);
         if (unit) {
           setDonViQuanSoTong(unit.quanSoTong);
         }
@@ -225,7 +226,7 @@ export default function DailyTroopReport() {
       }
     };
     fetchDonViInfo();
-  }, [account?.donVi?.maDonVi]);
+  }, [maDonViCurrent]);
 
   const handleToggleMenu = (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -467,7 +468,7 @@ export default function DailyTroopReport() {
         onQueryChange={setQuery}
         reportDate={reportDate}
         onReportDateChange={setReportDate}
-        onAddReport={handleAddReport}
+        onAddReport={isCommander ? undefined : handleAddReport}
         onExportWord={handleExportWord}
         onExportExcel={handleExportExcel}
         hasReport={checkIfDateHasReport}

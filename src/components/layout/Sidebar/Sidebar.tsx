@@ -115,7 +115,11 @@ export default function Sidebar({
   );
   const showSettings = allowedNavItems.some((nav) => nav.id === "settings");
 
-  const reportLabel = getNavGroupLabelByRole(REPORT_NAV_GROUP.label, userRole);
+  const reportLabel = getNavGroupLabelByRole(
+    REPORT_NAV_GROUP.label,
+    userRole,
+    isParentUnit(),
+  );
 
   return (
     <>
