@@ -11,6 +11,7 @@ import type {
 import { dailyReportService } from "../../services/dailyReport/dailyReportService";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import CustomSelect from "../../components/ui/CustomSelect/CustomSelect";
 
 const LY_DO_OPTIONS: { value: keyof VangChiTiet; label: string }[] = [
   { value: "hoiThaiNgoaiSuDoan", label: "Hội thao - Ngoài Sư Đoàn" },
@@ -328,22 +329,16 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
             </div>
             <div className={styles.field}>
               <label className={styles.label}>Cấp bậc</label>
-              <select
-                className={styles.input}
+              <CustomSelect
+                options={CAP_BAC_OPTIONS.map((cb) => ({
+                  value: cb,
+                  label: cb,
+                }))}
                 value={trucChiHuy.capbacNguoitruc}
-                onChange={(e) =>
-                  setTrucChiHuy((prev) => ({
-                    ...prev,
-                    capbacNguoitruc: e.target.value,
-                  }))
+                onChange={(val) =>
+                  setTrucChiHuy((prev) => ({ ...prev, capbacNguoitruc: val }))
                 }
-              >
-                {CAP_BAC_OPTIONS.map((cb) => (
-                  <option key={cb} value={cb}>
-                    {cb}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
             <div className={styles.field}>
               <label className={styles.label}>Chức vụ</label>
@@ -404,22 +399,19 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
             </div>
             <div className={styles.field}>
               <label className={styles.label}>Cấp bậc</label>
-              <select
-                className={styles.input}
+              <CustomSelect
+                options={CAP_BAC_OPTIONS.map((cb) => ({
+                  value: cb,
+                  label: cb,
+                }))}
                 value={trucBanTacChien.capbacNguoitruc}
-                onChange={(e) =>
+                onChange={(val) =>
                   setTrucBanTacChien((prev) => ({
                     ...prev,
-                    capbacNguoitruc: e.target.value,
+                    capbacNguoitruc: val,
                   }))
                 }
-              >
-                {CAP_BAC_OPTIONS.map((cb) => (
-                  <option key={cb} value={cb}>
-                    {cb}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
             <div className={styles.field}>
               <label className={styles.label}>Chức vụ</label>
@@ -523,53 +515,44 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                         />
                       </td>
                       <td>
-                        <select
-                          className={styles.tableSelect}
+                        <CustomSelect
+                          options={CAP_BAC_OPTIONS.map((cb) => ({
+                            value: cb,
+                            label: cb,
+                          }))}
                           value={row.capBac}
-                          onChange={(e) =>
-                            handleUpdateRow(row.id, "capBac", e.target.value)
+                          onChange={(val) =>
+                            handleUpdateRow(row.id, "capBac", val)
                           }
-                        >
-                          {CAP_BAC_OPTIONS.map((cb) => (
-                            <option key={cb} value={cb}>
-                              {cb}
-                            </option>
-                          ))}
-                        </select>
+                          variant="table"
+                        />
                       </td>
                       <td>
-                        <select
-                          className={styles.tableSelect}
+                        <CustomSelect
+                          options={CHUC_VU_OPTIONS.map((cv) => ({
+                            value: cv,
+                            label: cv,
+                          }))}
                           value={row.chucVu}
-                          onChange={(e) =>
-                            handleUpdateRow(row.id, "chucVu", e.target.value)
+                          onChange={(val) =>
+                            handleUpdateRow(row.id, "chucVu", val)
                           }
-                        >
-                          {CHUC_VU_OPTIONS.map((cv) => (
-                            <option key={cv} value={cv}>
-                              {cv}
-                            </option>
-                          ))}
-                        </select>
+                          variant="table"
+                        />
                       </td>
                       <td>
-                        <select
-                          className={styles.tableSelect}
+                        <CustomSelect
+                          options={LY_DO_OPTIONS}
                           value={row.lyDoVang}
-                          onChange={(e) =>
+                          onChange={(val) =>
                             handleUpdateRow(
                               row.id,
                               "lyDoVang",
-                              e.target.value as keyof VangChiTiet,
+                              val as keyof VangChiTiet,
                             )
                           }
-                        >
-                          {LY_DO_OPTIONS.map((opt) => (
-                            <option key={opt.value} value={opt.value}>
-                              {opt.label}
-                            </option>
-                          ))}
-                        </select>
+                          variant="table"
+                        />
                       </td>
                       <td>
                         <input

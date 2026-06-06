@@ -1,0 +1,101 @@
+.wrapper {  
+  position: relative;  
+  width: 100%;  
+}  
+  
+.trigger {  
+  width: 100%;  
+  display: flex;  
+  align-items: center;  
+  justify-content: space-between;  
+  gap: 8px;  
+  padding: 9px 12px;  
+  border: 1px solid var(--modal-input-border);  
+  border-radius: 6px;  
+  font-size: 14px;  
+  background-color: var(--modal-input-bg);  
+  color: var(--modal-input-text);  
+  cursor: pointer;  
+  text-align: left;  
+  transition: border-color 0.15s, box-shadow 0.15s;  
+}  
+  
+.trigger:hover {  
+  border-color: var(--modal-input-focus-border);  
+}  
+  
+.triggerOpen {  
+  border-color: var(--modal-input-focus-border);  
+  box-shadow: 0 0 0 3px var(--modal-input-focus-shadow);  
+  outline: none;  
+}  
+  
+.triggerLabel {  
+  flex: 1;  
+  overflow: hidden;  
+  text-overflow: ellipsis;  
+  white-space: nowrap;  
+}  
+  
+.chevron {  
+  flex-shrink: 0;  
+  color: var(--modal-label-text);  
+  transition: transform 0.15s;  
+}  
+  
+.chevronOpen {  
+  transform: rotate(180deg);  
+}  
+  
+.dropdown {  
+  top: calc(100% + 4px);  
+  left: 0;  
+  right: 0;  
+  z-index: 9999;  
+  background-color: var(--modal-bg);  
+  border: 1px solid var(--modal-input-focus-border);  
+  border-radius: 8px;  
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);  
+  max-height: 220px;  
+  overflow-y: auto;  
+  padding: 4px;  
+  list-style: none;  
+  margin: 0;  
+}  
+  
+.option {  
+  display: flex;  
+  align-items: center;  
+  justify-content: space-between;  
+  padding: 8px 12px;  
+  border-radius: 6px;  
+  font-size: 13px;  
+  color: var(--modal-input-text);  
+  cursor: pointer;  
+  transition: background-color 0.1s;  
+  user-select: none;  
+}  
+  
+.optionFocused {  
+  background-color: var(--modal-section-bg);  
+}  
+  
+.optionSelected {  
+  color: var(--primary-color);  
+  font-weight: 600;  
+}  
+  
+.checkIcon {  
+  flex-shrink: 0;  
+  color: var(--primary-color);  
+}  
+  
+.tableVariant .trigger {  
+  padding: 7px 10px;  
+  border-radius: 4px;  
+  font-size: 13px;  
+}  
+  
+.tableVariant .dropdown {  
+  min-width: 180px;  
+}

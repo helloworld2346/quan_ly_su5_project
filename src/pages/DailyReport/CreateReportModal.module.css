@@ -206,12 +206,6 @@
   transition: border-color 0.15s;
 }
 
-.tableInput:focus, .tableSelect:focus {
-  border-color: var(--modal-input-focus-border);
-  outline: none;
-  box-shadow: 0 0 0 1px var(--modal-input-focus-border);
-}
-
 .textCenter {
   text-align: center !important;
 }
