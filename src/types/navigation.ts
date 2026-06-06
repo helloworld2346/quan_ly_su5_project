@@ -2,6 +2,7 @@ import { lazy } from "react";
 
 export type NavItemId =
   | "executive"
+  | "executive-training"
   | "report-troop"
   | "report-training"
   | "report-family"
@@ -37,14 +38,33 @@ const CommandDuty = lazy(() => import("../pages/CommandDuty/CommandDuty"));
 const TacticalDuty = lazy(() => import("../pages/TacticalDuty/TacticalDuty"));
 const Settings = lazy(() => import("../pages/Settings/Settings"));
 
+const Trainningstatistical = lazy(
+  () => import("../pages/TrainingReport/Trainningstatistical"),
+);
+
 export const EXECUTIVE_NAV: NavItem = {
   id: "executive",
-  label: "Dashboard điều hành",
+  label: "Tổng hợp ngày",
   path: "/dashboard",
-  loadingTitle: "Đang tải Dashboard",
-  loadingSubtitle: "Đang đồng bộ dữ liệu quân số…",
+  loadingTitle: "Đang tải tổng hợp ngày",
+  loadingSubtitle: "Đang đồng bộ dữ liệu quân số...",
   component: ExecutiveDashboard,
   allowedRoles: ["Quản Trị Viên", "Sư đoàn"],
+};
+
+export const EXECUTIVE_TRAINING_NAV: NavItem = {
+  id: "executive-training",
+  label: "Tổng hợp huấn luyện",
+  path: "/dashboard/training",
+  loadingTitle: "Đang tải tổng hợp huấn luyện",
+  loadingSubtitle: "Đang tải dữ liệu huấn luyện...",
+  component: Trainningstatistical,
+  allowedRoles: ["Quản Trị Viên", "Sư đoàn"],
+};
+
+export const EXECUTIVE_NAV_GROUP = {
+  label: "Tổng hợp điều hành",
+  items: [EXECUTIVE_NAV, EXECUTIVE_TRAINING_NAV],
 };
 
 export const REPORT_NAV_GROUP = {
@@ -127,7 +147,8 @@ export const SETTINGS_NAV: NavItem = {
 };
 
 export const NAV_PAGE_TITLES: Record<NavItemId, string | undefined> = {
-  executive: "Dashboard điều hành",
+  executive: "Tổng hợp ngày",
+  "executive-training": "Tổng hợp huấn luyện",
   "report-troop": "Báo ban ngày",
   "report-training": "Báo ban quân số huấn luyện",
   "report-family": "Báo ban thân nhân thăm nuôi",
@@ -139,6 +160,7 @@ export const NAV_PAGE_TITLES: Record<NavItemId, string | undefined> = {
 
 export const ALL_NAV_ITEMS: NavItem[] = [
   EXECUTIVE_NAV,
+  EXECUTIVE_TRAINING_NAV,
   ...REPORT_NAV_GROUP.items,
   ...DUTY_NAV_GROUP.items,
   SETTINGS_NAV,
@@ -155,13 +177,20 @@ export function getIdByPath(path: string): NavItemId {
 }
 
 export function getNavGroupLabel(activeId: NavItemId): string | null {
-  if (activeId === "executive" || activeId === "settings") return null;
+  if (activeId === "settings") return null;
+
+  if (EXECUTIVE_NAV_GROUP.items.some((i) => i.id === activeId)) {
+    return EXECUTIVE_NAV_GROUP.label;
+  }
+
   if (REPORT_NAV_GROUP.items.some((i) => i.id === activeId)) {
     return REPORT_NAV_GROUP.label;
   }
+
   if (DUTY_NAV_GROUP.items.some((i) => i.id === activeId)) {
     return DUTY_NAV_GROUP.label;
   }
+
   return null;
 }
 
@@ -216,6 +245,7 @@ export function getNavItemsByRole(
     return ALL_NAV_ITEMS.filter(
       (item) =>
         item.id === "executive" ||
+        item.id === "executive-training" ||
         item.id.startsWith("report-") ||
         item.id.startsWith("duty-") ||
         item.id === "settings",

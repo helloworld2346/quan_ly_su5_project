@@ -1,9 +1,17 @@
-import PieChart from "../../components/charts/PieChart/PieChart";
 import BarChart from "../../components/charts/BarChart/BarChart";
 import LineChart from "../../components/charts/LineChart/LineChart";
+import PieChart from "../../components/charts/PieChart/PieChart";
 import styles from "./Trainningstatistical.module.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faUsers,
+  faUserMinus,
+  faPersonRifle,
+  faPersonMilitaryRifle,
 
-// ── Mock data (thay bằng API sau) ──────────────────────────────
+} from "@fortawesome/free-solid-svg-icons";
+
+// ── Mock data ──────────────────────────────────────────────────
 const MOCK_SUMMARY = {
   tongQuanSo: 80,
   thamGia: 70,
@@ -22,9 +30,10 @@ const MOCK_DON_VI = [
 
 const MOCK_LOAI_QUAN = {
   labels: ["SQ", "QNCN", "HSQ-CS Năm 1", "HSQ-CS Năm 2"],
-  tongQS:    [29,  30,  108, 101],
-  thamGia:   [25,  28,   99,  97],
-  vang:      [ 4,   2,    9,  14],
+  hienDien: [5, 25, 101, 108],
+  tongQS: [29, 30, 108, 101],
+  thamGia: [25, 28, 99, 97],
+  vang: [4, 2, 9, 14],
 };
 
 const MOCK_TY_LE_THEO_NGAY = {
@@ -48,7 +57,7 @@ function MetricCard({
   value: string;
   sub: string;
   color: string;
-  icon: string;
+  icon: React.ReactNode;
 }) {
   return (
     <div className={styles.metricCard}>
@@ -64,16 +73,20 @@ function MetricCard({
   );
 }
 
-// ── Chart Section Wrapper ──────────────────────────────────────
+// ── Chart Card ─────────────────────────────────────────────────
 function ChartCard({
-  title, children,
+  title, total, children,
 }: {
   title: string;
+  total?: number;
   children: React.ReactNode;
 }) {
   return (
     <div className={styles.chartCard}>
       <h4 className={styles.chartCardTitle}>{title}</h4>
+      {total !== undefined && (
+        <p className={styles.chartCardTotal}>Tổng cộng: {formatNum(total)}</p>
+      )}
       {children}
     </div>
   );
@@ -86,68 +99,69 @@ export default function TrainingDashboard() {
   return (
     <div className={styles.wrapper}>
 
-      {/* ── Metrics Bar ── */}
       <div className={styles.metricsBar}>
         <MetricCard
-          title="Tổng quân số phân huấn luyện"
+          title="Quân số hiện diện"
+          value={formatNum(58)}
+          sub="72.5% tổng quân số phải huấn luyện"
+          color="var(--chart-green)"
+          icon={<FontAwesomeIcon icon={faUsers} />}
+        />
+        <MetricCard
+          title="Tổng quân số phải huấn luyện"
           value={formatNum(tongQuanSo)}
           sub="100% tổng quân số"
           color="var(--chart-blue)"
-          icon="👥"
+          icon={<FontAwesomeIcon icon={faPersonRifle} />}
         />
         <MetricCard
           title="Tham gia huấn luyện"
           value={formatNum(thamGia)}
-          sub={`${formatRate(tyLe)} tổng quân số`}
+          sub={`${formatRate(tyLe)} tổng quân số phải huấn luyện`}
           color="var(--chart-green)"
-          icon="👤"
+          icon={<FontAwesomeIcon icon={faPersonMilitaryRifle} />}
         />
         <MetricCard
           title="Vắng huấn luyện"
           value={formatNum(vang)}
-          sub={`${formatRate((vang / tongQuanSo) * 100)} tổng quân số`}
+          sub={`${formatRate((vang / tongQuanSo) * 100)} tổng quân số phải huấn luyện`}
           color="var(--chart-red)"
-          icon="🚫"
-        />
-        <MetricCard
-          title="Tỷ lệ tham gia"
-          value={formatRate(tyLe)}
-          sub="Tỷ lệ tham gia huấn luyện"
-          color="var(--chart-purple)"
-          icon="%"
+          icon={<FontAwesomeIcon icon={faUserMinus} />}
         />
       </div>
 
       {/* ── Row 1: Donut + Bar theo đơn vị ── */}
       <div className={styles.row2col}>
         <ChartCard title="Tỷ lệ tham gia huấn luyện">
-          <div className={styles.donutRow}>
+          <div className={styles.donutWrapper}>
             <PieChart
               chart={{
                 id: "training-overview",
                 name: "Huấn luyện",
-                unitType: "battalion",
+                unitType: "division",
                 total: tongQuanSo,
                 present: thamGia,
                 absent: vang,
               }}
               size="large"
+              variant="compact"
             />
+            <div className={styles.donutTotal}>
+              Tổng quân số: <strong>{formatNum(tongQuanSo)}</strong>
+            </div>
           </div>
         </ChartCard>
 
         <ChartCard title="Tỷ lệ tham gia huấn luyện theo đơn vị">
           <BarChart
             labels={MOCK_DON_VI.map((d) => d.ten)}
-            datasets={[
-              {
-                label: "Tỷ lệ tham gia (%)",
-                color: "var(--chart-green)",
-                data: MOCK_DON_VI.map((d) => d.thamGia),
-              },
-            ]}
+            datasets={[{
+              label: "Tỷ lệ tham gia (%)",
+              color: "var(--chart-green)",
+              data: MOCK_DON_VI.map((d) => d.thamGia),
+            }]}
             orientation="vertical"
-            height={240}
+            height={380}
             showLegend={false}
             unit="%"
             maxValue={100}
@@ -161,66 +175,73 @@ export default function TrainingDashboard() {
       </div>
 
       <div className={styles.row4col}>
-        <ChartCard title="Phân bố quân số theo loại quân">
-          <PieChart
-            chart={{
-              id: "loai-quan-dist",
-              name: "Phân bố",
-              unitType: "battalion",
-              total: MOCK_LOAI_QUAN.tongQS.reduce((a, b) => a + b, 0),
-              present: MOCK_LOAI_QUAN.thamGia.reduce((a, b) => a + b, 0),
-              absent: MOCK_LOAI_QUAN.vang.reduce((a, b) => a + b, 0),
-            }}
-            size="small"
-          />
-        </ChartCard>
-
-        <ChartCard title="Quân số phân huấn luyện">
+        <ChartCard
+          title="Quân số hiện diện"
+          total={MOCK_LOAI_QUAN.hienDien.reduce((a, b) => a + b, 0)}
+        >
           <BarChart
             labels={MOCK_LOAI_QUAN.labels}
-            datasets={[
-              {
-                label: "Quân số",
-                color: "var(--chart-blue)",
-                data: MOCK_LOAI_QUAN.tongQS,
-              },
-            ]}
+            datasets={[{
+              label: "Hiện diện",
+              color: "var(--chart-green)",
+              data: MOCK_LOAI_QUAN.hienDien,
+            }]}
             orientation="vertical"
-            height={230}
+            height={260}
             showLegend={false}
             showValues
           />
         </ChartCard>
 
-        <ChartCard title="Quân số tham gia huấn luyện">
+        <ChartCard
+          title="Quân số phải huấn luyện"
+          total={MOCK_LOAI_QUAN.tongQS.reduce((a, b) => a + b, 0)}
+        >
           <BarChart
             labels={MOCK_LOAI_QUAN.labels}
-            datasets={[
-              {
-                label: "Tham gia",
-                color: "var(--chart-green)",
-                data: MOCK_LOAI_QUAN.thamGia,
-              },
-            ]}
+            datasets={[{
+              label: "Quân số",
+              color: "var(--chart-blue)",
+              data: MOCK_LOAI_QUAN.tongQS,
+            }]}
             orientation="vertical"
-            height={230}
+            height={260}
             showLegend={false}
             showValues
           />
         </ChartCard>
 
-        <ChartCard title="Quân số vắng huấn luyện">
+        <ChartCard
+          title="Quân số tham gia huấn luyện"
+          total={MOCK_LOAI_QUAN.thamGia.reduce((a, b) => a + b, 0)}
+        >
           <BarChart
             labels={MOCK_LOAI_QUAN.labels}
-            datasets={[
-              {
-                label: "Vắng",
-                color: "var(--chart-red)",
-                data: MOCK_LOAI_QUAN.vang,
-              },
-            ]}
+            datasets={[{
+              label: "Tham gia",
+              color: "var(--chart-green)",
+              data: MOCK_LOAI_QUAN.thamGia,
+            }]}
             orientation="vertical"
-            height={230}
+            height={260}
+            showLegend={false}
+            showValues
+          />
+        </ChartCard>
+
+        <ChartCard
+          title="Quân số vắng huấn luyện"
+          total={MOCK_LOAI_QUAN.vang.reduce((a, b) => a + b, 0)}
+        >
+          <BarChart
+            labels={MOCK_LOAI_QUAN.labels}
+            datasets={[{
+              label: "Vắng",
+              color: "var(--chart-red)",
+              data: MOCK_LOAI_QUAN.vang,
+            }]}
+            orientation="vertical"
+            height={260}
             showLegend={false}
             showValues
           />
@@ -232,13 +253,11 @@ export default function TrainingDashboard() {
         <ChartCard title="Tỷ lệ tham gia huấn luyện theo ngày">
           <LineChart
             labels={MOCK_TY_LE_THEO_NGAY.labels}
-            datasets={[
-              {
-                label: "Tỷ lệ tham gia (%)",
-                color: "var(--chart-purple)",
-                data: MOCK_TY_LE_THEO_NGAY.data,
-              },
-            ]}
+            datasets={[{
+              label: "Tỷ lệ tham gia (%)",
+              color: "var(--chart-purple)",
+              data: MOCK_TY_LE_THEO_NGAY.data,
+            }]}
             height={200}
             showLegend={false}
             unit="%"

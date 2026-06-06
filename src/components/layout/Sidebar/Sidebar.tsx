@@ -1,25 +1,27 @@
 import { useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import type { IconProp } from "@fortawesome/fontawesome-svg-core";
+
 import {
-  faGaugeHigh,
+
   faRightFromBracket,
   faChartColumn,
   faClipboardList,
   faGear,
+  faChartPie,
 } from "@fortawesome/free-solid-svg-icons";
 
 import styles from "./Sidebar.module.css";
 
 import logo from "../../../assets/images/logo-su5.png";
 import {
-  EXECUTIVE_NAV,
+
   REPORT_NAV_GROUP,
   DUTY_NAV_GROUP,
   SETTINGS_NAV,
   type NavItemId,
   getNavItemsByRole,
   getNavGroupLabelByRole,
+  EXECUTIVE_NAV_GROUP,
 } from "../../../types/navigation";
 import NavGroup from "./NavGroup";
 import { useNavGroupState } from "./useNavGroupState";
@@ -50,16 +52,12 @@ export default function Sidebar({
   const userRole = account?.vaiTro?.tenVaiTro || null;
   const allowedNavItems = getNavItemsByRole(userRole, isParentUnit());
 
-  const iconById: Record<NavItemId, IconProp> = {
-    executive: faGaugeHigh,
-    "report-troop": faChartColumn,
-    "report-training": faChartColumn,
-    "report-family": faChartColumn,
-    "report-communication": faChartColumn,
-    "duty-command": faClipboardList,
-    "duty-tactical": faClipboardList,
-    settings: faGear,
-  };
+
+
+  const executiveActive = EXECUTIVE_NAV_GROUP.items.some(
+    (item) =>
+      item.id === activeId && allowedNavItems.some((nav) => nav.id === item.id),
+  );
 
   const reportActive = REPORT_NAV_GROUP.items.some(
     (item) =>
@@ -72,11 +70,11 @@ export default function Sidebar({
 
   const [reportsOpen, setReportsOpen] = useNavGroupState("reportsOpen");
   const [dutyOpen, setDutyOpen] = useNavGroupState("dutyOpen");
-
+  const [executiveOpen, setExecutiveOpen] = useNavGroupState("executiveOpen");
   const [prevCollapsed, setPrevCollapsed] = useState(collapsed);
 
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
-  const executiveRef = useRef<HTMLButtonElement>(null);
+
   const settingsRef = useRef<HTMLButtonElement>(null);
   const logoutRef = useRef<HTMLButtonElement>(null);
 
@@ -95,7 +93,9 @@ export default function Sidebar({
 
   if (collapsed !== prevCollapsed) {
     setPrevCollapsed(collapsed);
-
+    if (!executiveActive) {
+      setExecutiveOpen(false);
+    }
     if (collapsed) {
       if (!reportActive) {
         setReportsOpen(false);
@@ -106,7 +106,9 @@ export default function Sidebar({
     }
   }
 
-  const showExecutive = allowedNavItems.some((nav) => nav.id === "executive");
+  const showExecutiveGroup = EXECUTIVE_NAV_GROUP.items.some((item) =>
+    allowedNavItems.some((nav) => nav.id === item.id),
+  );
   const showReportGroup = REPORT_NAV_GROUP.items.some((item) =>
     allowedNavItems.some((nav) => nav.id === item.id),
   );
@@ -141,28 +143,23 @@ export default function Sidebar({
         </div>
 
         <nav className={styles.nav} aria-label="Điều hướng chính">
-          {showExecutive && (
-            <button
-              ref={executiveRef}
-              type="button"
-              className={
-                activeId === EXECUTIVE_NAV.id
-                  ? `${styles.navItem} ${styles.active}`
-                  : styles.navItem
-              }
-              onClick={() => onNavigate(EXECUTIVE_NAV.id)}
-              aria-label={collapsed ? EXECUTIVE_NAV.label : undefined}
-              onMouseEnter={() =>
-                handleTooltipEnter(EXECUTIVE_NAV.label, executiveRef)
-              }
-              onMouseLeave={handleTooltipLeave}
-            >
-              <FontAwesomeIcon
-                icon={iconById[EXECUTIVE_NAV.id]}
-                className={styles.navIcon}
-              />
-              {!collapsed && EXECUTIVE_NAV.label}
-            </button>
+          {showExecutiveGroup && (
+            <NavGroup
+              label={EXECUTIVE_NAV_GROUP.label}
+              icon={faChartPie}
+              items={EXECUTIVE_NAV_GROUP.items.filter((item) =>
+                allowedNavItems.some((nav) => nav.id === item.id),
+              )}
+              isOpen={executiveOpen}
+              onToggle={() => setExecutiveOpen(!executiveOpen)}
+              activeId={activeId}
+              onNavigate={(id) => onNavigate(id as NavItemId)}
+              collapsed={collapsed}
+              onExpand={onExpand}
+              isActive={executiveActive}
+              onTooltipEnter={handleTooltipEnter}
+              onTooltipLeave={handleTooltipLeave}
+            />
           )}
 
           {showReportGroup && (

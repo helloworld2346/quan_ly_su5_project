@@ -13,6 +13,7 @@ import type { UnitTroopChart } from "../../../types/troopStats";
 type Props = {
   chart: UnitTroopChart;
   size?: "hero" | "large" | "small";
+  variant?: "default" | "compact" | "executive";
   badge?: string;
   unitType?: UnitTroopChart["unitType"];
 };
@@ -36,6 +37,7 @@ function formatNumber(value: number) {
 export default function PieChart({
   chart,
   size = "small",
+  variant = "default",
   badge,
   unitType = chart.unitType,
 }: Props) {
@@ -44,7 +46,7 @@ export default function PieChart({
 
   const segments = useMemo(() => getChartSegments(chart), [chart]);
   const sized = useMemo(() => getSegmentOffsets(segments), [segments]);
-  
+
 
   const [hovered, setHovered] = useState<AttendanceKey | null>(null);
 
@@ -72,8 +74,13 @@ export default function PieChart({
         isHero
           ? `${styles.card} ${styles.hero}`
           : isLarge
-            ? `${styles.card} ${styles.large}`
-            : styles.card
+            ? `${styles.card} ${styles.large} ${variant === "compact"
+              ? styles.compact
+              : variant === "executive"
+                ? styles.executive
+                : ""
+            }`
+            : `${styles.card} ${variant === "compact" ? styles.compact : ""}`
       }
     >
       <div
@@ -87,7 +94,7 @@ export default function PieChart({
       >
         <div className={styles.titleContainer}>
           {!isLarge && !isHero && (
-            <div className={styles.title}>{chart.name}</div> 
+            <div className={styles.title}>{chart.name}</div>
           )}
           {badge && (
             <div className={styles.headerMeta}>
@@ -224,7 +231,7 @@ export default function PieChart({
                   {formatNumber(segment.value)}
                 </span>
                 <span className={styles.legendPercent}>
-                  {((segment.value / chart.total) * 100).toFixed(1)}%
+                {chart.total > 0 ? ((segment.value / chart.total) * 100).toFixed(1) : "0"}%
                 </span>
               </button>
             </li>
