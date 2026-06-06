@@ -58,6 +58,8 @@ export type ReportItemInput = {
   thongTinVang: string;
   chiTietVang?: string;
   ghiChu?: string | null;
+  trucBanChiHuy?: string;
+  trucBanTacChien?: string;
   donVi: { maDonVi: string; tenDonvi: string };
   caTruc: CaTrucInfo;
 };
@@ -70,8 +72,8 @@ export interface CreateReportRequest {
   thongTinVang: string;
   chiTietVang?: string;
   donVi: string;
-  trucBanChiHuy?: string; // JSON.stringify(TrucNguoiInfo)
-  trucBanTacChien?: string; // JSON.stringify(TrucNguoiInfo)
+  trucBanChiHuy?: string;
+  trucBanTacChien?: string;
 }
 
 export interface CreateReportResponse {
