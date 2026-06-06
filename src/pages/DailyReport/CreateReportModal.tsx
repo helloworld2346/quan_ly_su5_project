@@ -26,6 +26,7 @@ const LY_DO_OPTIONS: { value: keyof VangChiTiet; label: string }[] = [
   { value: "choHuu", label: "Chờ hưu" },
   { value: "nghiTranhThu", label: "Nghỉ tranh thủ" },
   { value: "phep", label: "Phép" },
+  { value: "lyDoVangKhac", label: "Lý do khác" },
 ];
 
 const CAP_BAC_OPTIONS = [
@@ -203,6 +204,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       congTacSuDoan: 0,
       hocSQ: 0,
       hocCS: 0,
+      lyDoVangKhac: 0,
     };
 
     absentRows.forEach((row) => {

@@ -41,6 +41,7 @@ interface ReportRow {
   idDonBaoCao: string;
   donVi: string;
   tenDonVi: string;
+  kyhieuDonVi?: string;
   quanSoTong: number;
   quanSoHienDien: number;
   quanSoVang: number;
@@ -89,6 +90,7 @@ const EMPTY_VANG: VangChiTiet = {
   congTacSuDoan: 0,
   hocSQ: 0,
   hocCS: 0,
+  lyDoVangKhac: 0,
 };
 
 function mapItemToRow(item: ReportItemInput): ReportRow {
@@ -113,6 +115,7 @@ function mapItemToRow(item: ReportItemInput): ReportRow {
     idDonBaoCao: item.idDonBaoCao,
     donVi: item.donVi.maDonVi,
     tenDonVi: item.donVi.tenDonvi,
+    kyhieuDonVi: item.donVi.kyhieuDonvi,
     quanSoTong: item.quanSoTong,
     quanSoHienDien: item.quanSoHienDien,
     quanSoVang: item.quanSoVang,
@@ -285,6 +288,7 @@ export default function DailyTroopReport() {
         congTacSuDoan: acc.congTacSuDoan + r.vang.congTacSuDoan,
         hocSQ: acc.hocSQ + r.vang.hocSQ,
         hocCS: acc.hocCS + r.vang.hocCS,
+        lyDoVangKhac: acc.lyDoVangKhac + (r.vang.lyDoVangKhac ?? 0),
       }),
       { ...EMPTY_VANG },
     );
@@ -412,12 +416,12 @@ export default function DailyTroopReport() {
     setActiveMenuUnit(null);
   };
 
-  const handleRefuseReportClick = (row: ReportRow) => {
-    setRefuseReportId(row.idDonBaoCao);
-    setRefuseUnitName(row.tenDonVi);
-    setShowRefuseDialog(true);
-    setActiveMenuUnit(null);
-  };
+const handleRefuseReportClick = (row: ReportRow) => {
+  setRefuseReportId(row.idDonBaoCao);
+  setRefuseUnitName(row.kyhieuDonVi || row.tenDonVi);
+  setShowRefuseDialog(true);
+  setActiveMenuUnit(null);
+};
 
   const handleRefuseConfirm = async (reason: string) => {
     if (!refuseReportId) return;
@@ -479,6 +483,7 @@ export default function DailyTroopReport() {
         row.vang.congTacSuDoan,
         row.vang.hocSQ,
         row.vang.hocCS,
+        row.vang.lyDoVangKhac,
         row.ghiChu,
       ]
         .join(" ")
@@ -510,6 +515,7 @@ export default function DailyTroopReport() {
         congTacSuDoan: acc.congTacSuDoan + row.vang.congTacSuDoan,
         hocSQ: acc.hocSQ + row.vang.hocSQ,
         hocCS: acc.hocCS + row.vang.hocCS,
+        lyDoVangKhac: acc.lyDoVangKhac + (row.vang.lyDoVangKhac ?? 0),
       }),
       {
         quanSoTong: 0,
@@ -528,6 +534,7 @@ export default function DailyTroopReport() {
         congTacSuDoan: 0,
         hocSQ: 0,
         hocCS: 0,
+        lyDoVangKhac: 0,
       },
     );
   }, [reportData]);
@@ -633,7 +640,7 @@ export default function DailyTroopReport() {
               : undefined
         }
       >
-        <td className={styles.unitCell}>{row.tenDonVi}</td>
+        <td className={styles.unitCell}>{row.kyhieuDonVi || row.tenDonVi}</td>
         <td>{row.quanSoTong}</td>
         <td>{row.quanSoHienDien}</td>
         <td>{row.quanSoVang}</td>
@@ -650,6 +657,7 @@ export default function DailyTroopReport() {
         <td>{row.vang.congTacSuDoan}</td>
         <td>{row.vang.hocSQ}</td>
         <td>{row.vang.hocCS}</td>
+        <td>{row.vang.lyDoVangKhac ?? 0}</td>
         <td>
           <ReportStatusBadge status={row.status} />
         </td>
@@ -780,7 +788,7 @@ export default function DailyTroopReport() {
                 <th rowSpan={3}>Tổng quân số</th>
                 <th rowSpan={3}>Hiện diện</th>
                 <th rowSpan={3}>Tổng vắng</th>
-                <th colSpan={13}>Quân số vắng</th>
+                <th colSpan={14}>Quân số vắng</th>
                 <th rowSpan={3}>Trạng thái</th>
                 <th rowSpan={3}>Ghi chú</th>
                 <th rowSpan={3}>Thao tác</th>
@@ -794,6 +802,7 @@ export default function DailyTroopReport() {
                 <th colSpan={2}>Viện</th>
                 <th colSpan={2}>Công tác</th>
                 <th colSpan={2}>Học</th>
+                <th rowSpan={2}>Lý do khác</th>
               </tr>
               <tr>
                 <th>Ngoài Sư Đoàn</th>
@@ -812,13 +821,13 @@ export default function DailyTroopReport() {
             <tbody>
               {filteredRows.length === 0 && !parentReportData ? (
                 <tr className={styles.noReportRow}>
-                  <td colSpan={21}>Không có dữ liệu báo cáo</td>
+                  <td colSpan={22}>Không có dữ liệu báo cáo</td>
                 </tr>
               ) : (
                 <>
                   {isParentUnit && filteredRows.length > 0 && (
                     <tr className={styles.separatorRow}>
-                      <td colSpan={21}>Báo cáo đơn vị con</td>
+                      <td colSpan={22}>Báo cáo đơn vị con</td>
                     </tr>
                   )}
 
@@ -843,6 +852,7 @@ export default function DailyTroopReport() {
                       <td>{totals.congTacSuDoan}</td>
                       <td>{totals.hocSQ}</td>
                       <td>{totals.hocCS}</td>
+                      <td>{totals.lyDoVangKhac}</td>
                       <td></td>
                       <td></td>
                       <td></td>
@@ -851,7 +861,7 @@ export default function DailyTroopReport() {
 
                   {isParentUnit && (
                     <tr className={styles.separatorRow}>
-                      <td colSpan={21}>Báo cáo tổng hợp</td>
+                      <td colSpan={22}>Báo cáo tổng hợp</td>
                     </tr>
                   )}
 
@@ -859,7 +869,7 @@ export default function DailyTroopReport() {
                     ? renderReportRow(parentReportData, true)
                     : isParentUnit && (
                         <tr className={styles.noConsolidatedRow}>
-                          <td colSpan={21}>Chưa có báo cáo tổng hợp</td>
+                          <td colSpan={22}>Chưa có báo cáo tổng hợp</td>
                         </tr>
                       )}
                 </>
@@ -929,7 +939,7 @@ export default function DailyTroopReport() {
 
       {selectedReportRow && (
         <TroopDetailModal
-          unit={selectedReportRow.tenDonVi}
+          unit={selectedReportRow.kyhieuDonVi || selectedReportRow.tenDonVi}
           members={selectedReportRow.chiTietVangList.map((m) => ({
             id: m.id,
             name: m.hoTen,

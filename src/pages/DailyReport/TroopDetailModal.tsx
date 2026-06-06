@@ -18,6 +18,7 @@ const LY_DO_VANG_MAP: Record<string, string> = {
   congTacSuDoan: "Công tác (Sư đoàn)",
   hocSQ: "Học Sĩ quan",
   hocCS: "Học Chiến sĩ",
+  lyDoVangKhac: "Lý do khác",
 };
 
 interface TrucNguoiParsed {

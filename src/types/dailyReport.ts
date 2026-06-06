@@ -37,6 +37,7 @@ export interface VangChiTiet {
   congTacSuDoan: number;
   hocSQ: number;
   hocCS: number;
+  lyDoVangKhac: number;
 }
 
 export interface AbsentRow {
@@ -60,7 +61,7 @@ export type ReportItemInput = {
   ghiChu?: string | null;
   trucBanChiHuy?: string;
   trucBanTacChien?: string;
-  donVi: { maDonVi: string; tenDonvi: string };
+  donVi: { maDonVi: string; tenDonvi: string; kyhieuDonvi?: string };
   caTruc: CaTrucInfo;
 };
 
