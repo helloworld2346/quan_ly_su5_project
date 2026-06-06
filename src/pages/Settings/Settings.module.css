@@ -271,3 +271,18 @@
     font-size: 14px;  
   }  
 }
+
+.warningBanner {  
+  display: flex;  
+  align-items: flex-start;  
+  gap: 12px;  
+  padding: 14px 18px;  
+  margin-top: 10px;
+  background: #fff8e1;  
+  border: 1.5px solid #f59e0b;  
+  border-radius: 10px;  
+  margin-bottom: 20px;  
+  color: #92400e;  
+  font-size: 14px;  
+  font-weight: 500;  
+}

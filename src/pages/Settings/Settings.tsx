@@ -1,11 +1,16 @@
+// src/pages/Settings/Settings.tsx
 import { useState, useEffect, useMemo } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUserCog } from "@fortawesome/free-solid-svg-icons";
+import {
+  faUserCog,
+  faTriangleExclamation,
+} from "@fortawesome/free-solid-svg-icons";
 
 import { accountService } from "../../services/account/accountService";
 import { donviService } from "../../services/unit/unitService";
 import { useToast } from "../../context/useToast";
+import { useAuth } from "../../context/useAuth";
 import type { Account, DonVi } from "../../types/account";
 
 import styles from "./Settings.module.css";
@@ -22,6 +27,7 @@ export default function Settings() {
   const [saving, setSaving] = useState(false);
 
   const { showError } = useToast();
+  const { refreshAccount } = useAuth();
 
   const quanSoTong = useMemo(
     () => quanSoSiQuan + quanSoHsqBs + quanSoQncn,
@@ -85,6 +91,7 @@ export default function Settings() {
         setQuanSoHsqBs(response.Result.quanSoHsqBs);
         setQuanSoSiQuan(response.Result.quanSoSiQuan);
         setQuanSoQncn(response.Result.quanSoQncn);
+        await refreshAccount();
       } else {
         showError(response.message || "Cập nhật thất bại");
       }
@@ -110,9 +117,7 @@ export default function Settings() {
   if (error) {
     return (
       <div className={styles.container}>
-        <div className={styles.error}>
-          {error}
-        </div>
+        <div className={styles.error}>{error}</div>
       </div>
     );
   }
@@ -120,9 +125,7 @@ export default function Settings() {
   if (!account) {
     return (
       <div className={styles.container}>
-        <div className={styles.error}>
-          Không tìm thấy thông tin tài khoản
-        </div>
+        <div className={styles.error}>Không tìm thấy thông tin tài khoản</div>
       </div>
     );
   }
@@ -178,6 +181,19 @@ export default function Settings() {
           </div>
         </div>
       </div>
+
+      {donVi && donVi.quanSoTong === 0 && (
+        <div className={styles.warningBanner}>
+          <FontAwesomeIcon
+            icon={faTriangleExclamation}
+            className={styles.warningIcon}
+          />
+          <div>
+            <strong>Chưa nhập quân số biên chế.</strong> Vui lòng nhập quân số
+            bên dưới để có thể sử dụng các tính năng báo cáo.
+          </div>
+        </div>
+      )}
 
       {donVi && (
         <div className={styles.cardSection}>
