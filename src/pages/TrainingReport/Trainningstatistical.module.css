@@ -204,6 +204,44 @@
   color: var(--login-text-muted);
 }
 
+/* ── Chi tiết đơn vị ── */
+.filterBar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.filterBtn {
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--login-border);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--login-text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.filterBtn:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.filterBtnActive {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: #fff;
+}
+
+.unitGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
 /* ── Responsive ── */
 @media (max-width: 1200px) {
   .metricsBar {
