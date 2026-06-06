@@ -237,18 +237,12 @@ export default function DailyTroopReport() {
   }, [maDonViCurrent, isParentUnit, reportDate]);
 
   useEffect(() => {
-    let isCurrent = true;
-
-    if (isCurrent && maDonViCurrent) {
-      Promise.resolve().then(() => {
-        fetchReports();
-      });
-    }
-
-    return () => {
-      isCurrent = false;
-    };
-  }, [fetchReports, maDonViCurrent]);
+    if (!maDonViCurrent) return;
+    const id = setTimeout(() => {
+      void fetchReports();
+    }, 0);
+    return () => clearTimeout(id);
+  }, [fetchReports]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const fetchDonViInfo = async () => {
