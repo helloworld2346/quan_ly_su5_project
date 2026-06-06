@@ -1,3 +1,4 @@
+// src/types/navigation.ts
 import { lazy } from "react";
 
 export type NavItemId =
@@ -7,6 +8,7 @@ export type NavItemId =
   | "report-training"
   | "report-family"
   | "report-communication"
+  | "statistics"
   | "duty-command"
   | "duty-tactical"
   | "settings";
@@ -33,6 +35,9 @@ const TrainingReport = lazy(
 const FamilyReport = lazy(() => import("../pages/FamilyReport/FamilyReport"));
 const CommunicationReport = lazy(
   () => import("../pages/CommunicationReport/CommunicationReport"),
+);
+const ReportStatistics = lazy(
+  () => import("../pages/ReportStatistics/ReportStatistics"),
 );
 const CommandDuty = lazy(() => import("../pages/CommandDuty/CommandDuty"));
 const TacticalDuty = lazy(() => import("../pages/TacticalDuty/TacticalDuty"));
@@ -112,6 +117,16 @@ export const REPORT_NAV_GROUP = {
   ],
 };
 
+export const STATISTICS_NAV: NavItem = {
+  id: "statistics",
+  label: "Thống kê báo cáo",
+  path: "/statistics",
+  loadingTitle: "Đang tải thống kê",
+  loadingSubtitle: "Đang tải dữ liệu…",
+  component: ReportStatistics,
+  allowedRoles: ["Quản Trị Viên", "Sư đoàn", "Chỉ huy", "Báo cáo"],
+};
+
 export const DUTY_NAV_GROUP = {
   label: "Trực ban",
   items: [
@@ -153,6 +168,7 @@ export const NAV_PAGE_TITLES: Record<NavItemId, string | undefined> = {
   "report-training": "Báo ban quân số huấn luyện",
   "report-family": "Báo ban thân nhân thăm nuôi",
   "report-communication": "Báo ban thông tin liên lạc",
+  statistics: "Thống kê báo ban",
   "duty-command": "Trực chỉ huy",
   "duty-tactical": "Trực ban tác chiến",
   settings: "Cài đặt",
@@ -162,6 +178,7 @@ export const ALL_NAV_ITEMS: NavItem[] = [
   EXECUTIVE_NAV,
   EXECUTIVE_TRAINING_NAV,
   ...REPORT_NAV_GROUP.items,
+  STATISTICS_NAV,
   ...DUTY_NAV_GROUP.items,
   SETTINGS_NAV,
 ];
@@ -177,7 +194,7 @@ export function getIdByPath(path: string): NavItemId {
 }
 
 export function getNavGroupLabel(activeId: NavItemId): string | null {
-  if (activeId === "settings") return null;
+  if (activeId === "settings" || activeId === "statistics") return null;
 
   if (EXECUTIVE_NAV_GROUP.items.some((i) => i.id === activeId)) {
     return EXECUTIVE_NAV_GROUP.label;
@@ -229,10 +246,7 @@ function normalizeRoleName(role: string): string {
   return role;
 }
 
-export function getNavItemsByRole(
-  userRole: string | null,
-  isParentUnit: boolean = false,
-): NavItem[] {
+export function getNavItemsByRole(userRole: string | null): NavItem[] {
   if (!userRole) return [];
 
   const normalizedRole = normalizeRoleName(userRole);
@@ -247,6 +261,7 @@ export function getNavItemsByRole(
         item.id === "executive" ||
         item.id === "executive-training" ||
         item.id.startsWith("report-") ||
+        item.id === "statistics" ||
         item.id.startsWith("duty-") ||
         item.id === "settings",
     );
@@ -256,21 +271,19 @@ export function getNavItemsByRole(
     return ALL_NAV_ITEMS.filter(
       (item) =>
         item.id.startsWith("report-") ||
+        item.id === "statistics" ||
         item.id.startsWith("duty-") ||
         item.id === "settings",
     );
   }
 
   if (normalizedRole === "Báo cáo") {
-    if (isParentUnit) {
-      return ALL_NAV_ITEMS.filter(
-        (item) => item.id.startsWith("report-") || item.id === "settings",
-      );
-    } else {
-      return ALL_NAV_ITEMS.filter(
-        (item) => item.id.startsWith("report-") || item.id === "settings",
-      );
-    }
+    return ALL_NAV_ITEMS.filter(
+      (item) =>
+        item.id.startsWith("report-") ||
+        item.id === "statistics" ||
+        item.id === "settings",
+    );
   }
 
   return ALL_NAV_ITEMS.filter((item) => {

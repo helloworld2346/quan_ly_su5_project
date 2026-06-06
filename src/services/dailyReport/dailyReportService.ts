@@ -9,6 +9,7 @@ import type {
   RefuseRequest,
   SearchReportResponse,
   SearchChildrenResponse,
+  SearchByRangeResponse,
 } from "../../types/dailyReport";
 
 export const dailyReportService = {
@@ -69,6 +70,18 @@ export const dailyReportService = {
     const response = await apiNoPrefix.get<SearchChildrenResponse>(
       `/donbaocao/search/DonVi/${maDonVi}/children`,
       { params: { ngayLoc } },
+    );
+    return response.data;
+  },
+
+  searchReportsByRange: async (
+    idDonVi: string,
+    start: string,
+    end: string,
+  ): Promise<SearchByRangeResponse> => {
+    const response = await apiNoPrefix.get<SearchByRangeResponse>(
+      `/donbaocao/don-bao-cao/search`,
+      { params: { idDonVi, start, end } },
     );
     return response.data;
   },

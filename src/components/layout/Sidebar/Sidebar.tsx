@@ -1,23 +1,20 @@
 import { useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
 import {
-
   faRightFromBracket,
   faChartColumn,
   faClipboardList,
   faGear,
   faChartPie,
+  faChartBar,
 } from "@fortawesome/free-solid-svg-icons";
-
 import styles from "./Sidebar.module.css";
-
 import logo from "../../../assets/images/logo-su5.png";
 import {
-
   REPORT_NAV_GROUP,
   DUTY_NAV_GROUP,
   SETTINGS_NAV,
+  STATISTICS_NAV,
   type NavItemId,
   getNavItemsByRole,
   getNavGroupLabelByRole,
@@ -50,15 +47,12 @@ export default function Sidebar({
 }: Props) {
   const { account, isParentUnit } = useAuth();
   const userRole = account?.vaiTro?.tenVaiTro || null;
-  const allowedNavItems = getNavItemsByRole(userRole, isParentUnit());
-
-
+  const allowedNavItems = getNavItemsByRole(userRole);
 
   const executiveActive = EXECUTIVE_NAV_GROUP.items.some(
     (item) =>
       item.id === activeId && allowedNavItems.some((nav) => nav.id === item.id),
   );
-
   const reportActive = REPORT_NAV_GROUP.items.some(
     (item) =>
       item.id === activeId && allowedNavItems.some((nav) => nav.id === item.id),
@@ -76,6 +70,7 @@ export default function Sidebar({
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
 
   const settingsRef = useRef<HTMLButtonElement>(null);
+  const statisticsRef = useRef<HTMLButtonElement>(null);
   const logoutRef = useRef<HTMLButtonElement>(null);
 
   const handleTooltipEnter = (
@@ -114,6 +109,9 @@ export default function Sidebar({
   );
   const showDutyGroup = DUTY_NAV_GROUP.items.some((item) =>
     allowedNavItems.some((nav) => nav.id === item.id),
+  );
+  const showStatistics = allowedNavItems.some(
+    (nav) => nav.id === STATISTICS_NAV.id,
   );
   const showSettings = allowedNavItems.some((nav) => nav.id === "settings");
 
@@ -198,6 +196,27 @@ export default function Sidebar({
               onTooltipEnter={handleTooltipEnter}
               onTooltipLeave={handleTooltipLeave}
             />
+          )}
+
+          {showStatistics && (
+            <button
+              ref={statisticsRef}
+              type="button"
+              className={
+                activeId === STATISTICS_NAV.id
+                  ? `${styles.navItem} ${styles.active}`
+                  : styles.navItem
+              }
+              onClick={() => onNavigate(STATISTICS_NAV.id)}
+              aria-label={collapsed ? STATISTICS_NAV.label : undefined}
+              onMouseEnter={() =>
+                handleTooltipEnter(STATISTICS_NAV.label, statisticsRef)
+              }
+              onMouseLeave={handleTooltipLeave}
+            >
+              <FontAwesomeIcon icon={faChartBar} className={styles.navIcon} />
+              {!collapsed && STATISTICS_NAV.label}
+            </button>
           )}
 
           {showSettings && (

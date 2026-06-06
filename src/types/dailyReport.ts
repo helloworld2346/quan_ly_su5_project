@@ -96,6 +96,7 @@ export interface CreateReportResponse {
     donVi: {
       maDonVi: string;
       tenDonvi: string;
+      kyhieuDonvi?: string;
     };
     caTruc: CaTrucInfo;
   };
@@ -132,6 +133,7 @@ export interface UpdateReportResponse {
     donVi: {
       maDonVi: string;
       tenDonvi: string;
+      kyhieuDonvi?: string;
     };
     caTruc: CaTrucInfo;
   };
@@ -152,6 +154,7 @@ export interface ApproveResponse {
     donVi: {
       maDonVi: string;
       tenDonvi: string;
+      kyhieuDonvi?: string;
     };
     caTruc: CaTrucInfo;
   };
@@ -177,6 +180,7 @@ export interface RefuseResponse {
     donVi: {
       maDonVi: string;
       tenDonvi: string;
+      kyhieuDonvi?: string;
     };
     caTruc: CaTrucInfo;
   };
@@ -201,6 +205,7 @@ export interface SearchReportResponse {
     donVi: {
       maDonVi: string;
       tenDonvi: string;
+      kyhieuDonvi?: string;
     };
     caTruc: CaTrucInfo;
   };
@@ -225,7 +230,29 @@ export interface SearchChildrenResponse {
     donVi: {
       maDonVi: string;
       tenDonvi: string;
+      kyhieuDonvi?: string;
     };
+    caTruc: CaTrucInfo;
+  }>;
+}
+
+export interface SearchByRangeResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  Result: Array<{
+    idDonBaoCao: string;
+    quanSoTong: number;
+    quanSoHienDien: number;
+    quanSoVang: number;
+    thoiGianBaoCao: string;
+    thongTinVang: string;
+    chiTietVang?: string;
+    trucBanChiHuy?: string;
+    trucBanTacChien?: string;
+    ghiChu?: string | null;
+    status: string;
+    donVi: { maDonVi: string; tenDonvi: string; kyhieuDonvi?: string };
     caTruc: CaTrucInfo;
   }>;
 }

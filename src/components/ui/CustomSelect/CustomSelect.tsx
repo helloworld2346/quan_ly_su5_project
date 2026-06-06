@@ -123,7 +123,10 @@ export default function CustomSelect({
               left: dropdownPos.left,
               width: dropdownPos.width,
             }}
-            onMouseDown={(e) => e.preventDefault()}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
           >
             {options.map((opt, i) => {
               const isSelected = opt.value === value;
