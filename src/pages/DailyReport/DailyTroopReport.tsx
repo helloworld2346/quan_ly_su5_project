@@ -157,6 +157,10 @@ export default function DailyTroopReport() {
 
   const { account } = useAuth();
   const { showError, showSuccess } = useToast();
+  const showErrorRef = useRef(showError);
+  useEffect(() => {
+    showErrorRef.current = showError;
+  }, [showError]);
 
   const maDonViCurrent = account?.donVi?.maDonVi;
 
@@ -210,14 +214,14 @@ export default function DailyTroopReport() {
       }
     } catch (error) {
       handleApiError(error, {
-        showError,
+        showError: showErrorRef.current,
         errorMessage: "Không thể tải dữ liệu báo cáo",
         clearData: () => setReportData([]),
       });
     } finally {
       setLoading(false);
     }
-  }, [maDonViCurrent, isParentUnit, reportDate, showError]);
+  }, [maDonViCurrent, isParentUnit, reportDate]);
 
   useEffect(() => {
     let isCurrent = true;
@@ -934,6 +938,8 @@ export default function DailyTroopReport() {
             reason: m.lyDoVang,
           }))}
           onClose={() => setSelectedReportRow(null)}
+          trucBanChiHuy={selectedReportRow.rawItem.trucBanChiHuy}
+          trucBanTacChien={selectedReportRow.rawItem.trucBanTacChien}
         />
       )}
 

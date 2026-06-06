@@ -26,24 +26,15 @@ const LY_DO_OPTIONS: { value: keyof VangChiTiet; label: string }[] = [
 ];
 
 const CAP_BAC_OPTIONS = [
-  "Binh nhì",
-  "Binh nhất",
-  "Hạ sĩ",
-  "Trung sĩ",
-  "Thượng sĩ",
   "Thiếu úy",
   "Trung úy",
   "Thượng úy",
   "Đại úy",
   "Thiếu tá",
   "Trung tá",
-  "Thượng tá",
 ];
 
 const CHUC_VU_OPTIONS = [
-  "Chiến sĩ",
-  "Tiểu đội trưởng",
-  "Phó trung đội trưởng",
   "Trung đội trưởng",
   "Phó đại đội trưởng",
   "Đại đội trưởng",

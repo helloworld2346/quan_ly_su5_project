@@ -20,13 +20,52 @@ const LY_DO_VANG_MAP: Record<string, string> = {
   hocCS: "Học Chiến sĩ",
 };
 
+interface TrucNguoiParsed {
+  tenNguoitruc?: string;
+  capbacNguoitruc?: string;
+  chucvuNguoitruc?: string;
+  sodienthoai?: string;
+}
+
+function parseTruc(raw?: string): TrucNguoiParsed | null {
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as TrucNguoiParsed;
+  } catch {
+    return null;
+  }
+}
+
+function formatTruc(truc: TrucNguoiParsed | null): string {
+  if (!truc) return "Chưa có thông tin";
+  return [
+    truc.capbacNguoitruc,
+    truc.chucvuNguoitruc,
+    truc.tenNguoitruc,
+    truc.sodienthoai,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+}
+
 type Props = {
   unit: string;
   members: TroopMember[];
   onClose: () => void;
+  trucBanChiHuy?: string;
+  trucBanTacChien?: string;
 };
 
-export default function TroopDetailModal({ unit, members, onClose }: Props) {
+export default function TroopDetailModal({
+  unit,
+  members,
+  onClose,
+  trucBanChiHuy,
+  trucBanTacChien,
+}: Props) {
+  const parsedTrucChiHuy = parseTruc(trucBanChiHuy);
+  const parsedTrucBanTacChien = parseTruc(trucBanTacChien);
+
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -44,8 +83,6 @@ export default function TroopDetailModal({ unit, members, onClose }: Props) {
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           <div className={styles.headerContent}>
-            <h2 className={styles.title}>Chi tiết quân số vắng</h2>
-
             <div className={styles.subTitle}>{unit}</div>
           </div>
 
@@ -59,6 +96,26 @@ export default function TroopDetailModal({ unit, members, onClose }: Props) {
         </div>
 
         <div className={styles.body}>
+          {(parsedTrucChiHuy || parsedTrucBanTacChien) && (
+            <div className={styles.trucSection}>
+              <div className={styles.trucTitle}>Thông tin trực đơn vị</div>
+              <div className={styles.trucGrid}>
+                <div className={styles.trucItem}>
+                  <span className={styles.trucRole}>Trực chỉ huy</span>
+                  <span className={styles.trucInfo}>
+                    {formatTruc(parsedTrucChiHuy)}
+                  </span>
+                </div>
+                <div className={styles.trucItem}>
+                  <span className={styles.trucRole}>Trực ban tác chiến</span>
+                  <span className={styles.trucInfo}>
+                    {formatTruc(parsedTrucBanTacChien)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+          <h2 className={styles.title}>Chi tiết quân số vắng</h2>
           <div className={styles.summary}>
             <div className={styles.summaryCard}>
               <span>Số quân nhân vắng</span>
@@ -88,9 +145,7 @@ export default function TroopDetailModal({ unit, members, onClose }: Props) {
                       <td className={styles.nameCell}>{m.name}</td>
                       <td>{m.rank}</td>
                       <td>{m.position}</td>
-                      <td>
-                        {LY_DO_VANG_MAP[m.reason] || m.reason}
-                      </td>
+                      <td>{LY_DO_VANG_MAP[m.reason] || m.reason}</td>
                     </tr>
                   ))}
                 </tbody>
