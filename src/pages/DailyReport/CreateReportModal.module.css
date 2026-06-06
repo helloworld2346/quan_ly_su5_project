@@ -331,3 +331,33 @@
   text-transform: uppercase;  
   letter-spacing: 0.5px;  
 }
+
+.sectionActions {  
+  display: flex;  
+  gap: 8px;  
+  align-items: center;  
+  flex-shrink: 0;  
+}  
+  
+.btnLoadYesterday {  
+  padding: 7px 14px;  
+  border-radius: 8px;  
+  border: 1px solid var(--primary-color, #218673);  
+  background: transparent;  
+  color: var(--primary-color, #218673);  
+  font-size: 13px;  
+  font-weight: 600;  
+  cursor: pointer;  
+  white-space: nowrap;  
+  transition: background 0.15s, color 0.15s;  
+}  
+  
+.btnLoadYesterday:hover:not(:disabled) {  
+  background: var(--primary-color, #218673);  
+  color: #fff;  
+}  
+  
+.btnLoadYesterday:disabled {  
+  opacity: 0.6;  
+  cursor: not-allowed;  
+}

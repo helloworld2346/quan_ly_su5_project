@@ -8,6 +8,9 @@ import type {
   CaTrucInfo,
   TrucNguoiInfo,
 } from "../../types/dailyReport";
+import { dailyReportService } from "../../services/dailyReport/dailyReportService";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
 const LY_DO_OPTIONS: { value: keyof VangChiTiet; label: string }[] = [
   { value: "hoiThaiNgoaiSuDoan", label: "Hội thao - Ngoài Sư Đoàn" },
@@ -115,6 +118,8 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
     parseTrucNguoi(initialData?.trucBanTacChien),
   );
 
+  const [isLoadingYesterday, setIsLoadingYesterday] = useState(false);
+
   const quanSoVang = absentRows.length;
   const quanSoHienDien = useMemo(() => {
     const result = tongQuanSo - quanSoVang;
@@ -146,6 +151,39 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
 
   const handleRemoveRow = (id: string) => {
     setAbsentRows((prev) => prev.filter((row) => row.id !== id));
+  };
+
+  const handleLoadYesterday = async () => {
+    if (!maDonViCurrent) return;
+
+    const d = new Date(ngayBaoCao);
+    d.setDate(d.getDate() - 1);
+    const yesterday = d.toISOString().split("T")[0];
+
+    if (absentRows.length > 0) {
+      const confirmed = window.confirm(
+        `Danh sách hiện tại sẽ bị thay thế bằng dữ liệu ngày ${yesterday}. Tiếp tục?`,
+      );
+      if (!confirmed) return;
+    }
+
+    setIsLoadingYesterday(true);
+    try {
+      const res = await dailyReportService.searchReportByUnitAndDate(
+        maDonViCurrent,
+        yesterday,
+      );
+      if (res.success && res.Result?.chiTietVang) {
+        const rows = JSON.parse(res.Result.chiTietVang) as AbsentRow[];
+        setAbsentRows(rows.map((r) => ({ ...r, id: crypto.randomUUID() })));
+      } else {
+        alert(`Không tìm thấy báo cáo ngày ${yesterday}.`);
+      }
+    } catch {
+      alert(`Không tìm thấy báo cáo ngày ${yesterday}.`);
+    } finally {
+      setIsLoadingYesterday(false);
+    }
   };
 
   const handleLocalSubmit = (e: React.FormEvent) => {
@@ -209,7 +247,6 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
         </div>
 
         <div className={styles.body}>
-          {/* Mật khẩu ca trực (readonly) */}
           {caTrucInfo?.matkhau && (
             <div className={styles.caTrucBanner}>
               <span className={styles.caTrucBannerLabel}>
@@ -221,7 +258,6 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
             </div>
           )}
 
-          {/* Quân số */}
           <div className={styles.coreGrid}>
             <div className={styles.field}>
               <label className={styles.label}>Ngày báo cáo</label>
@@ -268,7 +304,6 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
 
           <hr className={styles.divider} />
 
-          {/* Trực chỉ huy đơn vị */}
           <div className={styles.trucSectionHeader}>
             <span className={styles.trucSectionTitle}>Trực chỉ huy đơn vị</span>
           </div>
@@ -343,7 +378,6 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
 
           <hr className={styles.divider} />
 
-          {/* Trực ban tác chiến đơn vị */}
           <div className={styles.trucSectionHeader}>
             <span className={styles.trucSectionTitle}>
               Trực ban tác chiến đơn vị
@@ -420,20 +454,31 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
 
           <hr className={styles.divider} />
 
-          {/* Danh sách vắng */}
           <div className={styles.sectionHeader}>
             <h3 className={styles.sectionTitle}>
               {isConsolidation
                 ? "Danh sách tổng hợp quân nhân vắng mặt (từ các đơn vị con)"
                 : "Danh sách chi tiết quân nhân vắng mặt trong ngày"}
             </h3>
-            <button
-              type="button"
-              className={styles.btnAddRow}
-              onClick={handleAddRow}
-            >
-              + Thêm quân nhân vắng
-            </button>
+            <div className={styles.sectionActions}>
+              {!isConsolidation && !initialData && (
+                <button
+                  type="button"
+                  className={styles.btnLoadYesterday}
+                  onClick={handleLoadYesterday}
+                  disabled={isLoadingYesterday}
+                >
+                  {isLoadingYesterday ? "Đang tải..." : "Sao chép từ hôm qua"}
+                </button>
+              )}
+              <button
+                type="button"
+                className={styles.btnAddRow}
+                onClick={handleAddRow}
+              >
+                + Thêm quân nhân vắng
+              </button>
+            </div>
           </div>
 
           <div className={styles.tableContainer}>
@@ -542,7 +587,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                           onClick={() => handleRemoveRow(row.id)}
                           title="Xóa dòng"
                         >
-                          🗑️
+                          <FontAwesomeIcon icon={faTrash} />{" "}
                         </button>
                       </td>
                     </tr>
