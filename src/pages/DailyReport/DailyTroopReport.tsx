@@ -416,12 +416,12 @@ export default function DailyTroopReport() {
     setActiveMenuUnit(null);
   };
 
-const handleRefuseReportClick = (row: ReportRow) => {
-  setRefuseReportId(row.idDonBaoCao);
-  setRefuseUnitName(row.kyhieuDonVi || row.tenDonVi);
-  setShowRefuseDialog(true);
-  setActiveMenuUnit(null);
-};
+  const handleRefuseReportClick = (row: ReportRow) => {
+    setRefuseReportId(row.idDonBaoCao);
+    setRefuseUnitName(row.kyhieuDonVi || row.tenDonVi);
+    setShowRefuseDialog(true);
+    setActiveMenuUnit(null);
+  };
 
   const handleRefuseConfirm = async (reason: string) => {
     if (!refuseReportId) return;
@@ -894,37 +894,34 @@ const handleRefuseReportClick = (row: ReportRow) => {
           </div>
           <div className={styles.caTrucBody}>
             <div className={styles.caTrucLeft}>
-              <div className={styles.caTrucPerson}>
-                <span className={styles.caTrucRole}>Trực chỉ huy</span>
-                <span className={styles.caTrucName}>
-                  {trucInfoFromReport?.trucChiHuy
-                    ? [
-                        trucInfoFromReport.trucChiHuy.capbacNguoitruc,
-                        trucInfoFromReport.trucChiHuy.chucvuNguoitruc,
-                        trucInfoFromReport.trucChiHuy.tenNguoitruc,
-                        trucInfoFromReport.trucChiHuy.sodienthoai,
-                      ]
-                        .filter(Boolean)
-                        .join(" · ")
-                    : "Chưa có thông tin"}
-                </span>
-              </div>
-              <div className={styles.caTrucDivider} />
-              <div className={styles.caTrucPerson}>
-                <span className={styles.caTrucRole}>Trực ban tác chiến</span>
-                <span className={styles.caTrucName}>
-                  {trucInfoFromReport?.trucBanTacChien
-                    ? [
-                        trucInfoFromReport.trucBanTacChien.capbacNguoitruc,
-                        trucInfoFromReport.trucBanTacChien.chucvuNguoitruc,
-                        trucInfoFromReport.trucBanTacChien.tenNguoitruc,
-                        trucInfoFromReport.trucBanTacChien.sodienthoai,
-                      ]
-                        .filter(Boolean)
-                        .join(" · ")
-                    : "Chưa có thông tin"}
-                </span>
-              </div>
+              {[
+                { label: "Trực chỉ huy", data: trucInfoFromReport?.trucChiHuy },
+                {
+                  label: "Trực ban tác chiến",
+                  data: trucInfoFromReport?.trucBanTacChien,
+                },
+              ].map(({ label, data }) => (
+                <div key={label} className={styles.caTrucCard}>
+                  <span className={styles.caTrucRole}>{label}</span>
+                  {data ? (
+                    <div className={styles.caTrucCardBody}>
+                      <div className={styles.caTrucPersonName}>
+                        {data.tenNguoitruc || "—"}
+                      </div>
+                      <div className={styles.caTrucPersonMeta}>
+                        {[data.capbacNguoitruc, data.chucvuNguoitruc]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </div>
+                      {data.sodienthoai && (
+                        <a className={styles.caTrucPhone}>{data.sodienthoai}</a>
+                      )}
+                    </div>
+                  ) : (
+                    <div className={styles.caTrucEmpty}>Chưa có thông tin</div>
+                  )}
+                </div>
+              ))}
             </div>
 
             <div className={styles.caTrucRight}>

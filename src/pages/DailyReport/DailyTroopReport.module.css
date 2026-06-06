@@ -294,7 +294,7 @@
   align-items: center;  
   gap: 5px;  
 }  
-
+  
 .caTrucHeader {  
   font-size: 18px;  
   font-weight: 700;  
@@ -302,7 +302,7 @@
   letter-spacing: 1px;  
   color: var(--login-text-muted);  
   margin-bottom: 2px;  
-}
+}  
   
 .caTrucNgay {  
   font-size: 12px;  
@@ -314,45 +314,68 @@
   
 .caTrucBody {  
   display: flex;  
-  align-items: center;  
+  align-items: flex-start;  
   justify-content: center;  
-  gap: 48px;  
+  gap: 24px;  
   width: 100%;  
-  max-width: 800px;  
+  max-width: 900px;  
+  margin-top: 12px;  
 }  
   
 .caTrucLeft {  
-  display: flex;  
-  flex-direction: column;  
-  gap: 0;  
+  display: grid;  
+  grid-template-columns: 1fr 1fr;  
+  gap: 12px;  
   flex: 1;  
 }  
   
-.caTrucPerson {  
+.caTrucCard {  
   display: flex;  
   flex-direction: column;  
-  gap: 2px;  
-  padding: 10px 0;  
+  gap: 6px;  
+  padding: 12px 16px;  
+  border: 1px solid var(--login-border);  
+  border-radius: 10px;  
+  background: var(--dialog-bg, #fff);  
 }  
   
 .caTrucRole {  
-  font-size: 10px;  
+  font-size: 12px;  
   font-weight: 700;  
   text-transform: uppercase;  
   letter-spacing: 0.8px;  
   color: var(--primary-color);  
 }  
   
-.caTrucName {  
+.caTrucCardBody {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 2px;  
+}  
+  
+.caTrucPersonName {  
   font-size: 15px;  
-  font-weight: 600;  
+  font-weight: 700;  
   color: var(--login-text);  
 }  
   
-.caTrucDivider {  
-  height: 1px;  
-  background: var(--login-border);  
-  width: 100%;  
+.caTrucPersonMeta {  
+  font-size: 14px;  
+  color: var(--login-text-muted);  
+}  
+  
+.caTrucPhone {  
+  font-size: 14px;  
+  font-weight: 600;  
+  color: var(--primary-color, #218673);  
+  text-decoration: none;  
+  margin-top: 2px;  
+}  
+  
+.caTrucEmpty {  
+  font-size: 14px;  
+  color: var(--login-text-muted);  
+  font-style: italic;  
 }  
   
 .caTrucRight {  
@@ -363,12 +386,13 @@
   padding: 16px 28px;  
   border: 1.5px dashed var(--login-border);  
   border-radius: 12px;  
-  min-width: 220px;  
+  min-width: 200px;  
   background: var(--table-row-even);  
+  align-self: center;  
 }  
   
 .caTrucMatKhauLabel {  
-  font-size: 10px;  
+  font-size: 13px;  
   font-weight: 700;  
   text-transform: uppercase;  
   letter-spacing: 1px;  
@@ -389,35 +413,10 @@
     flex-direction: column;  
     gap: 16px;  
   }  
+  .caTrucLeft {  
+    grid-template-columns: 1fr;  
+  }  
   .caTrucRight {  
     width: 100%;  
   }  
-}
-
-.consolidateBtn {  
-  padding: 9px 20px;  
-  background-color: var(--primary-color);  
-  color: var(--text-white);  
-  border: none;  
-  border-radius: 8px;  
-  font-size: 14px;  
-  font-weight: 600;  
-  cursor: pointer;  
-  transition: background-color 0.2s;  
-}  
-  
-.consolidateBtn:hover {  
-  background-color: var(--primary-hover);  
-}
-  
-.separatorRow td {
-  font-weight: 800 !important;
-  text-transform: uppercase;
-  padding: 10px 12px !important;
-  text-align: left !important;
-}
-
-.consolidatedRow .unitCell {
-  text-align: left !important;
-  padding-left: 15px !important;
 }

@@ -204,49 +204,81 @@
 }  
   
 .trucSection {  
-  background-color: var(--modal-section-bg, #f8f9fa);  
-  border: 1px solid var(--modal-border, #e0e0e0);  
-  border-radius: 8px;  
-  padding: 14px 16px;  
   margin-bottom: 16px;  
 }  
   
 .trucTitle {  
-  font-size: 13px;  
+  font-size: 16px;  
   font-weight: 700;  
-  text-transform: uppercase;  
-  letter-spacing: 0.5px;  
-  color: var(--modal-card-title, #555);  
-  margin-bottom: 12px;  
+  letter-spacing: 0.8px;  
+  margin-bottom: 10px;  
   text-align: center;  
 }  
   
 .trucGrid {  
+  display: grid;  
+  grid-template-columns: 1fr 1fr;  
+  gap: 12px;  
+}  
+  
+.trucCard {  
   display: flex;  
   flex-direction: column;  
   gap: 10px;  
-}  
-  
-.trucItem {  
-  display: flex;  
-  flex-direction: column;  
-  gap: 3px;  
-  padding: 8px 12px;  
-  border-radius: 6px;  
+  padding: 14px 16px;  
+  border-radius: 12px;  
   background: var(--dialog-bg);  
   border: 1px solid var(--login-border);  
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);  
+}  
+  
+.trucCardHeader {  
+  display: flex;  
+  align-items: center;  
+  gap: 10px;  
 }  
   
 .trucRole {  
-  font-size: 13px;  
-  font-weight: 600;  
-  color: var(--modal-label-text, #888);  
+  font-size: 12px;  
+  font-weight: 700;  
   text-transform: uppercase;  
-  letter-spacing: 0.3px;  
+  letter-spacing: 0.4px;  
+  color: var(--dialog-message-text, #888);  
 }  
   
-.trucInfo {  
+.trucCardBody {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 3px;  
+}  
+  
+.trucName {  
+  font-size: 15px;  
+  font-weight: 700;  
+  color: var(--dialog-title-text, #111);  
+}  
+  
+.trucMeta {  
   font-size: 14px;  
-  font-weight: 500;  
-  color: var(--dialog-title-text, #222);  
+  color: var(--dialog-message-text, #666);  
+}  
+  
+.trucPhone {  
+  font-size: 14px;  
+  font-weight: 600;  
+  color: #218673;  
+  text-decoration: none;  
+  margin-top: 2px;  
+}
+  
+.trucEmpty {  
+  font-size: 13px;  
+  color: var(--dialog-message-text, #aaa);  
+  font-style: italic;  
+}  
+  
+@media (max-width: 480px) {  
+  .trucGrid {  
+    grid-template-columns: 1fr;  
+  }  
 }

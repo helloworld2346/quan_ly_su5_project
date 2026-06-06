@@ -37,18 +37,6 @@ function parseTruc(raw?: string): TrucNguoiParsed | null {
   }
 }
 
-function formatTruc(truc: TrucNguoiParsed | null): string {
-  if (!truc) return "Chưa có thông tin";
-  return [
-    truc.capbacNguoitruc,
-    truc.chucvuNguoitruc,
-    truc.tenNguoitruc,
-    truc.sodienthoai,
-  ]
-    .filter(Boolean)
-    .join(" · ");
-}
-
 type Props = {
   unit: string;
   members: TroopMember[];
@@ -71,13 +59,14 @@ export default function TroopDetailModal({
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
-
     document.addEventListener("keydown", handleKey);
-
-    return () => {
-      document.removeEventListener("keydown", handleKey);
-    };
+    return () => document.removeEventListener("keydown", handleKey);
   }, [onClose]);
+
+  const trucItems = [
+    { label: "Trực chỉ huy", data: parsedTrucChiHuy },
+    { label: "Trực ban tác chiến", data: parsedTrucBanTacChien },
+  ];
 
   return (
     <div className={styles.overlay} onClick={onClose}>
@@ -86,7 +75,6 @@ export default function TroopDetailModal({
           <div className={styles.headerContent}>
             <div className={styles.subTitle}>{unit}</div>
           </div>
-
           <button
             className={styles.closeBtn}
             onClick={onClose}
@@ -101,21 +89,38 @@ export default function TroopDetailModal({
             <div className={styles.trucSection}>
               <div className={styles.trucTitle}>Thông tin trực đơn vị</div>
               <div className={styles.trucGrid}>
-                <div className={styles.trucItem}>
-                  <span className={styles.trucRole}>Trực chỉ huy</span>
-                  <span className={styles.trucInfo}>
-                    {formatTruc(parsedTrucChiHuy)}
-                  </span>
-                </div>
-                <div className={styles.trucItem}>
-                  <span className={styles.trucRole}>Trực ban tác chiến</span>
-                  <span className={styles.trucInfo}>
-                    {formatTruc(parsedTrucBanTacChien)}
-                  </span>
-                </div>
+                {trucItems.map(({ label, data }) => (
+                  <div key={label} className={styles.trucCard}>
+                    <div className={styles.trucCardHeader}>
+                      <span className={styles.trucRole}>{label}</span>
+                    </div>
+                    {data ? (
+                      <div className={styles.trucCardBody}>
+                        <div className={styles.trucName}>
+                          {data.tenNguoitruc || "—"}
+                        </div>
+                        <div className={styles.trucMeta}>
+                          {[data.capbacNguoitruc, data.chucvuNguoitruc]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        </div>
+                        {data.sodienthoai && (
+                          <a className={styles.trucPhone}>{data.sodienthoai}</a>
+                        )}
+                      </div>
+                    ) : (
+                      <div className={styles.trucCardBody}>
+                        <div className={styles.trucEmpty}>
+                          Chưa có thông tin
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
           )}
+
           <h2 className={styles.title}>Chi tiết quân số vắng</h2>
           <div className={styles.summary}>
             <div className={styles.summaryCard}>
@@ -138,7 +143,6 @@ export default function TroopDetailModal({
                     <th>Lý do vắng</th>
                   </tr>
                 </thead>
-
                 <tbody>
                   {members.map((m, i) => (
                     <tr key={m.id || i}>
