@@ -73,7 +73,7 @@ export const EXECUTIVE_NAV_GROUP = {
 };
 
 export const REPORT_NAV_GROUP = {
-  label: "Thống kê báo cáo",
+  label: "Báo ban",
   labelByRole: {
     "Báo cáo": "Báo ban",
   },
@@ -237,9 +237,9 @@ function normalizeRoleName(role: string): string {
   if (role.includes("Chỉ huy")) {
     return "Chỉ huy";
   }
-  if (role.includes("Sư đoàn")) {
-    return "Sư đoàn";
-  }
+if (role.includes("Sư đoàn") || role.includes("Sư đoan")) {
+  return "Sư đoàn";
+}
   if (role.includes("Quản Trị Viên") || role.includes("Admin")) {
     return "Quản Trị Viên";
   }

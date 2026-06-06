@@ -10,18 +10,24 @@ import type {
 
 type ReportItem = SearchByRangeResponse["Result"][number];
 
+function toLocalDateStr(d: Date) {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
 function getDefaultDates() {
   const today = new Date();
   const start = new Date(today);
   start.setDate(today.getDate() - 2);
   return {
-    start: start.toISOString().split("T")[0],
-    end: today.toISOString().split("T")[0],
+    start: toLocalDateStr(start),
+    end: toLocalDateStr(today),
   };
 }
 
 function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("vi-VN", {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString("vi-VN", {
     weekday: "long",
     day: "2-digit",
     month: "2-digit",
