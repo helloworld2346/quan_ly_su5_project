@@ -21,7 +21,11 @@ interface DropdownPos {
   top: number;
   left: number;
   width: number;
+  openUpward: boolean;
 }
+
+const DROPDOWN_MAX_HEIGHT = 220;
+const DROPDOWN_OFFSET = 4;
 
 export default function CustomSelect({
   options,
@@ -37,17 +41,32 @@ export default function CustomSelect({
   const selectedLabel =
     options.find((o) => o.value === value)?.label ?? placeholder;
 
+  const calcPos = useCallback(
+    (rect: DOMRect): DropdownPos => {
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const openUpward =
+        spaceBelow < DROPDOWN_MAX_HEIGHT + DROPDOWN_OFFSET &&
+        rect.top > DROPDOWN_MAX_HEIGHT + DROPDOWN_OFFSET;
+
+      return {
+        top: openUpward
+          ? rect.top + window.scrollY - DROPDOWN_MAX_HEIGHT - DROPDOWN_OFFSET
+          : rect.bottom + window.scrollY + DROPDOWN_OFFSET,
+        left: rect.left + window.scrollX,
+        width: Math.max(rect.width, variant === "table" ? 180 : rect.width),
+        openUpward,
+      };
+    },
+    [variant],
+  );
+
   const openDropdown = useCallback(() => {
     if (!wrapperRef.current) return;
     const rect = wrapperRef.current.getBoundingClientRect();
-    setDropdownPos({
-      top: rect.bottom + window.scrollY + 4,
-      left: rect.left + window.scrollX,
-      width: Math.max(rect.width, variant === "table" ? 180 : rect.width),
-    });
+    setDropdownPos(calcPos(rect));
     setIsOpen(true);
     setFocusedIndex(options.findIndex((o) => o.value === value));
-  }, [options, value, variant]);
+  }, [options, value, calcPos]);
 
   const closeDropdown = useCallback(() => {
     setIsOpen(false);
@@ -73,11 +92,7 @@ export default function CustomSelect({
     const update = () => {
       if (!wrapperRef.current) return;
       const rect = wrapperRef.current.getBoundingClientRect();
-      setDropdownPos({
-        top: rect.bottom + window.scrollY + 4,
-        left: rect.left + window.scrollX,
-        width: Math.max(rect.width, variant === "table" ? 180 : rect.width),
-      });
+      setDropdownPos(calcPos(rect));
     };
     window.addEventListener("scroll", update, true);
     window.addEventListener("resize", update);
@@ -85,7 +100,7 @@ export default function CustomSelect({
       window.removeEventListener("scroll", update, true);
       window.removeEventListener("resize", update);
     };
-  }, [isOpen, variant]);
+  }, [isOpen, calcPos]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!isOpen) {
@@ -116,7 +131,7 @@ export default function CustomSelect({
     isOpen && dropdownPos
       ? createPortal(
           <ul
-            className={styles.dropdown}
+            className={`${styles.dropdown} ${dropdownPos.openUpward ? styles.dropdownUpward : ""}`}
             style={{
               position: "absolute",
               top: dropdownPos.top,
