@@ -1,0 +1,189 @@
+.bellBtn {  
+  position: relative;  
+  width: 34px;  
+  height: 34px;  
+  border-radius: 999px;  
+  border: 1px solid var(--login-border);  
+  background: var(--topbar-btn-bg);  
+  display: flex;  
+  align-items: center;  
+  justify-content: center;  
+  cursor: pointer;  
+  color: var(--login-text-muted);  
+  transition:  
+    background 0.15s ease,  
+    border-color 0.15s ease,  
+    color 0.15s ease;  
+}  
+  
+.bellBtn:hover,  
+.bellBtnOpen {  
+  background: var(--topbar-btn-hover);  
+  border-color: var(--primary-color);  
+  color: var(--primary-color);  
+}  
+  
+.badge {  
+  position: absolute;  
+  top: -4px;  
+  right: -4px;  
+  min-width: 16px;  
+  height: 16px;  
+  padding: 0 4px;  
+  border-radius: 999px;  
+  background: #e53e3e;  
+  color: #fff;  
+  font-size: 10px;  
+  font-weight: 700;  
+  display: flex;  
+  align-items: center;  
+  justify-content: center;  
+  line-height: 1;  
+  border: 1.5px solid var(--topbar-bg, #fff);  
+  pointer-events: none;  
+}  
+  
+.dropdown {  
+  z-index: 99999;  
+  width: 340px;  
+  background: var(--dialog-bg, #fff);  
+  border: 1px solid var(--login-border);  
+  border-radius: 12px;  
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);  
+  overflow: hidden;  
+}  
+  
+.dropdownHeader {  
+  display: flex;  
+  align-items: center;  
+  justify-content: space-between;  
+  padding: 14px 16px 12px;  
+  border-bottom: 1px solid var(--login-border);  
+}  
+  
+.dropdownTitle {  
+  font-size: 14px;  
+  font-weight: 700;  
+  color: var(--login-text);  
+  display: flex;  
+  align-items: center;  
+  gap: 8px;  
+}  
+  
+.headerBadge {  
+  display: inline-flex;  
+  align-items: center;  
+  justify-content: center;  
+  min-width: 20px;  
+  height: 20px;  
+  padding: 0 5px;  
+  border-radius: 999px;  
+  background: var(--primary-color);  
+  color: #fff;  
+  font-size: 11px;  
+  font-weight: 700;  
+}  
+  
+.headerActions {  
+  display: flex;  
+  align-items: center;  
+  gap: 6px;  
+}  
+  
+.actionBtn {  
+  display: flex;  
+  align-items: center;  
+  gap: 5px;  
+  padding: 5px 10px;  
+  border-radius: 6px;  
+  border: 1px solid var(--login-border);  
+  background: transparent;  
+  color: var(--login-text-muted);  
+  font-size: 12px;  
+  font-weight: 600;  
+  cursor: pointer;  
+  transition:  
+    background 0.12s,  
+    color 0.12s,  
+    border-color 0.12s;  
+}  
+  
+.actionBtn:hover {  
+  background: var(--topbar-btn-hover);  
+  color: var(--primary-color);  
+  border-color: var(--primary-color);  
+}  
+  
+.actionBtnDanger:hover {  
+  color: #e53e3e;  
+  border-color: #e53e3e;  
+}  
+  
+.list {  
+  list-style: none;  
+  margin: 0;  
+  padding: 4px;  
+  max-height: 360px;  
+  overflow-y: auto;  
+}  
+  
+.item {  
+  position: relative;  
+  display: flex;  
+  align-items: flex-start;  
+  gap: 10px;  
+  padding: 10px 12px;  
+  border-radius: 8px;  
+  cursor: pointer;  
+  transition: background 0.1s;  
+}  
+  
+.item:hover {  
+  background: var(--modal-section-bg, #f8f9fa);  
+}  
+  
+.itemRead {  
+  opacity: 0.6;  
+}  
+  
+.unreadDot {  
+  flex-shrink: 0;  
+  width: 8px;  
+  height: 8px;  
+  border-radius: 50%;  
+  background: var(--primary-color);  
+  margin-top: 5px;  
+}  
+  
+.itemContent {  
+  flex: 1;  
+  min-width: 0;  
+}  
+  
+.itemTitle {  
+  font-size: 13px;  
+  font-weight: 700;  
+  color: var(--login-text);  
+  margin-bottom: 2px;  
+}  
+  
+.itemMessage {  
+  font-size: 13px;  
+  color: var(--login-text-muted);  
+  line-height: 1.4;  
+}  
+  
+.itemTime {  
+  font-size: 11px;  
+  color: var(--login-text-muted);  
+  margin-top: 4px;  
+  opacity: 0.8;  
+}  
+  
+.empty {  
+  padding: 32px 16px;  
+  text-align: center;  
+  color: var(--login-text-muted);  
+  font-size: 14px;  
+  font-style: italic;  
+}

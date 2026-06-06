@@ -1,20 +1,16 @@
 import { type ReactNode, useEffect, useState } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faBell } from "@fortawesome/free-solid-svg-icons";
+import { faBars } from "@fortawesome/free-solid-svg-icons";
 
 import Sidebar from "../Sidebar/Sidebar";
 import styles from "./DashboardLayout.module.css";
+import NotificationBell from "../../ui/NotificationBell/NotificationBell";
 
-import {
-
-  getNavGroupLabel,
-  type NavItemId,
-} from "../../../types/navigation";
+import { getNavGroupLabel, type NavItemId } from "../../../types/navigation";
 import { accountService } from "../../../services/account/accountService";
 import type { Account } from "../../../types/account";
 import { useTheme, ThemeToggle } from "../../../theme";
-
 
 type Props = {
   activeId: NavItemId;
@@ -47,7 +43,6 @@ function TopBarActions({ isDark, onToggleTheme }: TopBarActionsProps) {
     fetchAccount();
   }, []);
 
-
   const getAvatarText = () => {
     if (!account) return "QT";
     const name = account.tenDangNhap || account.tenTaiKhoan || "";
@@ -68,13 +63,7 @@ function TopBarActions({ isDark, onToggleTheme }: TopBarActionsProps) {
         activeClassName={styles.iconButtonActive}
       />
 
-      <button
-        type="button"
-        className={styles.iconButton}
-        aria-label="Thông báo"
-      >
-        <FontAwesomeIcon icon={faBell} />
-      </button>
+      <NotificationBell />
 
       <div className={styles.userBlock}>
         <span className={styles.userAvatar} aria-hidden>
@@ -103,11 +92,11 @@ export default function DashboardLayout({
       "--current-sidebar-width",
       sidebarCollapsed
         ? "var(--sidebar-collapsed-width)"
-        : "var(--sidebar-width)"
+        : "var(--sidebar-width)",
     );
     document.documentElement.style.setProperty(
       "--modal-offset",
-      sidebarCollapsed ? "0px" : "120px"
+      sidebarCollapsed ? "0px" : "120px",
     );
   }, [sidebarCollapsed]);
 
