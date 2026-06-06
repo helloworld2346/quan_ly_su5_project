@@ -1,3 +1,11 @@
+export interface TrucNguoiInfo {
+  idNguoitruc?: string;
+  tenNguoitruc: string;
+  capbacNguoitruc: string;
+  chucvuNguoitruc: string;
+  sodienthoai: string;
+}
+
 export interface CaTrucInfo {
   idCatruc?: string;
   matkhau?: string;
@@ -62,7 +70,10 @@ export interface CreateReportRequest {
   thongTinVang: string;
   chiTietVang?: string;
   donVi: string;
+  trucBanChiHuy?: string; // JSON.stringify(TrucNguoiInfo)
+  trucBanTacChien?: string; // JSON.stringify(TrucNguoiInfo)
 }
+
 export interface CreateReportResponse {
   success: boolean;
   code: number;
@@ -77,6 +88,8 @@ export interface CreateReportResponse {
     thoiGianBaoCao: string;
     thongTinVang: string;
     chiTietVang?: string;
+    trucBanChiHuy?: string;
+    trucBanTacChien?: string;
     donVi: {
       maDonVi: string;
       tenDonvi: string;
@@ -94,6 +107,8 @@ export interface UpdateReportRequest {
   chiTietVang?: string;
   account: string;
   donVi: string;
+  trucBanChiHuy?: string;
+  trucBanTacChien?: string;
 }
 
 export interface UpdateReportResponse {
@@ -109,6 +124,8 @@ export interface UpdateReportResponse {
     thoiGianBaoCao: string;
     thongTinVang: string;
     chiTietVang?: string;
+    trucBanChiHuy?: string;
+    trucBanTacChien?: string;
     donVi: {
       maDonVi: string;
       tenDonvi: string;
@@ -176,6 +193,8 @@ export interface SearchReportResponse {
     thoiGianBaoCao: string;
     thongTinVang: string;
     chiTietVang?: string;
+    trucBanChiHuy?: string;
+    trucBanTacChien?: string;
     donVi: {
       maDonVi: string;
       tenDonvi: string;
@@ -198,6 +217,8 @@ export interface SearchChildrenResponse {
     thoiGianBaoCao: string;
     thongTinVang: string;
     chiTietVang?: string;
+    trucBanChiHuy?: string;
+    trucBanTacChien?: string;
     donVi: {
       maDonVi: string;
       tenDonvi: string;

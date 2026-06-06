@@ -293,3 +293,41 @@
   cursor: not-allowed;  
   opacity: 1;
 }
+.caTrucBanner {  
+  display: flex;  
+  align-items: center;  
+  gap: 12px;  
+  background-color: var(--modal-section-bg);  
+  border: 1px solid var(--modal-border);  
+  border-left: 4px solid var(--primary-color);  
+  border-radius: 8px;  
+  padding: 12px 16px;  
+  margin-bottom: 20px;  
+}  
+  
+.caTrucBannerLabel {  
+  font-size: 13px;  
+  font-weight: 600;  
+  color: var(--modal-label-text);  
+  white-space: nowrap;  
+}  
+  
+.caTrucBannerValue {  
+  font-family: monospace;  
+  font-size: 16px;  
+  font-weight: 700;  
+  letter-spacing: 3px;  
+  color: var(--primary-color);  
+}  
+  
+.trucSectionHeader {  
+  margin-bottom: 12px;  
+}  
+  
+.trucSectionTitle {  
+  font-size: 13px;  
+  font-weight: 700;  
+  color: var(--modal-card-title);  
+  text-transform: uppercase;  
+  letter-spacing: 0.5px;  
+}

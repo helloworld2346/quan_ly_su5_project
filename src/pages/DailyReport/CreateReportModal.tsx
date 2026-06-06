@@ -5,6 +5,8 @@ import type {
   VangChiTiet,
   CreateReportRequest,
   CreateReportResponse,
+  CaTrucInfo,
+  TrucNguoiInfo,
 } from "../../types/dailyReport";
 
 const LY_DO_OPTIONS: { value: keyof VangChiTiet; label: string }[] = [
@@ -50,6 +52,22 @@ const CHUC_VU_OPTIONS = [
   "Tiểu đoàn trưởng",
 ];
 
+const EMPTY_TRUC: TrucNguoiInfo = {
+  tenNguoitruc: "",
+  capbacNguoitruc: CAP_BAC_OPTIONS[0],
+  chucvuNguoitruc: "",
+  sodienthoai: "",
+};
+
+function parseTrucNguoi(raw?: string): TrucNguoiInfo {
+  if (!raw) return { ...EMPTY_TRUC };
+  try {
+    return JSON.parse(raw) as TrucNguoiInfo;
+  } catch {
+    return { ...EMPTY_TRUC };
+  }
+}
+
 interface CreateReportModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -58,6 +76,7 @@ interface CreateReportModalProps {
   maDonViCurrent?: string;
   tongQuanSoBienChe?: number;
   consolidatedAbsentRows?: AbsentRow[];
+  caTrucInfo?: CaTrucInfo | null;
 }
 
 export const CreateReportModal: React.FC<CreateReportModalProps> = ({
@@ -68,6 +87,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   maDonViCurrent,
   tongQuanSoBienChe,
   consolidatedAbsentRows,
+  caTrucInfo,
 }) => {
   const [ngayBaoCao] = useState<string>(() => {
     if (initialData?.thoiGianBaoCao) {
@@ -96,6 +116,14 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
     return [];
   });
 
+  const [trucChiHuy, setTrucChiHuy] = useState<TrucNguoiInfo>(() =>
+    parseTrucNguoi(initialData?.trucBanChiHuy),
+  );
+
+  const [trucBanTacChien, setTrucBanTacChien] = useState<TrucNguoiInfo>(() =>
+    parseTrucNguoi(initialData?.trucBanTacChien),
+  );
+
   const quanSoVang = absentRows.length;
   const quanSoHienDien = useMemo(() => {
     const result = tongQuanSo - quanSoVang;
@@ -104,7 +132,6 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
 
   const handleAddRow = () => {
     const lastRow = absentRows[absentRows.length - 1];
-
     const newRow: AbsentRow = {
       id: crypto.randomUUID(),
       hoTen: "",
@@ -113,7 +140,6 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       lyDoVang: lastRow ? lastRow.lyDoVang : LY_DO_OPTIONS[0].value,
       ghiChu: "",
     };
-
     setAbsentRows((prev) => [...prev, newRow]);
   };
 
@@ -164,6 +190,8 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       chiTietVang: JSON.stringify(absentRows),
       thongTinVang: JSON.stringify(thongTinVangObj),
       donVi: initialData?.donVi?.maDonVi || maDonViCurrent || "",
+      trucBanChiHuy: JSON.stringify(trucChiHuy),
+      trucBanTacChien: JSON.stringify(trucBanTacChien),
     };
 
     onSubmit(payload);
@@ -190,6 +218,19 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
         </div>
 
         <div className={styles.body}>
+          {/* Mật khẩu ca trực (readonly) */}
+          {caTrucInfo?.matkhau && (
+            <div className={styles.caTrucBanner}>
+              <span className={styles.caTrucBannerLabel}>
+                Mật khẩu ca trực:
+              </span>
+              <span className={styles.caTrucBannerValue}>
+                {caTrucInfo.matkhau}
+              </span>
+            </div>
+          )}
+
+          {/* Quân số */}
           <div className={styles.coreGrid}>
             <div className={styles.field}>
               <label className={styles.label}>Ngày báo cáo</label>
@@ -236,6 +277,159 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
 
           <hr className={styles.divider} />
 
+          {/* Trực chỉ huy đơn vị */}
+          <div className={styles.trucSectionHeader}>
+            <span className={styles.trucSectionTitle}>Trực chỉ huy đơn vị</span>
+          </div>
+          <div className={styles.coreGrid}>
+            <div className={styles.field}>
+              <label className={styles.label}>Họ và tên</label>
+              <input
+                type="text"
+                className={styles.input}
+                value={trucChiHuy.tenNguoitruc}
+                onChange={(e) =>
+                  setTrucChiHuy((prev) => ({
+                    ...prev,
+                    tenNguoitruc: e.target.value,
+                  }))
+                }
+                placeholder="Nhập họ và tên..."
+                required
+              />
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label}>Cấp bậc</label>
+              <select
+                className={styles.input}
+                value={trucChiHuy.capbacNguoitruc}
+                onChange={(e) =>
+                  setTrucChiHuy((prev) => ({
+                    ...prev,
+                    capbacNguoitruc: e.target.value,
+                  }))
+                }
+              >
+                {CAP_BAC_OPTIONS.map((cb) => (
+                  <option key={cb} value={cb}>
+                    {cb}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label}>Chức vụ</label>
+              <input
+                type="text"
+                className={styles.input}
+                value={trucChiHuy.chucvuNguoitruc}
+                onChange={(e) =>
+                  setTrucChiHuy((prev) => ({
+                    ...prev,
+                    chucvuNguoitruc: e.target.value,
+                  }))
+                }
+                placeholder="Nhập chức vụ..."
+                required
+              />
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label}>Số điện thoại</label>
+              <input
+                type="text"
+                className={styles.input}
+                value={trucChiHuy.sodienthoai}
+                onChange={(e) =>
+                  setTrucChiHuy((prev) => ({
+                    ...prev,
+                    sodienthoai: e.target.value,
+                  }))
+                }
+                placeholder="Nhập số điện thoại..."
+              />
+            </div>
+          </div>
+
+          <hr className={styles.divider} />
+
+          {/* Trực ban tác chiến đơn vị */}
+          <div className={styles.trucSectionHeader}>
+            <span className={styles.trucSectionTitle}>
+              Trực ban tác chiến đơn vị
+            </span>
+          </div>
+          <div className={styles.coreGrid}>
+            <div className={styles.field}>
+              <label className={styles.label}>Họ và tên</label>
+              <input
+                type="text"
+                className={styles.input}
+                value={trucBanTacChien.tenNguoitruc}
+                onChange={(e) =>
+                  setTrucBanTacChien((prev) => ({
+                    ...prev,
+                    tenNguoitruc: e.target.value,
+                  }))
+                }
+                placeholder="Nhập họ và tên..."
+                required
+              />
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label}>Cấp bậc</label>
+              <select
+                className={styles.input}
+                value={trucBanTacChien.capbacNguoitruc}
+                onChange={(e) =>
+                  setTrucBanTacChien((prev) => ({
+                    ...prev,
+                    capbacNguoitruc: e.target.value,
+                  }))
+                }
+              >
+                {CAP_BAC_OPTIONS.map((cb) => (
+                  <option key={cb} value={cb}>
+                    {cb}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label}>Chức vụ</label>
+              <input
+                type="text"
+                className={styles.input}
+                value={trucBanTacChien.chucvuNguoitruc}
+                onChange={(e) =>
+                  setTrucBanTacChien((prev) => ({
+                    ...prev,
+                    chucvuNguoitruc: e.target.value,
+                  }))
+                }
+                placeholder="Nhập chức vụ..."
+                required
+              />
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label}>Số điện thoại</label>
+              <input
+                type="text"
+                className={styles.input}
+                value={trucBanTacChien.sodienthoai}
+                onChange={(e) =>
+                  setTrucBanTacChien((prev) => ({
+                    ...prev,
+                    sodienthoai: e.target.value,
+                  }))
+                }
+                placeholder="Nhập số điện thoại..."
+              />
+            </div>
+          </div>
+
+          <hr className={styles.divider} />
+
+          {/* Danh sách vắng */}
           <div className={styles.sectionHeader}>
             <h3 className={styles.sectionTitle}>
               {isConsolidation

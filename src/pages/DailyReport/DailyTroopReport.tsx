@@ -528,7 +528,7 @@ export default function DailyTroopReport() {
     );
   }, [reportData]);
 
-  const caTrucInfo = useMemo(() => {
+  const caTrucInfo = useMemo((): CaTrucInfo | null => {
     if (isParentUnit) {
       return parentReportData
         ? (parentReportData.rawItem.caTruc as CaTrucInfo)
@@ -537,6 +537,46 @@ export default function DailyTroopReport() {
     return reportData.length > 0
       ? (reportData[0].rawItem.caTruc as CaTrucInfo)
       : null;
+  }, [isParentUnit, parentReportData, reportData]);
+
+  const trucInfoFromReport = useMemo(() => {
+    const currentReport = isParentUnit
+      ? parentReportData
+      : reportData.length > 0
+        ? reportData[0]
+        : null;
+    if (!currentReport) return null;
+
+    let trucChiHuy: {
+      tenNguoitruc?: string;
+      capbacNguoitruc?: string;
+      chucvuNguoitruc?: string;
+      sodienthoai?: string;
+    } | null = null;
+    let trucBanTacChien: {
+      tenNguoitruc?: string;
+      capbacNguoitruc?: string;
+      chucvuNguoitruc?: string;
+      sodienthoai?: string;
+    } | null = null;
+
+    try {
+      if (currentReport.rawItem.trucBanChiHuy) {
+        trucChiHuy = JSON.parse(currentReport.rawItem.trucBanChiHuy);
+      }
+    } catch {
+      /* ignore */
+    }
+
+    try {
+      if (currentReport.rawItem.trucBanTacChien) {
+        trucBanTacChien = JSON.parse(currentReport.rawItem.trucBanTacChien);
+      }
+    } catch {
+      /* ignore */
+    }
+
+    return { trucChiHuy, trucBanTacChien };
   }, [isParentUnit, parentReportData, reportData]);
 
   const userRole = account?.vaiTro?.tenVaiTro;
@@ -772,17 +812,14 @@ export default function DailyTroopReport() {
                 </tr>
               ) : (
                 <>
-                  {/* Dòng separator "Báo cáo đơn vị con" - chỉ hiện khi isParentUnit */}
                   {isParentUnit && filteredRows.length > 0 && (
                     <tr className={styles.separatorRow}>
                       <td colSpan={21}>Báo cáo đơn vị con</td>
                     </tr>
                   )}
 
-                  {/* Các dòng báo cáo con */}
                   {filteredRows.map((row) => renderReportRow(row, false))}
 
-                  {/* Dòng tổng (chỉ hiện khi có dữ liệu) */}
                   {filteredRows.length > 0 && (
                     <tr className={styles.totalRow}>
                       <td className={styles.unitCell}>Tổng</td>
@@ -808,14 +845,12 @@ export default function DailyTroopReport() {
                     </tr>
                   )}
 
-                  {/* Dòng separator "Báo cáo tổng hợp" - chỉ hiện khi isParentUnit */}
                   {isParentUnit && (
                     <tr className={styles.separatorRow}>
                       <td colSpan={21}>Báo cáo tổng hợp</td>
                     </tr>
                   )}
 
-                  {/* Dòng báo cáo tổng hợp của đơn vị cha */}
                   {isParentUnit && parentReportData
                     ? renderReportRow(parentReportData, true)
                     : isParentUnit && (
@@ -832,7 +867,7 @@ export default function DailyTroopReport() {
 
       {caTrucInfo && (
         <div className={styles.caTrucSection}>
-          <div className={styles.caTrucHeader}>Thông tin ca trực</div>{" "}
+          <div className={styles.caTrucHeader}>Thông tin ca trực</div>
           <div className={styles.caTrucNgay}>
             {caTrucInfo.ngaytruc
               ? new Date(caTrucInfo.ngaytruc).toLocaleDateString("vi-VN", {
@@ -848,26 +883,32 @@ export default function DailyTroopReport() {
               <div className={styles.caTrucPerson}>
                 <span className={styles.caTrucRole}>Trực chỉ huy</span>
                 <span className={styles.caTrucName}>
-                  {[
-                    caTrucInfo.trucChiHuy?.capbacNguoitruc,
-                    caTrucInfo.trucChiHuy?.chucvuNguoitruc,
-                    caTrucInfo.trucChiHuy?.tenNguoitruc,
-                  ]
-                    .filter(Boolean)
-                    .join(" · ")}
+                  {trucInfoFromReport?.trucChiHuy
+                    ? [
+                        trucInfoFromReport.trucChiHuy.capbacNguoitruc,
+                        trucInfoFromReport.trucChiHuy.chucvuNguoitruc,
+                        trucInfoFromReport.trucChiHuy.tenNguoitruc,
+                        trucInfoFromReport.trucChiHuy.sodienthoai,
+                      ]
+                        .filter(Boolean)
+                        .join(" · ")
+                    : "Chưa có thông tin"}
                 </span>
               </div>
               <div className={styles.caTrucDivider} />
               <div className={styles.caTrucPerson}>
                 <span className={styles.caTrucRole}>Trực ban tác chiến</span>
                 <span className={styles.caTrucName}>
-                  {[
-                    caTrucInfo.trucBanTacChien?.capbacNguoitruc,
-                    caTrucInfo.trucBanTacChien?.chucvuNguoitruc,
-                    caTrucInfo.trucBanTacChien?.tenNguoitruc,
-                  ]
-                    .filter(Boolean)
-                    .join(" · ")}
+                  {trucInfoFromReport?.trucBanTacChien
+                    ? [
+                        trucInfoFromReport.trucBanTacChien.capbacNguoitruc,
+                        trucInfoFromReport.trucBanTacChien.chucvuNguoitruc,
+                        trucInfoFromReport.trucBanTacChien.tenNguoitruc,
+                        trucInfoFromReport.trucBanTacChien.sodienthoai,
+                      ]
+                        .filter(Boolean)
+                        .join(" · ")
+                    : "Chưa có thông tin"}
                 </span>
               </div>
             </div>
@@ -915,6 +956,7 @@ export default function DailyTroopReport() {
           }}
           maDonViCurrent={account?.donVi?.maDonVi}
           tongQuanSoBienChe={donViQuanSoTong || undefined}
+          caTrucInfo={caTrucInfo}
         />
       )}
 
@@ -945,6 +987,7 @@ export default function DailyTroopReport() {
           }}
           maDonViCurrent={account?.donVi?.maDonVi}
           tongQuanSoBienChe={donViQuanSoTong || undefined}
+          caTrucInfo={caTrucInfo}
         />
       )}
 
@@ -968,6 +1011,7 @@ export default function DailyTroopReport() {
               });
             }
           }}
+          caTrucInfo={caTrucInfo}
         />
       )}
 
