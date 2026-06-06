@@ -9,11 +9,11 @@ import PieChart from "../../components/charts/PieChart/PieChart";
 import type { SubordinateUnitType } from "../../types/troopStats";
 import { CHART_GROUP_LABELS, CHART_GROUP_ORDER } from "../../data/troopData";
 import { troopStatsService, type ThongKeQuanSoResult, type DonViItem } from "../../services/troopStats";
-import Trainningstatistical from "../TrainingReport/Trainningstatistical"
+
 import styles from "./ExecutiveDashboard.module.css";
 
 type FilterKey = "all" | SubordinateUnitType;
-type DashboardTab = "tongquan" | "huanluyen";
+
 
 const FILTER_OPTIONS: { key: FilterKey; label: string }[] = [
   { key: "all", label: "Tất cả đơn vị" },
@@ -81,7 +81,7 @@ function groupDonVi(danhSach: DonViItem[], filter: FilterKey) {
 
 export default function ExecutiveDashboard() {
   const [filter, setFilter] = useState<FilterKey>("all");
-  const [activeTab, setActiveTab] = useState<DashboardTab>("tongquan");
+  
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [data, setData] = useState<ThongKeQuanSoResult | null>(null);
   const [loading, setLoading] = useState(true);
@@ -119,10 +119,10 @@ export default function ExecutiveDashboard() {
       <header className={styles.pageHeader}>
         <div>
           <h2 id="troop-charts-title" className={styles.sectionTitle}>
-            Tổng quan điều hành
+            Tổng hợp ngày
           </h2>
           <p className={styles.sectionDesc}>
-            Theo dõi tổng quân số, hiện diện và vắng theo từng đơn vị. Di chuột
+            Theo dõi tổng quân số, hiện diện và vắng của từng đơn vị theo từng ngày. Di chuột
             vào biểu đồ hoặc chú thích để xem chi tiết.
           </p>
         </div>
@@ -160,24 +160,9 @@ export default function ExecutiveDashboard() {
         </dl>
       </header>
 
-      {/* Tab bar */}
-      <div className={styles.tabBar}>
-        <button
-          className={activeTab === "tongquan" ? `${styles.tabBtn} ${styles.tabBtnActive}` : styles.tabBtn}
-          onClick={() => setActiveTab("tongquan")}
-        >
-          Tổng quan
-        </button>
-        <button
-          className={activeTab === "huanluyen" ? `${styles.tabBtn} ${styles.tabBtnActive}` : styles.tabBtn}
-          onClick={() => setActiveTab("huanluyen")}
-        >
-          Huấn luyện
-        </button>
-      </div>
+   
 
-      {activeTab === "tongquan" ? (
-        <div key="tongquan" className={styles.tabContent}>
+     
           {/* Datebar */}
           <div className={styles.datebar}>
             <div style={{ width: 220 }} />
@@ -376,12 +361,6 @@ export default function ExecutiveDashboard() {
               </div>
             </>
           )}
-        </div>
-      ) : (
-        <div key="huanluyen" className={styles.tabContent}>
-            <Trainningstatistical />
-        </div>
-      )}
     </section>
   );
 }

@@ -7,7 +7,7 @@ import Sidebar from "../Sidebar/Sidebar";
 import styles from "./DashboardLayout.module.css";
 
 import {
-  EXECUTIVE_NAV,
+
   getNavGroupLabel,
   type NavItemId,
 } from "../../../types/navigation";
@@ -46,18 +46,18 @@ function TopBarActions({ isDark, onToggleTheme }: TopBarActionsProps) {
 
     fetchAccount();
   }, []);
-  
 
-const getAvatarText = () => {
-  if (!account) return "QT";
-  const name = account.tenDangNhap || account.tenTaiKhoan || "";
-  return name.slice(0, 2).toUpperCase();
-};
 
-const getDisplayName = () => {
-  if (!account) return "Quản trị viên";
-  return account.tenTaiKhoan || account.tenDangNhap || "Người dùng";
-};
+  const getAvatarText = () => {
+    if (!account) return "QT";
+    const name = account.tenDangNhap || account.tenTaiKhoan || "";
+    return name.slice(0, 2).toUpperCase();
+  };
+
+  const getDisplayName = () => {
+    if (!account) return "Quản trị viên";
+    return account.tenTaiKhoan || account.tenDangNhap || "Người dùng";
+  };
 
   return (
     <div className={styles.topBarRight}>
@@ -93,23 +93,24 @@ export default function DashboardLayout({
   onNavigate,
   onLogout,
 }: Props) {
-  const isExecutive = activeId === EXECUTIVE_NAV.id;
+  const isExecutive =
+    activeId === "executive" || activeId === "executive-training";
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { isDark, toggleTheme } = useTheme();
-   
-useEffect(() => {
-  document.body.style.setProperty(
-    "--current-sidebar-width",
-    sidebarCollapsed
-      ? "var(--sidebar-collapsed-width)"
-      : "var(--sidebar-width)"
-  );
-  document.documentElement.style.setProperty(
-    "--modal-offset",
-    sidebarCollapsed ? "0px" : "120px"
-  );
-}, [sidebarCollapsed]);
-  
+
+  useEffect(() => {
+    document.body.style.setProperty(
+      "--current-sidebar-width",
+      sidebarCollapsed
+        ? "var(--sidebar-collapsed-width)"
+        : "var(--sidebar-width)"
+    );
+    document.documentElement.style.setProperty(
+      "--modal-offset",
+      sidebarCollapsed ? "0px" : "120px"
+    );
+  }, [sidebarCollapsed]);
+
   const groupLabel = getNavGroupLabel(activeId);
   const showBreadcrumb = Boolean(groupLabel);
   const showPageHeading = !isExecutive;

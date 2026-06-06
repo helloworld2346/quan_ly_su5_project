@@ -146,7 +146,7 @@ export default function LineChart({
               fill="none"
               stroke={ds.color}
               strokeWidth={2.2}
-              opacity={hovered && hovered.datasetIdx !== dsIdx ? 0.3 : 1}
+              opacity={1}
               strokeLinejoin="round"
               strokeLinecap="round"
             />
@@ -166,7 +166,7 @@ export default function LineChart({
                   stroke="#ffffff"
                   strokeWidth={2.5}
                   className={styles.dot}
-                  opacity={hovered && !isHov ? 0.3 : 1}
+                 opacity={1}
                   onMouseEnter={() => setHovered({ datasetIdx: dsIdx, pointIdx })}
                   onMouseLeave={() => setHovered(null)}
                 />
@@ -180,7 +180,7 @@ export default function LineChart({
             const value = ds.data[hovered.pointIdx];
             const cx = getX(hovered.pointIdx);
             const cy = getY(value);
-            const tipW = 130;
+            const tipW = 160;
             const tipH = 52;
             const tipX = Math.min(cx - tipW / 2, svgWidth - paddingRight - tipW);
             const tipY = cy - tipH - 10;
@@ -198,7 +198,7 @@ export default function LineChart({
                 <text x={tipX + tipW / 2} y={tipY + 18} textAnchor="middle" fontSize={11} fontWeight={700} fill="var(--tooltip-fg, #f5faf7)">
                   {labels[hovered.pointIdx]}
                 </text>
-                <text x={tipX + tipW / 2} y={tipY + 36} textAnchor="middle" fontSize={12} fill="var(--tooltip-muted, #c8d9d0)">
+                <text x={tipX + tipW / 2} y={tipY + 36} textAnchor="middle" fontSize={12} fontWeight={700} fill="var(--tooltip-fg, #f5faf7)">
                   {ds.label}: {formatNum(value)}{unit}
                 </text>
               </g>

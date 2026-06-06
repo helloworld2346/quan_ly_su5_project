@@ -10,7 +10,7 @@ export const ATTENDANCE_META: Record<
   { label: string; color: string }
 > = {
   present: { label: "Hiện diện", color: "#1f5c3f" },
-  absent: { label: "Vắng", color: "#d97706" },
+  absent: { label: "Vắng", color: "#ef4444" },
 };
 
 function buildChart(
