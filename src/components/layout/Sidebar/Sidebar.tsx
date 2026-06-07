@@ -12,7 +12,7 @@ import styles from "./Sidebar.module.css";
 import logo from "../../../assets/images/logo-su5.png";
 import {
   REPORT_NAV_GROUP,
-  DUTY_NAV,
+  DUTY_NAV_GROUP,
   SETTINGS_NAV,
   STATISTICS_NAV,
   type NavItemId,
@@ -66,8 +66,15 @@ export default function Sidebar({
 
   const settingsRef = useRef<HTMLButtonElement>(null);
   const statisticsRef = useRef<HTMLButtonElement>(null);
-  const dutyRef = useRef<HTMLButtonElement>(null);
   const logoutRef = useRef<HTMLButtonElement>(null);
+  const [dutyOpen, setDutyOpen] = useNavGroupState("dutyOpen");
+  const dutyActive = DUTY_NAV_GROUP.items.some(
+    (item) =>
+      item.id === activeId && allowedNavItems.some((nav) => nav.id === item.id),
+  );
+  const showDutyGroup = DUTY_NAV_GROUP.items.some((item) =>
+    allowedNavItems.some((nav) => nav.id === item.id),
+  );
 
   const handleTooltipEnter = (
     text: string,
@@ -88,9 +95,8 @@ export default function Sidebar({
       setExecutiveOpen(false);
     }
     if (collapsed) {
-      if (!reportActive) {
-        setReportsOpen(false);
-      }
+      if (!reportActive) setReportsOpen(false);
+      if (!dutyActive) setDutyOpen(false);
     }
   }
 
@@ -100,7 +106,6 @@ export default function Sidebar({
   const showReportGroup = REPORT_NAV_GROUP.items.some((item) =>
     allowedNavItems.some((nav) => nav.id === item.id),
   );
-  const showDuty = allowedNavItems.some((nav) => nav.id === DUTY_NAV.id);
   const showStatistics = allowedNavItems.some(
     (nav) => nav.id === STATISTICS_NAV.id,
   );
@@ -191,26 +196,23 @@ export default function Sidebar({
             </button>
           )}
 
-          {showDuty && (
-            <button
-              ref={dutyRef}
-              type="button"
-              className={
-                activeId === DUTY_NAV.id
-                  ? `${styles.navItem} ${styles.active}`
-                  : styles.navItem
-              }
-              onClick={() => onNavigate(DUTY_NAV.id)}
-              aria-label={collapsed ? DUTY_NAV.label : undefined}
-              onMouseEnter={() => handleTooltipEnter(DUTY_NAV.label, dutyRef)}
-              onMouseLeave={handleTooltipLeave}
-            >
-              <FontAwesomeIcon
-                icon={faClipboardList}
-                className={styles.navIcon}
-              />
-              {!collapsed && DUTY_NAV.label}
-            </button>
+          {showDutyGroup && (
+            <NavGroup
+              label={DUTY_NAV_GROUP.label}
+              icon={faClipboardList}
+              items={DUTY_NAV_GROUP.items.filter((item) =>
+                allowedNavItems.some((nav) => nav.id === item.id),
+              )}
+              isOpen={dutyOpen}
+              onToggle={() => setDutyOpen(!dutyOpen)}
+              activeId={activeId}
+              onNavigate={(id) => onNavigate(id as NavItemId)}
+              collapsed={collapsed}
+              onExpand={onExpand}
+              isActive={dutyActive}
+              onTooltipEnter={handleTooltipEnter}
+              onTooltipLeave={handleTooltipLeave}
+            />
           )}
 
           {showSettings && (

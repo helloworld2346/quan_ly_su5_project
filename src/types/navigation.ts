@@ -8,7 +8,9 @@ export type NavItemId =
   | "report-family"
   | "report-communication"
   | "statistics"
-  | "duty-command"
+  | "duty-personnel"
+  | "duty-shifts"
+  | "duty-create"
   | "settings";
 
 export type NavItem = {
@@ -37,8 +39,14 @@ const CommunicationReport = lazy(
 const ReportStatistics = lazy(
   () => import("../pages/ReportStatistics/ReportStatistics"),
 );
-const CommandDuty = lazy(() => import("../pages/CommandDuty/CommandDuty"));
+const DutyPersonnel = lazy(() => import("../pages/CommandDuty/DutyPersonnel"));
+const DutyShifts = lazy(() => import("../pages/CommandDuty/DutyShifts"));
+const CreateDutyShift = lazy(
+  () => import("../pages/CommandDuty/CreateDutyShift"),
+);
 const Settings = lazy(() => import("../pages/Settings/Settings"));
+
+
 
 const Trainningstatistical = lazy(
   () => import("../pages/TrainingReport/Trainningstatistical"),
@@ -124,14 +132,37 @@ export const STATISTICS_NAV: NavItem = {
   allowedRoles: ["Quản Trị Viên", "Sư đoàn", "Chỉ huy", "Báo cáo"],
 };
 
-export const DUTY_NAV: NavItem = {
-  id: "duty-command",
+export const DUTY_NAV_GROUP = {
   label: "Ca trực",
-  path: "/duty-command",
-  loadingTitle: "Đang tải ca trực",
-  loadingSubtitle: "Đang tải dữ liệu…",
-  component: CommandDuty,
-  allowedRoles: ["Quản Trị Viên", "Sư đoàn"],
+  items: [
+    {
+      id: "duty-personnel" as const,
+      label: "Quản lý trực ban",
+      path: "/duty/personnel",
+      loadingTitle: "Đang tải quản lý trực ban",
+      loadingSubtitle: "Đang tải dữ liệu…",
+      component: DutyPersonnel,
+      allowedRoles: ["Quản Trị Viên", "Sư đoàn"],
+    },
+    {
+      id: "duty-shifts" as const,
+      label: "Quản lý ca trực",
+      path: "/duty/shifts",
+      loadingTitle: "Đang tải quản lý ca trực",
+      loadingSubtitle: "Đang tải dữ liệu…",
+      component: DutyShifts,
+      allowedRoles: ["Quản Trị Viên", "Sư đoàn"],
+    },
+    {
+      id: "duty-create" as const,
+      label: "Tạo ca trực",
+      path: "/duty/create",
+      loadingTitle: "Đang tải tạo ca trực",
+      loadingSubtitle: "Đang tải dữ liệu…",
+      component: CreateDutyShift,
+      allowedRoles: ["Quản Trị Viên", "Sư đoàn"],
+    },
+  ],
 };
 
 export const SETTINGS_NAV: NavItem = {
@@ -152,7 +183,9 @@ export const NAV_PAGE_TITLES: Record<NavItemId, string | undefined> = {
   "report-family": "Báo ban thân nhân thăm nuôi",
   "report-communication": "Báo ban thông tin liên lạc",
   statistics: "Thống kê báo ban",
-  "duty-command": "Ca trực",
+  "duty-personnel": "Quản lý trực ban",
+  "duty-shifts": "Quản lý ca trực",
+  "duty-create": "Tạo ca trực",
   settings: "Cài đặt",
 };
 
@@ -161,7 +194,7 @@ export const ALL_NAV_ITEMS: NavItem[] = [
   EXECUTIVE_TRAINING_NAV,
   ...REPORT_NAV_GROUP.items,
   STATISTICS_NAV,
-  DUTY_NAV,
+  ...DUTY_NAV_GROUP.items,
   SETTINGS_NAV,
 ];
 
@@ -175,24 +208,20 @@ export function getIdByPath(path: string): NavItemId {
   );
 }
 
-export function getNavGroupLabel(activeId: NavItemId): string | null {
-  if (
-    activeId === "settings" ||
-    activeId === "statistics" ||
-    activeId === "duty-command"
-  )
-    return null;
-
-  if (EXECUTIVE_NAV_GROUP.items.some((i) => i.id === activeId)) {
-    return EXECUTIVE_NAV_GROUP.label;
-  }
-
-  if (REPORT_NAV_GROUP.items.some((i) => i.id === activeId)) {
-    return REPORT_NAV_GROUP.label;
-  }
-
+export function getNavGroupLabel(activeId: NavItemId): string | null {  
+  if (activeId === "settings" || activeId === "statistics") return null;  
+  
+  if (EXECUTIVE_NAV_GROUP.items.some((i) => i.id === activeId))  
+    return EXECUTIVE_NAV_GROUP.label;  
+  
+  if (REPORT_NAV_GROUP.items.some((i) => i.id === activeId))  
+    return REPORT_NAV_GROUP.label;  
+  
+  if (DUTY_NAV_GROUP.items.some((i) => i.id === activeId))  
+    return DUTY_NAV_GROUP.label;  
+  
   return null;
-}
+  }
 
 export function getNavGroupLabelByRole(
   groupLabel: string,
@@ -245,7 +274,7 @@ export function getNavItemsByRole(userRole: string | null): NavItem[] {
         item.id === "executive-training" ||
         item.id.startsWith("report-") ||
         item.id === "statistics" ||
-        item.id === "duty-command" ||
+        item.id.startsWith("duty-") ||
         item.id === "settings",
     );
   }

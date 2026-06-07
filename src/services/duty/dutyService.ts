@@ -1,4 +1,6 @@
 import { apiNoPrefix } from "../api";
+import api from "../api"
+
 import type {
   TrucNguoiPayload,
   TrucNguoiResponse,
@@ -6,8 +8,11 @@ import type {
   KhungGioResponse,
   CaTrucPayload,
   CaTrucCreateResponse,
-  CaTrucDetailResponse,
   GetCaTrucByDateResponse,
+  CapBacListResponse,
+  ChucVuListResponse,
+  NguoiTrucListResponse,
+  CaTrucDetailResponse,
 } from "../../types/duty";
 
 export const dutyService = {
@@ -75,6 +80,28 @@ export const dutyService = {
       `/ca-truc/ngaytruc?ngayTruc=${ngayTruc}`,
     );
     return response.data;
+  },
+
+  getCapBac: async (): Promise<CapBacListResponse> => {
+    const res = await api.get<CapBacListResponse>("/capbac");
+    return res.data;
+  },
+
+  getChucVu: async (): Promise<ChucVuListResponse> => {
+    const res = await api.get<ChucVuListResponse>("/chucvu");
+    return res.data;
+  },
+
+  getAllTrucChiHuy: async (): Promise<NguoiTrucListResponse> => {
+    const res = await apiNoPrefix.get<NguoiTrucListResponse>("/truc-chi-huy");
+    return res.data;
+  },
+
+  getAllTrucBanTacChien: async (): Promise<NguoiTrucListResponse> => {
+    const res = await apiNoPrefix.get<NguoiTrucListResponse>(
+      "/truc-ban-tac-chien",
+    );
+    return res.data;
   },
 };
 

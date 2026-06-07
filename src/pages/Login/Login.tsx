@@ -65,7 +65,7 @@ export default function Login({ onSuccess }: Props) {
 
       if (response.success && response.Result.token) {
         storage.setToken(response.Result.token);
-        themeSession.applyOnLogin(); // ← thêm dòng này
+        themeSession.applyOnLogin();
         showSuccess("Đăng nhập thành công!");
         onSuccess?.();
       } else {

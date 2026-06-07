@@ -84,3 +84,55 @@ export interface GetCaTrucByDateResponse {
   message: string;
   Result: CaTrucDetail | null;
 }
+export interface CapBac {
+  idCapBac: string;
+  tenCapBac: string;
+  kyhieu: string;
+}
+
+export interface ChucVu {
+  idChucVu: string;
+  tenChucVu: string;
+  mota: string;
+}
+
+export interface NguoiTrucWithCaTruc {
+  idNguoitruc: string;
+  tenNguoitruc: string;
+  capbacNguoitruc: string;
+  chucvuNguoitruc: string;
+  sodienthoai: string;
+  createdAt: string;
+  updatedAt: string;
+  isDeleted: boolean;
+  deletedAt: string | null;
+  caTruc: unknown[];
+}
+
+export interface CapBacListResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  Result: CapBac[];
+}
+
+export interface ChucVuListResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  Result: ChucVu[];
+}
+
+export interface NguoiTrucListResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  Result: NguoiTrucWithCaTruc[];
+}
+
+export interface CaTrucListResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  Result: CaTrucDetail[];
+}

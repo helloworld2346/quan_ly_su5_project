@@ -11,7 +11,7 @@ import {
   faPlus,
   faCircleInfo,
 } from "@fortawesome/free-solid-svg-icons";
-import styles from "./CommandDuty.module.css";
+import styles from "./CreateDutyShift.module.css";
 import { dutyService } from "../../services/duty/dutyService";
 import { useToast } from "../../context/useToast";
 import type { TrucNguoiPayload, CaTrucDetail } from "../../types/duty";
@@ -54,7 +54,7 @@ const STEPS = [
   { label: "Tạo ca trực", icon: faFlagCheckered },
 ];
 
-export default function CommandDuty() {
+export default function CreateDutyShift() {
   const { showSuccess, showError } = useToast();
   const today = toLocalDateStr(new Date());
 
