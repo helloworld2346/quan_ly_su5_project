@@ -369,12 +369,10 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                 type="text"
                 className={styles.input}
                 value={trucChiHuy.sodienthoai}
-                onChange={(e) =>
-                  setTrucChiHuy((prev) => ({
-                    ...prev,
-                    sodienthoai: e.target.value,
-                  }))
-                }
+                onChange={(e) => {
+                  const val = e.target.value.replace(/[^\d+\-\s]/g, "");
+                  setTrucChiHuy((prev) => ({ ...prev, sodienthoai: val }));
+                }}
                 placeholder="Nhập số điện thoại..."
               />
             </div>
@@ -442,12 +440,10 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                 type="text"
                 className={styles.input}
                 value={trucBanTacChien.sodienthoai}
-                onChange={(e) =>
-                  setTrucBanTacChien((prev) => ({
-                    ...prev,
-                    sodienthoai: e.target.value,
-                  }))
-                }
+                onChange={(e) => {
+                  const val = e.target.value.replace(/[^\d+\-\s]/g, "");
+                  setTrucChiHuy((prev) => ({ ...prev, sodienthoai: val }));
+                }}
                 placeholder="Nhập số điện thoại..."
               />
             </div>

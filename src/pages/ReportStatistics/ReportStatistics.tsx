@@ -26,7 +26,8 @@ function getDefaultDates() {
 }
 
 function formatDate(dateStr: string) {
-  const [y, m, d] = dateStr.split("-").map(Number);
+  const datePart = dateStr.split("T")[0];
+  const [y, m, d] = datePart.split("-").map(Number);
   return new Date(y, m - 1, d).toLocaleDateString("vi-VN", {
     weekday: "long",
     day: "2-digit",
