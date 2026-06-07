@@ -12,7 +12,7 @@ import styles from "./Sidebar.module.css";
 import logo from "../../../assets/images/logo-su5.png";
 import {
   REPORT_NAV_GROUP,
-  DUTY_NAV_GROUP,
+  DUTY_NAV,
   SETTINGS_NAV,
   STATISTICS_NAV,
   type NavItemId,
@@ -57,13 +57,8 @@ export default function Sidebar({
     (item) =>
       item.id === activeId && allowedNavItems.some((nav) => nav.id === item.id),
   );
-  const dutyActive = DUTY_NAV_GROUP.items.some(
-    (item) =>
-      item.id === activeId && allowedNavItems.some((nav) => nav.id === item.id),
-  );
 
   const [reportsOpen, setReportsOpen] = useNavGroupState("reportsOpen");
-  const [dutyOpen, setDutyOpen] = useNavGroupState("dutyOpen");
   const [executiveOpen, setExecutiveOpen] = useNavGroupState("executiveOpen");
   const [prevCollapsed, setPrevCollapsed] = useState(collapsed);
 
@@ -71,6 +66,7 @@ export default function Sidebar({
 
   const settingsRef = useRef<HTMLButtonElement>(null);
   const statisticsRef = useRef<HTMLButtonElement>(null);
+  const dutyRef = useRef<HTMLButtonElement>(null);
   const logoutRef = useRef<HTMLButtonElement>(null);
 
   const handleTooltipEnter = (
@@ -95,9 +91,6 @@ export default function Sidebar({
       if (!reportActive) {
         setReportsOpen(false);
       }
-      if (!dutyActive) {
-        setDutyOpen(false);
-      }
     }
   }
 
@@ -107,9 +100,7 @@ export default function Sidebar({
   const showReportGroup = REPORT_NAV_GROUP.items.some((item) =>
     allowedNavItems.some((nav) => nav.id === item.id),
   );
-  const showDutyGroup = DUTY_NAV_GROUP.items.some((item) =>
-    allowedNavItems.some((nav) => nav.id === item.id),
-  );
+  const showDuty = allowedNavItems.some((nav) => nav.id === DUTY_NAV.id);
   const showStatistics = allowedNavItems.some(
     (nav) => nav.id === STATISTICS_NAV.id,
   );
@@ -179,25 +170,6 @@ export default function Sidebar({
             />
           )}
 
-          {showDutyGroup && (
-            <NavGroup
-              label={DUTY_NAV_GROUP.label}
-              icon={faClipboardList}
-              items={DUTY_NAV_GROUP.items.filter((item) =>
-                allowedNavItems.some((nav) => nav.id === item.id),
-              )}
-              isOpen={dutyOpen}
-              onToggle={() => setDutyOpen(!dutyOpen)}
-              activeId={activeId}
-              onNavigate={(id) => onNavigate(id as NavItemId)}
-              collapsed={collapsed}
-              onExpand={onExpand}
-              isActive={dutyActive}
-              onTooltipEnter={handleTooltipEnter}
-              onTooltipLeave={handleTooltipLeave}
-            />
-          )}
-
           {showStatistics && (
             <button
               ref={statisticsRef}
@@ -216,6 +188,28 @@ export default function Sidebar({
             >
               <FontAwesomeIcon icon={faChartBar} className={styles.navIcon} />
               {!collapsed && STATISTICS_NAV.label}
+            </button>
+          )}
+
+          {showDuty && (
+            <button
+              ref={dutyRef}
+              type="button"
+              className={
+                activeId === DUTY_NAV.id
+                  ? `${styles.navItem} ${styles.active}`
+                  : styles.navItem
+              }
+              onClick={() => onNavigate(DUTY_NAV.id)}
+              aria-label={collapsed ? DUTY_NAV.label : undefined}
+              onMouseEnter={() => handleTooltipEnter(DUTY_NAV.label, dutyRef)}
+              onMouseLeave={handleTooltipLeave}
+            >
+              <FontAwesomeIcon
+                icon={faClipboardList}
+                className={styles.navIcon}
+              />
+              {!collapsed && DUTY_NAV.label}
             </button>
           )}
 
