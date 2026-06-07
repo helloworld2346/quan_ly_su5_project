@@ -633,3 +633,23 @@
     grid-template-columns: 1fr;  
   }  
 }
+
+.autoFillBanner {  
+  display: flex;  
+  align-items: flex-start;  
+  gap: 10px;  
+  padding: 12px 16px;  
+  background: color-mix(in srgb, var(--primary-color, #218673) 8%, transparent);  
+  border: 1px solid color-mix(in srgb, var(--primary-color, #218673) 30%, transparent);  
+  border-left: 4px solid var(--primary-color, #218673);  
+  border-radius: 0 8px 8px 0;  
+  font-size: 14px;  
+  color: var(--login-text);  
+  line-height: 1.5;  
+}  
+  
+.checkingHint {  
+  font-size: 13px;  
+  color: var(--login-text-muted);  
+  font-style: italic;  
+}

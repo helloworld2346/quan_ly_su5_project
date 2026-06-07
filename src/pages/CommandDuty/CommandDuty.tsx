@@ -9,6 +9,7 @@ import {
   faCalendarDays,
   faFlagCheckered,
   faPlus,
+  faCircleInfo,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./CommandDuty.module.css";
 import { dutyService } from "../../services/duty/dutyService";
@@ -81,6 +82,11 @@ export default function CommandDuty() {
 
   const [createdCaTruc, setCreatedCaTruc] = useState<CaTrucDetail | null>(null);
 
+  const [isCheckingDate, setIsCheckingDate] = useState(false);
+  const [autoFilledFromDate, setAutoFilledFromDate] = useState<string | null>(
+    null,
+  );
+
   useEffect(() => {
     const today = new Date();
     const ngayTruc = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
@@ -98,6 +104,40 @@ export default function CommandDuty() {
 
     return () => clearTimeout(id);
   }, []);
+
+  const handleNgaytructChange = async (newDate: string) => {
+    setNgayTruc(newDate);
+
+    if (!newDate) return;
+
+    setIsCheckingDate(true);
+    setAutoFilledFromDate(null);
+    try {
+      const res = await dutyService.getCaTrucByDate(newDate);
+      if (res.success && res.Result) {
+        const caTruc = res.Result;
+        setMatKhau(caTruc.matkhau || "");
+        if (caTruc.ghichu) setGhiChu(caTruc.ghichu);
+        setTrucChiHuy({
+          tenNguoitruc: caTruc.trucChiHuy.tenNguoitruc || "",
+          capbacNguoitruc: caTruc.trucChiHuy.capbacNguoitruc || "",
+          chucvuNguoitruc: caTruc.trucChiHuy.chucvuNguoitruc || "",
+          sodienthoai: caTruc.trucChiHuy.sodienthoai || "",
+        });
+        setTrucTacChien({
+          tenNguoitruc: caTruc.trucBanTacChien.tenNguoitruc || "",
+          capbacNguoitruc: caTruc.trucBanTacChien.capbacNguoitruc || "",
+          chucvuNguoitruc: caTruc.trucBanTacChien.chucvuNguoitruc || "",
+          sodienthoai: caTruc.trucBanTacChien.sodienthoai || "",
+        });
+        setAutoFilledFromDate(newDate);
+      }
+    } catch {
+      // Không có dữ liệu hoặc lỗi — bỏ qua
+    } finally {
+      setIsCheckingDate(false);
+    }
+  };
 
   const handleStep1 = async () => {
     if (
@@ -220,6 +260,8 @@ export default function CommandDuty() {
     setNgayTruc(today);
     setMatKhau("");
     setGhiChu("");
+    setAutoFilledFromDate(null);
+    setIsCheckingDate(false);
   };
 
   if (createdCaTruc) {
@@ -515,6 +557,17 @@ export default function CommandDuty() {
         {step === 3 && (
           <div className={styles.card}>
             <h2 className={styles.cardTitle}>Tạo ca trực</h2>
+
+            {autoFilledFromDate && (
+              <div className={styles.autoFillBanner}>
+                <FontAwesomeIcon icon={faCircleInfo} />
+                <span>
+                  Đã tìm thấy ca trực ngày này — thông tin đã được điền tự động.
+                  Bạn có thể chỉnh sửa trước khi lưu.
+                </span>
+              </div>
+            )}
+
             <div className={styles.formGrid}>
               <div className={styles.formGroup}>
                 <label>
@@ -524,8 +577,13 @@ export default function CommandDuty() {
                   type="date"
                   className={styles.input}
                   value={ngayTruc}
-                  onChange={(e) => setNgayTruc(e.target.value)}
+                  onChange={(e) => void handleNgaytructChange(e.target.value)}
                 />
+                {isCheckingDate && (
+                  <span className={styles.checkingHint}>
+                    Đang kiểm tra ca trực...
+                  </span>
+                )}
               </div>
               <div className={styles.formGroup}>
                 <label>
