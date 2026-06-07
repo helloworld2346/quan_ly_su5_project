@@ -505,11 +505,8 @@ export default function DailyTroopReport() {
     });
   }, [query, reportData]);
 
-  // Với role Sư đoàn: merge danh sách đơn vị con với báo cáo đã nộp
-  // Đơn vị chưa nộp sẽ có notSubmitted = true và được highlight đỏ
   const displayRows = useMemo((): ReportRow[] => {
-    if (!isSuDoan || !isParentUnit || childUnits.length === 0)
-      return filteredRows;
+    if (!isParentUnit || childUnits.length === 0) return filteredRows;
 
     return childUnits.map((unit) => {
       const submitted = filteredRows.find((r) => r.donVi === unit.maDonVi);
@@ -530,7 +527,7 @@ export default function DailyTroopReport() {
         notSubmitted: true,
       };
     });
-  }, [isSuDoan, isParentUnit, childUnits, filteredRows]);
+  }, [isParentUnit, childUnits, filteredRows]);
 
   const totals = useMemo(() => {
     return reportData.reduce(
@@ -830,14 +827,20 @@ export default function DailyTroopReport() {
         consolidateDisabled={
           !consolidatedData ||
           consolidatedData.submittedCount === 0 ||
-          parentReportData !== null
+          parentReportData !== null ||
+          (childUnits.length > 0 &&
+            consolidatedData.submittedCount < childUnits.length)
         }
         consolidateLabel={
           parentReportData !== null
             ? "Đã tổng hợp"
-            : consolidatedData && consolidatedData.submittedCount > 0
-              ? `Tổng hợp (${consolidatedData.submittedCount}/${consolidatedData.totalCount} đơn vị)`
-              : "Chưa có báo cáo con"
+            : childUnits.length > 0 &&
+                consolidatedData &&
+                consolidatedData.submittedCount < childUnits.length
+              ? `Chưa đủ (${consolidatedData.submittedCount ?? 0}/${childUnits.length} đơn vị)`
+              : consolidatedData && consolidatedData.submittedCount > 0
+                ? `Tổng hợp (${consolidatedData.submittedCount}/${childUnits.length} đơn vị)`
+                : "Chưa có báo cáo con"
         }
         onExportWord={handleExportWord}
         onExportExcel={handleExportExcel}
