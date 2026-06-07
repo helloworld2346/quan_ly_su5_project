@@ -230,58 +230,71 @@ export default function CommandDuty() {
           <span>Ca trực đã được tạo thành công</span>
         </div>
 
-        <div className={styles.card}>
-          <h2 className={styles.cardTitle}>Thông tin ca trực</h2>
-          <div className={styles.infoGrid}>
-            <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Ngày trực</span>
-              <span className={styles.infoValue}>
-                {new Date(
-                  createdCaTruc.ngaytruc + "T00:00:00",
-                ).toLocaleDateString("vi-VN", {
-                  weekday: "long",
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                })}
-              </span>
-            </div>
-            <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Mật khẩu</span>
-              <span className={`${styles.infoValue} ${styles.matKhau}`}>
-                {createdCaTruc.matkhau}
-              </span>
-            </div>
-            {createdCaTruc.ghichu && (
-              <div className={`${styles.infoItem} ${styles.fullWidth}`}>
-                <span className={styles.infoLabel}>Ghi chú</span>
-                <span className={styles.infoValue}>{createdCaTruc.ghichu}</span>
-              </div>
+        <div className={styles.caTrucSection}>
+          <div className={styles.caTrucHeader}>Thông tin ca trực</div>
+          <div className={styles.caTrucNgay}>
+            {new Date(createdCaTruc.ngaytruc + "T00:00:00").toLocaleDateString(
+              "vi-VN",
+              {
+                weekday: "long",
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              },
             )}
           </div>
-        </div>
 
-        <div className={styles.trucGrid}>
-          {[
-            { label: "Trực chỉ huy", data: createdCaTruc.trucChiHuy },
-            {
-              label: "Trực ban tác chiến",
-              data: createdCaTruc.trucBanTacChien,
-            },
-          ].map(({ label, data }) => (
-            <div key={label} className={styles.trucCard}>
-              <span className={styles.trucRole}>{label}</span>
-              <div className={styles.trucCardBody}>
-                <span className={styles.trucName}>
-                  {data.capbacNguoitruc} {data.tenNguoitruc}
-                </span>
-                <span className={styles.trucMeta}>{data.chucvuNguoitruc}</span>
-                {data.sodienthoai && (
-                  <a className={styles.trucPhone}>{data.sodienthoai}</a>
-                )}
-              </div>
+          <div className={styles.caTrucBody}>
+            <div className={styles.caTrucLeft}>
+              {[
+                { label: "Trực chỉ huy", data: createdCaTruc.trucChiHuy },
+                {
+                  label: "Trực ban tác chiến",
+                  data: createdCaTruc.trucBanTacChien,
+                },
+              ].map(({ label, data }) => (
+                <div key={label} className={styles.caTrucCard}>
+                  <span className={styles.caTrucRole}>{label}</span>
+                  {data ? (
+                    <div className={styles.caTrucCardBody}>
+                      <div className={styles.caTrucPersonName}>
+                        {data.capbacNguoitruc} {data.tenNguoitruc}
+                      </div>
+                      <div className={styles.caTrucPersonMeta}>
+                        {data.chucvuNguoitruc}
+                      </div>
+                      {data.sodienthoai && (
+                        <a
+                          href={`tel:${data.sodienthoai}`}
+                          className={styles.caTrucPhone}
+                        >
+                          {data.sodienthoai}
+                        </a>
+                      )}
+                    </div>
+                  ) : (
+                    <div className={styles.caTrucEmpty}>Chưa có thông tin</div>
+                  )}
+                </div>
+              ))}
             </div>
-          ))}
+
+            <div className={styles.caTrucRight}>
+              <span className={styles.caTrucMatKhauLabel}>Mật khẩu</span>
+              <span className={styles.caTrucMatKhau}>
+                {createdCaTruc.matkhau || "—"}
+              </span>
+            </div>
+          </div>
+
+          {createdCaTruc.ghichu && (
+            <div className={styles.caTrucGhiChu}>
+              <span className={styles.caTrucGhiChuLabel}>Ghi chú</span>
+              <span className={styles.caTrucGhiChuText}>
+                {createdCaTruc.ghichu}
+              </span>
+            </div>
+          )}
         </div>
 
         <div className={styles.actions}>
@@ -499,7 +512,6 @@ export default function CommandDuty() {
           </div>
         )}
 
-        {/* Bước 4 */}
         {step === 3 && (
           <div className={styles.card}>
             <h2 className={styles.cardTitle}>Tạo ca trực</h2>
