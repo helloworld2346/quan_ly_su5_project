@@ -2,243 +2,107 @@ import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheck,
-  faChevronRight,
-  faChevronLeft,
   faShieldHalved,
-  faCrosshairs,
-  faCalendarDays,
-  faFlagCheckered,
   faPlus,
-  faCircleInfo,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./CreateDutyShift.module.css";
 import { dutyService } from "../../services/duty/dutyService";
 import { useToast } from "../../context/useToast";
-import type { TrucNguoiPayload, CaTrucDetail } from "../../types/duty";
+import type { NguoiTrucWithCaTruc, CaTrucDetail } from "../../types/duty";
 import CustomSelect from "../../components/ui/CustomSelect/CustomSelect";
 
-const CAP_BAC_OPTIONS = [
-  "Đại tá",
-  "Thượng tá",
-  "Trung tá",
-  "Thiếu tá",
-  "Đại úy",
-  "Thượng úy",
-  "Trung úy",
-];
-
-const EMPTY_TRUC: TrucNguoiPayload = {
-  tenNguoitruc: "",
-  capbacNguoitruc: "",
-  chucvuNguoitruc: "",
-  sodienthoai: "",
-};
-
-function toLocalDateStr(d: Date): string {
+function getTomorrow(): string {
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
 }
 
-function diffDays(start: string, end: string): number {
-  const s = new Date(start);
-  const e = new Date(end);
-  return Math.max(1, Math.round((e.getTime() - s.getTime()) / 86400000) + 1);
-}
-
-const STEPS = [
-  { label: "Trực chỉ huy", icon: faShieldHalved },
-  { label: "Trực ban tác chiến", icon: faCrosshairs },
-  { label: "Chọn ngày trực", icon: faCalendarDays },
-  { label: "Tạo ca trực", icon: faFlagCheckered },
-];
-
 export default function CreateDutyShift() {
   const { showSuccess, showError } = useToast();
-  const today = toLocalDateStr(new Date());
+  const tomorrow = getTomorrow();
 
-  const [step, setStep] = useState(0);
-  const [submitting, setSubmitting] = useState(false);
+  const [chiHuyList, setChiHuyList] = useState<NguoiTrucWithCaTruc[]>([]);
+  const [tacChienList, setTacChienList] = useState<NguoiTrucWithCaTruc[]>([]);
+  const [loadingPersonnel, setLoadingPersonnel] = useState(true);
 
-  const [trucChiHuy, setTrucChiHuy] = useState<TrucNguoiPayload>({
-    ...EMPTY_TRUC,
-  });
-  const [idTrucChiHuy, setIdTrucChiHuy] = useState<string | null>(null);
+  const [selectedChiHuyId, setSelectedChiHuyId] = useState("");
+  const [selectedTacChienId, setSelectedTacChienId] = useState("");
 
-  const [trucTacChien, setTrucTacChien] = useState<TrucNguoiPayload>({
-    ...EMPTY_TRUC,
-  });
-  const [idTrucTacChien, setIdTrucTacChien] = useState<string | null>(null);
-
-  const [chiHuyStart, setChiHuyStart] = useState(today);
-  const [chiHuyEnd, setChiHuyEnd] = useState(today);
-  const [tacChienStart, setTacChienStart] = useState(today);
-  const [tacChienEnd, setTacChienEnd] = useState(today);
-
-  const [ngayTruc, setNgayTruc] = useState(today);
+  const [ngayTruc, setNgayTruc] = useState(tomorrow);
   const [matKhau, setMatKhau] = useState("");
   const [ghiChu, setGhiChu] = useState("");
 
+  const [submitting, setSubmitting] = useState(false);
   const [createdCaTruc, setCreatedCaTruc] = useState<CaTrucDetail | null>(null);
 
-  const [isCheckingDate, setIsCheckingDate] = useState(false);
-  const [autoFilledFromDate, setAutoFilledFromDate] = useState<string | null>(
-    null,
-  );
-
   useEffect(() => {
-    const today = new Date();
-    const ngayTruc = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-
-    const id = setTimeout(async () => {
+    const load = async () => {
+      setLoadingPersonnel(true);
       try {
-        const res = await dutyService.getCaTrucByDate(ngayTruc);
-        if (res.success && res.Result) {
-          setCreatedCaTruc(res.Result);
-        }
+        const [chiHuyRes, tacChienRes] = await Promise.all([
+          dutyService.getAllTrucChiHuy(),
+          dutyService.getAllTrucBanTacChien(),
+        ]);
+        setChiHuyList(chiHuyRes.Result ?? []);
+        setTacChienList(tacChienRes.Result ?? []);
       } catch {
-        // 404 hoặc lỗi khác → giữ nguyên step 0
+        showError("Không thể tải danh sách người trực");
+      } finally {
+        setLoadingPersonnel(false);
       }
-    }, 0);
-
-    return () => clearTimeout(id);
+    };
+    void load();
   }, []);
 
-  const handleNgaytructChange = async (newDate: string) => {
-    setNgayTruc(newDate);
+  const selectedChiHuy =
+    chiHuyList.find((p) => p.idNguoitruc === selectedChiHuyId) ?? null;
+  const selectedTacChien =
+    tacChienList.find((p) => p.idNguoitruc === selectedTacChienId) ?? null;
 
-    if (!newDate) return;
+  const chiHuyOptions = chiHuyList.map((p) => ({
+    value: p.idNguoitruc,
+    label: `${p.capbacNguoitruc} ${p.tenNguoitruc} — ${p.chucvuNguoitruc}`,
+  }));
 
-    setIsCheckingDate(true);
-    setAutoFilledFromDate(null);
-    try {
-      const res = await dutyService.getCaTrucByDate(newDate);
-      if (res.success && res.Result) {
-        const caTruc = res.Result;
-        setMatKhau(caTruc.matkhau || "");
-        if (caTruc.ghichu) setGhiChu(caTruc.ghichu);
-        setTrucChiHuy({
-          tenNguoitruc: caTruc.trucChiHuy.tenNguoitruc || "",
-          capbacNguoitruc: caTruc.trucChiHuy.capbacNguoitruc || "",
-          chucvuNguoitruc: caTruc.trucChiHuy.chucvuNguoitruc || "",
-          sodienthoai: caTruc.trucChiHuy.sodienthoai || "",
-        });
-        setTrucTacChien({
-          tenNguoitruc: caTruc.trucBanTacChien.tenNguoitruc || "",
-          capbacNguoitruc: caTruc.trucBanTacChien.capbacNguoitruc || "",
-          chucvuNguoitruc: caTruc.trucBanTacChien.chucvuNguoitruc || "",
-          sodienthoai: caTruc.trucBanTacChien.sodienthoai || "",
-        });
-        setAutoFilledFromDate(newDate);
-      }
-    } catch {
-      // Không có dữ liệu hoặc lỗi — bỏ qua
-    } finally {
-      setIsCheckingDate(false);
-    }
-  };
+  const tacChienOptions = tacChienList.map((p) => ({
+    value: p.idNguoitruc,
+    label: `${p.capbacNguoitruc} ${p.tenNguoitruc} — ${p.chucvuNguoitruc}`,
+  }));
 
-  const handleStep1 = async () => {
-    if (
-      !trucChiHuy.tenNguoitruc ||
-      !trucChiHuy.capbacNguoitruc ||
-      !trucChiHuy.chucvuNguoitruc
-    ) {
-      showError("Vui lòng nhập đầy đủ thông tin trực chỉ huy");
+  const handleSubmit = async () => {
+    if (!selectedChiHuyId) {
+      showError("Vui lòng chọn trực chỉ huy");
       return;
     }
-    setSubmitting(true);
-    try {
-      const res = await dutyService.createTrucChiHuy(trucChiHuy);
-      if (!res.success) throw new Error(res.message);
-      setIdTrucChiHuy(res.Result.idNguoitruc);
-      setStep(1);
-    } catch (e: unknown) {
-      showError(e instanceof Error ? e.message : "Không thể tạo trực chỉ huy");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleStep2 = async () => {
-    if (
-      !trucTacChien.tenNguoitruc ||
-      !trucTacChien.capbacNguoitruc ||
-      !trucTacChien.chucvuNguoitruc
-    ) {
-      showError("Vui lòng nhập đầy đủ thông tin trực ban tác chiến");
+    if (!selectedTacChienId) {
+      showError("Vui lòng chọn trực ban tác chiến");
       return;
     }
-    setSubmitting(true);
-    try {
-      const res = await dutyService.createTrucBanTacChien(trucTacChien);
-      if (!res.success) throw new Error(res.message);
-      setIdTrucTacChien(res.Result.idNguoitruc);
-      setStep(2);
-    } catch (e: unknown) {
-      showError(
-        e instanceof Error ? e.message : "Không thể tạo trực ban tác chiến",
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleStep3 = async () => {
-    if (chiHuyEnd < chiHuyStart || tacChienEnd < tacChienStart) {
-      showError("Ngày kết thúc phải sau hoặc bằng ngày bắt đầu");
+    if (!ngayTruc) {
+      showError("Vui lòng chọn ngày trực");
       return;
     }
-    setSubmitting(true);
-    try {
-      const [r1, r2] = await Promise.all([
-        dutyService.createKhungGioChiHuy({
-          soNgayTruc: diffDays(chiHuyStart, chiHuyEnd),
-          khunggioBatdau: "00:00:00",
-          khunggioKetthuc: "00:00:00",
-        }),
-        dutyService.createKhungGioTacChien({
-          soNgayTruc: diffDays(tacChienStart, tacChienEnd),
-          khunggioBatdau: "00:00:00",
-          khunggioKetthuc: "00:00:00",
-        }),
-      ]);
-      if (!r1.success) throw new Error(r1.message);
-      if (!r2.success) throw new Error(r2.message);
-      setStep(3);
-    } catch (e: unknown) {
-      showError(e instanceof Error ? e.message : "Không thể tạo khung giờ");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleStep4 = async () => {
-    if (!matKhau) {
+    if (!matKhau.trim()) {
       showError("Vui lòng nhập mật khẩu ca trực");
       return;
     }
-    if (!idTrucChiHuy || !idTrucTacChien) {
-      showError("Thiếu thông tin người trực");
-      return;
-    }
+
     setSubmitting(true);
     try {
       const res = await dutyService.createCaTruc({
         ngaytruc: ngayTruc,
         matkhau: matKhau,
         ghichu: ghiChu,
-        trucChiHuy: idTrucChiHuy,
-        trucBanTacChien: idTrucTacChien,
+        trucChiHuy: selectedChiHuyId,
+        trucBanTacChien: selectedTacChienId,
       });
       if (!res.success) throw new Error(res.message);
       showSuccess("Tạo ca trực thành công");
-
       const detail = await dutyService.getCaTruc(res.Result.idCatruc);
-      if (detail.success) {
-        setCreatedCaTruc(detail.Result);
-      }
+      if (detail.success) setCreatedCaTruc(detail.Result);
     } catch (e: unknown) {
       showError(e instanceof Error ? e.message : "Không thể tạo ca trực");
     } finally {
@@ -248,21 +112,39 @@ export default function CreateDutyShift() {
 
   const handleReset = () => {
     setCreatedCaTruc(null);
-    setStep(0);
-    setTrucChiHuy({ ...EMPTY_TRUC });
-    setTrucTacChien({ ...EMPTY_TRUC });
-    setIdTrucChiHuy(null);
-    setIdTrucTacChien(null);
-    setChiHuyStart(today);
-    setChiHuyEnd(today);
-    setTacChienStart(today);
-    setTacChienEnd(today);
-    setNgayTruc(today);
+    setSelectedChiHuyId("");
+    setSelectedTacChienId("");
+    setNgayTruc(getTomorrow());
     setMatKhau("");
     setGhiChu("");
-    setAutoFilledFromDate(null);
-    setIsCheckingDate(false);
   };
+
+  const renderPersonCard = (
+    person: NguoiTrucWithCaTruc | null,
+    roleLabel: string,
+    icon: typeof faShieldHalved,
+  ) => (
+    <div className={styles.trucColumn}>
+      <div className={styles.trucColumnHeader}>
+        <FontAwesomeIcon icon={icon} className={styles.trucColumnIcon} />
+        <span className={styles.trucColumnLabel}>{roleLabel}</span>
+      </div>
+      {person ? (
+        <div className={styles.personCard}>
+          <span className={styles.personRole}>{roleLabel}</span>
+          <div className={styles.personName}>
+            {person.capbacNguoitruc} {person.tenNguoitruc}
+          </div>
+          <div className={styles.personMeta}>{person.chucvuNguoitruc}</div>
+          {person.sodienthoai && (
+            <a className={styles.personPhone}>{person.sodienthoai}</a>
+          )}
+        </div>
+      ) : (
+        <div className={styles.personEmpty}>Chưa chọn người trực</div>
+      )}
+    </div>
+  );
 
   if (createdCaTruc) {
     return (
@@ -306,12 +188,7 @@ export default function CreateDutyShift() {
                         {data.chucvuNguoitruc}
                       </div>
                       {data.sodienthoai && (
-                        <a
-                          href={`tel:${data.sodienthoai}`}
-                          className={styles.caTrucPhone}
-                        >
-                          {data.sodienthoai}
-                        </a>
+                        <a className={styles.caTrucPhone}>{data.sodienthoai}</a>
                       )}
                     </div>
                   ) : (
@@ -342,7 +219,7 @@ export default function CreateDutyShift() {
         <div className={styles.actions}>
           <button
             type="button"
-            className={styles.btnNext}
+            className={styles.btnSubmit}
             onClick={handleReset}
           >
             <FontAwesomeIcon icon={faPlus} /> Tạo ca trực mới
@@ -352,298 +229,123 @@ export default function CreateDutyShift() {
     );
   }
 
-  const renderTrucForm = (
-    label: string,
-    data: TrucNguoiPayload,
-    onChange: (field: keyof TrucNguoiPayload, val: string) => void,
-    onNext: () => void,
-    onBack?: () => void,
-  ) => (
-    <div className={styles.card}>
-      <h2 className={styles.cardTitle}>{label}</h2>
-      <div className={styles.formGrid}>
-        <div className={styles.formGroup}>
-          <label>
-            Họ và tên <span className={styles.required}>*</span>
-          </label>
-          <input
-            className={styles.input}
-            value={data.tenNguoitruc}
-            onChange={(e) => onChange("tenNguoitruc", e.target.value)}
-            placeholder="Nhập họ và tên..."
-          />
-        </div>
-        <div className={styles.formGroup}>
-          <label>
-            Cấp bậc <span className={styles.required}>*</span>
-          </label>
-          <CustomSelect
-            options={CAP_BAC_OPTIONS.map((cb) => ({ value: cb, label: cb }))}
-            value={data.capbacNguoitruc}
-            onChange={(val) => onChange("capbacNguoitruc", val)}
-            placeholder="-- Chọn cấp bậc --"
-          />
-        </div>
-        <div className={styles.formGroup}>
-          <label>
-            Chức vụ <span className={styles.required}>*</span>
-          </label>
-          <input
-            className={styles.input}
-            value={data.chucvuNguoitruc}
-            onChange={(e) => onChange("chucvuNguoitruc", e.target.value)}
-            placeholder="Nhập chức vụ..."
-          />
-        </div>
-        <div className={styles.formGroup}>
-          <label>Số điện thoại</label>
-          <input
-            className={styles.input}
-            value={data.sodienthoai}
-            onChange={(e) => onChange("sodienthoai", e.target.value)}
-            placeholder="Nhập số điện thoại..."
-            type="tel"
-          />
-        </div>
-      </div>
-      <div className={styles.actions}>
-        {onBack && (
-          <button
-            type="button"
-            className={styles.btnBack}
-            onClick={onBack}
-            disabled={submitting}
-          >
-            <FontAwesomeIcon icon={faChevronLeft} /> Quay lại
-          </button>
-        )}
-        <button
-          type="button"
-          className={styles.btnNext}
-          onClick={onNext}
-          disabled={submitting}
-        >
-          {submitting ? "Đang xử lý..." : "Tiếp theo"}{" "}
-          <FontAwesomeIcon icon={faChevronRight} />
-        </button>
-      </div>
-    </div>
-  );
-
   return (
     <section className={styles.page}>
-      <div className={styles.stepper}>
-        {STEPS.map((s, i) => (
-          <div
-            key={i}
-            className={`${styles.stepItem} ${i === step ? styles.stepActive : ""} ${i < step ? styles.stepDone : ""}`}
-          >
-            <div className={styles.stepCircle}>
-              {i < step ? (
-                <FontAwesomeIcon icon={faCheck} />
-              ) : (
-                <FontAwesomeIcon icon={s.icon} />
-              )}
-            </div>
-            <span className={styles.stepLabel}>{s.label}</span>
-            {i < STEPS.length - 1 && <div className={styles.stepLine} />}
+      <div className={styles.formCard}>
+        <h2 className={styles.cardTitle}>Tạo ca trực</h2>
+
+        <div className={styles.formGrid}>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>
+              Ngày trực <span className={styles.required}>*</span>
+            </label>
+            <input
+              type="date"
+              className={styles.input}
+              value={ngayTruc}
+              min={tomorrow}
+              onChange={(e) => setNgayTruc(e.target.value)}
+            />
           </div>
-        ))}
-      </div>
-
-      <div className={styles.content}>
-        {step === 0 &&
-          renderTrucForm(
-            "Thông tin trực chỉ huy",
-            trucChiHuy,
-            (field, val) =>
-              setTrucChiHuy((prev) => ({ ...prev, [field]: val })),
-            handleStep1,
-          )}
-
-        {step === 1 &&
-          renderTrucForm(
-            "Thông tin trực ban tác chiến",
-            trucTacChien,
-            (field, val) =>
-              setTrucTacChien((prev) => ({ ...prev, [field]: val })),
-            handleStep2,
-            () => setStep(0),
-          )}
-
-        {step === 2 && (
-          <div className={styles.card}>
-            <h2 className={styles.cardTitle}>Chọn ngày trực</h2>
-            <div className={styles.dateSection}>
-              <h3 className={styles.dateSectionTitle}>Trực chỉ huy</h3>
-              <div className={styles.dateRow}>
-                <div className={styles.formGroup}>
-                  <label>Ngày bắt đầu</label>
-                  <input
-                    type="date"
-                    className={styles.input}
-                    value={chiHuyStart}
-                    onChange={(e) => setChiHuyStart(e.target.value)}
-                  />
-                </div>
-                <div className={styles.formGroup}>
-                  <label>Ngày kết thúc</label>
-                  <input
-                    type="date"
-                    className={styles.input}
-                    value={chiHuyEnd}
-                    min={chiHuyStart}
-                    onChange={(e) => setChiHuyEnd(e.target.value)}
-                  />
-                </div>
-                <div className={styles.dayCount}>
-                  <span>{diffDays(chiHuyStart, chiHuyEnd)}</span>
-                  <small>ngày trực</small>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.dateSection}>
-              <h3 className={styles.dateSectionTitle}>Trực ban tác chiến</h3>
-              <div className={styles.dateRow}>
-                <div className={styles.formGroup}>
-                  <label>Ngày bắt đầu</label>
-                  <input
-                    type="date"
-                    className={styles.input}
-                    value={tacChienStart}
-                    onChange={(e) => setTacChienStart(e.target.value)}
-                  />
-                </div>
-                <div className={styles.formGroup}>
-                  <label>Ngày kết thúc</label>
-                  <input
-                    type="date"
-                    className={styles.input}
-                    value={tacChienEnd}
-                    min={tacChienStart}
-                    onChange={(e) => setTacChienEnd(e.target.value)}
-                  />
-                </div>
-                <div className={styles.dayCount}>
-                  <span>{diffDays(tacChienStart, tacChienEnd)}</span>
-                  <small>ngày trực</small>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.actions}>
-              <button
-                type="button"
-                className={styles.btnBack}
-                onClick={() => setStep(1)}
-                disabled={submitting}
-              >
-                <FontAwesomeIcon icon={faChevronLeft} /> Quay lại
-              </button>
-              <button
-                type="button"
-                className={styles.btnNext}
-                onClick={handleStep3}
-                disabled={submitting}
-              >
-                {submitting ? "Đang xử lý..." : "Tiếp theo"}{" "}
-                <FontAwesomeIcon icon={faChevronRight} />
-              </button>
-            </div>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>
+              Mật khẩu <span className={styles.required}>*</span>
+            </label>
+            <input
+              className={styles.input}
+              value={matKhau}
+              onChange={(e) => setMatKhau(e.target.value)}
+              placeholder="Nhập mật khẩu ca trực..."
+            />
           </div>
-        )}
+          <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+            <label className={styles.label}>Ghi chú</label>
+            <textarea
+              className={`${styles.input} ${styles.textarea}`}
+              value={ghiChu}
+              onChange={(e) => setGhiChu(e.target.value)}
+              placeholder="Nhập ghi chú..."
+              rows={2}
+            />
+          </div>
+        </div>
 
-        {step === 3 && (
-          <div className={styles.card}>
-            <h2 className={styles.cardTitle}>Tạo ca trực</h2>
-
-            {autoFilledFromDate && (
-              <div className={styles.autoFillBanner}>
-                <FontAwesomeIcon icon={faCircleInfo} />
-                <span>
-                  Đã tìm thấy ca trực ngày này — thông tin đã được điền tự động.
-                  Bạn có thể chỉnh sửa trước khi lưu.
-                </span>
-              </div>
-            )}
-
-            <div className={styles.formGrid}>
-              <div className={styles.formGroup}>
-                <label>
-                  Ngày trực <span className={styles.required}>*</span>
-                </label>
-                <input
-                  type="date"
-                  className={styles.input}
-                  value={ngayTruc}
-                  onChange={(e) => void handleNgaytructChange(e.target.value)}
-                />
-                {isCheckingDate && (
-                  <span className={styles.checkingHint}>
-                    Đang kiểm tra ca trực...
-                  </span>
+        <div className={styles.trucGrid}>
+          <div className={styles.trucColumn}>
+            <div className={styles.trucColumnHeader}>
+              <span className={styles.trucColumnLabel}>Trực chỉ huy</span>
+            </div>
+            <CustomSelect
+              options={chiHuyOptions}
+              value={selectedChiHuyId}
+              onChange={setSelectedChiHuyId}
+              placeholder={
+                loadingPersonnel ? "Đang tải..." : "-- Chọn trực chỉ huy --"
+              }
+            />
+            {selectedChiHuy && (
+              <div className={styles.personCard}>
+                <span className={styles.personRole}>Trực chỉ huy</span>
+                <div className={styles.personName}>
+                  {selectedChiHuy.capbacNguoitruc} {selectedChiHuy.tenNguoitruc}
+                </div>
+                <div className={styles.personMeta}>
+                  {selectedChiHuy.chucvuNguoitruc}
+                </div>
+                {selectedChiHuy.sodienthoai && (
+                  <a className={styles.personPhone}>
+                    {selectedChiHuy.sodienthoai}
+                  </a>
                 )}
               </div>
-              <div className={styles.formGroup}>
-                <label>
-                  Mật khẩu <span className={styles.required}>*</span>
-                </label>
-                <input
-                  className={styles.input}
-                  value={matKhau}
-                  onChange={(e) => setMatKhau(e.target.value)}
-                  placeholder="Nhập mật khẩu ca trực..."
-                />
-              </div>
-              <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label>Ghi chú</label>
-                <textarea
-                  className={`${styles.input} ${styles.textarea}`}
-                  value={ghiChu}
-                  onChange={(e) => setGhiChu(e.target.value)}
-                  placeholder="Nhập ghi chú..."
-                  rows={3}
-                />
-              </div>
-            </div>
-
-            <div className={styles.summary}>
-              <div className={styles.summaryItem}>
-                <span className={styles.summaryLabel}>Trực chỉ huy</span>
-                <span className={styles.summaryValue}>
-                  {trucChiHuy.capbacNguoitruc} {trucChiHuy.tenNguoitruc}
-                </span>
-              </div>
-              <div className={styles.summaryItem}>
-                <span className={styles.summaryLabel}>Trực ban tác chiến</span>
-                <span className={styles.summaryValue}>
-                  {trucTacChien.capbacNguoitruc} {trucTacChien.tenNguoitruc}
-                </span>
-              </div>
-            </div>
-
-            <div className={styles.actions}>
-              <button
-                type="button"
-                className={styles.btnBack}
-                onClick={() => setStep(2)}
-                disabled={submitting}
-              >
-                <FontAwesomeIcon icon={faChevronLeft} /> Quay lại
-              </button>
-              <button
-                type="button"
-                className={styles.btnSubmit}
-                onClick={handleStep4}
-                disabled={submitting}
-              >
-                {submitting ? "Đang tạo..." : "Tạo ca trực"}{" "}
-                <FontAwesomeIcon icon={faCheck} />
-              </button>
-            </div>
+            )}
           </div>
-        )}
+
+          <div className={styles.trucColumn}>
+            <div className={styles.trucColumnHeader}>
+              <span className={styles.trucColumnLabel}>Trực ban tác chiến</span>
+            </div>
+            <CustomSelect
+              options={tacChienOptions}
+              value={selectedTacChienId}
+              onChange={setSelectedTacChienId}
+              placeholder={
+                loadingPersonnel
+                  ? "Đang tải..."
+                  : "-- Chọn trực ban tác chiến --"
+              }
+            />
+            {selectedTacChien && (
+              <div className={styles.personCard}>
+                <span className={styles.personRole}>Trực ban tác chiến</span>
+                <div className={styles.personName}>
+                  {selectedTacChien.capbacNguoitruc}{" "}
+                  {selectedTacChien.tenNguoitruc}
+                </div>
+                <div className={styles.personMeta}>
+                  {selectedTacChien.chucvuNguoitruc}
+                </div>
+                {selectedTacChien.sodienthoai && (
+                  <a className={styles.personPhone}>
+                    {selectedTacChien.sodienthoai}
+                  </a>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.btnSubmit}
+            onClick={handleSubmit}
+            disabled={submitting}
+          >
+            {submitting ? "Đang tạo..." : "Tạo ca trực"}
+            {!submitting && <FontAwesomeIcon icon={faCheck} />}
+          </button>
+        </div>
       </div>
     </section>
   );
