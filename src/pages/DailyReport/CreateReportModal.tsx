@@ -44,6 +44,31 @@ const CAP_BAC_OPTIONS = [
   "Đại úy",
   "Thiếu tá",
   "Trung tá",
+  "Thiếu úy QNCN",
+  "Trung úy QNCN",
+  "Thượng úy QNCN",
+  "Đại úy QNCN",
+  "Thiếu tá QNCN",
+  "Trung tá QNCN",
+];
+
+const CAP_BAC_CHI_HUY_OPTIONS = [
+  "Trung úy",
+  "Thượng úy",
+  "Đại úy",
+  "Thiếu tá",
+  "Trung tá",
+
+];
+
+const CAP_BAC_TAC_CHIEN_OPTIONS = [
+  "Thiếu úy",
+  "Trung úy",
+  "Thượng úy",
+  "Đại úy",
+  "Thiếu tá",
+  "Trung tá",
+
 ];
 
 const CHUC_VU_OPTIONS = [
@@ -59,7 +84,7 @@ const CHUC_VU_OPTIONS = [
 
 const EMPTY_TRUC: TrucNguoiInfo = {
   tenNguoitruc: "",
-  capbacNguoitruc: CAP_BAC_OPTIONS[0],
+  capbacNguoitruc: "",
   chucvuNguoitruc: "",
   sodienthoai: "",
 };
@@ -142,17 +167,17 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   }, [tongQuanSo, quanSoVang]);
 
   const handleAddRow = () => {
-    const lastRow = absentRows[absentRows.length - 1];
     const newRow: AbsentRow = {
       id: crypto.randomUUID(),
       hoTen: "",
-      capBac: lastRow ? lastRow.capBac : CAP_BAC_OPTIONS[0],
-      chucVu: lastRow ? lastRow.chucVu : CHUC_VU_OPTIONS[0],
-      lyDoVang: lastRow ? lastRow.lyDoVang : LY_DO_OPTIONS[0].value,
+      capBac: "",
+      chucVu: "",
+      lyDoVang: "" as any,
       ghiChu: "",
     };
     setAbsentRows((prev) => [...prev, newRow]);
   };
+
 
   const handleUpdateRow = (
     id: string,
@@ -346,7 +371,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
             <div className={styles.field}>
               <label className={styles.label}>Cấp bậc</label>
               <CustomSelect
-                options={CAP_BAC_OPTIONS.map((cb) => ({
+                options={CAP_BAC_CHI_HUY_OPTIONS.map((cb) => ({
                   value: cb,
                   label: cb,
                 }))}
@@ -354,6 +379,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                 onChange={(val) =>
                   setTrucChiHuy((prev) => ({ ...prev, capbacNguoitruc: val }))
                 }
+                placeholder="Chọn cấp bậc"
               />
             </div>
             <div className={styles.field}>
@@ -414,7 +440,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
             <div className={styles.field}>
               <label className={styles.label}>Cấp bậc</label>
               <CustomSelect
-                options={CAP_BAC_OPTIONS.map((cb) => ({
+                options={CAP_BAC_TAC_CHIEN_OPTIONS.map((cb) => ({
                   value: cb,
                   label: cb,
                 }))}
@@ -425,6 +451,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                     capbacNguoitruc: val,
                   }))
                 }
+                placeholder="Chọn cấp bậc"
               />
             </div>
             <div className={styles.field}>
@@ -537,6 +564,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                             handleUpdateRow(row.id, "capBac", val)
                           }
                           variant="table"
+                          placeholder="-- Chọn cấp bậc --"
                         />
                       </td>
                       <td>
@@ -550,6 +578,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                             handleUpdateRow(row.id, "chucVu", val)
                           }
                           variant="table"
+                          placeholder="-- Chọn chức vụ --"
                         />
                       </td>
                       <td>
@@ -564,6 +593,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                             )
                           }
                           variant="table"
+                          placeholder="-- Chọn lý do vắng --"
                         />
                       </td>
                       <td>

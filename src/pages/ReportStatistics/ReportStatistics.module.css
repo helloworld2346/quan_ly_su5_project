@@ -315,7 +315,8 @@
   font-size: 13px;  
   color: var(--login-text-muted);  
   font-style: italic;  
-}  
+} 
+
   
 @media (max-width: 600px) {  
   .trucGrid {  

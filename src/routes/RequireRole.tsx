@@ -42,7 +42,7 @@ export default function RequireRole({ children, allowedRoles }: Props) {
   }
 
   const userRole = account.vaiTro?.tenVaiTro;
-  const normalizedRole = normalizeRoleName(account?.vaiTro?.tenVaiTro);
+  const normalizedRole = normalizeRoleName(account?.vaiTro?.tenVaiTro?? undefined);
   if (
     normalizedRole === "Báo cáo" &&
     donVi !== null &&

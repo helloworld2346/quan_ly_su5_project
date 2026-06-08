@@ -26,7 +26,8 @@ export default function Settings() {
   const [quanSoQncn, setQuanSoQncn] = useState(0);
   const [saving, setSaving] = useState(false);
 
-  const { showError } = useToast();
+
+  const { showError, showSuccess } = useToast();
   const { refreshAccount } = useAuth();
 
   const quanSoTong = useMemo(
@@ -69,7 +70,7 @@ export default function Settings() {
     fetchData();
   }, []);
 
-  const handleUpdateDonVi = async (e: React.FormEvent) => {
+ const handleUpdateDonVi = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!donVi) return;
 
@@ -91,7 +92,13 @@ export default function Settings() {
         setQuanSoHsqBs(response.Result.quanSoHsqBs);
         setQuanSoSiQuan(response.Result.quanSoSiQuan);
         setQuanSoQncn(response.Result.quanSoQncn);
+        
+        // 1. Gọi làm mới thông tin tài khoản
         await refreshAccount();
+        
+        // 2. Bắn thông báo toast xanh thành công "y chang" mẫu
+        showSuccess("Cập nhật quân số biên chế thành công"); 
+        
       } else {
         showError(response.message || "Cập nhật thất bại");
       }
@@ -218,6 +225,7 @@ export default function Settings() {
                 />
               </div>
 
+              {/* QUÂN SỐ SĨ QUAN */}
               <div className={styles.formGroup}>
                 <label>Quân số Sĩ quan</label>
                 <div className={styles.numberInput}>
@@ -233,7 +241,8 @@ export default function Settings() {
                   <input
                     type="number"
                     min={0}
-                    value={quanSoSiQuan}
+                    value={quanSoSiQuan === 0 ? "" : quanSoSiQuan}
+                    placeholder="0"
                     onChange={(e) =>
                       setQuanSoSiQuan(
                         Math.max(0, parseInt(e.target.value, 10) || 0),
@@ -251,6 +260,7 @@ export default function Settings() {
                 </div>
               </div>
 
+              {/* QUÂN SỐ HSQ-BS */}
               <div className={styles.formGroup}>
                 <label>Quân số HSQ-BS</label>
                 <div className={styles.numberInput}>
@@ -264,7 +274,8 @@ export default function Settings() {
                   <input
                     type="number"
                     min={0}
-                    value={quanSoHsqBs}
+                    value={quanSoHsqBs === 0 ? "" : quanSoHsqBs}
+                    placeholder="0"
                     onChange={(e) =>
                       setQuanSoHsqBs(
                         Math.max(0, parseInt(e.target.value, 10) || 0),
@@ -282,6 +293,7 @@ export default function Settings() {
                 </div>
               </div>
 
+              {/* QUÂN SỐ QNCN */}
               <div className={styles.formGroup}>
                 <label>Quân số QNCN</label>
                 <div className={styles.numberInput}>
@@ -295,7 +307,8 @@ export default function Settings() {
                   <input
                     type="number"
                     min={0}
-                    value={quanSoQncn}
+                    value={quanSoQncn === 0 ? "" : quanSoQncn}
+                    placeholder="0"
                     onChange={(e) =>
                       setQuanSoQncn(
                         Math.max(0, parseInt(e.target.value, 10) || 0),

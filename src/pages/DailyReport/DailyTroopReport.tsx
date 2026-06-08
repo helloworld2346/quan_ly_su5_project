@@ -89,6 +89,7 @@ function normalizeRoleName(role: string | undefined): string {
     return "Quản Trị Viên";
   }
   return role;
+  
 }
 
 const EMPTY_VANG: VangChiTiet = {
@@ -188,7 +189,7 @@ export default function DailyTroopReport() {
   }, [maDonViCurrent]);
 
   const userRole = account?.vaiTro?.tenVaiTro;
-  const normalizedRole = normalizeRoleName(userRole);
+  const normalizedRole = normalizeRoleName(userRole ??undefined);
   const isCommander = normalizedRole === "Chỉ huy";
   const isReporter = normalizedRole === "Báo cáo";
   const isSuDoan = normalizedRole === "Sư đoàn";
