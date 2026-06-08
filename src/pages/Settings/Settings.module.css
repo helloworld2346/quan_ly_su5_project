@@ -286,3 +286,73 @@
   font-size: 14px;  
   font-weight: 500;  
 }
+
+.numberInput {  
+  display: flex;  
+  align-items: center;  
+  border: 1px solid var(--login-border);  
+  border-radius: 10px;  
+  overflow: hidden;  
+  background: var(--input-bg);  
+  transition: border-color 0.15s, box-shadow 0.15s;  
+}  
+  
+.numberInput:focus-within {  
+  border-color: var(--primary-color);  
+  box-shadow: 0 0 0 3px var(--modal-input-focus-shadow);  
+}  
+  
+.numberInput input[type="number"] {  
+  flex: 1;  
+  height: 48px;  
+  padding: 0 8px;  
+  border: none !important;  
+  border-radius: 0 !important;  
+  font-size: 16px;  
+  font-weight: 600;  
+  text-align: center;  
+  background: transparent;  
+  color: var(--login-text);  
+  outline: none;  
+  box-shadow: none !important;  
+  -moz-appearance: textfield;  
+}  
+  
+.numberInput input[type="number"]::-webkit-inner-spin-button,  
+.numberInput input[type="number"]::-webkit-outer-spin-button {  
+  -webkit-appearance: none;  
+  margin: 0;  
+}  
+  
+.numberInputBtn {  
+  width: 44px;  
+  height: 48px;  
+  display: flex;  
+  align-items: center;  
+  justify-content: center;  
+  background: var(--table-row-even);  
+  border: none;  
+  font-size: 22px;  
+  font-weight: 700;  
+  color: var(--primary-color);  
+  cursor: pointer;  
+  transition: background 0.15s;  
+  flex-shrink: 0;  
+  user-select: none;  
+}  
+  
+.numberInputBtn:hover {  
+  background: color-mix(in srgb, var(--primary-color) 12%, transparent);  
+}  
+  
+.numberInputBtn:active {  
+  background: color-mix(in srgb, var(--primary-color) 22%, transparent);  
+}  
+  
+.numberInputBtnLeft {  
+  border-right: 1px solid var(--login-border);  
+}  
+  
+.numberInputBtnRight {  
+  border-left: 1px solid var(--login-border);  
+}

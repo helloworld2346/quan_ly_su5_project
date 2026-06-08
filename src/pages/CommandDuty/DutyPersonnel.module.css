@@ -1,0 +1,276 @@
+.page {  
+  height: calc(100vh - 112px);
+  display: flex;  
+  flex-direction: column;  
+  gap: 20px;  
+  overflow: hidden;  
+  max-width: 1200px;  
+  margin: 0 auto;  
+  width: 100%;  
+}  
+  
+.formCard {  
+  background: var(--surface-card, #fff);  
+  border: 1px solid var(--login-border);  
+  border-radius: 14px;  
+  padding: 24px 28px;  
+  display: flex;  
+  flex-direction: column;  
+  gap: 18px;  
+  flex-shrink: 0;
+}  
+  
+.formTitle {  
+  font-size: 20px;  
+  font-weight: 700;  
+  color: var(--login-text);  
+  margin: 0;  
+}  
+  
+.typeToggle {  
+  display: flex;  
+  gap: 10px;  
+}  
+  
+.typeBtn {  
+  display: flex;  
+  align-items: center;  
+  gap: 8px;  
+  padding: 10px 20px;  
+  border: 1.5px solid var(--login-border);  
+  border-radius: 8px;  
+  background: transparent;  
+  color: var(--login-text-muted);  
+  font-size: 14px;  
+  font-weight: 600;  
+  cursor: pointer;  
+  transition: border-color 0.15s, background 0.15s, color 0.15s;  
+}  
+  
+.typeBtn:hover {  
+  border-color: var(--primary-color, #218673);  
+  color: var(--primary-color, #218673);  
+}  
+  
+.typeBtnActive {  
+  border-color: var(--primary-color, #218673);  
+  background: color-mix(in srgb, var(--primary-color, #218673) 10%, transparent);  
+  color: var(--primary-color, #218673);  
+}  
+  
+.formGrid {  
+  display: grid;  
+  grid-template-columns: 1fr 1fr;  
+  gap: 14px 24px;  
+}  
+  
+.formGroup {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 6px;  
+}  
+  
+.formGroup label {  
+  font-size: 14px;  
+  font-weight: 600;  
+  color: var(--login-text);  
+}  
+  
+.required {  
+  color: #e53e3e;  
+  margin-left: 2px;  
+}  
+  
+.input {  
+  height: 44px;  
+  padding: 0 14px;  
+  border: 1px solid var(--login-border);  
+  border-radius: 8px;  
+  font-size: 14px;  
+  font-family: inherit;  
+  color: var(--login-text);  
+  background: var(--input-bg);  
+  outline: none;  
+  transition: border-color 0.15s;  
+}  
+  
+.input:focus {  
+  border-color: var(--primary-color, #218673);  
+  box-shadow: 0 0 0 3px var(--modal-input-focus-shadow);  
+}  
+  
+.formActions {  
+  display: flex;  
+  justify-content: flex-end;  
+}  
+  
+.btnAdd {  
+  display: flex;  
+  align-items: center;  
+  gap: 8px;  
+  padding: 11px 24px;  
+  background: var(--primary-color, #218673);  
+  color: #fff;  
+  border: none;  
+  border-radius: 8px;  
+  font-size: 15px;  
+  font-weight: 600;  
+  cursor: pointer;  
+  transition: opacity 0.15s;  
+}  
+  
+.btnAdd:hover:not(:disabled) {  
+  opacity: 0.88;  
+}  
+  
+.btnAdd:disabled {  
+  opacity: 0.6;  
+  cursor: not-allowed;  
+}  
+  
+.loading {  
+  text-align: center;  
+  color: var(--login-text-muted);  
+  font-size: 14px;  
+  padding: 32px;  
+}  
+  
+.listsGrid {  
+  display: grid;  
+  grid-template-columns: 1fr 1fr;  
+  gap: 24px;  
+  flex: 1;  
+  min-height: 0;  
+  overflow: hidden;  
+}  
+  
+.listSection {  
+  background: var(--surface-card, #fff);  
+  border: 1px solid var(--login-border);  
+  border-radius: 14px;  
+  overflow: hidden;  
+  display: flex;  
+  flex-direction: column;  
+  min-height: 0;  
+}  
+  
+.listHeader {  
+  display: flex;  
+  align-items: center;  
+  gap: 10px;  
+  padding: 16px 20px;  
+  background: var(--table-row-odd);  
+  border-bottom: 1px solid var(--login-border);  
+  font-size: 16px;  
+  font-weight: 700;  
+  color: var(--login-text);  
+  flex-shrink: 0;  
+}  
+  
+.listHeaderIcon {  
+  color: var(--primary-color, #218673);  
+  font-size: 18px;  
+}  
+  
+.listCount {  
+  margin-left: auto;  
+  background: var(--primary-color, #218673);  
+  color: #fff;  
+  font-size: 14px;  
+  font-weight: 700;  
+  padding: 2px 10px;  
+  border-radius: 20px;  
+  min-width: 28px;  
+  text-align: center;  
+}  
+  
+.listBody {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 0;  
+  flex: 1;  
+  min-height: 0;  
+  overflow-y: auto;  
+}  
+  
+.emptyList {  
+  padding: 32px 20px;  
+  text-align: center;  
+  color: var(--login-text-muted);  
+  font-size: 14px;  
+  font-style: italic;  
+}  
+  
+.personCard {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 4px;  
+  padding: 16px 20px;  
+  border-bottom: 1px solid var(--login-border);  
+  transition: background 0.12s;  
+}  
+  
+.personCard:last-child {  
+  border-bottom: none;  
+}  
+  
+.personCard:hover {  
+  background: var(--table-row-even);  
+}  
+  
+.personName {  
+  font-size: 16px;  
+  font-weight: 700;  
+  color: var(--login-text);  
+}  
+  
+.personMeta {  
+  font-size: 14px;  
+  color: var(--login-text-muted);  
+}  
+  
+.personPhone {  
+  display: flex;  
+  align-items: center;  
+  gap: 6px;  
+  font-size: 14px;  
+  font-weight: 600;  
+  color: var(--primary-color, #218673);  
+  text-decoration: none;  
+  margin-top: 2px;  
+}  
+  
+.personPhone:hover {  
+  text-decoration: underline;  
+}  
+  
+@media (max-width: 768px) {  
+  .page {  
+    height: auto;  
+    overflow: visible;  
+    padding: 16px;  
+  }  
+  
+  .formGrid {  
+    grid-template-columns: 1fr;  
+  }  
+  
+  .listsGrid {  
+    grid-template-columns: 1fr;  
+    flex: none;  
+    overflow: visible;  
+  }  
+  
+  .listSection {  
+    min-height: 300px;  
+  }  
+  
+  .listBody {  
+    max-height: 300px;  
+    overflow-y: auto;  
+  }  
+  
+  .typeToggle {  
+    flex-direction: column;  
+  }  
+}

@@ -420,3 +420,17 @@
     width: 100%;  
   }  
 }
+
+.notSubmittedRow td {  
+  background: #ffe9e9 !important;  
+  color: #b42318 !important;  
+}  
+  
+.notSubmittedRow .unitCell {  
+  font-weight: 700;  
+}  
+  
+[data-theme="dark"] .notSubmittedRow td {  
+  background: rgba(239, 68, 68, 0.18) !important;  
+  color: #fca5a5 !important;  
+}

@@ -1,4 +1,3 @@
-// src/types/navigation.ts
 import { lazy } from "react";
 
 export type NavItemId =
@@ -9,8 +8,9 @@ export type NavItemId =
   | "report-family"
   | "report-communication"
   | "statistics"
-  | "duty-command"
-  | "duty-tactical"
+  | "duty-personnel"
+  | "duty-shifts"
+  | "duty-create"
   | "settings";
 
 export type NavItem = {
@@ -39,9 +39,14 @@ const CommunicationReport = lazy(
 const ReportStatistics = lazy(
   () => import("../pages/ReportStatistics/ReportStatistics"),
 );
-const CommandDuty = lazy(() => import("../pages/CommandDuty/CommandDuty"));
-const TacticalDuty = lazy(() => import("../pages/TacticalDuty/TacticalDuty"));
+const DutyPersonnel = lazy(() => import("../pages/CommandDuty/DutyPersonnel"));
+const DutyShifts = lazy(() => import("../pages/CommandDuty/DutyShifts"));
+const CreateDutyShift = lazy(
+  () => import("../pages/CommandDuty/CreateDutyShift"),
+);
 const Settings = lazy(() => import("../pages/Settings/Settings"));
+
+
 
 const Trainningstatistical = lazy(
   () => import("../pages/TrainingReport/Trainningstatistical"),
@@ -73,7 +78,7 @@ export const EXECUTIVE_NAV_GROUP = {
 };
 
 export const REPORT_NAV_GROUP = {
-  label: "Thống kê báo cáo",
+  label: "Báo ban",
   labelByRole: {
     "Báo cáo": "Báo ban",
   },
@@ -128,25 +133,34 @@ export const STATISTICS_NAV: NavItem = {
 };
 
 export const DUTY_NAV_GROUP = {
-  label: "Trực ban",
+  label: "Ca trực",
   items: [
     {
-      id: "duty-command" as const,
-      label: "Trực chỉ huy",
-      path: "/duty-command",
-      loadingTitle: "Đang tải trực chỉ huy",
+      id: "duty-personnel" as const,
+      label: "Quản lý trực ban",
+      path: "/duty/personnel",
+      loadingTitle: "Đang tải quản lý trực ban",
       loadingSubtitle: "Đang tải dữ liệu…",
-      component: CommandDuty,
-      allowedRoles: ["Quản Trị Viên", "Sư đoàn", "Chỉ huy"],
+      component: DutyPersonnel,
+      allowedRoles: ["Quản Trị Viên", "Sư đoàn"],
     },
     {
-      id: "duty-tactical" as const,
-      label: "Trực ban tác chiến",
-      path: "/duty-tactical",
-      loadingTitle: "Đang tải trực ban tác chiến",
+      id: "duty-shifts" as const,
+      label: "Quản lý ca trực",
+      path: "/duty/shifts",
+      loadingTitle: "Đang tải quản lý ca trực",
       loadingSubtitle: "Đang tải dữ liệu…",
-      component: TacticalDuty,
-      allowedRoles: ["Quản Trị Viên", "Sư đoàn", "Chỉ huy"],
+      component: DutyShifts,
+      allowedRoles: ["Quản Trị Viên", "Sư đoàn"],
+    },
+    {
+      id: "duty-create" as const,
+      label: "Tạo ca trực",
+      path: "/duty/create",
+      loadingTitle: "Đang tải tạo ca trực",
+      loadingSubtitle: "Đang tải dữ liệu…",
+      component: CreateDutyShift,
+      allowedRoles: ["Quản Trị Viên", "Sư đoàn"],
     },
   ],
 };
@@ -169,8 +183,9 @@ export const NAV_PAGE_TITLES: Record<NavItemId, string | undefined> = {
   "report-family": "Báo ban thân nhân thăm nuôi",
   "report-communication": "Báo ban thông tin liên lạc",
   statistics: "Thống kê báo ban",
-  "duty-command": "Trực chỉ huy",
-  "duty-tactical": "Trực ban tác chiến",
+  "duty-personnel": "Quản lý trực ban",
+  "duty-shifts": "Quản lý ca trực",
+  "duty-create": "Tạo ca trực",
   settings: "Cài đặt",
 };
 
@@ -193,23 +208,20 @@ export function getIdByPath(path: string): NavItemId {
   );
 }
 
-export function getNavGroupLabel(activeId: NavItemId): string | null {
-  if (activeId === "settings" || activeId === "statistics") return null;
-
-  if (EXECUTIVE_NAV_GROUP.items.some((i) => i.id === activeId)) {
-    return EXECUTIVE_NAV_GROUP.label;
-  }
-
-  if (REPORT_NAV_GROUP.items.some((i) => i.id === activeId)) {
-    return REPORT_NAV_GROUP.label;
-  }
-
-  if (DUTY_NAV_GROUP.items.some((i) => i.id === activeId)) {
-    return DUTY_NAV_GROUP.label;
-  }
-
+export function getNavGroupLabel(activeId: NavItemId): string | null {  
+  if (activeId === "settings" || activeId === "statistics") return null;  
+  
+  if (EXECUTIVE_NAV_GROUP.items.some((i) => i.id === activeId))  
+    return EXECUTIVE_NAV_GROUP.label;  
+  
+  if (REPORT_NAV_GROUP.items.some((i) => i.id === activeId))  
+    return REPORT_NAV_GROUP.label;  
+  
+  if (DUTY_NAV_GROUP.items.some((i) => i.id === activeId))  
+    return DUTY_NAV_GROUP.label;  
+  
   return null;
-}
+  }
 
 export function getNavGroupLabelByRole(
   groupLabel: string,
@@ -237,7 +249,7 @@ function normalizeRoleName(role: string): string {
   if (role.includes("Chỉ huy")) {
     return "Chỉ huy";
   }
-  if (role.includes("Sư đoàn")) {
+  if (role.includes("Sư đoàn") || role.includes("Sư đoan")) {
     return "Sư đoàn";
   }
   if (role.includes("Quản Trị Viên") || role.includes("Admin")) {
@@ -272,7 +284,6 @@ export function getNavItemsByRole(userRole: string | null): NavItem[] {
       (item) =>
         item.id.startsWith("report-") ||
         item.id === "statistics" ||
-        item.id.startsWith("duty-") ||
         item.id === "settings",
     );
   }

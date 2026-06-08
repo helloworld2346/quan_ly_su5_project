@@ -217,43 +217,100 @@ export default function Settings() {
                   className={styles.inputDisabled}
                 />
               </div>
+
               <div className={styles.formGroup}>
                 <label>Quân số Sĩ quan</label>
-                <input
-                  type="number"
-                  min={0}
-                  value={quanSoSiQuan || ""}
-                  onChange={(e) =>
-                    setQuanSoSiQuan(parseInt(e.target.value, 10) || 0)
-                  }
-                  required
-                />
+                <div className={styles.numberInput}>
+                  <button
+                    type="button"
+                    className={`${styles.numberInputBtn} ${styles.numberInputBtnLeft}`}
+                    onClick={() =>
+                      setQuanSoSiQuan(Math.max(0, quanSoSiQuan - 1))
+                    }
+                  >
+                    −
+                  </button>
+                  <input
+                    type="number"
+                    min={0}
+                    value={quanSoSiQuan}
+                    onChange={(e) =>
+                      setQuanSoSiQuan(
+                        Math.max(0, parseInt(e.target.value, 10) || 0),
+                      )
+                    }
+                    required
+                  />
+                  <button
+                    type="button"
+                    className={`${styles.numberInputBtn} ${styles.numberInputBtnRight}`}
+                    onClick={() => setQuanSoSiQuan(quanSoSiQuan + 1)}
+                  >
+                    +
+                  </button>
+                </div>
               </div>
 
               <div className={styles.formGroup}>
                 <label>Quân số HSQ-BS</label>
-                <input
-                  type="number"
-                  min={0}
-                  value={quanSoHsqBs || ""}
-                  onChange={(e) =>
-                    setQuanSoHsqBs(parseInt(e.target.value, 10) || 0)
-                  }
-                  required
-                />
+                <div className={styles.numberInput}>
+                  <button
+                    type="button"
+                    className={`${styles.numberInputBtn} ${styles.numberInputBtnLeft}`}
+                    onClick={() => setQuanSoHsqBs(Math.max(0, quanSoHsqBs - 1))}
+                  >
+                    −
+                  </button>
+                  <input
+                    type="number"
+                    min={0}
+                    value={quanSoHsqBs}
+                    onChange={(e) =>
+                      setQuanSoHsqBs(
+                        Math.max(0, parseInt(e.target.value, 10) || 0),
+                      )
+                    }
+                    required
+                  />
+                  <button
+                    type="button"
+                    className={`${styles.numberInputBtn} ${styles.numberInputBtnRight}`}
+                    onClick={() => setQuanSoHsqBs(quanSoHsqBs + 1)}
+                  >
+                    +
+                  </button>
+                </div>
               </div>
 
               <div className={styles.formGroup}>
                 <label>Quân số QNCN</label>
-                <input
-                  type="number"
-                  min={0}
-                  value={quanSoQncn || ""}
-                  onChange={(e) =>
-                    setQuanSoQncn(parseInt(e.target.value, 10) || 0)
-                  }
-                  required
-                />
+                <div className={styles.numberInput}>
+                  <button
+                    type="button"
+                    className={`${styles.numberInputBtn} ${styles.numberInputBtnLeft}`}
+                    onClick={() => setQuanSoQncn(Math.max(0, quanSoQncn - 1))}
+                  >
+                    −
+                  </button>
+                  <input
+                    type="number"
+                    min={0}
+                    value={quanSoQncn}
+                    onChange={(e) =>
+                      setQuanSoQncn(
+                        Math.max(0, parseInt(e.target.value, 10) || 0),
+                      )
+                    }
+                    required
+                  />
+                  <button
+                    type="button"
+                    className={`${styles.numberInputBtn} ${styles.numberInputBtnRight}`}
+                    onClick={() => setQuanSoQncn(quanSoQncn + 1)}
+                  >
+                    +
+                  </button>
+                </div>
               </div>
             </div>
 

@@ -57,13 +57,8 @@ export default function Sidebar({
     (item) =>
       item.id === activeId && allowedNavItems.some((nav) => nav.id === item.id),
   );
-  const dutyActive = DUTY_NAV_GROUP.items.some(
-    (item) =>
-      item.id === activeId && allowedNavItems.some((nav) => nav.id === item.id),
-  );
 
   const [reportsOpen, setReportsOpen] = useNavGroupState("reportsOpen");
-  const [dutyOpen, setDutyOpen] = useNavGroupState("dutyOpen");
   const [executiveOpen, setExecutiveOpen] = useNavGroupState("executiveOpen");
   const [prevCollapsed, setPrevCollapsed] = useState(collapsed);
 
@@ -72,6 +67,14 @@ export default function Sidebar({
   const settingsRef = useRef<HTMLButtonElement>(null);
   const statisticsRef = useRef<HTMLButtonElement>(null);
   const logoutRef = useRef<HTMLButtonElement>(null);
+  const [dutyOpen, setDutyOpen] = useNavGroupState("dutyOpen");
+  const dutyActive = DUTY_NAV_GROUP.items.some(
+    (item) =>
+      item.id === activeId && allowedNavItems.some((nav) => nav.id === item.id),
+  );
+  const showDutyGroup = DUTY_NAV_GROUP.items.some((item) =>
+    allowedNavItems.some((nav) => nav.id === item.id),
+  );
 
   const handleTooltipEnter = (
     text: string,
@@ -92,12 +95,8 @@ export default function Sidebar({
       setExecutiveOpen(false);
     }
     if (collapsed) {
-      if (!reportActive) {
-        setReportsOpen(false);
-      }
-      if (!dutyActive) {
-        setDutyOpen(false);
-      }
+      if (!reportActive) setReportsOpen(false);
+      if (!dutyActive) setDutyOpen(false);
     }
   }
 
@@ -105,9 +104,6 @@ export default function Sidebar({
     allowedNavItems.some((nav) => nav.id === item.id),
   );
   const showReportGroup = REPORT_NAV_GROUP.items.some((item) =>
-    allowedNavItems.some((nav) => nav.id === item.id),
-  );
-  const showDutyGroup = DUTY_NAV_GROUP.items.some((item) =>
     allowedNavItems.some((nav) => nav.id === item.id),
   );
   const showStatistics = allowedNavItems.some(
@@ -179,25 +175,6 @@ export default function Sidebar({
             />
           )}
 
-          {showDutyGroup && (
-            <NavGroup
-              label={DUTY_NAV_GROUP.label}
-              icon={faClipboardList}
-              items={DUTY_NAV_GROUP.items.filter((item) =>
-                allowedNavItems.some((nav) => nav.id === item.id),
-              )}
-              isOpen={dutyOpen}
-              onToggle={() => setDutyOpen(!dutyOpen)}
-              activeId={activeId}
-              onNavigate={(id) => onNavigate(id as NavItemId)}
-              collapsed={collapsed}
-              onExpand={onExpand}
-              isActive={dutyActive}
-              onTooltipEnter={handleTooltipEnter}
-              onTooltipLeave={handleTooltipLeave}
-            />
-          )}
-
           {showStatistics && (
             <button
               ref={statisticsRef}
@@ -217,6 +194,25 @@ export default function Sidebar({
               <FontAwesomeIcon icon={faChartBar} className={styles.navIcon} />
               {!collapsed && STATISTICS_NAV.label}
             </button>
+          )}
+
+          {showDutyGroup && (
+            <NavGroup
+              label={DUTY_NAV_GROUP.label}
+              icon={faClipboardList}
+              items={DUTY_NAV_GROUP.items.filter((item) =>
+                allowedNavItems.some((nav) => nav.id === item.id),
+              )}
+              isOpen={dutyOpen}
+              onToggle={() => setDutyOpen(!dutyOpen)}
+              activeId={activeId}
+              onNavigate={(id) => onNavigate(id as NavItemId)}
+              collapsed={collapsed}
+              onExpand={onExpand}
+              isActive={dutyActive}
+              onTooltipEnter={handleTooltipEnter}
+              onTooltipLeave={handleTooltipLeave}
+            />
           )}
 
           {showSettings && (

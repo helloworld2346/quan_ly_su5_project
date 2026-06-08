@@ -1,0 +1,655 @@
+.page {  
+  padding: 32px;  
+  max-width: 1100px;  
+  margin: 0 auto;  
+  display: flex;  
+  flex-direction: column;  
+  gap: 36px;  
+}  
+    
+.stepper {  
+  display: flex;  
+  align-items: flex-start;  
+  gap: 0;  
+}  
+  
+.stepItem {  
+  display: flex;  
+  flex-direction: column;  
+  align-items: center;  
+  flex: 1;  
+  position: relative;  
+}  
+  
+.stepCircle {  
+  width: 48px;  
+  height: 48px;  
+  border-radius: 50%;  
+  display: flex;  
+  align-items: center;  
+  justify-content: center;  
+  font-size: 18px;  
+  border: 2px solid var(--login-border);  
+  background: var(--dialog-bg, #fff);  
+  color: var(--login-text-muted);  
+  transition: background 0.2s, border-color 0.2s, color 0.2s;  
+  z-index: 1;  
+}  
+  
+.stepActive .stepCircle {  
+  border-color: var(--primary-color, #218673);  
+  background: var(--primary-color, #218673);  
+  color: #fff;  
+}  
+  
+.stepDone .stepCircle {  
+  border-color: var(--primary-color, #218673);  
+  background: var(--primary-color, #218673);  
+  color: #fff;  
+}  
+  
+.stepLabel {  
+  font-size: 14px;  
+  font-weight: 600;  
+  color: var(--login-text-muted);  
+  text-align: center;  
+  margin-top: 8px;  
+  text-transform: uppercase;  
+  letter-spacing: 0.3px;  
+  max-width: 110px;  
+}  
+  
+.stepActive .stepLabel,  
+.stepDone .stepLabel {  
+  color: var(--primary-color, #218673);  
+}  
+  
+.stepLine {  
+  position: absolute;  
+  top: 24px;  
+  left: calc(50% + 24px);  
+  right: calc(-50% + 24px);  
+  height: 2px;  
+  background: var(--login-border);  
+  z-index: 0;  
+}  
+  
+.stepDone .stepLine {  
+  background: var(--primary-color, #218673);  
+}  
+  
+  
+.card {  
+  background: var(--dialog-bg, #fff);  
+  border: 1px solid var(--login-border);  
+  border-radius: 16px;  
+  padding: 36px;  
+  display: flex;  
+  flex-direction: column;  
+  gap: 28px;  
+}  
+  
+.cardTitle {  
+  font-size: 20px;  
+  font-weight: 700;  
+  color: var(--login-text);  
+  margin: 0;  
+}  
+  
+    
+.formGrid {  
+  display: grid;  
+  grid-template-columns: 1fr 1fr;  
+  gap: 20px;  
+}  
+  
+.formGroup {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 8px;  
+}  
+  
+.formGroup label {  
+  font-size: 15px;  
+  font-weight: 600;  
+  color: var(--modal-label-text, #555);  
+}  
+  
+.fullWidth {  
+  grid-column: 1 / -1;  
+}  
+  
+.input {  
+  padding: 12px 16px;  
+  border: 1px solid var(--modal-input-border);  
+  border-radius: 8px;  
+  font-size: 15px;  
+  background: var(--modal-input-bg);  
+  color: var(--modal-input-text);  
+  transition: border-color 0.15s;  
+  width: 100%;  
+  box-sizing: border-box;  
+}  
+  
+.input:focus {  
+  outline: none;  
+  border-color: var(--modal-input-focus-border);  
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color, #218673) 15%, transparent);  
+}  
+  
+.textarea {  
+  resize: vertical;  
+  min-height: 90px;  
+  font-family: inherit;  
+}  
+  
+.required {  
+  color: var(--error-color, #dc2626);  
+}  
+  
+  
+.dateSection {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 14px;  
+  padding: 20px;  
+  background: var(--table-row-even);  
+  border-radius: 10px;  
+  border: 1px solid var(--login-border);  
+}  
+  
+.dateSectionTitle {  
+  font-size: 15px;  
+  font-weight: 700;  
+  color: var(--primary-color, #218673);  
+  text-transform: uppercase;  
+  letter-spacing: 0.5px;  
+  margin: 0;  
+}  
+  
+.dateRow {  
+  display: flex;  
+  align-items: flex-end;  
+  gap: 16px;  
+}  
+  
+.dateRow .formGroup {  
+  flex: 1;  
+}  
+  
+.dayCount {  
+  display: flex;  
+  flex-direction: column;  
+  align-items: center;  
+  justify-content: center;  
+  min-width: 72px;  
+  padding: 10px 16px;  
+  background: var(--primary-color, #218673);  
+  border-radius: 10px;  
+  color: #fff;  
+  margin-bottom: 0;  
+}  
+  
+.dayCount span {  
+  font-size: 24px;  
+  font-weight: 800;  
+  line-height: 1;  
+}  
+  
+.dayCount small {  
+  font-size: 14px;  
+  font-weight: 600;  
+  text-transform: uppercase;  
+  letter-spacing: 0.5px;  
+  opacity: 0.85;  
+}  
+  
+  
+.summary {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 10px;  
+  padding: 18px 22px;  
+  background: var(--table-row-even);  
+  border-radius: 10px;  
+  border: 1px solid var(--login-border);  
+}  
+  
+.summaryItem {  
+  display: flex;  
+  justify-content: space-between;  
+  align-items: center;  
+  font-size: 15px;  
+}  
+  
+.summaryLabel {  
+  font-weight: 600;  
+  color: var(--modal-label-text, #888);  
+  text-transform: uppercase;  
+  font-size: 14px;  
+  letter-spacing: 0.3px;  
+}  
+  
+.summaryValue {  
+  font-weight: 600;  
+  color: var(--login-text);  
+}  
+  
+  
+.actions {  
+  display: flex;  
+  justify-content: flex-end;  
+  gap: 12px;  
+  margin-top: 4px;  
+}  
+  
+.btnBack {  
+  display: flex;  
+  align-items: center;  
+  gap: 8px;  
+  padding: 11px 24px;  
+  border: 1px solid var(--login-border);  
+  border-radius: 8px;  
+  background: transparent;  
+  color: var(--login-text-muted);  
+  font-size: 15px;  
+  font-weight: 600;  
+  cursor: pointer;  
+  transition: background 0.15s;  
+}  
+  
+.btnBack:hover:not(:disabled) {  
+  background: var(--table-row-even);  
+}  
+  
+.btnNext {  
+  display: flex;  
+  align-items: center;  
+  gap: 8px;  
+  padding: 11px 28px;  
+  border: none;  
+  border-radius: 8px;  
+  background: var(--primary-color, #218673);  
+  color: #fff;  
+  font-size: 15px;  
+  font-weight: 600;  
+  cursor: pointer;  
+  transition: opacity 0.15s;  
+}  
+  
+.btnNext:hover:not(:disabled) {  
+  opacity: 0.88;  
+}  
+  
+.btnSubmit {  
+  display: flex;  
+  align-items: center;  
+  gap: 8px;  
+  padding: 11px 28px;  
+  border: none;  
+  border-radius: 8px;  
+  background: var(--primary-color, #218673);  
+  color: #fff;  
+  font-size: 15px;  
+  font-weight: 700;  
+  cursor: pointer;  
+  transition: opacity 0.15s;  
+}  
+  
+.btnSubmit:hover:not(:disabled) {  
+  opacity: 0.88;  
+}  
+  
+.btnBack:disabled,  
+.btnNext:disabled,  
+.btnSubmit:disabled {  
+  opacity: 0.55;  
+  cursor: not-allowed;  
+}  
+  
+  
+@media (max-width: 600px) {  
+  .page {  
+    padding: 16px;  
+    gap: 24px;  
+  }  
+  
+  .card {  
+    padding: 20px;  
+    gap: 20px;  
+  }  
+  
+  .formGrid {  
+    grid-template-columns: 1fr;  
+  }  
+  
+  .dateRow {  
+    flex-direction: column;  
+    align-items: stretch;  
+  }  
+  
+  .dayCount {  
+    flex-direction: row;  
+    gap: 6px;  
+    justify-content: center;  
+  }  
+  
+  .stepLabel {  
+    display: none;  
+  }  
+}  
+  
+  
+.successBanner {  
+  display: flex;  
+  align-items: center;  
+  gap: 12px;  
+  padding: 18px 24px;  
+  background: color-mix(in srgb, var(--primary-color, #218673) 12%, transparent);  
+  border: 1.5px solid var(--primary-color, #218673);  
+  border-radius: 12px;  
+  font-size: 16px;  
+  font-weight: 600;  
+  color: var(--primary-color, #218673);  
+}  
+  
+.successIcon {  
+  font-size: 20px;  
+}  
+    
+.infoGrid {  
+  display: grid;  
+  grid-template-columns: 1fr 1fr;  
+  gap: 16px;  
+}  
+  
+.infoItem {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 4px;  
+}  
+  
+.infoLabel {  
+  font-size: 14px;  
+  font-weight: 700;  
+  text-transform: uppercase;  
+  letter-spacing: 0.5px;  
+  color: var(--modal-label-text, #888);  
+}  
+  
+.infoValue {  
+  font-size: 15px;  
+  font-weight: 600;  
+  color: var(--login-text);  
+}  
+  
+.matKhau {  
+  font-size: 22px;  
+  font-weight: 800;  
+  color: var(--primary-color, #218673);  
+  letter-spacing: 0.5px;  
+}  
+  
+  
+.trucGrid {  
+  display: grid;  
+  grid-template-columns: 1fr 1fr;  
+  gap: 20px;  
+}  
+  
+.trucCard {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 10px;  
+  padding: 22px 26px;  
+  border: 1px solid var(--login-border);  
+  border-radius: 12px;  
+  background: var(--dialog-bg, #fff);  
+}  
+  
+.trucRole {  
+  font-size: 14px;  
+  font-weight: 700;  
+  text-transform: uppercase;  
+  letter-spacing: 0.8px;  
+  color: var(--primary-color, #218673);  
+}  
+  
+.trucCardBody {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 4px;  
+}  
+  
+.trucName {  
+  font-size: 18px;  
+  font-weight: 700;  
+  color: var(--login-text);  
+}  
+  
+.trucMeta {  
+  font-size: 15px;  
+  color: var(--login-text-muted);  
+}  
+  
+.trucPhone {  
+  font-size: 15px;  
+  font-weight: 600;  
+  color: var(--primary-color, #218673);  
+  text-decoration: none;  
+  margin-top: 6px;  
+  display: flex;  
+  align-items: center;  
+  gap: 5px;  
+}  
+  
+.trucPhone:hover {  
+  text-decoration: underline;  
+}  
+    
+.caTrucSection {  
+  padding: 28px 36px;  
+  background: var(--table-row-odd);  
+  border: 1px solid var(--login-border);  
+  border-radius: 16px;  
+  display: flex;  
+  flex-direction: column;  
+  align-items: center;  
+  gap: 8px;  
+}  
+  
+.caTrucHeader {  
+  font-size: 22px;  
+  font-weight: 700;  
+  text-transform: uppercase;  
+  letter-spacing: 1px;  
+  color: var(--login-text-muted);  
+  margin-bottom: 2px;  
+}  
+  
+.caTrucNgay {  
+  font-size: 15px;  
+  font-weight: 600;  
+  text-transform: uppercase;  
+  letter-spacing: 1px;  
+  color: var(--login-text-muted);  
+}  
+  
+.caTrucBody {  
+  display: flex;  
+  align-items: flex-start;  
+  justify-content: center;  
+  gap: 28px;  
+  width: 100%;  
+  max-width: 960px;  
+  margin-top: 16px;  
+}  
+  
+.caTrucLeft {  
+  display: grid;  
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));  
+  gap: 20px;  
+  flex: 3;  
+  min-width: 0;
+}  
+  
+.caTrucCard {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 10px;  
+  padding: 22px 26px;  
+  border: 1px solid var(--login-border);  
+  border-radius: 12px;  
+  background: var(--dialog-bg, #fff);  
+}  
+  
+.caTrucRole {  
+  font-size: 14px;  
+  font-weight: 700;  
+  text-transform: uppercase;  
+  letter-spacing: 0.8px;  
+  color: var(--primary-color, #218673);  
+}  
+  
+.caTrucCardBody {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 4px;  
+}  
+  
+.caTrucPersonName {  
+  font-size: 18px;  
+  font-weight: 700;  
+  color: var(--login-text);  
+}  
+  
+.caTrucPersonMeta {  
+  font-size: 15px;  
+  color: var(--login-text-muted);  
+}  
+  
+.caTrucPhone {  
+  font-size: 15px;  
+  font-weight: 600;  
+  color: var(--primary-color, #218673);  
+  text-decoration: none;  
+  margin-top: 6px;  
+  display: flex;  
+  align-items: center;  
+  gap: 5px;  
+}  
+  
+.caTrucPhone:hover {  
+  text-decoration: underline;  
+}  
+  
+.caTrucEmpty {  
+  font-size: 15px;  
+  color: var(--login-text-muted);  
+  font-style: italic;  
+}  
+  
+.caTrucRight {  
+  display: flex;  
+  flex-direction: column;  
+  align-items: center;  
+  gap: 6px;  
+  align-self: center;  
+  padding: 20px 32px;  
+  border: 1.5px dashed var(--login-border);  
+  border-radius: 14px;  
+  min-width: 160px;  
+  flex-shrink: 0;
+  background: var(--table-row-even);  
+}  
+  
+.caTrucMatKhauLabel {  
+  font-size: 14px;  
+  font-weight: 700;  
+  text-transform: uppercase;  
+  letter-spacing: 1px;  
+  color: var(--login-text-muted);  
+}  
+  
+.caTrucMatKhau {  
+  font-size: 28px;  
+  font-weight: 800;  
+  color: var(--login-text);  
+  letter-spacing: 0.5px;  
+  text-align: center;  
+  line-height: 1.3;  
+}  
+  
+.caTrucGhiChu {  
+  width: 100%;  
+  margin-top: 16px;  
+  padding: 14px 20px;  
+  background: color-mix(in srgb, var(--primary-color, #218673) 8%, transparent);  
+  border: 1px solid color-mix(in srgb, var(--primary-color, #218673) 25%, transparent);  
+  border-left: 4px solid var(--primary-color, #218673);  
+  border-radius: 0 10px 10px 0;  
+  display: flex;  
+  flex-direction: column;  
+  gap: 4px;  
+}  
+  
+.caTrucGhiChuLabel {  
+  font-size: 12px;  
+  font-weight: 700;  
+  text-transform: uppercase;  
+  letter-spacing: 0.8px;  
+  color: var(--primary-color, #218673);  
+}  
+  
+.caTrucGhiChuText {  
+  font-size: 15px;  
+  color: var(--login-text);  
+  font-style: italic;  
+  line-height: 1.6;  
+}
+  
+@media (max-width: 768px) {  
+  .caTrucSection {  
+    padding: 20px 16px;  
+  }  
+  
+  .caTrucBody {  
+    flex-direction: column;  
+    gap: 16px;  
+  }  
+  
+  .caTrucLeft {  
+    grid-template-columns: 1fr;  
+  }  
+  
+  .caTrucRight {  
+    width: 100%;  
+  }  
+}  
+  
+@media (max-width: 600px) {  
+  .infoGrid,  
+  .trucGrid {  
+    grid-template-columns: 1fr;  
+  }  
+}
+
+.autoFillBanner {  
+  display: flex;  
+  align-items: flex-start;  
+  gap: 10px;  
+  padding: 12px 16px;  
+  background: color-mix(in srgb, var(--primary-color, #218673) 8%, transparent);  
+  border: 1px solid color-mix(in srgb, var(--primary-color, #218673) 30%, transparent);  
+  border-left: 4px solid var(--primary-color, #218673);  
+  border-radius: 0 8px 8px 0;  
+  font-size: 14px;  
+  color: var(--login-text);  
+  line-height: 1.5;  
+}  
+  
+.checkingHint {  
+  font-size: 13px;  
+  color: var(--login-text-muted);  
+  font-style: italic;  
+}

@@ -11,13 +11,20 @@ import type {
 
 type ReportItem = SearchByRangeResponse["Result"][number];
 
+function toLocalDateStr(d: Date) {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
 function getDefaultDates() {
   const today = new Date().toISOString().split("T")[0];
   return { start: today, end: today };
 }
 
 function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("vi-VN", {
+  const datePart = dateStr.split("T")[0];
+  const [y, m, d] = datePart.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString("vi-VN", {
     weekday: "long",
     day: "2-digit",
     month: "2-digit",

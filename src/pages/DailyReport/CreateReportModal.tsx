@@ -12,6 +12,8 @@ import { dailyReportService } from "../../services/dailyReport/dailyReportServic
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import CustomSelect from "../../components/ui/CustomSelect/CustomSelect";
+import { useToast } from "../../context/useToast";
+import ConfirmDialog from "../../components/ui/ConfirmDialog/ConfirmDialog";
 
 const LY_DO_OPTIONS: { value: keyof VangChiTiet; label: string }[] = [
   { value: "hoiThaiNgoaiSuDoan", label: "Hội thao - Ngoài Sư Đoàn" },
@@ -109,6 +111,8 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   consolidatedAbsentRows,
   caTrucInfo,
 }) => {
+  const { showWarning } = useToast();
+
   const [ngayBaoCao] = useState<string>(() => {
     if (initialData?.thoiGianBaoCao) {
       return initialData.thoiGianBaoCao.split("T")[0];
@@ -145,6 +149,8 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   );
 
   const [isLoadingYesterday, setIsLoadingYesterday] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingYesterday, setPendingYesterday] = useState<string | null>(null);
 
   const quanSoVang = absentRows.length;
   const quanSoHienDien = useMemo(() => {
@@ -179,6 +185,26 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
     setAbsentRows((prev) => prev.filter((row) => row.id !== id));
   };
 
+  const doLoadYesterday = async (yesterday: string) => {
+    setIsLoadingYesterday(true);
+    try {
+      const res = await dailyReportService.searchReportByUnitAndDate(
+        maDonViCurrent!,
+        yesterday,
+      );
+      if (res.success && res.Result?.chiTietVang) {
+        const rows = JSON.parse(res.Result.chiTietVang) as AbsentRow[];
+        setAbsentRows(rows.map((r) => ({ ...r, id: crypto.randomUUID() })));
+      } else {
+        showWarning(`Không tìm thấy báo cáo ngày ${yesterday}.`);
+      }
+    } catch {
+      showWarning(`Không tìm thấy báo cáo ngày ${yesterday}.`);
+    } finally {
+      setIsLoadingYesterday(false);
+    }
+  };
+
   const handleLoadYesterday = async () => {
     if (!maDonViCurrent) return;
 
@@ -187,29 +213,12 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
     const yesterday = d.toISOString().split("T")[0];
 
     if (absentRows.length > 0) {
-      const confirmed = window.confirm(
-        `Danh sách hiện tại sẽ bị thay thế bằng dữ liệu ngày ${yesterday}. Tiếp tục?`,
-      );
-      if (!confirmed) return;
+      setPendingYesterday(yesterday);
+      setConfirmOpen(true);
+      return;
     }
 
-    setIsLoadingYesterday(true);
-    try {
-      const res = await dailyReportService.searchReportByUnitAndDate(
-        maDonViCurrent,
-        yesterday,
-      );
-      if (res.success && res.Result?.chiTietVang) {
-        const rows = JSON.parse(res.Result.chiTietVang) as AbsentRow[];
-        setAbsentRows(rows.map((r) => ({ ...r, id: crypto.randomUUID() })));
-      } else {
-        alert(`Không tìm thấy báo cáo ngày ${yesterday}.`);
-      }
-    } catch {
-      alert(`Không tìm thấy báo cáo ngày ${yesterday}.`);
-    } finally {
-      setIsLoadingYesterday(false);
-    }
+    await doLoadYesterday(yesterday);
   };
 
   const handleLocalSubmit = (e: React.FormEvent) => {
@@ -387,12 +396,10 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                 type="text"
                 className={styles.input}
                 value={trucChiHuy.sodienthoai}
-                onChange={(e) =>
-                  setTrucChiHuy((prev) => ({
-                    ...prev,
-                    sodienthoai: e.target.value,
-                  }))
-                }
+                onChange={(e) => {
+                  const val = e.target.value.replace(/[^\d+\-\s]/g, "");
+                  setTrucChiHuy((prev) => ({ ...prev, sodienthoai: val }));
+                }}
                 placeholder="Nhập số điện thoại..."
               />
             </div>
@@ -461,12 +468,10 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                 type="text"
                 className={styles.input}
                 value={trucBanTacChien.sodienthoai}
-                onChange={(e) =>
-                  setTrucBanTacChien((prev) => ({
-                    ...prev,
-                    sodienthoai: e.target.value,
-                  }))
-                }
+                onChange={(e) => {
+                  const val = e.target.value.replace(/[^\d+\-\s]/g, "");
+                  setTrucBanTacChien((prev) => ({ ...prev, sodienthoai: val }));
+                }}
                 placeholder="Nhập số điện thoại..."
               />
             </div>
@@ -629,6 +634,26 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
           </button>
         </div>
       </form>
+
+      <ConfirmDialog
+        isOpen={confirmOpen}
+        title="Xác nhận sao chép"
+        message={`Danh sách hiện tại sẽ bị thay thế bằng dữ liệu ngày ${pendingYesterday ?? ""}. Tiếp tục?`}
+        confirmText="Tiếp tục"
+        cancelText="Hủy"
+        type="warning"
+        onConfirm={() => {
+          setConfirmOpen(false);
+          if (pendingYesterday) {
+            void doLoadYesterday(pendingYesterday);
+          }
+          setPendingYesterday(null);
+        }}
+        onCancel={() => {
+          setConfirmOpen(false);
+          setPendingYesterday(null);
+        }}
+      />
     </div>
   );
 };

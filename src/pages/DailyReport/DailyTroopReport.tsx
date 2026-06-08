@@ -1,3 +1,4 @@
+// src/pages/DailyReport/DailyTroopReport.tsx
 import { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import styles from "./DailyTroopReport.module.css";
@@ -25,6 +26,7 @@ import type {
   ReportItemInput,
   CaTrucInfo,
 } from "../../types/dailyReport";
+import type { DonVi } from "../../types/account";
 import { handleApiError } from "../../utils/errorHandler";
 import ReportStatusBadge from "../../components/ui/ReportStatusBadge/ReportStatusBadge";
 
@@ -50,6 +52,7 @@ interface ReportRow {
   status: string;
   ghiChu: string;
   rawItem: CreateReportResponse["Result"];
+  notSubmitted?: boolean; // đơn vị chưa nộp báo cáo (chỉ dùng cho isSuDoan)
 }
 
 type EditModalData = {
@@ -148,6 +151,7 @@ export default function DailyTroopReport() {
   const [loading, setLoading] = useState(false);
 
   const [donViQuanSoTong, setDonViQuanSoTong] = useState<number>(0);
+  const [childUnits, setChildUnits] = useState<DonVi[]>([]);
 
   const [activeMenuUnit, setActiveMenuUnit] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
@@ -170,6 +174,12 @@ export default function DailyTroopReport() {
   const isParentUnit = useMemo(() => {
     return maDonViCurrent ? maDonViCurrent.split(".").length < 3 : false;
   }, [maDonViCurrent]);
+
+  const userRole = account?.vaiTro?.tenVaiTro;
+  const normalizedRole = normalizeRoleName(userRole);
+  const isCommander = normalizedRole === "Chỉ huy";
+  const isReporter = normalizedRole === "Báo cáo";
+  const isSuDoan = normalizedRole === "Sư đoàn";
 
   const fetchReports = useCallback(async () => {
     if (!maDonViCurrent) return;
@@ -227,18 +237,12 @@ export default function DailyTroopReport() {
   }, [maDonViCurrent, isParentUnit, reportDate]);
 
   useEffect(() => {
-    let isCurrent = true;
-
-    if (isCurrent && maDonViCurrent) {
-      Promise.resolve().then(() => {
-        fetchReports();
-      });
-    }
-
-    return () => {
-      isCurrent = false;
-    };
-  }, [fetchReports, maDonViCurrent]);
+    if (!maDonViCurrent) return;
+    const id = setTimeout(() => {
+      void fetchReports();
+    }, 0);
+    return () => clearTimeout(id);
+  }, [fetchReports]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const fetchDonViInfo = async () => {
@@ -249,12 +253,20 @@ export default function DailyTroopReport() {
         if (unit) {
           setDonViQuanSoTong(unit.quanSoTong);
         }
+        if (isParentUnit) {
+          const children = allUnits.filter((u) => {
+            if (!u.maDonVi.startsWith(maDonViCurrent + ".")) return false;
+            const suffix = u.maDonVi.slice(maDonViCurrent.length + 1);
+            return !suffix.includes(".");
+          });
+          setChildUnits(children);
+        }
       } catch (err) {
         console.error("Không thể tải thông tin đơn vị:", err);
       }
     };
     fetchDonViInfo();
-  }, [maDonViCurrent]);
+  }, [maDonViCurrent, isParentUnit]);
 
   const consolidatedData = useMemo(() => {
     if (!isParentUnit || reportData.length === 0) return null;
@@ -493,6 +505,30 @@ export default function DailyTroopReport() {
     });
   }, [query, reportData]);
 
+  const displayRows = useMemo((): ReportRow[] => {
+    if (!isParentUnit || childUnits.length === 0) return filteredRows;
+
+    return childUnits.map((unit) => {
+      const submitted = filteredRows.find((r) => r.donVi === unit.maDonVi);
+      if (submitted) return { ...submitted, notSubmitted: false };
+      return {
+        idDonBaoCao: unit.maDonVi,
+        donVi: unit.maDonVi,
+        tenDonVi: unit.tenDonvi,
+        kyhieuDonVi: unit.kyhieuDonvi,
+        quanSoTong: 0,
+        quanSoHienDien: 0,
+        quanSoVang: 0,
+        vang: { ...EMPTY_VANG },
+        chiTietVangList: [],
+        status: "Chưa_Nộp",
+        ghiChu: "",
+        rawItem: {} as CreateReportResponse["Result"],
+        notSubmitted: true,
+      };
+    });
+  }, [isParentUnit, childUnits, filteredRows]);
+
   const totals = useMemo(() => {
     return reportData.reduce(
       (acc, row) => ({
@@ -590,11 +626,6 @@ export default function DailyTroopReport() {
     return { trucChiHuy, trucBanTacChien };
   }, [isParentUnit, parentReportData, reportData]);
 
-  const userRole = account?.vaiTro?.tenVaiTro;
-  const normalizedRole = normalizeRoleName(userRole);
-  const isCommander = normalizedRole === "Chỉ huy";
-  const isReporter = normalizedRole === "Báo cáo";
-
   const currentEditingReport = useMemo(() => {
     if (!editModalData) return null;
     const childRow = reportData.find(
@@ -611,6 +642,37 @@ export default function DailyTroopReport() {
   }, [editModalData, reportData, parentReportData]);
 
   const renderReportRow = (row: ReportRow, isConsolidatedRow = false) => {
+    if (row.notSubmitted) {
+      // Đơn vị chưa nộp báo cáo — highlight đỏ, không có menu actions
+      return (
+        <tr key={row.donVi} className={styles.notSubmittedRow}>
+          <td className={styles.unitCell}>{row.kyhieuDonVi || row.tenDonVi}</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td>
+            <ReportStatusBadge status="Chưa_Nộp" />
+          </td>
+          <td>—</td>
+          <td></td>
+        </tr>
+      );
+    }
+
     const menuKey = isConsolidatedRow ? `parent-${row.idDonBaoCao}` : row.donVi;
     const isMenuOpen = activeMenuUnit === menuKey;
     const canEdit =
@@ -759,18 +821,26 @@ export default function DailyTroopReport() {
         reportDate={reportDate}
         onReportDateChange={setReportDate}
         onAddReport={isCommander || isParentUnit ? undefined : handleAddReport}
-        onConsolidate={isParentUnit ? handleConsolidate : undefined}
+        onConsolidate={
+          isParentUnit && !isSuDoan ? handleConsolidate : undefined
+        }
         consolidateDisabled={
           !consolidatedData ||
           consolidatedData.submittedCount === 0 ||
-          parentReportData !== null
+          parentReportData !== null ||
+          (childUnits.length > 0 &&
+            consolidatedData.submittedCount < childUnits.length)
         }
         consolidateLabel={
           parentReportData !== null
             ? "Đã tổng hợp"
-            : consolidatedData && consolidatedData.submittedCount > 0
-              ? `Tổng hợp (${consolidatedData.submittedCount}/${consolidatedData.totalCount} đơn vị)`
-              : "Chưa có báo cáo con"
+            : childUnits.length > 0 &&
+                consolidatedData &&
+                consolidatedData.submittedCount < childUnits.length
+              ? `Chưa đủ (${consolidatedData.submittedCount ?? 0}/${childUnits.length} đơn vị)`
+              : consolidatedData && consolidatedData.submittedCount > 0
+                ? `Tổng hợp (${consolidatedData.submittedCount}/${childUnits.length} đơn vị)`
+                : "Chưa có báo cáo con"
         }
         onExportWord={handleExportWord}
         onExportExcel={handleExportExcel}
@@ -819,19 +889,19 @@ export default function DailyTroopReport() {
             </thead>
 
             <tbody>
-              {filteredRows.length === 0 && !parentReportData ? (
+              {displayRows.length === 0 && !parentReportData ? (
                 <tr className={styles.noReportRow}>
                   <td colSpan={22}>Không có dữ liệu báo cáo</td>
                 </tr>
               ) : (
                 <>
-                  {isParentUnit && filteredRows.length > 0 && (
+                  {isParentUnit && displayRows.length > 0 && (
                     <tr className={styles.separatorRow}>
                       <td colSpan={22}>Báo cáo đơn vị con</td>
                     </tr>
                   )}
 
-                  {filteredRows.map((row) => renderReportRow(row, false))}
+                  {displayRows.map((row) => renderReportRow(row, false))}
 
                   {filteredRows.length > 0 && (
                     <tr className={styles.totalRow}>
@@ -859,15 +929,16 @@ export default function DailyTroopReport() {
                     </tr>
                   )}
 
-                  {isParentUnit && (
+                  {isParentUnit && !isSuDoan && (
                     <tr className={styles.separatorRow}>
                       <td colSpan={22}>Báo cáo tổng hợp</td>
                     </tr>
                   )}
 
-                  {isParentUnit && parentReportData
+                  {isParentUnit && !isSuDoan && parentReportData
                     ? renderReportRow(parentReportData, true)
-                    : isParentUnit && (
+                    : isParentUnit &&
+                      !isSuDoan && (
                         <tr className={styles.noConsolidatedRow}>
                           <td colSpan={22}>Chưa có báo cáo tổng hợp</td>
                         </tr>
@@ -914,7 +985,12 @@ export default function DailyTroopReport() {
                           .join(" · ")}
                       </div>
                       {data.sodienthoai && (
-                        <a className={styles.caTrucPhone}>{data.sodienthoai}</a>
+                        <a
+                          href={`tel:${data.sodienthoai}`}
+                          className={styles.caTrucPhone}
+                        >
+                          {data.sodienthoai}
+                        </a>
                       )}
                     </div>
                   ) : (
