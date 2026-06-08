@@ -1,8 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faPlus,
-} from "@fortawesome/free-solid-svg-icons";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import styles from "./DutyPersonnel.module.css";
 import { dutyService } from "../../services/duty/dutyService";
 import { useToast } from "../../context/useToast";
@@ -13,6 +11,26 @@ import type {
   ChucVu,
 } from "../../types/duty";
 import CustomSelect from "../../components/ui/CustomSelect/CustomSelect";
+
+const CHI_HUY_CAP_BAC = ["Đại tá", "Thượng tá", "Trung tá"];  
+const CHI_HUY_CHUC_VU = [
+  "Sư đoàn trưởng",
+  "Tham mưu trưởng",
+  "Sư đoàn phó",
+  "Tham mưu phó",
+];  
+const TAC_CHIEN_CAP_BAC = [
+  "Trung tá",
+  "Thiếu tá",
+  "Đại úy",
+  "Thượng úy",
+  "Trung úy",
+  "Thiếu úy",
+];
+const TAC_CHIEN_CHUC_VU = ["Trợ lý tác chiến", "Trợ lý tham mưu"];
+
+const sortByNewest = (arr: NguoiTrucWithCaTruc[]) =>
+  [...arr].sort((a, b) => b.createdAt.localeCompare(a.createdAt));  
 
 type DutyType = "chiHuy" | "tacChien";
 
@@ -49,8 +67,9 @@ export default function DutyPersonnel() {
           ]);
         if (capBacRes.success) setCapBacList(capBacRes.Result);
         if (chucVuRes.success) setChucVuList(chucVuRes.Result);
-        if (chiHuyRes.success) setChiHuyList(chiHuyRes.Result);
-        if (tacChienRes.success) setTacChienList(tacChienRes.Result);
+        if (chiHuyRes.success) setChiHuyList(sortByNewest(chiHuyRes.Result ?? []));
+        if (tacChienRes.success) setTacChienList(sortByNewest(tacChienRes.Result ?? []));
+
       } catch {
         showError("Không thể tải dữ liệu");
       } finally {
@@ -58,7 +77,12 @@ export default function DutyPersonnel() {
       }
     };
     void fetchAll();
-  }, []);
+  }, [showError]);
+
+  const handleDutyTypeChange = (type: DutyType) => {
+    setDutyType(type);
+    setForm({ ...EMPTY_FORM });
+  };  
 
   const handleFieldChange = (field: keyof TrucNguoiPayload, val: string) => {
     setForm((prev) => ({ ...prev, [field]: val }));
@@ -90,26 +114,28 @@ export default function DutyPersonnel() {
     }
   };
 
-  const capBacOptions = capBacList.map((c) => ({
-    value: c.tenCapBac,
-    label: c.tenCapBac,
-  }));
+  const capBacOptions = useMemo(() => {
+    const allowed = dutyType === "chiHuy" ? CHI_HUY_CAP_BAC : TAC_CHIEN_CAP_BAC;
+    return allowed
+      .filter((name) => capBacList.some((c) => c.tenCapBac === name))
+      .map((name) => ({ value: name, label: name }));
+  }, [capBacList, dutyType]);
 
-  const chucVuOptions = chucVuList.map((c) => ({
-    value: c.tenChucVu,
-    label: c.tenChucVu,
-  }));
+  const chucVuOptions = useMemo(() => {
+    const allowed = dutyType === "chiHuy" ? CHI_HUY_CHUC_VU : TAC_CHIEN_CHUC_VU;
+    return allowed
+      .filter((name) => chucVuList.some((c) => c.tenChucVu === name))
+      .map((name) => ({ value: name, label: name }));
+  }, [chucVuList, dutyType]);
 
   const renderPersonCard = (person: NguoiTrucWithCaTruc) => (
     <div key={person.idNguoitruc} className={styles.personCard}>
       <div className={styles.personName}>
-        {person.capbacNguoitruc} {person.tenNguoitruc}
+        {person.capbacNguoitruc} - {person.tenNguoitruc}
       </div>
       <div className={styles.personMeta}>{person.chucvuNguoitruc}</div>
       {person.sodienthoai && (
-        <a className={styles.personPhone}>
-          {person.sodienthoai}
-        </a>
+        <a className={styles.personPhone}>{person.sodienthoai}</a>
       )}
     </div>
   );
@@ -123,14 +149,14 @@ export default function DutyPersonnel() {
           <button
             type="button"
             className={`${styles.typeBtn} ${dutyType === "chiHuy" ? styles.typeBtnActive : ""}`}
-            onClick={() => setDutyType("chiHuy")}
+            onClick={() => handleDutyTypeChange("chiHuy")}
           >
             Trực chỉ huy
           </button>
           <button
             type="button"
             className={`${styles.typeBtn} ${dutyType === "tacChien" ? styles.typeBtnActive : ""}`}
-            onClick={() => setDutyType("tacChien")}
+            onClick={() => handleDutyTypeChange("tacChien")}
           >
             Trực ban tác chiến
           </button>
