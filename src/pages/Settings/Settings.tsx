@@ -1,4 +1,3 @@
-// src/pages/Settings/Settings.tsx
 import { useState, useEffect, useMemo } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -12,6 +11,7 @@ import { donviService } from "../../services/unit/unitService";
 import { useToast } from "../../context/useToast";
 import { useAuth } from "../../context/useAuth";
 import type { Account, DonVi } from "../../types/account";
+import { authService } from "../../services/auth/authService";
 
 import styles from "./Settings.module.css";
 
@@ -26,9 +26,12 @@ export default function Settings() {
   const [quanSoQncn, setQuanSoQncn] = useState(0);
   const [saving, setSaving] = useState(false);
 
-
   const { showError, showSuccess } = useToast();
   const { refreshAccount } = useAuth();
+
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [changingPassword, setChangingPassword] = useState(false);
 
   const quanSoTong = useMemo(
     () => quanSoSiQuan + quanSoHsqBs + quanSoQncn,
@@ -70,7 +73,34 @@ export default function Settings() {
     fetchData();
   }, []);
 
- const handleUpdateDonVi = async (e: React.FormEvent) => {
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPassword.trim()) {
+      showError("Vui lòng nhập mật khẩu mới");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      showError("Mật khẩu xác nhận không khớp");
+      return;
+    }
+    setChangingPassword(true);
+    try {
+      const res = await authService.changePassword({ matKhau: newPassword });
+      if (res.success) {
+        showSuccess("Đổi mật khẩu thành công");
+        setNewPassword("");
+        setConfirmPassword("");
+      } else {
+        showError(res.message || "Đổi mật khẩu thất bại");
+      }
+    } catch {
+      showError("Có lỗi xảy ra khi đổi mật khẩu");
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
+  const handleUpdateDonVi = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!donVi) return;
 
@@ -92,13 +122,10 @@ export default function Settings() {
         setQuanSoHsqBs(response.Result.quanSoHsqBs);
         setQuanSoSiQuan(response.Result.quanSoSiQuan);
         setQuanSoQncn(response.Result.quanSoQncn);
-        
-        // 1. Gọi làm mới thông tin tài khoản
+
         await refreshAccount();
-        
-        // 2. Bắn thông báo toast xanh thành công "y chang" mẫu
-        showSuccess("Cập nhật quân số biên chế thành công"); 
-        
+
+        showSuccess("Cập nhật quân số biên chế thành công");
       } else {
         showError(response.message || "Cập nhật thất bại");
       }
@@ -205,11 +232,9 @@ export default function Settings() {
       {donVi && (
         <div className={styles.cardSection}>
           <div className={styles.cardHeader}>
-            <div className={styles.cardTitleRow}>
-              <h2 className={styles.cardTitle}>
-                Cập nhật thông tin đơn vị — {donVi.tenDonvi}
-              </h2>
-            </div>
+            <h2 className={styles.cardTitle}>
+              Cập nhật thông tin đơn vị — {donVi.tenDonvi}
+            </h2>
           </div>
 
           <form className={styles.form} onSubmit={handleUpdateDonVi}>
@@ -225,7 +250,6 @@ export default function Settings() {
                 />
               </div>
 
-              {/* QUÂN SỐ SĨ QUAN */}
               <div className={styles.formGroup}>
                 <label>Quân số Sĩ quan</label>
                 <div className={styles.numberInput}>
@@ -260,7 +284,6 @@ export default function Settings() {
                 </div>
               </div>
 
-              {/* QUÂN SỐ HSQ-BS */}
               <div className={styles.formGroup}>
                 <label>Quân số HSQ-BS</label>
                 <div className={styles.numberInput}>
@@ -293,7 +316,6 @@ export default function Settings() {
                 </div>
               </div>
 
-              {/* QUÂN SỐ QNCN */}
               <div className={styles.formGroup}>
                 <label>Quân số QNCN</label>
                 <div className={styles.numberInput}>
@@ -339,6 +361,46 @@ export default function Settings() {
           </form>
         </div>
       )}
+
+      <div className={styles.cardSection}>
+        <div className={styles.cardHeader}>
+          <h2 className={styles.cardTitle}>Đổi mật khẩu</h2>
+        </div>
+
+        <form className={styles.form} onSubmit={handleChangePassword}>
+          <div className={styles.infoGrid}>
+            <div className={styles.formGroup}>
+              <label>Mật khẩu mới</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Nhập mật khẩu mới"
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label>Xác nhận mật khẩu</label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Nhập lại mật khẩu mới"
+              />
+            </div>
+          </div>
+
+          <div className={styles.formActions}>
+            <button
+              type="submit"
+              className={styles.saveBtn}
+              disabled={changingPassword}
+            >
+              {changingPassword ? "Đang lưu..." : "Đổi mật khẩu"}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

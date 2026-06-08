@@ -1,5 +1,10 @@
 import api from "../api";
-import type { LoginRequest, LoginResponse } from "../../types/auth";
+import type {
+  LoginRequest,
+  LoginResponse,
+  ChangePasswordRequest,
+  ChangePasswordResponse,
+} from "../../types/auth";
 
 const MOCK_MODE = import.meta.env.VITE_MOCK_AUTH === "true";
 
@@ -25,5 +30,15 @@ export const authService = {
     if (!MOCK_MODE) {
       await api.post("/auth/logout", { token });
     }
+  },
+
+  changePassword: async (
+    payload: ChangePasswordRequest,
+  ): Promise<ChangePasswordResponse> => {
+    const response = await api.put<ChangePasswordResponse>(
+      "/auth/change-password",
+      payload,
+    );
+    return response.data;
   },
 };

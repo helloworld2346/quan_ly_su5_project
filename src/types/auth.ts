@@ -22,3 +22,13 @@ export interface LogoutResponse {
   code: number;
   message: string;
 }
+
+export interface ChangePasswordRequest {
+  matKhau: string;
+}
+
+export interface ChangePasswordResponse {
+  success: boolean;
+  code: number;
+  message: string;
+}
