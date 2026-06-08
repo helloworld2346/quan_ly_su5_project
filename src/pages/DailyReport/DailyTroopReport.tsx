@@ -376,6 +376,13 @@ export default function DailyTroopReport() {
     };
   }, [activeMenuUnit]);
 
+  const isPastDate = useMemo(() => {
+    const selectedDate = new Date(reportDate + "T00:00:00");
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return selectedDate < today;
+  }, [reportDate]);
+
   const checkIfDateHasReport = useMemo(() => {
     if (!maDonViCurrent) return false;
 
@@ -386,12 +393,7 @@ export default function DailyTroopReport() {
     const isPastDate = selectedDate < today;
     if (isPastDate) return true;
 
-    return reportData.some(
-      (report) =>
-        report.donVi === maDonViCurrent &&
-        report.status !== "Từ_Chối" &&
-        report.status !== "Từ chối",
-    );
+    return reportData.some((report) => report.donVi === maDonViCurrent);
   }, [reportData, maDonViCurrent, reportDate]);
 
   const handleAddReport = () => {
@@ -542,7 +544,12 @@ export default function DailyTroopReport() {
   }, [query, reportData]);
 
   const displayRows = useMemo((): ReportRow[] => {
-    if (!isParentUnit || childUnits.length === 0) return filteredRows;
+    if (!isParentUnit || childUnits.length === 0) {
+      if (isCommander) {
+        return filteredRows.filter((r) => r.status !== "Nháp");
+      }
+      return filteredRows;
+    }
 
     const ownReport = filteredRows.find((r) => r.donVi === maDonViCurrent);
     const ownRow: ReportRow = ownReport
@@ -582,9 +589,19 @@ export default function DailyTroopReport() {
         notSubmitted: true,
       };
     });
-
-    return [ownRow, ...childRows];
-  }, [isParentUnit, childUnits, filteredRows, maDonViCurrent, account]);
+    const allRows = [ownRow, ...childRows];
+    if (isCommander) {
+      return allRows.filter((r) => r.notSubmitted || r.status !== "Nháp");
+    }
+    return allRows;
+  }, [
+    isParentUnit,
+    childUnits,
+    filteredRows,
+    maDonViCurrent,
+    account,
+    isCommander,
+  ]);
 
   const totals = useMemo(() => {
     return reportData.reduce(
@@ -946,6 +963,7 @@ export default function DailyTroopReport() {
         }
         onExportWord={handleExportWord}
         onExportExcel={handleExportExcel}
+        isPastDate={isPastDate}
         hasReport={checkIfDateHasReport}
       />
 
@@ -1126,6 +1144,7 @@ export default function DailyTroopReport() {
           trucBanChiHuy={selectedReportRow.rawItem.trucBanChiHuy}
           trucBanTacChien={selectedReportRow.rawItem.trucBanTacChien}
           status={selectedReportRow.status}
+          isCommander={isCommander}
         />
       )}
 

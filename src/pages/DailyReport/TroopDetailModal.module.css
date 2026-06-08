@@ -290,3 +290,15 @@
   font-size: 15px;  
   font-style: italic;  
 }
+
+.recalledNotice {  
+  padding: 48px 24px;  
+  text-align: center;  
+  color: var(--dialog-message-text);  
+  font-size: 15px;  
+  font-style: italic;  
+}  
+  
+.recalledNotice p {  
+  margin: 0;  
+}

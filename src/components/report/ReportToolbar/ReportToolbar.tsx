@@ -31,6 +31,7 @@ type Props = {
   consolidateLabel?: string;
   maxDate?: string;
   hasReport?: boolean;
+  isPastDate?: boolean;
   showExport?: boolean;
 };
 
@@ -59,8 +60,9 @@ export default function ReportToolbar({
   consolidateDisabled = false,
   consolidateLabel = "Tổng hợp báo cáo",
   maxDate = todayIsoDate(),
+  isPastDate = false,
   hasReport = false,
-  showExport = false, 
+  showExport = false,
 }: Props) {
   const searchId = useId();
   const dateId = useId();
@@ -111,7 +113,11 @@ export default function ReportToolbar({
             disabled={hasReport}
           >
             <FontAwesomeIcon icon={faPlus} className={styles.addIcon} />
-            {hasReport ? "Ngày này đã có báo cáo" : "Thêm báo cáo"}
+            {isPastDate
+              ? "Không thể thêm báo cáo ở ngày cũ"
+              : hasReport
+                ? "Ngày này đã có báo cáo"
+                : "Thêm báo cáo"}
           </button>
         )}
 
@@ -126,7 +132,7 @@ export default function ReportToolbar({
             {consolidateLabel}
           </button>
         )}
-        
+
         {onSubmit && (
           <button
             type="button"
