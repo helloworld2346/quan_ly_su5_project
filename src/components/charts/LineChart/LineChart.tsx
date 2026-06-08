@@ -182,7 +182,7 @@ export default function LineChart({
             const cy = getY(value);
             const tipW = 160;
             const tipH = 52;
-            const tipX = Math.min(cx - tipW / 2, svgWidth - paddingRight - tipW);
+            const tipX = Math.max(paddingLeft, Math.min(cx - tipW / 2, svgWidth - paddingRight - tipW));
             const tipY = cy - tipH - 10;
 
             return (

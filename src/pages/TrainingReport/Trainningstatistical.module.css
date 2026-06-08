@@ -15,7 +15,7 @@
 
 .metricCard {
   display: flex;
-  align-items: flex-start;  
+  align-items: flex-start;
   gap: 14px;
   padding: 16px 18px;
   background: var(--surface-card);
@@ -81,7 +81,7 @@
   border-radius: 12px;
   border-top: 3px solid var(--primary-color);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  min-width: 0;  
+  min-width: 0;
   overflow: hidden;
 }
 
@@ -97,9 +97,9 @@
 /* ── Layouts ── */
 .row2col {
   display: grid;
-  grid-template-columns: 420px 1fr;  /* cố định cột trái */
+  grid-template-columns: 420px 1fr;
   gap: 20px;
-  align-items: stretch;  /* đổi từ start → stretch */
+  align-items: stretch;
 }
 
 .row4col {
@@ -122,19 +122,6 @@
   line-height: 1.25;
 }
 
-.rowLineChart {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 210px;
-  gap: 14px;
-  align-items: end;
-}
-
-.donutRow {
-  display: flex;
-  justify-content: center;
-  min-height: 240px;
-  align-items: center;
-}
 .donutWrapper {
   display: flex;
   flex-direction: column;
@@ -148,6 +135,7 @@
   padding: 8px 0;
   border-top: 1px solid var(--login-border);
 }
+
 /* ── Section Head ── */
 .sectionHead {
   padding: 0 0 4px;
@@ -161,42 +149,6 @@
   color: #071b6f;
 }
 
-/* ── Overall Rate ── */
-.overallRate {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  min-height: 112px;
-  padding: 20px;
-  background: #ffffff;
-  border: 1px solid rgba(138, 44, 255, 0.28);
-  border-radius: 8px;
-  text-align: center;
-  box-shadow: 0 8px 24px rgba(15, 35, 80, 0.08);
-}
-
-.overallRateLabel {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--chart-purple);
-  text-transform: uppercase;
-  letter-spacing: 0;
-}
-
-.overallRateValue {
-  font-size: 38px;
-  font-weight: 800;
-  line-height: 1;
-}
-
-.overallRateSub {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--chart-purple);
-}
-
 .chartCardTotal {
   margin: -8px 0 10px;
   font-size: 13px;
@@ -204,25 +156,49 @@
   color: var(--login-text-muted);
 }
 
-/* ── Chi tiết đơn vị ── */
-.filterBar {
+/* ── Toolbar + Filter — giống ExecutiveDashboard ── */
+.toolbar {
   display: flex;
-  gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 16px;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--surface-card);
+  border: 1px solid var(--login-border);
+  border-radius: 10px;
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.toolbarIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid var(--login-border);
+  background: var(--surface-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+  flex-shrink: 0;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .filterBtn {
-  padding: 6px 16px;
-  border-radius: 20px;
+  padding: 7px 13px;
   border: 1px solid var(--login-border);
-  background: transparent;
-  font-size: 13px;
-  font-weight: 700;
+  border-radius: 20px;
+  background: var(--surface-muted);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
   color: var(--login-text-muted);
   cursor: pointer;
-  transition: all 0.15s;
-  font-family: inherit;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 .filterBtn:hover {
@@ -233,42 +209,66 @@
 .filterBtnActive {
   background: var(--primary-color);
   border-color: var(--primary-color);
-  color: #fff;
+  color: var(--text-white, #fff);
+  font-weight: 600;
 }
 
-.unitGrid {
+.filterBtnActive:hover {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--text-white, #fff);
+}
+
+/* ── Groups — giống ExecutiveDashboard ── */
+.groups {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.groupHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--login-border);
+}
+
+.groupTitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.groupCount {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--login-text-muted);
+  padding: 4px 10px;
+  background: var(--surface-muted);
+  border-radius: 20px;
+}
+
+.groupGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 16px;
 }
 
 /* ── Responsive ── */
 @media (max-width: 1200px) {
-  .metricsBar {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .row4col {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .metricsBar { grid-template-columns: repeat(2, 1fr); }
+  .row4col { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 900px) {
-  .row2col {
-    grid-template-columns: 1fr;
-  }
-
-  .rowLineChart {
-    grid-template-columns: 1fr;
-  }
+  .row2col { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 600px) {
-  .metricsBar {
-    grid-template-columns: 1fr;
-  }
-
-  .row4col {
-    grid-template-columns: 1fr;
-  }
+  .metricsBar { grid-template-columns: 1fr; }
+  .row4col { grid-template-columns: 1fr; }
 }

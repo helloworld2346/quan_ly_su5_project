@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
+import ReportTrendChart from "../../components/charts/ReportTrendChart/ReportTrendChart";
 import styles from "./ReportStatistics.module.css";
 import { dailyReportService } from "../../services/dailyReport/dailyReportService";
 import { useAuth } from "../../context/useAuth";
@@ -11,13 +12,8 @@ import type {
 type ReportItem = SearchByRangeResponse["Result"][number];
 
 function getDefaultDates() {
-  const today = new Date();
-  const start = new Date(today);
-  start.setDate(today.getDate() - 2);
-  return {
-    start: start.toISOString().split("T")[0],
-    end: today.toISOString().split("T")[0],
-  };
+  const today = new Date().toISOString().split("T")[0];
+  return { start: today, end: today };
 }
 
 function formatDate(dateStr: string) {
@@ -26,6 +22,19 @@ function formatDate(dateStr: string) {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
+  });
+}
+function formatVNDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
+function formatShortDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
   });
 }
 
@@ -112,6 +121,8 @@ export default function ReportStatistics() {
   const defaults = useMemo(() => getDefaultDates(), []);
   const [startDate, setStartDate] = useState(defaults.start);
   const [endDate, setEndDate] = useState(defaults.end);
+  const [appliedStartDate, setAppliedStartDate] = useState(defaults.start);
+  const [appliedEndDate, setAppliedEndDate] = useState(defaults.end);
   const [reports, setReports] = useState<ReportItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
@@ -129,6 +140,8 @@ export default function ReportStatistics() {
       );
       setReports(res.success && Array.isArray(res.Result) ? res.Result : []);
       setHasLoaded(true);
+      setAppliedStartDate(startDate);
+      setAppliedEndDate(endDate);
     } catch {
       showErrorRef.current("Không thể tải dữ liệu thống kê");
       setReports([]);
@@ -152,6 +165,8 @@ export default function ReportStatistics() {
         if (cancelled) return;
         setReports(res.success && Array.isArray(res.Result) ? res.Result : []);
         setHasLoaded(true);
+        setAppliedStartDate(defaults.start);
+        setAppliedEndDate(defaults.end);
       } catch {
         if (cancelled) return;
         showErrorRef.current("Không thể tải dữ liệu thống kê");
@@ -164,8 +179,7 @@ export default function ReportStatistics() {
     return () => {
       cancelled = true;
     };
-  }, [maDonVi]); // eslint-disable-line react-hooks/exhaustive-deps
-
+  }, [maDonVi]); 
   const summary = useMemo(() => {
     const vangBreakdown = { ...EMPTY_VANG };
     reports.forEach((r) => {
@@ -190,6 +204,25 @@ export default function ReportStatistics() {
     ...activeVang.map(({ key }) => summary.vangBreakdown[key]),
     1,
   );
+
+   const isSingleDay = appliedStartDate === appliedEndDate;
+  
+
+  const trendReports = useMemo(
+    () =>
+      [...reports].sort(
+        (a, b) =>
+          new Date(a.thoiGianBaoCao).getTime() -
+          new Date(b.thoiGianBaoCao).getTime(),
+      ),
+    [reports],
+  );
+
+
+  const trendLabels = trendReports.map((r) => formatShortDate(r.thoiGianBaoCao));
+  const hienDienValues = trendReports.map((r) => r.quanSoHienDien);
+
+
 
   return (
     <section className={styles.page}>
@@ -232,26 +265,35 @@ export default function ReportStatistics() {
 
       {!loading && reports.length > 0 && (
         <>
-          <div className={styles.summaryGrid}>
-            <div className={styles.summaryCard}>
-              <span className={styles.summaryValue}>
-                {summary.totalReports}
-              </span>
-              <span className={styles.summaryLabel}>Báo cáo</span>
+          {isSingleDay ? (
+            <div className={styles.summaryGrid}>
+              <div className={styles.summaryCard}>
+                <span className={styles.summaryValue}>
+                  {summary.totalReports}
+                </span>
+                <span className={styles.summaryLabel}>Báo cáo</span>
+              </div>
+              <div className={styles.summaryCard}>
+                <span className={styles.summaryValue}>{summary.totalQS}</span>
+                <span className={styles.summaryLabel}>Tổng quân số</span>
+              </div>
+              <div className={`${styles.summaryCard} ${styles.cardGreen}`}>
+                <span className={styles.summaryValue}>{summary.totalHD}</span>
+                <span className={styles.summaryLabel}>Hiện diện</span>
+              </div>
+              <div className={`${styles.summaryCard} ${styles.cardRed}`}>
+                <span className={styles.summaryValue}>{summary.totalVang}</span>
+                <span className={styles.summaryLabel}>Vắng mặt</span>
+              </div>
             </div>
-            <div className={styles.summaryCard}>
-              <span className={styles.summaryValue}>{summary.totalQS}</span>
-              <span className={styles.summaryLabel}>Tổng quân số</span>
-            </div>
-            <div className={`${styles.summaryCard} ${styles.cardGreen}`}>
-              <span className={styles.summaryValue}>{summary.totalHD}</span>
-              <span className={styles.summaryLabel}>Hiện diện</span>
-            </div>
-            <div className={`${styles.summaryCard} ${styles.cardRed}`}>
-              <span className={styles.summaryValue}>{summary.totalVang}</span>
-              <span className={styles.summaryLabel}>Vắng mặt</span>
-            </div>
-          </div>
+          ) : (
+         <ReportTrendChart
+  labels={trendLabels}
+  values={hienDienValues}
+  height={450}
+  title={`Quân số hiện diện từ ${formatVNDate(appliedStartDate)} đến ${formatVNDate(appliedEndDate)}`}
+/>
+          )}
 
           {activeVang.length > 0 && (
             <div className={styles.section}>

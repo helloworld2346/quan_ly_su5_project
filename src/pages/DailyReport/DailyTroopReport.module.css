@@ -273,7 +273,7 @@
 
   .noteCell {  
     text-align: left;  
-    min-width: 120px;  
+    min-width:50px;  
     padding: 12px 16px;  
     font-size: 13px;  
     color: #6b7280;  
