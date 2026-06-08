@@ -25,10 +25,7 @@ export interface Account {
   tenDangNhap: string;
   tenTaiKhoan: string;
   vaiTro: Role;
-  donVi?: {
-    maDonVi: string;
-    tenDonvi: string;
-  };
+  donVi?: DonVi;
   matKhau: string;
   createdAt: string;
   updatedAt: string;
