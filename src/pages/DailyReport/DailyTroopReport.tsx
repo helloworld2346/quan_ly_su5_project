@@ -757,6 +757,7 @@ export default function DailyTroopReport() {
                 : isParentUnit
                   ? styles.childRow
                   : "",
+              styles.notSubmittedRow,
             ]
               .filter(Boolean)
               .join(" ") || undefined

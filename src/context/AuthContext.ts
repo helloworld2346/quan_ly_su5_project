@@ -1,5 +1,6 @@
 import { createContext } from "react";
 import type { Account, Role, DonVi } from "../types/account";
+import type { Notification } from "../components/ui/NotificationBell/NotificationBell";
 
 export interface AuthContextType {
   account: Account | null;
@@ -12,6 +13,10 @@ export interface AuthContextType {
   getChildUnits: () => DonVi[];
   refreshAccount: () => Promise<void>;
   clearAuth: () => void;
+  notifications: Notification[];
+  markRead: (id: string) => void;
+  markAllRead: () => void;
+  clearRead: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(

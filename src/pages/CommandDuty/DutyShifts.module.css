@@ -76,10 +76,10 @@
 }
 
 .filterInput {
-  height: 42px;
+  height: 37px;
   padding: 0 14px;
-  border: 1.5px solid var(--login-border);
-  border-radius: 10px;
+  border: 1px solid var(--login-border);
+  border-radius: 6px;
   font-size: 14px;
   font-family: inherit;
   color: var(--login-text);
@@ -392,6 +392,30 @@
 .btnCancel:hover {
   border-color: var(--login-text-muted);
   color: var(--login-text);
+}
+
+.btnCancelEdit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 8px;
+  background: var(--btn-refuse-fg, --btn-refuse-fg);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.btnCancelEdit:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.btnCancelEdit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .btnSave {

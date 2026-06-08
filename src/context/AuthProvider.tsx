@@ -5,6 +5,22 @@ import { roleService } from "../services/role/roleService";
 import { storage } from "../utils/storage";
 import type { Account, Role, DonVi } from "../types/account";
 import { AuthContext } from "./AuthContext";
+import { WebSocketLink } from "../services/websocket/WebSocket";
+import { notificationService } from "../services/notification/notificationService";
+import { notificationStorage } from "../utils/notificationStorage";
+import type { Notification } from "../components/ui/NotificationBell/NotificationBell";
+import type { ApiNotification } from "../types/notification";
+import { useToast } from "./useToast";
+
+function mapApiNotification(n: ApiNotification): Notification {
+  return {
+    id: n.id,
+    title: n.tieuDe,
+    message: n.noiDung,
+    time: n.thoiGian,
+    isRead: n.daDoc,
+  };
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const token = storage.getToken();
@@ -13,6 +29,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [donVi, setDonVi] = useState<DonVi | null>(null);
   const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(!!token);
+  const [notifications, setNotifications] = useState<Notification[]>(() =>
+    notificationStorage.get(),
+  );
+  const { showError, showSuccess } = useToast();
 
   const fetchData = useCallback(async () => {
     try {
@@ -43,7 +63,67 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           );
           setDonVi(donViData || null);
         }
+
+        const notifId = accountResponse.Result.vaiTro?.idVaiTro;
+        if (notifId) {
+          try {
+            const apiNotifs =
+              await notificationService.getNotifications(notifId);
+            const mapped = (apiNotifs.Result ?? []).map(mapApiNotification);
+            notificationStorage.set(mapped);
+            setNotifications(mapped);
+          } catch {
+            // Không block auth nếu notification lỗi
+          }
+        }
       }
+
+      const connectWebSocket = () => {
+        WebSocketLink.setOnOpen(() => {
+          console.log("🚀 WebSocket opened");
+
+          WebSocketLink.send({
+            type: "REGISTER",
+            role: accountResponse.Result.vaiTro?.idVaiTro ?? "",
+            donViId: accountResponse.Result.donVi?.maDonVi ?? "",
+            userId: accountResponse.Result.idTaiKhoan,
+            token: storage.getToken() ?? "",
+          });
+        });
+
+        WebSocketLink.setOnMessage((data) => {
+          const msg = data as {
+            type?: string;
+            title?: string;
+            message?: string;
+            id?: string;
+          };
+
+          if (msg.title || msg.message) {
+            const newNotif: Notification = {
+              id: msg.id ?? crypto.randomUUID(),
+              title: msg.title ?? "",
+              message: msg.message ?? "",
+              time: new Date().toISOString(),
+              isRead: false,
+            };
+            setNotifications((prev) => {
+              const updated = [newNotif, ...prev];
+              notificationStorage.set(updated);
+              return updated;
+            });
+          }
+
+          if (msg.type === "URGENT" || msg.type === "WARNING") {
+            showError(`${msg.title}: ${msg.message}`);
+          } else if (msg.title) {
+            showSuccess(`${msg.title}: ${msg.message}`);
+          }
+        });
+
+        WebSocketLink.connect();
+      };
+      connectWebSocket();
     } catch (error) {
       console.error("Failed to fetch auth data:", error);
       storage.removeToken();
@@ -51,7 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [showError, showSuccess]);
 
   useEffect(() => {
     let active = true;
@@ -101,6 +181,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }));
   }, [donVi]);
 
+  const markRead = useCallback((id: string) => {
+    setNotifications((prev) => {
+      const updated = prev.map((n) =>
+        n.id === id ? { ...n, isRead: true } : n,
+      );
+      notificationStorage.set(updated);
+      return updated;
+    });
+  }, []);
+
+  const markAllRead = useCallback(() => {
+    setNotifications((prev) => {
+      const updated = prev.map((n) => ({ ...n, isRead: true }));
+      notificationStorage.set(updated);
+      return updated;
+    });
+  }, []);
+
+  const clearRead = useCallback(() => {
+    setNotifications((prev) => {
+      const updated = prev.filter((n) => !n.isRead);
+      notificationStorage.set(updated);
+      return updated;
+    });
+  }, []);
+
   const refreshAccount = useCallback(async () => {
     setLoading(true);
     await fetchData();
@@ -126,6 +232,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         getChildUnits,
         refreshAccount,
         clearAuth,
+        notifications,
+        markRead,
+        markAllRead,
+        clearRead,
       }}
     >
       {children}
