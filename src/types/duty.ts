@@ -127,3 +127,18 @@ export interface CaTrucListResponse {
   message: string;
   Result: CaTrucDetail[];
 }
+
+export interface UpdateCaTrucPayload {
+  ngaytruc: string;
+  matkhau: string;
+  ghichu: string;
+  trucChiHuy: string;
+  trucBanTacChien: string;
+}
+
+export interface UpdateCaTrucResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  Result: CaTrucDetail;
+}

@@ -13,6 +13,9 @@ import type {
   ChucVuListResponse,
   NguoiTrucListResponse,
   CaTrucDetailResponse,
+  CaTrucListResponse,
+  UpdateCaTrucPayload,
+  UpdateCaTrucResponse,
 } from "../../types/duty";
 
 export const dutyService = {
@@ -100,6 +103,22 @@ export const dutyService = {
   getAllTrucBanTacChien: async (): Promise<NguoiTrucListResponse> => {
     const res = await apiNoPrefix.get<NguoiTrucListResponse>(
       "/truc-ban-tac-chien",
+    );
+    return res.data;
+  },
+
+  getAllCaTruc: async (): Promise<CaTrucListResponse> => {
+    const res = await apiNoPrefix.get<CaTrucListResponse>("/ca-truc");
+    return res.data;
+  },
+
+  updateCaTruc: async (
+    idCatruc: string,
+    payload: UpdateCaTrucPayload,
+  ): Promise<UpdateCaTrucResponse> => {
+    const res = await apiNoPrefix.put<UpdateCaTrucResponse>(
+      `/ca-truc/${idCatruc}`,
+      payload,
     );
     return res.data;
   },
