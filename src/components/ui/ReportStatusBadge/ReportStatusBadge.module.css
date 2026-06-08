@@ -5,6 +5,19 @@
   font-size: 12px;
   font-weight: 600;
 }
-.pending { background: #fef3c7; color: #92400e; }
-.approved { background: #d1fae5; color: #065f46; }
-.rejected { background: #fee2e2; color: #991b1b; }
+.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+.approved {
+  background: #d1fae5;
+  color: #065f46;
+}
+.rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.draft {
+  background: #f1f5f9;
+  color: #475569;
+}

@@ -85,4 +85,22 @@ export const dailyReportService = {
     );
     return response.data;
   },
+
+  submitReport: async (id: string): Promise<ApproveResponse> => {
+    const response = await apiNoPrefix.put<ApproveResponse>(
+      `/donbaocao/submit/${id}`,
+      null,
+      { params: { id } },
+    );
+    return response.data;
+  },
+
+  recallReport: async (id: string): Promise<ApproveResponse> => {
+    const response = await apiNoPrefix.put<ApproveResponse>(
+      `/donbaocao/recall/${id}`,
+      null,
+      { params: { id } },
+    );
+    return response.data;
+  },
 };

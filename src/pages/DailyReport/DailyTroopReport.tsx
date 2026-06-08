@@ -9,6 +9,8 @@ import {
   faPenToSquare,
   faCheck,
   faBan,
+  faRotateLeft,
+  faPaperPlane,
 } from "@fortawesome/free-solid-svg-icons";
 import TroopDetailModal from "./TroopDetailModal";
 import CreateReportModal from "./CreateReportModal";
@@ -448,6 +450,34 @@ export default function DailyTroopReport() {
     setActiveMenuUnit(null);
   };
 
+  const handleSubmitReport = async (id: string) => {
+    try {
+      await dailyReportService.submitReport(id);
+      showSuccess("Đã trình phê duyệt thành công");
+      setActiveMenuUnit(null);
+      fetchReports();
+    } catch (error) {
+      handleApiError(error, {
+        showError,
+        errorMessage: "Không thể trình phê duyệt",
+      });
+    }
+  };
+
+  const handleRecallReport = async (id: string) => {
+    try {
+      await dailyReportService.recallReport(id);
+      showSuccess("Đã thu hồi báo cáo thành công");
+      setActiveMenuUnit(null);
+      fetchReports();
+    } catch (error) {
+      handleApiError(error, {
+        showError,
+        errorMessage: "Không thể thu hồi báo cáo",
+      });
+    }
+  };
+
   const handleRefuseConfirm = async (reason: string) => {
     if (!refuseReportId) return;
 
@@ -711,24 +741,36 @@ export default function DailyTroopReport() {
     const canEdit =
       isReporter &&
       !isParentUnit &&
-      (row.status === "Từ_Chối" ||
-        row.status === "Từ chối" ||
-        row.status === "Chờ_Duyệt");
+      (row.status === "Nháp" ||
+        row.status === "Từ_Chối" ||
+        row.status === "Từ chối");
+
     const canEditParent =
       isReporter &&
       isParentUnit &&
       isConsolidatedRow &&
-      (row.status === "Từ_Chối" ||
-        row.status === "Từ chối" ||
-        row.status === "Chờ_Duyệt");
+      (row.status === "Nháp" ||
+        row.status === "Từ_Chối" ||
+        row.status === "Từ chối");
+
     const canEditOwn =
       isReporter &&
       isParentUnit &&
       !isConsolidatedRow &&
       row.donVi === maDonViCurrent &&
-      (row.status === "Từ_Chối" ||
-        row.status === "Từ chối" ||
-        row.status === "Chờ_Duyệt");
+      (row.status === "Nháp" ||
+        row.status === "Từ_Chối" ||
+        row.status === "Từ chối");
+
+    const canSubmit =
+      isReporter &&
+      row.status === "Nháp" &&
+      (!isParentUnit || isConsolidatedRow || row.donVi === maDonViCurrent);
+
+    const canRecall =
+      isReporter &&
+      row.status === "Chờ_Duyệt" &&
+      (!isParentUnit || isConsolidatedRow || row.donVi === maDonViCurrent);
     const canApprove = isCommander && row.status === "Chờ_Duyệt";
     const canRefuse = isCommander && row.status === "Chờ_Duyệt";
 
@@ -831,6 +873,36 @@ export default function DailyTroopReport() {
                     </button>
                   )}
 
+                  {canSubmit && (
+                    <button
+                      type="button"
+                      className={`${styles.menuItem} ${styles.menuItemPrimary}`}
+                      role="menuitem"
+                      onClick={() => handleSubmitReport(row.idDonBaoCao)}
+                    >
+                      <FontAwesomeIcon
+                        icon={faPaperPlane}
+                        className={styles.menuIcon}
+                      />
+                      Trình phê duyệt
+                    </button>
+                  )}
+
+                  {canRecall && (
+                    <button
+                      type="button"
+                      className={`${styles.menuItem} ${styles.menuItemWarning}`}
+                      role="menuitem"
+                      onClick={() => handleRecallReport(row.idDonBaoCao)}
+                    >
+                      <FontAwesomeIcon
+                        icon={faRotateLeft}
+                        className={styles.menuIcon}
+                      />
+                      Thu hồi
+                    </button>
+                  )}
+
                   {canRefuse && (
                     <button
                       type="button"
@@ -852,7 +924,7 @@ export default function DailyTroopReport() {
         </td>
       </tr>
     );
-  };
+  };;
 
   const totalRequiredCount = childUnits.length + 1;
 
