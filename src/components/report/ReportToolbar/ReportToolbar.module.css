@@ -258,3 +258,47 @@
   background: var(--primary-hover);  
   border-color: var(--primary-hover);  
 }
+
+.submitBtn {  
+  color: var(--text-white);  
+  background: var(--primary-color, #218673);  
+  border-color: var(--primary-color, #218673);  
+}  
+  
+.submitBtn:hover {  
+  background: var(--primary-hover, #1a6b5c);  
+  border-color: var(--primary-hover, #1a6b5c);  
+}  
+  
+.recallBtn {  
+  color: var(--btn-recall-fg);  
+  background: var(--btn-recall-bg);  
+  border-color: var(--btn-recall-border);  
+}  
+  
+.recallBtn:hover {  
+  background: var(--btn-recall-hover-bg);  
+  border-color: var(--btn-recall-hover-border);  
+}  
+  
+.approveBtn {  
+  color: var(--btn-approve-fg);  
+  background: var(--btn-approve-bg);  
+  border-color: var(--btn-approve-border);  
+}  
+  
+.approveBtn:hover {  
+  background: var(--btn-approve-hover-bg);  
+  border-color: var(--btn-approve-hover-border);  
+}  
+  
+.refuseBtn {  
+  color: var(--btn-refuse-fg);  
+  background: var(--btn-refuse-bg);  
+  border-color: var(--btn-refuse-border);  
+}  
+  
+.refuseBtn:hover {  
+  background: var(--btn-refuse-hover-bg);  
+  border-color: var(--btn-refuse-hover-border);  
+}

@@ -160,6 +160,27 @@
 /* Bar chart */
 --bar-bg: rgba(59, 130, 246, 0.12);
 --bar-hover: rgba(59, 130, 246, 0.2);
+
+/* Nút Phê duyệt (Màu Xanh lá - Approve) */  
+--btn-approve-fg: #065f46;  
+--btn-approve-bg: #d1fae5;  
+--btn-approve-border: #6ee7b7;  
+--btn-approve-hover-bg: #a7f3d0;  
+--btn-approve-hover-border: #34d399;  
+  
+/* Nút Từ chối (Màu Đỏ - Refuse) */  
+--btn-refuse-fg: #991b1b;  
+--btn-refuse-bg: #fee2e2;  
+--btn-refuse-border: #fca5a5;  
+--btn-refuse-hover-bg: #fecaca;  
+--btn-refuse-hover-border: #f87171;  
+  
+/* Nút Thu hồi (Màu Vàng hổ phách - Recall) */  
+--btn-recall-fg: #92400e;  
+--btn-recall-bg: #fef3c7;  
+--btn-recall-border: #fde68a;  
+--btn-recall-hover-bg: #fde68a;  
+--btn-recall-hover-border: #f59e0b;
 }
 
 /* ==========================================================================  
@@ -303,4 +324,25 @@
 
 --bar-bg: rgba(96, 165, 250, 0.15);
 --bar-hover: rgba(96, 165, 250, 0.25);
+
+/* Nút Phê duyệt (Màu Xanh lá - Approve) */  
+--btn-approve-fg: #4ade80;  
+--btn-approve-bg: rgba(74, 222, 128, 0.15);  
+--btn-approve-border: rgba(74, 222, 128, 0.35);  
+--btn-approve-hover-bg: rgba(74, 222, 128, 0.25);  
+--btn-approve-hover-border: #4ade80;  
+  
+/* Nút Từ chối (Màu Đỏ - Refuse) */  
+--btn-refuse-fg: #f87171;  
+--btn-refuse-bg: rgba(248, 113, 113, 0.15);  
+--btn-refuse-border: rgba(248, 113, 113, 0.35);  
+--btn-refuse-hover-bg: rgba(248, 113, 113, 0.25);  
+--btn-refuse-hover-border: #f87171;  
+  
+/* Nút Thu hồi (Màu Vàng hổ phách - Recall) */  
+--btn-recall-fg: #fbbf24;  
+--btn-recall-bg: rgba(245, 158, 11, 0.15);  
+--btn-recall-border: rgba(245, 158, 11, 0.35);  
+--btn-recall-hover-bg: rgba(245, 158, 11, 0.25);  
+--btn-recall-hover-border: #fbbf24;
 }

@@ -6,6 +6,10 @@ import {
   faLayerGroup,
   faFileWord,
   faFileExcel,
+  faCheck,
+  faBan,
+  faPaperPlane,
+  faRotateLeft,
 } from "@fortawesome/free-solid-svg-icons";
 
 import styles from "./ReportToolbar.module.css";
@@ -15,6 +19,10 @@ type Props = {
   onQueryChange: (value: string) => void;
   reportDate: string;
   onReportDateChange: (value: string) => void;
+  onApprove?: () => void;
+  onRefuse?: () => void;
+  onSubmit?: () => void;
+  onRecall?: () => void;
   onExportWord?: () => void;
   onExportExcel?: () => void;
   onAddReport?: () => void;
@@ -40,6 +48,10 @@ export default function ReportToolbar({
   onQueryChange,
   reportDate,
   onReportDateChange,
+  onApprove,
+  onRefuse,
+  onSubmit,
+  onRecall,
   onExportWord,
   onExportExcel,
   onAddReport,
@@ -112,6 +124,50 @@ export default function ReportToolbar({
           >
             <FontAwesomeIcon icon={faLayerGroup} className={styles.addIcon} />
             {consolidateLabel}
+          </button>
+        )}
+        
+        {onSubmit && (
+          <button
+            type="button"
+            className={`${styles.actionBtn} ${styles.submitBtn}`}
+            onClick={onSubmit}
+          >
+            <FontAwesomeIcon icon={faPaperPlane} className={styles.addIcon} />
+            Trình phê duyệt
+          </button>
+        )}
+
+        {onRecall && (
+          <button
+            type="button"
+            className={`${styles.actionBtn} ${styles.recallBtn}`}
+            onClick={onRecall}
+          >
+            <FontAwesomeIcon icon={faRotateLeft} className={styles.addIcon} />
+            Thu hồi
+          </button>
+        )}
+
+        {onApprove && (
+          <button
+            type="button"
+            className={`${styles.actionBtn} ${styles.approveBtn}`}
+            onClick={onApprove}
+          >
+            <FontAwesomeIcon icon={faCheck} className={styles.addIcon} />
+            Phê duyệt
+          </button>
+        )}
+
+        {onRefuse && (
+          <button
+            type="button"
+            className={`${styles.actionBtn} ${styles.refuseBtn}`}
+            onClick={onRefuse}
+          >
+            <FontAwesomeIcon icon={faBan} className={styles.addIcon} />
+            Từ chối
           </button>
         )}
         {showExport && (

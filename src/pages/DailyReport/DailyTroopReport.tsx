@@ -7,10 +7,6 @@ import {
   faEllipsisVertical,
   faEye,
   faPenToSquare,
-  faCheck,
-  faBan,
-  faRotateLeft,
-  faPaperPlane,
 } from "@fortawesome/free-solid-svg-icons";
 import TroopDetailModal from "./TroopDetailModal";
 import CreateReportModal from "./CreateReportModal";
@@ -91,7 +87,6 @@ function normalizeRoleName(role: string | undefined): string {
     return "Quản Trị Viên";
   }
   return role;
-  
 }
 
 const EMPTY_VANG: VangChiTiet = {
@@ -191,7 +186,7 @@ export default function DailyTroopReport() {
   }, [maDonViCurrent]);
 
   const userRole = account?.vaiTro?.tenVaiTro;
-  const normalizedRole = normalizeRoleName(userRole ??undefined);
+  const normalizedRole = normalizeRoleName(userRole ?? undefined);
   const isCommander = normalizedRole === "Chỉ huy";
   const isReporter = normalizedRole === "Báo cáo";
   const isSuDoan = normalizedRole === "Sư đoàn";
@@ -454,7 +449,6 @@ export default function DailyTroopReport() {
     try {
       await dailyReportService.submitReport(id);
       showSuccess("Đã trình phê duyệt thành công");
-      setActiveMenuUnit(null);
       fetchReports();
     } catch (error) {
       handleApiError(error, {
@@ -468,7 +462,6 @@ export default function DailyTroopReport() {
     try {
       await dailyReportService.recallReport(id);
       showSuccess("Đã thu hồi báo cáo thành công");
-      setActiveMenuUnit(null);
       fetchReports();
     } catch (error) {
       handleApiError(error, {
@@ -650,6 +643,17 @@ export default function DailyTroopReport() {
       : null;
   }, [isParentUnit, parentReportData, reportData]);
 
+  const ownReport = useMemo(() => {
+    if (isParentUnit) return parentReportData;
+    return reportData.length > 0 ? reportData[0] : null;
+  }, [isParentUnit, parentReportData, reportData]);
+
+  const commanderReport = useMemo(() => {
+    if (!isCommander) return null;
+    if (isParentUnit) return parentReportData;
+    return reportData.length > 0 ? reportData[0] : null;
+  }, [isCommander, isParentUnit, parentReportData, reportData]);
+
   const trucInfoFromReport = useMemo(() => {
     const currentReport = isParentUnit
       ? parentReportData
@@ -690,6 +694,25 @@ export default function DailyTroopReport() {
     return { trucChiHuy, trucBanTacChien };
   }, [isParentUnit, parentReportData, reportData]);
 
+  const canApprove = useMemo(() => {
+    if (!commanderReport || commanderReport.notSubmitted) return false;
+    return isCommander && commanderReport.status === "Chờ_Duyệt";
+  }, [commanderReport, isCommander]);
+
+  const canRefuse = useMemo(() => {
+    if (!commanderReport || commanderReport.notSubmitted) return false;
+    return isCommander && commanderReport.status === "Chờ_Duyệt";
+  }, [commanderReport, isCommander]);
+  const canSubmit = useMemo(() => {
+    if (!isReporter || !ownReport || ownReport.notSubmitted) return false;
+    return ownReport.status === "Nháp";
+  }, [isReporter, ownReport]);
+
+  const canRecall = useMemo(() => {
+    if (!isReporter || !ownReport || ownReport.notSubmitted) return false;
+    return ownReport.status === "Chờ_Duyệt";
+  }, [isReporter, ownReport]);
+
   const currentEditingReport = useMemo(() => {
     if (!editModalData) return null;
     const childRow = reportData.find(
@@ -708,7 +731,20 @@ export default function DailyTroopReport() {
   const renderReportRow = (row: ReportRow, isConsolidatedRow = false) => {
     if (row.notSubmitted) {
       return (
-        <tr key={row.donVi} className={styles.notSubmittedRow}>
+        <tr
+          key={row.idDonBaoCao}
+          className={
+            [
+              isConsolidatedRow
+                ? styles.consolidatedRow
+                : isParentUnit
+                  ? styles.childRow
+                  : "",
+            ]
+              .filter(Boolean)
+              .join(" ") || undefined
+          }
+        >
           <td className={styles.unitCell}>{row.kyhieuDonVi || row.tenDonVi}</td>
           <td>—</td>
           <td>—</td>
@@ -761,28 +797,19 @@ export default function DailyTroopReport() {
       (row.status === "Nháp" ||
         row.status === "Từ_Chối" ||
         row.status === "Từ chối");
-
-    const canSubmit =
-      isReporter &&
-      row.status === "Nháp" &&
-      (!isParentUnit || isConsolidatedRow || row.donVi === maDonViCurrent);
-
-    const canRecall =
-      isReporter &&
-      row.status === "Chờ_Duyệt" &&
-      (!isParentUnit || isConsolidatedRow || row.donVi === maDonViCurrent);
-    const canApprove = isCommander && row.status === "Chờ_Duyệt";
-    const canRefuse = isCommander && row.status === "Chờ_Duyệt";
-
     return (
       <tr
         key={row.idDonBaoCao}
         className={
-          isConsolidatedRow
-            ? styles.consolidatedRow
-            : isParentUnit
-              ? styles.childRow
-              : undefined
+          [
+            isConsolidatedRow
+              ? styles.consolidatedRow
+              : isParentUnit
+                ? styles.childRow
+                : "",
+          ]
+            .filter(Boolean)
+            .join(" ") || undefined
         }
       >
         <td className={styles.unitCell}>{row.kyhieuDonVi || row.tenDonVi}</td>
@@ -854,67 +881,7 @@ export default function DailyTroopReport() {
                         icon={faPenToSquare}
                         className={styles.menuIcon}
                       />
-                      Sửa
-                    </button>
-                  )}
-
-                  {canApprove && (
-                    <button
-                      type="button"
-                      className={`${styles.menuItem} ${styles.menuItemSuccess}`}
-                      role="menuitem"
-                      onClick={() => handleApproveReport(row.idDonBaoCao)}
-                    >
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        className={styles.menuIcon}
-                      />
-                      Phê duyệt
-                    </button>
-                  )}
-
-                  {canSubmit && (
-                    <button
-                      type="button"
-                      className={`${styles.menuItem} ${styles.menuItemPrimary}`}
-                      role="menuitem"
-                      onClick={() => handleSubmitReport(row.idDonBaoCao)}
-                    >
-                      <FontAwesomeIcon
-                        icon={faPaperPlane}
-                        className={styles.menuIcon}
-                      />
-                      Trình phê duyệt
-                    </button>
-                  )}
-
-                  {canRecall && (
-                    <button
-                      type="button"
-                      className={`${styles.menuItem} ${styles.menuItemWarning}`}
-                      role="menuitem"
-                      onClick={() => handleRecallReport(row.idDonBaoCao)}
-                    >
-                      <FontAwesomeIcon
-                        icon={faRotateLeft}
-                        className={styles.menuIcon}
-                      />
-                      Thu hồi
-                    </button>
-                  )}
-
-                  {canRefuse && (
-                    <button
-                      type="button"
-                      className={`${styles.menuItem} ${styles.menuItemDanger}`}
-                      role="menuitem"
-                      onClick={() => handleRefuseReportClick(row)}
-                    >
-                      <FontAwesomeIcon
-                        icon={faBan}
-                        className={styles.menuIcon}
-                      />
-                      Từ chối
+                      Chỉnh Sửa
                     </button>
                   )}
                 </div>,
@@ -924,7 +891,7 @@ export default function DailyTroopReport() {
         </td>
       </tr>
     );
-  };;
+  };
 
   const totalRequiredCount = childUnits.length + 1;
 
@@ -956,6 +923,26 @@ export default function DailyTroopReport() {
               : consolidatedData && consolidatedData.submittedCount > 0
                 ? `Tổng hợp (${consolidatedData.submittedCount}/${totalRequiredCount} đơn vị)`
                 : "Chưa có báo cáo con"
+        }
+        onApprove={
+          canApprove
+            ? () => handleApproveReport(commanderReport!.idDonBaoCao)
+            : undefined
+        }
+        onRefuse={
+          canRefuse
+            ? () => handleRefuseReportClick(commanderReport!)
+            : undefined
+        }
+        onSubmit={
+          canSubmit
+            ? () => handleSubmitReport(ownReport!.idDonBaoCao)
+            : undefined
+        }
+        onRecall={
+          canRecall
+            ? () => handleRecallReport(ownReport!.idDonBaoCao)
+            : undefined
         }
         onExportWord={handleExportWord}
         onExportExcel={handleExportExcel}
@@ -1139,6 +1126,7 @@ export default function DailyTroopReport() {
           onClose={() => setSelectedReportRow(null)}
           trucBanChiHuy={selectedReportRow.rawItem.trucBanChiHuy}
           trucBanTacChien={selectedReportRow.rawItem.trucBanTacChien}
+          status={selectedReportRow.status}
         />
       )}
 
