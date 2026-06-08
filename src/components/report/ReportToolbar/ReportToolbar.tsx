@@ -48,7 +48,7 @@ export default function ReportToolbar({
   consolidateLabel = "Tổng hợp báo cáo",
   maxDate = todayIsoDate(),
   hasReport = false,
-  showExport = false,
+  showExport = false, 
 }: Props) {
   const searchId = useId();
   const dateId = useId();
