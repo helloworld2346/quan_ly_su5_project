@@ -256,3 +256,37 @@ export interface SearchByRangeResponse {
     caTruc: CaTrucInfo;
   }>;
 }
+
+export interface SubmitReportResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  Result: {
+    idDonBaoCao: string;
+    status: string;
+    quanSoTong: number;
+    quanSoHienDien: number;
+    quanSoVang: number;
+    thoiGianBaoCao: string;
+    thongTinVang: string;
+    donVi: { maDonVi: string; tenDonvi: string; kyhieuDonvi?: string };
+    caTruc: CaTrucInfo;
+  };
+}
+
+export interface RecallReportResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  Result: {
+    idDonBaoCao: string;
+    status: string;
+    quanSoTong: number;
+    quanSoHienDien: number;
+    quanSoVang: number;
+    thoiGianBaoCao: string;
+    thongTinVang: string;
+    donVi: { maDonVi: string; tenDonvi: string; kyhieuDonvi?: string };
+    caTruc: CaTrucInfo;
+  };
+}

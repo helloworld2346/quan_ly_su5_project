@@ -12,6 +12,7 @@ export default function ReportStatusBadge({ status }: Props) {
     Chờ_Duyệt: styles.pending,
     Đã_Duyệt: styles.approved,
     Từ_Chối: styles.rejected,
+    Nháp: styles.draft,
   };
 
   return (

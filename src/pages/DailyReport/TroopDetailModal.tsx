@@ -1,3 +1,4 @@
+// src/pages/DailyReport/TroopDetailModal.tsx
 import { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
@@ -43,6 +44,7 @@ type Props = {
   onClose: () => void;
   trucBanChiHuy?: string;
   trucBanTacChien?: string;
+  status?: string;
 };
 
 export default function TroopDetailModal({
@@ -51,6 +53,7 @@ export default function TroopDetailModal({
   onClose,
   trucBanChiHuy,
   trucBanTacChien,
+  status,
 }: Props) {
   const parsedTrucChiHuy = parseTruc(trucBanChiHuy);
   const parsedTrucBanTacChien = parseTruc(trucBanTacChien);
@@ -85,77 +88,87 @@ export default function TroopDetailModal({
         </div>
 
         <div className={styles.body}>
-          {(parsedTrucChiHuy || parsedTrucBanTacChien) && (
-            <div className={styles.trucSection}>
-              <div className={styles.trucTitle}>Thông tin trực đơn vị</div>
-              <div className={styles.trucGrid}>
-                {trucItems.map(({ label, data }) => (
-                  <div key={label} className={styles.trucCard}>
-                    <div className={styles.trucCardHeader}>
-                      <span className={styles.trucRole}>{label}</span>
-                    </div>
-                    {data ? (
-                      <div className={styles.trucCardBody}>
-                        <div className={styles.trucName}>
-                          {data.tenNguoitruc || "—"}
+          {status === "Nháp" ? (
+            <div className={styles.recalledNotice}>
+              <p>Đơn báo cáo đã được thu hồi, không thể xem tiếp.</p>
+            </div>
+          ) : (
+            <>
+              {(parsedTrucChiHuy || parsedTrucBanTacChien) && (
+                <div className={styles.trucSection}>
+                  <div className={styles.trucTitle}>Thông tin trực đơn vị</div>
+                  <div className={styles.trucGrid}>
+                    {trucItems.map(({ label, data }) => (
+                      <div key={label} className={styles.trucCard}>
+                        <div className={styles.trucCardHeader}>
+                          <span className={styles.trucRole}>{label}</span>
                         </div>
-                        <div className={styles.trucMeta}>
-                          {[data.capbacNguoitruc, data.chucvuNguoitruc]
-                            .filter(Boolean)
-                            .join(" · ")}
-                        </div>
-                        {data.sodienthoai && (
-                          <a className={styles.trucPhone}>{data.sodienthoai}</a>
+                        {data ? (
+                          <div className={styles.trucCardBody}>
+                            <div className={styles.trucName}>
+                              {data.tenNguoitruc || "—"}
+                            </div>
+                            <div className={styles.trucMeta}>
+                              {[data.capbacNguoitruc, data.chucvuNguoitruc]
+                                .filter(Boolean)
+                                .join(" · ")}
+                            </div>
+                            {data.sodienthoai && (
+                              <a className={styles.trucPhone}>
+                                {data.sodienthoai}
+                              </a>
+                            )}
+                          </div>
+                        ) : (
+                          <div className={styles.trucCardBody}>
+                            <div className={styles.trucEmpty}>
+                              Chưa có thông tin
+                            </div>
+                          </div>
                         )}
                       </div>
-                    ) : (
-                      <div className={styles.trucCardBody}>
-                        <div className={styles.trucEmpty}>
-                          Chưa có thông tin
-                        </div>
-                      </div>
-                    )}
+                    ))}
                   </div>
-                ))}
+                </div>
+              )}
+
+              <h2 className={styles.title}>Chi tiết quân số vắng</h2>
+              <div className={styles.summary}>
+                <div className={styles.summaryCard}>
+                  <span>Số quân nhân vắng</span>
+                  <strong>{members.length}</strong>
+                </div>
               </div>
-            </div>
-          )}
 
-          <h2 className={styles.title}>Chi tiết quân số vắng</h2>
-          <div className={styles.summary}>
-            <div className={styles.summaryCard}>
-              <span>Số quân nhân vắng</span>
-              <strong>{members.length}</strong>
-            </div>
-          </div>
-
-          {members.length === 0 ? (
-            <p className={styles.empty}>Không có quân nhân vắng.</p>
-          ) : (
-            <div className={styles.tableWrapper}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>STT</th>
-                    <th>Họ và tên</th>
-                    <th>Cấp bậc</th>
-                    <th>Chức vụ</th>
-                    <th>Lý do vắng</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {members.map((m, i) => (
-                    <tr key={m.id || i}>
-                      <td>{i + 1}</td>
-                      <td className={styles.nameCell}>{m.name}</td>
-                      <td>{m.rank}</td>
-                      <td>{m.position}</td>
-                      <td>{LY_DO_VANG_MAP[m.reason] || m.reason}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+              {members.length === 0 ? (
+                <p className={styles.empty}>Không có quân nhân vắng.</p>
+              ) : (
+                <div className={styles.tableWrapper}>
+                  <table className={styles.table}>
+                    <thead>
+                      <tr>
+                        <th>STT</th>
+                        <th>Họ và tên</th>
+                        <th>Cấp bậc</th>
+                        <th>Chức vụ</th>
+                        <th>Lý do vắng</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {members.map((m, i) => (
+                        <tr key={m.id || i}>
+                          <td>{i + 1}</td>
+                          <td className={styles.nameCell}>{m.name}</td>
+                          <td>{m.rank}</td>
+                          <td>{m.position}</td>
+                          <td>{LY_DO_VANG_MAP[m.reason] || m.reason}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
