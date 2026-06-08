@@ -888,6 +888,7 @@ export default function DailyTroopReport() {
         onExportWord={handleExportWord}
         onExportExcel={handleExportExcel}
         hasReport={checkIfDateHasReport}
+        showExport={isSuDoan}
       />
 
       <div className={styles.tableShell}>

@@ -355,3 +355,9 @@
   opacity: 0.6;  
   cursor: not-allowed;  
 }
+
+.required {
+  color: #ff4d4f; 
+  margin-left: 4px;
+  font-weight: bold;
+}

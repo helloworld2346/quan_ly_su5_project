@@ -23,6 +23,7 @@ type Props = {
   consolidateLabel?: string;
   maxDate?: string;
   hasReport?: boolean;
+  showExport?: boolean;
 };
 
 function todayIsoDate() {
@@ -47,6 +48,7 @@ export default function ReportToolbar({
   consolidateLabel = "Tổng hợp báo cáo",
   maxDate = todayIsoDate(),
   hasReport = false,
+  showExport = false,
 }: Props) {
   const searchId = useId();
   const dateId = useId();
@@ -112,25 +114,26 @@ export default function ReportToolbar({
             {consolidateLabel}
           </button>
         )}
-
-        <div className={styles.exportGroup}>
-          <button
-            type="button"
-            className={`${styles.exportBtn} ${styles.exportWord}`}
-            onClick={onExportWord}
-          >
-            <FontAwesomeIcon icon={faFileWord} />
-            Xuất File Word
-          </button>
-          <button
-            type="button"
-            className={`${styles.exportBtn} ${styles.exportExcel}`}
-            onClick={onExportExcel}
-          >
-            <FontAwesomeIcon icon={faFileExcel} />
-            Xuất File Excel
-          </button>
-        </div>
+        {showExport && (
+          <div className={styles.exportGroup}>
+            <button
+              type="button"
+              className={`${styles.exportBtn} ${styles.exportWord}`}
+              onClick={onExportWord}
+            >
+              <FontAwesomeIcon icon={faFileWord} />
+              Xuất File Word
+            </button>
+            <button
+              type="button"
+              className={`${styles.exportBtn} ${styles.exportExcel}`}
+              onClick={onExportExcel}
+            >
+              <FontAwesomeIcon icon={faFileExcel} />
+              Xuất File Excel
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

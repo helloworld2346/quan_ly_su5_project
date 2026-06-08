@@ -348,142 +348,135 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
 
           <hr className={styles.divider} />
 
-          <div className={styles.trucSectionHeader}>
-            <span className={styles.trucSectionTitle}>Trực chỉ huy đơn vị</span>
-          </div>
-          <div className={styles.coreGrid}>
-            <div className={styles.field}>
-              <label className={styles.label}>Họ và tên</label>
-              <input
-                type="text"
-                className={styles.input}
-                value={trucChiHuy.tenNguoitruc}
-                onChange={(e) =>
-                  setTrucChiHuy((prev) => ({
-                    ...prev,
-                    tenNguoitruc: e.target.value,
-                  }))
-                }
-                placeholder="Nhập họ và tên..."
-                required
-              />
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label}>Cấp bậc</label>
-              <CustomSelect
-                options={CAP_BAC_CHI_HUY_OPTIONS.map((cb) => ({
-                  value: cb,
-                  label: cb,
-                }))}
-                value={trucChiHuy.capbacNguoitruc}
-                onChange={(val) =>
-                  setTrucChiHuy((prev) => ({ ...prev, capbacNguoitruc: val }))
-                }
-                placeholder="Chọn cấp bậc"
-              />
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label}>Chức vụ</label>
-              <input
-                type="text"
-                className={styles.input}
-                value={trucChiHuy.chucvuNguoitruc}
-                onChange={(e) =>
-                  setTrucChiHuy((prev) => ({
-                    ...prev,
-                    chucvuNguoitruc: e.target.value,
-                  }))
-                }
-                placeholder="Nhập chức vụ..."
-                required
-              />
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label}>Số điện thoại</label>
-              <input
-                type="text"
-                className={styles.input}
-                value={trucChiHuy.sodienthoai}
-                onChange={(e) => {
-                  const val = e.target.value.replace(/[^\d+\-\s]/g, "");
-                  setTrucChiHuy((prev) => ({ ...prev, sodienthoai: val }));
-                }}
-                placeholder="Nhập số điện thoại..."
-              />
-            </div>
-          </div>
+    {/* TRỰC CHỈ HUY ĐƠN VỊ */}
+<div className={styles.trucSectionHeader}>
+  <span className={styles.trucSectionTitle}>Trực chỉ huy đơn vị</span>
+</div>
+<div className={styles.coreGrid}>
+  <div className={styles.field}>
+    <label className={styles.label}>
+      Họ và tên <span className={styles.required}>*</span>
+    </label>
+    <input
+      type="text"
+      className={styles.input}
+      value={trucChiHuy.tenNguoitruc}
+      onChange={(e) =>
+        setTrucChiHuy((prev) => ({ ...prev, tenNguoitruc: e.target.value }))
+      }
+      placeholder="Nhập họ và tên..."
+      required
+    />
+  </div>
+  <div className={styles.field}>
+    <label className={styles.label}>
+      Cấp bậc <span className={styles.required}>*</span>
+    </label>
+    <CustomSelect
+      options={CAP_BAC_CHI_HUY_OPTIONS.map((cb) => ({ value: cb, label: cb }))}
+      value={trucChiHuy.capbacNguoitruc}
+      onChange={(val) =>
+        setTrucChiHuy((prev) => ({ ...prev, capbacNguoitruc: val }))
+      }
+      placeholder="Chọn cấp bậc"
+    />
+  </div>
+  <div className={styles.field}>
+    <label className={styles.label}>
+      Chức vụ <span className={styles.required}>*</span>
+    </label>
+    <input
+      type="text"
+      className={styles.input}
+      value={trucChiHuy.chucvuNguoitruc}
+      onChange={(e) =>
+        setTrucChiHuy((prev) => ({ ...prev, chucvuNguoitruc: e.target.value }))
+      }
+      placeholder="Nhập chức vụ..."
+      required
+    />
+  </div>
+  <div className={styles.field}>
+    <label className={styles.label}>Số điện thoại</label>
+    <input
+      type="text"
+      className={styles.input}
+      value={trucChiHuy.sodienthoai}
+      onChange={(e) => {
+        const val = e.target.value.replace(/[^\d+\-\s]/g, "");
+        setTrucChiHuy((prev) => ({ ...prev, sodienthoai: val }));
+      }}
+      placeholder="Nhập số điện thoại..."
+    />
+  </div>
+</div>
 
-          <hr className={styles.divider} />
+<hr className={styles.divider} />
 
-          <div className={styles.trucSectionHeader}>
-            <span className={styles.trucSectionTitle}>
-              Trực ban tác chiến đơn vị
-            </span>
-          </div>
-          <div className={styles.coreGrid}>
-            <div className={styles.field}>
-              <label className={styles.label}>Họ và tên</label>
-              <input
-                type="text"
-                className={styles.input}
-                value={trucBanTacChien.tenNguoitruc}
-                onChange={(e) =>
-                  setTrucBanTacChien((prev) => ({
-                    ...prev,
-                    tenNguoitruc: e.target.value,
-                  }))
-                }
-                placeholder="Nhập họ và tên..."
-                required
-              />
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label}>Cấp bậc</label>
-              <CustomSelect
-                options={CAP_BAC_TAC_CHIEN_OPTIONS.map((cb) => ({
-                  value: cb,
-                  label: cb,
-                }))}
-                value={trucBanTacChien.capbacNguoitruc}
-                onChange={(val) =>
-                  setTrucBanTacChien((prev) => ({
-                    ...prev,
-                    capbacNguoitruc: val,
-                  }))
-                }
-                placeholder="Chọn cấp bậc"
-              />
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label}>Chức vụ</label>
-              <input
-                type="text"
-                className={styles.input}
-                value={trucBanTacChien.chucvuNguoitruc}
-                onChange={(e) =>
-                  setTrucBanTacChien((prev) => ({
-                    ...prev,
-                    chucvuNguoitruc: e.target.value,
-                  }))
-                }
-                placeholder="Nhập chức vụ..."
-                required
-              />
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label}>Số điện thoại</label>
-              <input
-                type="text"
-                className={styles.input}
-                value={trucBanTacChien.sodienthoai}
-                onChange={(e) => {
-                  const val = e.target.value.replace(/[^\d+\-\s]/g, "");
-                  setTrucBanTacChien((prev) => ({ ...prev, sodienthoai: val }));
-                }}
-                placeholder="Nhập số điện thoại..."
-              />
-            </div>
-          </div>
+{/* TRỰC BAN TÁC CHIẾN ĐƠN VỊ */}
+<div className={styles.trucSectionHeader}>
+  <span className={styles.trucSectionTitle}>Trực ban tác chiến đơn vị</span>
+</div>
+<div className={styles.coreGrid}>
+  <div className={styles.field}>
+    <label className={styles.label}>
+      Họ và tên <span className={styles.required}>*</span>
+    </label>
+    <input
+      type="text"
+      className={styles.input}
+      value={trucBanTacChien.tenNguoitruc}
+      onChange={(e) =>
+        setTrucBanTacChien((prev) => ({ ...prev, tenNguoitruc: e.target.value }))
+      }
+      placeholder="Nhập họ và tên..."
+      required
+    />
+  </div>
+  <div className={styles.field}>
+    <label className={styles.label}>
+      Cấp bậc <span className={styles.required}>*</span>
+    </label>
+    <CustomSelect
+      options={CAP_BAC_TAC_CHIEN_OPTIONS.map((cb) => ({ value: cb, label: cb }))}
+      value={trucBanTacChien.capbacNguoitruc}
+      onChange={(val) =>
+        setTrucBanTacChien((prev) => ({ ...prev, capbacNguoitruc: val }))
+      }
+      placeholder="Chọn cấp bậc"
+    />
+  </div>
+  <div className={styles.field}>
+    <label className={styles.label}>
+      Chức vụ <span className={styles.required}>*</span>
+    </label>
+    <input
+      type="text"
+      className={styles.input}
+      value={trucBanTacChien.chucvuNguoitruc}
+      onChange={(e) =>
+        setTrucBanTacChien((prev) => ({ ...prev, chucvuNguoitruc: e.target.value }))
+      }
+      placeholder="Nhập chức vụ..."
+      required
+    />
+  </div>
+  <div className={styles.field}>
+    <label className={styles.label}>Số điện thoại</label>
+    <input
+      type="text"
+      className={styles.input}
+      value={trucBanTacChien.sodienthoai}
+      onChange={(e) => {
+        const val = e.target.value.replace(/[^\d+\-\s]/g, "");
+        setTrucBanTacChien((prev) => ({ ...prev, sodienthoai: val }));
+      }}
+      placeholder="Nhập số điện thoại..."
+    />
+  </div>
+</div>
+
+      
 
           <hr className={styles.divider} />
 
