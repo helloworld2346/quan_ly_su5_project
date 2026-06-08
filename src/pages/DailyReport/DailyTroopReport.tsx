@@ -70,13 +70,15 @@ function todayIsoDate() {
 }
 
 function normalizeRoleName(role: string | null | undefined): string {
+  console.log(role)
   if (!role) return "";
   if (role.includes("Báo cáo") || role.includes("Báo Ban")) return "Báo cáo";
-  if (role.includes("Chỉ huy")) return "Chỉ huy";
+  if (role.includes("Chỉ Huy")) return "Chỉ huy";
   if (role.includes("Sư đoàn")) return "Sư đoàn";
   if (role.includes("Quản Trị") || role.includes("Admin"))
     return "Quản Trị Viên";
   return role;
+  
 }
 
 const EMPTY_VANG: VangChiTiet = {

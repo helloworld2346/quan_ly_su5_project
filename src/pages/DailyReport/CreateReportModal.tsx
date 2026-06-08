@@ -44,6 +44,12 @@ const CAP_BAC_OPTIONS = [
   "Đại úy",
   "Thiếu tá",
   "Trung tá",
+  "Thiếu úy QNCN",
+  "Trung úy QNCN",
+  "Thượng úy QNCN",
+  "Đại úy QNCN",
+  "Thiếu tá QNCN",
+  "Trung tá QNCN",
 ];
 
 const CAP_BAC_CHI_HUY_OPTIONS = [
@@ -52,6 +58,7 @@ const CAP_BAC_CHI_HUY_OPTIONS = [
   "Đại úy",
   "Thiếu tá",
   "Trung tá",
+
 ];
 
 const CAP_BAC_TAC_CHIEN_OPTIONS = [
@@ -61,6 +68,7 @@ const CAP_BAC_TAC_CHIEN_OPTIONS = [
   "Đại úy",
   "Thiếu tá",
   "Trung tá",
+
 ];
 
 const CHUC_VU_OPTIONS = [
