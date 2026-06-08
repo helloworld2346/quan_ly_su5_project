@@ -96,19 +96,6 @@ export interface ChucVu {
   mota: string;
 }
 
-export interface NguoiTrucWithCaTruc {
-  idNguoitruc: string;
-  tenNguoitruc: string;
-  capbacNguoitruc: string;
-  chucvuNguoitruc: string;
-  sodienthoai: string;
-  createdAt: string;
-  updatedAt: string;
-  isDeleted: boolean;
-  deletedAt: string | null;
-  caTruc: unknown[];
-}
-
 export interface CapBacListResponse {
   success: boolean;
   code: number;
@@ -121,6 +108,10 @@ export interface ChucVuListResponse {
   code: number;
   message: string;
   Result: ChucVu[];
+}
+
+export interface NguoiTrucWithCaTruc extends NguoiTrucDetail {
+  caTruc: unknown[];
 }
 
 export interface NguoiTrucListResponse {

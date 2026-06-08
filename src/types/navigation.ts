@@ -243,16 +243,22 @@ export function getNavItemById(id: NavItemId): NavItem | undefined {
 }
 
 function normalizeRoleName(role: string): string {
-  if (role.includes("Báo cáo") || role.includes("Báo Ban")) {
+  const r = role.toLowerCase();
+
+  if (
+    r.includes("báo ban") ||
+    r.includes("báo cáo") ||
+    r.includes("trực ban")
+  ) {
     return "Báo cáo";
   }
-  if (role.includes("Chỉ huy")) {
+  if (r.includes("chỉ huy")) {
     return "Chỉ huy";
   }
-  if (role.includes("Sư đoàn") || role.includes("Sư đoan")) {
+  if (r.includes("sư đoàn") || r.includes("sư đoan")) {
     return "Sư đoàn";
   }
-  if (role.includes("Quản Trị Viên") || role.includes("Admin")) {
+  if (r.includes("quản trị viên") || r.includes("admin")) {
     return "Quản Trị Viên";
   }
   return role;

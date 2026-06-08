@@ -8,17 +8,22 @@ type Props = {
 
 function normalizeRoleName(role: string | undefined): string {
   if (!role) return "";
+  const r = role.toLowerCase();
 
-  if (role.includes("Báo cáo") || role.includes("Báo Ban")) {
+  if (
+    r.includes("báo ban") ||
+    r.includes("báo cáo") ||
+    r.includes("trực ban")
+  ) {
     return "Báo cáo";
   }
-  if (role.includes("Chỉ huy")) {
+  if (r.includes("chỉ huy")) {
     return "Chỉ huy";
   }
-  if (role.includes("Sư đoàn")) {
+  if (r.includes("sư đoàn") || r.includes("sư đoan")) {
     return "Sư đoàn";
   }
-  if (role.includes("Quản Trị Viên") || role.includes("Admin")) {
+  if (r.includes("quản trị viên") || r.includes("admin")) {
     return "Quản Trị Viên";
   }
   return role;
