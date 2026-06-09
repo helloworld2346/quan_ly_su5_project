@@ -192,6 +192,10 @@ export default function DailyTroopReport() {
   const isCommander = normalizedRole === "Chỉ huy";
   const isReporter = normalizedRole === "Báo cáo";
   const isSuDoan = normalizedRole === "Sư đoàn";
+  const TRUNG_DOAN_KY_HIEU = ["e4", "e5", "e271"];
+  const isTrungDoan = TRUNG_DOAN_KY_HIEU.includes(
+    account?.donVi?.kyhieuDonvi ?? "",
+  );
 
   const fetchReports = useCallback(async () => {
     if (!maDonViCurrent) return;
@@ -452,22 +456,9 @@ export default function DailyTroopReport() {
     setShowCreateModal(true);
   };
 
-  const handleCreateSuccess = useCallback(
-    async (reportId?: string) => {
-      if (isSuDoan && reportId) {
-        try {
-          await dailyReportService.approveReport(reportId);
-        } catch (error) {
-          handleApiError(error, {
-            showError,
-            errorMessage: "Không thể tự duyệt báo cáo",
-          });
-        }
-      }
-      fetchReports();
-    },
-    [isSuDoan, fetchReports, showError],
-  );
+  const handleCreateSuccess = useCallback(async () => {
+    fetchReports();
+  }, [fetchReports]);
 
   const handleEditReport = (row: ReportRow) => {
     setEditModalData({
@@ -596,15 +587,22 @@ export default function DailyTroopReport() {
 
   const displayRows = useMemo((): ReportRow[] => {
     if (!isParentUnit || childUnits.length === 0) {
+      if (isParentUnit && !isTrungDoan) {
+        const rows: ReportRow[] = parentReportData
+          ? [{ ...parentReportData, notSubmitted: false }]
+          : [];
+        if (isCommander) {
+          return rows.filter((r) => r.notSubmitted || r.status !== "Nháp");
+        }
+        return rows;
+      }
       if (isCommander) {
         return filteredRows.filter((r) => r.status !== "Nháp");
       }
       return filteredRows;
     }
 
-    const ownReport = isSuDoan
-      ? parentReportData
-      : filteredRows.find((r) => r.donVi === maDonViCurrent);
+    const ownReport = parentReportData;
 
     const ownRow: ReportRow = ownReport
       ? { ...ownReport, notSubmitted: false }
@@ -643,19 +641,19 @@ export default function DailyTroopReport() {
         notSubmitted: true,
       };
     });
-    const allRows = isSuDoan ? [ownRow, ...childRows] : childRows;
+    const allRows = !isTrungDoan ? [ownRow, ...childRows] : childRows;
     if (isCommander) {
       return allRows.filter((r) => r.notSubmitted || r.status !== "Nháp");
     }
     return allRows;
   }, [
     isParentUnit,
+    isTrungDoan,
     childUnits,
     filteredRows,
     maDonViCurrent,
     account,
     isCommander,
-    isSuDoan,
     parentReportData,
   ]);
 
@@ -799,14 +797,16 @@ export default function DailyTroopReport() {
     return isCommander && commanderReport.status === "Chờ_Duyệt";
   }, [commanderReport, isCommander]);
   const canSubmit = useMemo(() => {
-    if (!isReporter || !ownReport || ownReport.notSubmitted) return false;
+    if ((!isReporter && !isSuDoan) || !ownReport || ownReport.notSubmitted)
+      return false;
     return ownReport.status === "Nháp";
-  }, [isReporter, ownReport]);
+  }, [isReporter, isSuDoan, ownReport]);
 
   const canRecall = useMemo(() => {
-    if (!isReporter || !ownReport || ownReport.notSubmitted) return false;
+    if ((!isReporter && !isSuDoan) || !ownReport || ownReport.notSubmitted)
+      return false;
     return ownReport.status === "Chờ_Duyệt";
-  }, [isReporter, ownReport]);
+  }, [isReporter, isSuDoan, ownReport]);
 
   const currentEditingReport = useMemo(() => {
     if (!editModalData) return null;
@@ -998,14 +998,8 @@ export default function DailyTroopReport() {
         onQueryChange={setQuery}
         reportDate={reportDate}
         onReportDateChange={setReportDate}
-        onAddReport={
-          isCommander || (isParentUnit && !isSuDoan)
-            ? undefined
-            : handleAddReport
-        }
-        onConsolidate={
-          isParentUnit && !isSuDoan ? handleConsolidate : undefined
-        }
+        onAddReport={isCommander || isTrungDoan ? undefined : handleAddReport}
+        onConsolidate={isTrungDoan ? handleConsolidate : undefined}
         consolidateDisabled={
           !consolidatedData ||
           consolidatedData.submittedCount === 0 ||
@@ -1099,14 +1093,12 @@ export default function DailyTroopReport() {
                 </tr>
               ) : (
                 <>
-                  {isParentUnit && displayRows.length > 0 && (
+                  {isTrungDoan && displayRows.length > 0 && (
                     <tr className={styles.separatorRow}>
                       <td colSpan={22}>Báo cáo đơn vị con</td>
                     </tr>
                   )}
-
                   {displayRows.map((row) => renderReportRow(row, false))}
-
                   {displayRows.some((r) => !r.notSubmitted) && (
                     <tr className={styles.totalRow}>
                       <td className={styles.unitCell}>Tổng</td>
@@ -1132,17 +1124,14 @@ export default function DailyTroopReport() {
                       <td></td>
                     </tr>
                   )}
-
-                  {isParentUnit && !isSuDoan && (
+                  {isTrungDoan && (
                     <tr className={styles.separatorRow}>
                       <td colSpan={22}>Báo cáo tổng hợp</td>
                     </tr>
                   )}
-
-                  {isParentUnit && !isSuDoan && parentReportData
+                  {isTrungDoan && parentReportData
                     ? renderReportRow(parentReportData, true)
-                    : isParentUnit &&
-                      !isSuDoan && (
+                    : isTrungDoan && (
                         <tr className={styles.noConsolidatedRow}>
                           <td colSpan={22}>Chưa có báo cáo tổng hợp</td>
                         </tr>
@@ -1238,9 +1227,9 @@ export default function DailyTroopReport() {
           onClose={() => setShowCreateModal(false)}
           onSubmit={async (payload) => {
             try {
-              const result = await dailyReportService.createReport(payload);
+              await dailyReportService.createReport(payload);
               showSuccess("Tạo báo cáo quân số thành công");
-              await handleCreateSuccess(result.Result?.idDonBaoCao);
+              await handleCreateSuccess();
               setShowCreateModal(false);
             } catch (error) {
               handleApiError(error, {
@@ -1297,9 +1286,9 @@ export default function DailyTroopReport() {
           consolidatedAbsentRows={consolidatedData.absentRows}
           onSubmit={async (payload) => {
             try {
-              const result = await dailyReportService.createReport(payload);
+              await dailyReportService.createReport(payload);
               showSuccess("Tạo báo cáo tổng hợp thành công");
-              await handleCreateSuccess(result.Result?.idDonBaoCao);
+              await handleCreateSuccess();
               setShowConsolidateModal(false);
             } catch (error) {
               handleApiError(error, {
