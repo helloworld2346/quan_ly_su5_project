@@ -65,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         const notifId = accountResponse.Result.vaiTro?.idVaiTro;
-        console.log("[Auth] notifId for notifications:", notifId);  
+        console.log("[Auth] notifId for notifications:", notifId);
 
         if (notifId) {
           try {
@@ -123,6 +123,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             window.dispatchEvent(
               new CustomEvent("new-notification", { detail: newNotif }),
             );
+            window.dispatchEvent(new CustomEvent("report-data-changed"));
           }
 
           if (msg.type === "URGENT" || msg.type === "WARNING") {

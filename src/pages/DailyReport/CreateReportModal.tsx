@@ -628,10 +628,10 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
           </button>
           <button type="submit" className={`${styles.btn} ${styles.btnSubmit}`}>
             {isConsolidation
-              ? "Nộp báo cáo tổng hợp"
+              ? "Lưu báo cáo tổng hợp"
               : initialData
                 ? "Cập nhật báo cáo"
-                : "Nộp báo cáo quân số"}
+                : "Lưu báo cáo"}
           </button>
         </div>
       </form>
