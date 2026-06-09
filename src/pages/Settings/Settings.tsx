@@ -24,6 +24,9 @@ export default function Settings() {
   const [quanSoHsqBs, setQuanSoHsqBs] = useState(0);
   const [quanSoSiQuan, setQuanSoSiQuan] = useState(0);
   const [quanSoQncn, setQuanSoQncn] = useState(0);
+  const [siQuanStr, setSiQuanStr] = useState("0");
+  const [hsqBsStr, setHsqBsStr] = useState("0");
+  const [qncnStr, setQncnStr] = useState("0");
   const [saving, setSaving] = useState(false);
 
   const { showError, showSuccess } = useToast();
@@ -58,8 +61,11 @@ export default function Settings() {
           if (unit) {
             setDonVi(unit);
             setQuanSoHsqBs(unit.quanSoHsqBs);
+            setHsqBsStr(String(unit.quanSoHsqBs));
             setQuanSoSiQuan(unit.quanSoSiQuan);
+            setSiQuanStr(String(unit.quanSoSiQuan));
             setQuanSoQncn(unit.quanSoQncn);
+            setQncnStr(String(unit.quanSoQncn));
           }
         }
       } catch (err) {
@@ -120,8 +126,11 @@ export default function Settings() {
       if (response.success) {
         setDonVi(response.Result);
         setQuanSoHsqBs(response.Result.quanSoHsqBs);
+        setHsqBsStr(String(response.Result.quanSoHsqBs));
         setQuanSoSiQuan(response.Result.quanSoSiQuan);
+        setSiQuanStr(String(response.Result.quanSoSiQuan));
         setQuanSoQncn(response.Result.quanSoQncn);
+        setQncnStr(String(response.Result.quanSoQncn));
 
         await refreshAccount();
 
@@ -256,28 +265,37 @@ export default function Settings() {
                   <button
                     type="button"
                     className={`${styles.numberInputBtn} ${styles.numberInputBtnLeft}`}
-                    onClick={() =>
-                      setQuanSoSiQuan(Math.max(0, quanSoSiQuan - 1))
-                    }
+                    onClick={() => {
+                      const v = Math.max(0, quanSoSiQuan - 1);
+                      setQuanSoSiQuan(v);
+                      setSiQuanStr(String(v));
+                    }}
                   >
                     −
                   </button>
                   <input
-                    type="number"
-                    min={0}
-                    value={quanSoSiQuan === 0 ? "" : quanSoSiQuan}
-                    placeholder="0"
-                    onChange={(e) =>
-                      setQuanSoSiQuan(
-                        Math.max(0, parseInt(e.target.value, 10) || 0),
-                      )
-                    }
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={siQuanStr}
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/[^0-9]/g, "");
+                      setSiQuanStr(raw);
+                      setQuanSoSiQuan(raw === "" ? 0 : parseInt(raw, 10));
+                    }}
+                    onBlur={() => {
+                      if (siQuanStr === "") setSiQuanStr("0");
+                    }}
                     required
                   />
                   <button
                     type="button"
                     className={`${styles.numberInputBtn} ${styles.numberInputBtnRight}`}
-                    onClick={() => setQuanSoSiQuan(quanSoSiQuan + 1)}
+                    onClick={() => {
+                      const v = quanSoSiQuan + 1;
+                      setQuanSoSiQuan(v);
+                      setSiQuanStr(String(v));
+                    }}
                   >
                     +
                   </button>
@@ -290,26 +308,37 @@ export default function Settings() {
                   <button
                     type="button"
                     className={`${styles.numberInputBtn} ${styles.numberInputBtnLeft}`}
-                    onClick={() => setQuanSoHsqBs(Math.max(0, quanSoHsqBs - 1))}
+                    onClick={() => {
+                      const v = Math.max(0, quanSoHsqBs - 1);
+                      setQuanSoHsqBs(v);
+                      setHsqBsStr(String(v));
+                    }}
                   >
                     −
                   </button>
                   <input
-                    type="number"
-                    min={0}
-                    value={quanSoHsqBs === 0 ? "" : quanSoHsqBs}
-                    placeholder="0"
-                    onChange={(e) =>
-                      setQuanSoHsqBs(
-                        Math.max(0, parseInt(e.target.value, 10) || 0),
-                      )
-                    }
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={hsqBsStr}
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/[^0-9]/g, "");
+                      setHsqBsStr(raw);
+                      setQuanSoHsqBs(raw === "" ? 0 : parseInt(raw, 10));
+                    }}
+                    onBlur={() => {
+                      if (hsqBsStr === "") setHsqBsStr("0");
+                    }}
                     required
                   />
                   <button
                     type="button"
                     className={`${styles.numberInputBtn} ${styles.numberInputBtnRight}`}
-                    onClick={() => setQuanSoHsqBs(quanSoHsqBs + 1)}
+                    onClick={() => {
+                      const v = quanSoHsqBs + 1;
+                      setQuanSoHsqBs(v);
+                      setHsqBsStr(String(v));
+                    }}
                   >
                     +
                   </button>
@@ -322,26 +351,37 @@ export default function Settings() {
                   <button
                     type="button"
                     className={`${styles.numberInputBtn} ${styles.numberInputBtnLeft}`}
-                    onClick={() => setQuanSoQncn(Math.max(0, quanSoQncn - 1))}
+                    onClick={() => {
+                      const v = Math.max(0, quanSoQncn - 1);
+                      setQuanSoQncn(v);
+                      setQncnStr(String(v));
+                    }}
                   >
                     −
                   </button>
                   <input
-                    type="number"
-                    min={0}
-                    value={quanSoQncn === 0 ? "" : quanSoQncn}
-                    placeholder="0"
-                    onChange={(e) =>
-                      setQuanSoQncn(
-                        Math.max(0, parseInt(e.target.value, 10) || 0),
-                      )
-                    }
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={qncnStr}
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/[^0-9]/g, "");
+                      setQncnStr(raw);
+                      setQuanSoQncn(raw === "" ? 0 : parseInt(raw, 10));
+                    }}
+                    onBlur={() => {
+                      if (qncnStr === "") setQncnStr("0");
+                    }}
                     required
                   />
                   <button
                     type="button"
                     className={`${styles.numberInputBtn} ${styles.numberInputBtnRight}`}
-                    onClick={() => setQuanSoQncn(quanSoQncn + 1)}
+                    onClick={() => {
+                      const v = quanSoQncn + 1;
+                      setQuanSoQncn(v);
+                      setQncnStr(String(v));
+                    }}
                   >
                     +
                   </button>
