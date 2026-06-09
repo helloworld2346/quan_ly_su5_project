@@ -659,8 +659,9 @@ export default function DailyTroopReport() {
     parentReportData,
   ]);
 
-  const totals = useMemo(() => {
-    return reportData.reduce(
+  const displayTotals = useMemo(() => {
+    const submittedRows = displayRows.filter((r) => !r.notSubmitted);
+    return submittedRows.reduce(
       (acc, row) => ({
         quanSoTong: acc.quanSoTong + row.quanSoTong,
         quanSoHienDien: acc.quanSoHienDien + row.quanSoHienDien,
@@ -703,7 +704,7 @@ export default function DailyTroopReport() {
         lyDoVangKhac: 0,
       },
     );
-  }, [reportData]);
+  }, [displayRows]);
 
   const caTrucInfo = useMemo((): CaTrucInfo | null => {
     if (isParentUnit) {
@@ -1106,26 +1107,26 @@ export default function DailyTroopReport() {
 
                   {displayRows.map((row) => renderReportRow(row, false))}
 
-                  {filteredRows.length > 0 && (
+                  {displayRows.some((r) => !r.notSubmitted) && (
                     <tr className={styles.totalRow}>
                       <td className={styles.unitCell}>Tổng</td>
-                      <td>{totals.quanSoTong}</td>
-                      <td>{totals.quanSoHienDien}</td>
-                      <td>{totals.quanSoVang}</td>
-                      <td>{totals.hoiThaiNgoaiSuDoan}</td>
-                      <td>{totals.hoiThaiEF}</td>
-                      <td>{totals.xayDungNgoaiSuDoan}</td>
-                      <td>{totals.xayDungEF}</td>
-                      <td>{totals.choHuu}</td>
-                      <td>{totals.nghiTranhThu}</td>
-                      <td>{totals.phep}</td>
-                      <td>{totals.vienNgoaiSuDoan}</td>
-                      <td>{totals.vienEF}</td>
-                      <td>{totals.congTacNgoaiSuDoan}</td>
-                      <td>{totals.congTacSuDoan}</td>
-                      <td>{totals.hocSQ}</td>
-                      <td>{totals.hocCS}</td>
-                      <td>{totals.lyDoVangKhac}</td>
+                      <td>{displayTotals.quanSoTong}</td>
+                      <td>{displayTotals.quanSoHienDien}</td>
+                      <td>{displayTotals.quanSoVang}</td>
+                      <td>{displayTotals.hoiThaiNgoaiSuDoan}</td>
+                      <td>{displayTotals.hoiThaiEF}</td>
+                      <td>{displayTotals.xayDungNgoaiSuDoan}</td>
+                      <td>{displayTotals.xayDungEF}</td>
+                      <td>{displayTotals.choHuu}</td>
+                      <td>{displayTotals.nghiTranhThu}</td>
+                      <td>{displayTotals.phep}</td>
+                      <td>{displayTotals.vienNgoaiSuDoan}</td>
+                      <td>{displayTotals.vienEF}</td>
+                      <td>{displayTotals.congTacNgoaiSuDoan}</td>
+                      <td>{displayTotals.congTacSuDoan}</td>
+                      <td>{displayTotals.hocSQ}</td>
+                      <td>{displayTotals.hocCS}</td>
+                      <td>{displayTotals.lyDoVangKhac}</td>
                       <td></td>
                       <td></td>
                       <td></td>
@@ -1271,7 +1272,7 @@ export default function DailyTroopReport() {
                 updatePayload,
               );
               showSuccess("Cập nhật báo cáo quân số thành công");
-              handleCreateSuccess();
+              void handleCreateSuccess();
               setEditModalData(null);
             } catch (error) {
               handleApiError(error, {
