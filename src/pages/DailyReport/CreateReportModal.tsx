@@ -108,6 +108,7 @@ interface CreateReportModalProps {
   consolidatedAbsentRows?: AbsentRow[];
   caTrucInfo?: CaTrucInfo | null;
   isSuDoan?: boolean;
+  reportDate?: string;
 }
 
 export const CreateReportModal: React.FC<CreateReportModalProps> = ({
@@ -120,6 +121,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   consolidatedAbsentRows,
   caTrucInfo,
   isSuDoan,
+  reportDate,
 }) => {
   const { showWarning } = useToast();
 
@@ -127,7 +129,13 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
     if (initialData?.thoiGianBaoCao) {
       return initialData.thoiGianBaoCao.split("T")[0];
     }
-    return new Date().toISOString().split("T")[0];
+    if (reportDate) return reportDate;
+    const d = new Date();
+    return [
+      d.getFullYear(),
+      String(d.getMonth() + 1).padStart(2, "0"),
+      String(d.getDate()).padStart(2, "0"),
+    ].join("-");
   });
 
   const [tongQuanSo] = useState<number>(() => {
