@@ -357,9 +357,15 @@ export default function DailyTroopReport() {
       setActiveMenuUnit(null);
     } else {
       const rect = event.currentTarget.getBoundingClientRect();
+      const menuHeight = 120; // ước tính chiều cao dropdown
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const top =
+        spaceBelow < menuHeight
+          ? rect.top - menuHeight - 4  // flip lên trên
+          : rect.bottom + 4;           // hiện xuống dưới bình thường
       setMenuPosition({
-        top: rect.bottom + window.scrollY + 4,
-        left: rect.right + window.scrollX - 230,
+        top,
+        left: rect.right - 230,
       });
       setActiveMenuUnit(menuKey);
     }
@@ -395,7 +401,6 @@ export default function DailyTroopReport() {
 
   const checkIfDateHasReport = useMemo(() => {
     if (!maDonViCurrent) return false;
-    if (isParentUnit) return false;
 
     const selectedDate = new Date(reportDate);
     const today = new Date();
@@ -405,7 +410,7 @@ export default function DailyTroopReport() {
     if (isPastDate) return true;
 
     return reportData.some((report) => report.donVi === maDonViCurrent);
-  }, [reportData, maDonViCurrent, reportDate, isParentUnit]);
+  }, [reportData, maDonViCurrent, reportDate]);
 
   const handleAddReport = () => {
     const selectedDate = new Date(reportDate);
@@ -562,6 +567,25 @@ export default function DailyTroopReport() {
       return filteredRows;
     }
 
+    const ownReport = filteredRows.find((r) => r.donVi === maDonViCurrent);
+    const ownRow: ReportRow = ownReport
+      ? { ...ownReport, notSubmitted: false }
+      : {
+          idDonBaoCao: maDonViCurrent!,
+          donVi: maDonViCurrent!,
+          tenDonVi: account?.donVi?.tenDonvi ?? maDonViCurrent!,
+          kyhieuDonVi: account?.donVi?.kyhieuDonvi,
+          quanSoTong: 0,
+          quanSoHienDien: 0,
+          quanSoVang: 0,
+          vang: { ...EMPTY_VANG },
+          chiTietVangList: [],
+          status: "Chưa_Nộp",
+          ghiChu: "",
+          rawItem: {} as CreateReportResponse["Result"],
+          notSubmitted: true,
+        };
+
     const childRows = childUnits.map((unit) => {
       const submitted = filteredRows.find((r) => r.donVi === unit.maDonVi);
       if (submitted) return { ...submitted, notSubmitted: false };
@@ -581,12 +605,19 @@ export default function DailyTroopReport() {
         notSubmitted: true,
       };
     });
-
+    const allRows = [ownRow, ...childRows];
     if (isCommander) {
-      return childRows.filter((r) => r.notSubmitted || r.status !== "Nháp");
+      return allRows.filter((r) => r.notSubmitted || r.status !== "Nháp");
     }
-    return childRows;
-  }, [isParentUnit, childUnits, filteredRows, isCommander]);
+    return allRows;
+  }, [
+    isParentUnit,
+    childUnits,
+    filteredRows,
+    maDonViCurrent,
+    account,
+    isCommander,
+  ]);
 
   const totals = useMemo(() => {
     return reportData.reduce(
@@ -646,9 +677,9 @@ export default function DailyTroopReport() {
   }, [isParentUnit, parentReportData, reportData]);
 
   const ownReport = useMemo(() => {
-    if (isParentUnit) return null;
+    if (isParentUnit) return parentReportData;
     return reportData.length > 0 ? reportData[0] : null;
-  }, [isParentUnit, reportData]);
+  }, [isParentUnit, parentReportData, reportData]);
 
   const commanderReport = useMemo(() => {
     if (!isCommander) return null;
@@ -792,6 +823,14 @@ export default function DailyTroopReport() {
         row.status === "Từ_Chối" ||
         row.status === "Từ chối");
 
+    const canEditOwn =
+      isReporter &&
+      isParentUnit &&
+      !isConsolidatedRow &&
+      row.donVi === maDonViCurrent &&
+      (row.status === "Nháp" ||
+        row.status === "Từ_Chối" ||
+        row.status === "Từ chối");
     return (
       <tr
         key={row.idDonBaoCao}
@@ -865,7 +904,7 @@ export default function DailyTroopReport() {
                     Xem chi tiết
                   </button>
 
-                  {(canEdit || canEditParent) && (
+                  {(canEdit || canEditParent || canEditOwn) && (
                     <button
                       type="button"
                       className={styles.menuItem}
@@ -888,7 +927,7 @@ export default function DailyTroopReport() {
     );
   };
 
-  const totalRequiredCount = childUnits.length;
+  const totalRequiredCount = childUnits.length + 1;
 
   return (
     <section className={styles.report} aria-labelledby="dashboard-page-heading">
@@ -897,7 +936,7 @@ export default function DailyTroopReport() {
         onQueryChange={setQuery}
         reportDate={reportDate}
         onReportDateChange={setReportDate}
-        onAddReport={isCommander || isParentUnit ? undefined : handleAddReport}
+        onAddReport={isCommander ? undefined : handleAddReport}
         onConsolidate={
           isParentUnit && !isSuDoan ? handleConsolidate : undefined
         }
