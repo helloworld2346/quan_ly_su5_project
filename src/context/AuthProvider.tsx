@@ -65,6 +65,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         const notifId = accountResponse.Result.vaiTro?.idVaiTro;
+        console.log("[Auth] notifId for notifications:", notifId);  
+
         if (notifId) {
           try {
             const apiNotifs =
@@ -72,6 +74,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const mapped = (apiNotifs.Result ?? []).map(mapApiNotification);
             notificationStorage.set(mapped);
             setNotifications(mapped);
+            mapped.forEach((n) => {
+              window.dispatchEvent(
+                new CustomEvent("new-notification", { detail: n }),
+              );
+            });
           } catch {
             // Không block auth nếu notification lỗi
           }
@@ -112,6 +119,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               notificationStorage.set(updated);
               return updated;
             });
+
+            window.dispatchEvent(
+              new CustomEvent("new-notification", { detail: newNotif }),
+            );
           }
 
           if (msg.type === "URGENT" || msg.type === "WARNING") {
