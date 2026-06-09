@@ -26,7 +26,8 @@ import type {
 import type { DonVi } from "../../types/account";
 import { handleApiError } from "../../utils/errorHandler";
 import ReportStatusBadge from "../../components/ui/ReportStatusBadge/ReportStatusBadge";
-
+import { dutyService } from "../../services/duty/dutyService";
+import type { CaTrucDetail } from "../../types/duty";
 export interface ChiTietVangQuanNhan {
   id: string;
   hoTen: string;
@@ -169,6 +170,8 @@ export default function DailyTroopReport() {
   const [showRefuseDialog, setShowRefuseDialog] = useState(false);
   const [refuseReportId, setRefuseReportId] = useState<string | null>(null);
   const [refuseUnitName, setRefuseUnitName] = useState("");
+  const [caTrucFromApi, setCaTrucFromApi] = useState<CaTrucDetail | null>(null);
+
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
@@ -288,6 +291,23 @@ export default function DailyTroopReport() {
     fetchDonViInfo();
   }, [maDonViCurrent, isParentUnit]);
 
+  useEffect(() => {
+    if (!isSuDoan) return;
+    const fetchCaTruc = async () => {
+      try {
+        const res = await dutyService.getCaTrucByDate(reportDate);
+        if (res.success && res.Result) {
+          setCaTrucFromApi(res.Result);
+        } else {
+          setCaTrucFromApi(null);
+        }
+      } catch {
+        setCaTrucFromApi(null);
+      }
+    };
+    void fetchCaTruc();
+  }, [isSuDoan, reportDate]);
+
   const consolidatedData = useMemo(() => {
     if (!isParentUnit || reportData.length === 0) return null;
 
@@ -361,8 +381,8 @@ export default function DailyTroopReport() {
       const spaceBelow = window.innerHeight - rect.bottom;
       const top =
         spaceBelow < menuHeight
-          ? rect.top - menuHeight - 4  // flip lên trên
-          : rect.bottom + 4;           // hiện xuống dưới bình thường
+          ? rect.top - menuHeight - 4 // flip lên trên
+          : rect.bottom + 4; // hiện xuống dưới bình thường
       setMenuPosition({
         top,
         left: rect.right - 230,
@@ -409,8 +429,11 @@ export default function DailyTroopReport() {
     const isPastDate = selectedDate < today;
     if (isPastDate) return true;
 
+    if (isParentUnit) {
+      return parentReportData !== null;
+    }
     return reportData.some((report) => report.donVi === maDonViCurrent);
-  }, [reportData, maDonViCurrent, reportDate]);
+  }, [reportData, maDonViCurrent, reportDate, isParentUnit, parentReportData]);
 
   const handleAddReport = () => {
     const selectedDate = new Date(reportDate);
@@ -430,9 +453,22 @@ export default function DailyTroopReport() {
     setShowCreateModal(true);
   };
 
-  const handleCreateSuccess = () => {
-    fetchReports();
-  };
+  const handleCreateSuccess = useCallback(
+    async (reportId?: string) => {
+      if (isSuDoan && reportId) {
+        try {
+          await dailyReportService.approveReport(reportId);
+        } catch (error) {
+          handleApiError(error, {
+            showError,
+            errorMessage: "Không thể tự duyệt báo cáo",
+          });
+        }
+      }
+      fetchReports();
+    },
+    [isSuDoan, fetchReports, showError],
+  );
 
   const handleEditReport = (row: ReportRow) => {
     setEditModalData({
@@ -567,7 +603,10 @@ export default function DailyTroopReport() {
       return filteredRows;
     }
 
-    const ownReport = filteredRows.find((r) => r.donVi === maDonViCurrent);
+    const ownReport = isSuDoan
+      ? parentReportData
+      : filteredRows.find((r) => r.donVi === maDonViCurrent);
+
     const ownRow: ReportRow = ownReport
       ? { ...ownReport, notSubmitted: false }
       : {
@@ -617,6 +656,8 @@ export default function DailyTroopReport() {
     maDonViCurrent,
     account,
     isCommander,
+    isSuDoan,
+    parentReportData,
   ]);
 
   const totals = useMemo(() => {
@@ -667,14 +708,35 @@ export default function DailyTroopReport() {
 
   const caTrucInfo = useMemo((): CaTrucInfo | null => {
     if (isParentUnit) {
-      return parentReportData
-        ? (parentReportData.rawItem.caTruc as CaTrucInfo)
-        : null;
+      if (parentReportData) {
+        return parentReportData.rawItem.caTruc as CaTrucInfo;
+      }
+      if (isSuDoan && caTrucFromApi) {
+        return {
+          idCatruc: caTrucFromApi.idCatruc,
+          matkhau: caTrucFromApi.matkhau,
+          ghichu: caTrucFromApi.ghichu ?? undefined,
+          ngaytruc: caTrucFromApi.ngaytruc,
+          trucChiHuy: {
+            tenNguoitruc: caTrucFromApi.trucChiHuy.tenNguoitruc,
+            capbacNguoitruc: caTrucFromApi.trucChiHuy.capbacNguoitruc,
+            chucvuNguoitruc: caTrucFromApi.trucChiHuy.chucvuNguoitruc,
+            sodienthoai: caTrucFromApi.trucChiHuy.sodienthoai,
+          },
+          trucBanTacChien: {
+            tenNguoitruc: caTrucFromApi.trucBanTacChien.tenNguoitruc,
+            capbacNguoitruc: caTrucFromApi.trucBanTacChien.capbacNguoitruc,
+            chucvuNguoitruc: caTrucFromApi.trucBanTacChien.chucvuNguoitruc,
+            sodienthoai: caTrucFromApi.trucBanTacChien.sodienthoai,
+          },
+        };
+      }
+      return null;
     }
     return reportData.length > 0
       ? (reportData[0].rawItem.caTruc as CaTrucInfo)
       : null;
-  }, [isParentUnit, parentReportData, reportData]);
+  }, [isParentUnit, isSuDoan, parentReportData, reportData, caTrucFromApi]);
 
   const ownReport = useMemo(() => {
     if (isParentUnit) return parentReportData;
@@ -824,7 +886,7 @@ export default function DailyTroopReport() {
         row.status === "Từ chối");
 
     const canEditOwn =
-      isReporter &&
+      (isReporter || isSuDoan) &&
       isParentUnit &&
       !isConsolidatedRow &&
       row.donVi === maDonViCurrent &&
@@ -982,6 +1044,7 @@ export default function DailyTroopReport() {
         onExportExcel={handleExportExcel}
         isPastDate={isPastDate}
         hasReport={checkIfDateHasReport}
+        showExport={isSuDoan}
       />
 
       <div className={styles.tableShell}>
@@ -1171,9 +1234,9 @@ export default function DailyTroopReport() {
           onClose={() => setShowCreateModal(false)}
           onSubmit={async (payload) => {
             try {
-              await dailyReportService.createReport(payload);
+              const result = await dailyReportService.createReport(payload);
               showSuccess("Tạo báo cáo quân số thành công");
-              handleCreateSuccess();
+              await handleCreateSuccess(result.Result?.idDonBaoCao);
               setShowCreateModal(false);
             } catch (error) {
               handleApiError(error, {
@@ -1185,6 +1248,7 @@ export default function DailyTroopReport() {
           maDonViCurrent={account?.donVi?.maDonVi}
           tongQuanSoBienChe={donViQuanSoTong || undefined}
           caTrucInfo={caTrucInfo}
+          isSuDoan={isSuDoan}
         />
       )}
 
@@ -1216,6 +1280,7 @@ export default function DailyTroopReport() {
           maDonViCurrent={account?.donVi?.maDonVi}
           tongQuanSoBienChe={donViQuanSoTong || undefined}
           caTrucInfo={caTrucInfo}
+          isSuDoan={isSuDoan}
         />
       )}
 
@@ -1228,9 +1293,9 @@ export default function DailyTroopReport() {
           consolidatedAbsentRows={consolidatedData.absentRows}
           onSubmit={async (payload) => {
             try {
-              await dailyReportService.createReport(payload);
+              const result = await dailyReportService.createReport(payload);
               showSuccess("Tạo báo cáo tổng hợp thành công");
-              handleCreateSuccess();
+              await handleCreateSuccess(result.Result?.idDonBaoCao);
               setShowConsolidateModal(false);
             } catch (error) {
               handleApiError(error, {
