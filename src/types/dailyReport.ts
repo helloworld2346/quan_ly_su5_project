@@ -15,11 +15,13 @@ export interface CaTrucInfo {
     capbacNguoitruc: string;
     chucvuNguoitruc: string;
     tenNguoitruc: string;
+    sodienthoai?: string;
   };
   trucBanTacChien?: {
     capbacNguoitruc: string;
     chucvuNguoitruc: string;
     tenNguoitruc: string;
+    sodienthoai?: string;
   };
 }
 
