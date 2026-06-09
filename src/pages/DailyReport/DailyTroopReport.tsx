@@ -395,6 +395,7 @@ export default function DailyTroopReport() {
 
   const checkIfDateHasReport = useMemo(() => {
     if (!maDonViCurrent) return false;
+    if (isParentUnit) return false;
 
     const selectedDate = new Date(reportDate);
     const today = new Date();
@@ -404,7 +405,7 @@ export default function DailyTroopReport() {
     if (isPastDate) return true;
 
     return reportData.some((report) => report.donVi === maDonViCurrent);
-  }, [reportData, maDonViCurrent, reportDate]);
+  }, [reportData, maDonViCurrent, reportDate, isParentUnit]);
 
   const handleAddReport = () => {
     const selectedDate = new Date(reportDate);
@@ -561,25 +562,6 @@ export default function DailyTroopReport() {
       return filteredRows;
     }
 
-    const ownReport = filteredRows.find((r) => r.donVi === maDonViCurrent);
-    const ownRow: ReportRow = ownReport
-      ? { ...ownReport, notSubmitted: false }
-      : {
-          idDonBaoCao: maDonViCurrent!,
-          donVi: maDonViCurrent!,
-          tenDonVi: account?.donVi?.tenDonvi ?? maDonViCurrent!,
-          kyhieuDonVi: account?.donVi?.kyhieuDonvi,
-          quanSoTong: 0,
-          quanSoHienDien: 0,
-          quanSoVang: 0,
-          vang: { ...EMPTY_VANG },
-          chiTietVangList: [],
-          status: "Chưa_Nộp",
-          ghiChu: "",
-          rawItem: {} as CreateReportResponse["Result"],
-          notSubmitted: true,
-        };
-
     const childRows = childUnits.map((unit) => {
       const submitted = filteredRows.find((r) => r.donVi === unit.maDonVi);
       if (submitted) return { ...submitted, notSubmitted: false };
@@ -599,19 +581,12 @@ export default function DailyTroopReport() {
         notSubmitted: true,
       };
     });
-    const allRows = [ownRow, ...childRows];
+
     if (isCommander) {
-      return allRows.filter((r) => r.notSubmitted || r.status !== "Nháp");
+      return childRows.filter((r) => r.notSubmitted || r.status !== "Nháp");
     }
-    return allRows;
-  }, [
-    isParentUnit,
-    childUnits,
-    filteredRows,
-    maDonViCurrent,
-    account,
-    isCommander,
-  ]);
+    return childRows;
+  }, [isParentUnit, childUnits, filteredRows, isCommander]);
 
   const totals = useMemo(() => {
     return reportData.reduce(
@@ -671,9 +646,9 @@ export default function DailyTroopReport() {
   }, [isParentUnit, parentReportData, reportData]);
 
   const ownReport = useMemo(() => {
-    if (isParentUnit) return parentReportData;
+    if (isParentUnit) return null;
     return reportData.length > 0 ? reportData[0] : null;
-  }, [isParentUnit, parentReportData, reportData]);
+  }, [isParentUnit, reportData]);
 
   const commanderReport = useMemo(() => {
     if (!isCommander) return null;
@@ -817,14 +792,6 @@ export default function DailyTroopReport() {
         row.status === "Từ_Chối" ||
         row.status === "Từ chối");
 
-    const canEditOwn =
-      isReporter &&
-      isParentUnit &&
-      !isConsolidatedRow &&
-      row.donVi === maDonViCurrent &&
-      (row.status === "Nháp" ||
-        row.status === "Từ_Chối" ||
-        row.status === "Từ chối");
     return (
       <tr
         key={row.idDonBaoCao}
@@ -898,7 +865,7 @@ export default function DailyTroopReport() {
                     Xem chi tiết
                   </button>
 
-                  {(canEdit || canEditParent || canEditOwn) && (
+                  {(canEdit || canEditParent) && (
                     <button
                       type="button"
                       className={styles.menuItem}
@@ -921,7 +888,7 @@ export default function DailyTroopReport() {
     );
   };
 
-  const totalRequiredCount = childUnits.length + 1;
+  const totalRequiredCount = childUnits.length;
 
   return (
     <section className={styles.report} aria-labelledby="dashboard-page-heading">
@@ -930,7 +897,7 @@ export default function DailyTroopReport() {
         onQueryChange={setQuery}
         reportDate={reportDate}
         onReportDateChange={setReportDate}
-        onAddReport={isCommander ? undefined : handleAddReport}
+        onAddReport={isCommander || isParentUnit ? undefined : handleAddReport}
         onConsolidate={
           isParentUnit && !isSuDoan ? handleConsolidate : undefined
         }

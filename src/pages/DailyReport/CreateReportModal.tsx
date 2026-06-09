@@ -172,7 +172,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       hoTen: "",
       capBac: "",
       chucVu: "",
-      lyDoVang: "" as any,
+      lyDoVang: "" as keyof VangChiTiet,
       ghiChu: "",
     };
     setAbsentRows((prev) => [...prev, newRow]);
