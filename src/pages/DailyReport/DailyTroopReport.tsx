@@ -980,6 +980,7 @@ export default function DailyTroopReport() {
         }
         onExportWord={handleExportWord}
         onExportExcel={handleExportExcel}
+        showExport={isCommander || isSuDoan}
         isPastDate={isPastDate}
         hasReport={checkIfDateHasReport}
       />

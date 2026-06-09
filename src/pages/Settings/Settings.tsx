@@ -265,13 +265,11 @@ export default function Settings() {
                   <input
                     type="number"
                     min={0}
-                    value={quanSoSiQuan === 0 ? "" : quanSoSiQuan}
-                    placeholder="0"
-                    onChange={(e) =>
-                      setQuanSoSiQuan(
-                        Math.max(0, parseInt(e.target.value, 10) || 0),
-                      )
-                    }
+                    value={quanSoSiQuan}
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/^0+(?=\d)/, "");
+                      setQuanSoSiQuan(Math.max(0, parseInt(raw, 10) || 0));
+                    }}
                     required
                   />
                   <button
@@ -297,13 +295,11 @@ export default function Settings() {
                   <input
                     type="number"
                     min={0}
-                    value={quanSoHsqBs === 0 ? "" : quanSoHsqBs}
-                    placeholder="0"
-                    onChange={(e) =>
-                      setQuanSoHsqBs(
-                        Math.max(0, parseInt(e.target.value, 10) || 0),
-                      )
-                    }
+                    value={quanSoHsqBs}
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/^0+(?=\d)/, "");
+                      setQuanSoHsqBs(Math.max(0, parseInt(raw, 10) || 0));
+                    }}
                     required
                   />
                   <button
@@ -329,13 +325,11 @@ export default function Settings() {
                   <input
                     type="number"
                     min={0}
-                    value={quanSoQncn === 0 ? "" : quanSoQncn}
-                    placeholder="0"
-                    onChange={(e) =>
-                      setQuanSoQncn(
-                        Math.max(0, parseInt(e.target.value, 10) || 0),
-                      )
-                    }
+                    value={quanSoQncn}
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/^0+(?=\d)/, "");
+                      setQuanSoQncn(Math.max(0, parseInt(raw, 10) || 0));
+                    }}
                     required
                   />
                   <button
