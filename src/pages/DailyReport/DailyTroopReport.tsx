@@ -172,7 +172,6 @@ export default function DailyTroopReport() {
   const [refuseUnitName, setRefuseUnitName] = useState("");
   const [caTrucFromApi, setCaTrucFromApi] = useState<CaTrucDetail | null>(null);
 
-
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const { account } = useAuth();
@@ -644,7 +643,7 @@ export default function DailyTroopReport() {
         notSubmitted: true,
       };
     });
-    const allRows = [ownRow, ...childRows];
+    const allRows = isSuDoan ? [ownRow, ...childRows] : childRows;
     if (isCommander) {
       return allRows.filter((r) => r.notSubmitted || r.status !== "Nháp");
     }
@@ -989,7 +988,7 @@ export default function DailyTroopReport() {
     );
   };
 
-  const totalRequiredCount = childUnits.length + 1;
+  const totalRequiredCount = childUnits.length;
 
   return (
     <section className={styles.report} aria-labelledby="dashboard-page-heading">
@@ -998,7 +997,11 @@ export default function DailyTroopReport() {
         onQueryChange={setQuery}
         reportDate={reportDate}
         onReportDateChange={setReportDate}
-        onAddReport={isCommander ? undefined : handleAddReport}
+        onAddReport={
+          isCommander || (isParentUnit && !isSuDoan)
+            ? undefined
+            : handleAddReport
+        }
         onConsolidate={
           isParentUnit && !isSuDoan ? handleConsolidate : undefined
         }
