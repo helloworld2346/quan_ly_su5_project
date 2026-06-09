@@ -119,12 +119,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               notificationStorage.set(updated);
               return updated;
             });
-
             window.dispatchEvent(
               new CustomEvent("new-notification", { detail: newNotif }),
             );
-            window.dispatchEvent(new CustomEvent("report-data-changed"));
           }
+
+          window.dispatchEvent(new CustomEvent("report-data-changed"));
 
           if (msg.type === "URGENT" || msg.type === "WARNING") {
             showError(`${msg.title}: ${msg.message}`);
