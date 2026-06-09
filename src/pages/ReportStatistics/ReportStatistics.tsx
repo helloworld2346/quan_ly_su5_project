@@ -11,11 +11,6 @@ import type {
 
 type ReportItem = SearchByRangeResponse["Result"][number];
 
-function toLocalDateStr(d: Date) {
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
-
 function getDefaultDates() {
   const today = new Date().toISOString().split("T")[0];
   return { start: today, end: today };
@@ -157,6 +152,23 @@ export default function ReportStatistics() {
     }
   }, [maDonVi, startDate, endDate]);
 
+  const fetchApplied = useCallback(async () => {
+    if (!maDonVi || !hasLoaded) return;
+    setLoading(true);
+    try {
+      const res = await dailyReportService.searchReportsByRange(
+        maDonVi,
+        appliedStartDate,
+        appliedEndDate,
+      );
+      setReports(res.success && Array.isArray(res.Result) ? res.Result : []);
+    } catch {
+      showErrorRef.current("Không thể tải dữ liệu thống kê");
+    } finally {
+      setLoading(false);
+    }
+  }, [maDonVi, appliedStartDate, appliedEndDate, hasLoaded]);
+
   useEffect(() => {
     if (!maDonVi) return;
     let cancelled = false;
@@ -186,7 +198,18 @@ export default function ReportStatistics() {
     return () => {
       cancelled = true;
     };
-  }, [maDonVi]); 
+  }, [maDonVi, defaults.start, defaults.end]);
+
+  useEffect(() => {
+    const handler = () => {
+      void fetchApplied();
+    };
+    window.addEventListener("report-data-changed", handler);
+    return () => {
+      window.removeEventListener("report-data-changed", handler);
+    };
+  }, [fetchApplied]);
+
   const summary = useMemo(() => {
     const vangBreakdown = { ...EMPTY_VANG };
     reports.forEach((r) => {
@@ -212,8 +235,7 @@ export default function ReportStatistics() {
     1,
   );
 
-   const isSingleDay = appliedStartDate === appliedEndDate;
-  
+  const isSingleDay = appliedStartDate === appliedEndDate;
 
   const trendReports = useMemo(
     () =>
@@ -225,11 +247,10 @@ export default function ReportStatistics() {
     [reports],
   );
 
-
-  const trendLabels = trendReports.map((r) => formatShortDate(r.thoiGianBaoCao));
+  const trendLabels = trendReports.map((r) =>
+    formatShortDate(r.thoiGianBaoCao),
+  );
   const hienDienValues = trendReports.map((r) => r.quanSoHienDien);
-
-
 
   return (
     <section className={styles.page}>
@@ -294,12 +315,12 @@ export default function ReportStatistics() {
               </div>
             </div>
           ) : (
-         <ReportTrendChart
-  labels={trendLabels}
-  values={hienDienValues}
-  height={450}
-  title={`Quân số hiện diện từ ${formatVNDate(appliedStartDate)} đến ${formatVNDate(appliedEndDate)}`}
-/>
+            <ReportTrendChart
+              labels={trendLabels}
+              values={hienDienValues}
+              height={450}
+              title={`Quân số hiện diện từ ${formatVNDate(appliedStartDate)} đến ${formatVNDate(appliedEndDate)}`}
+            />
           )}
 
           {activeVang.length > 0 && (
