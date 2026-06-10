@@ -52,35 +52,11 @@ const CAP_BAC_OPTIONS = [
   "Trung tá QNCN",
 ];
 
-const CAP_BAC_CHI_HUY_OPTIONS = [
-  "Trung úy",
-  "Thượng úy",
-  "Đại úy",
-  "Thiếu tá",
-  "Trung tá",
-  "Thượng tá",
-  "Đại tá",
-];
+const CAP_BAC_CHI_HUY_DEFAULT = ["Đại úy", "Thiếu tá", "Trung tá"];
+const CAP_BAC_CHI_HUY_SU_DOAN = ["Trung tá", "Thượng tá", "Đại tá"];
 
-const CAP_BAC_TAC_CHIEN_OPTIONS = [
-  "Thiếu úy",
-  "Trung úy",
-  "Thượng úy",
-  "Đại úy",
-  "Thiếu tá",
-  "Trung tá",
-];
-
-const CHUC_VU_OPTIONS = [
-  "Chiến sĩ",
-  "Tiểu đội trưởng",
-  "Trung đội trưởng",
-  "Phó đại đội trưởng",
-  "Đại đội trưởng",
-  "Chính trị viên ĐĐ",
-  "Phó tiểu đoàn trưởng",
-  "Tiểu đoàn trưởng",
-];
+const CAP_BAC_TAC_CHIEN_DEFAULT = ["Thượng úy", "Đại úy", "Thiếu tá", "Trung tá"];
+const CAP_BAC_TAC_CHIEN_SU_DOAN = ["Thiếu tá", "Trung tá", "Thượng tá", "Đại tá"];
 
 const EMPTY_TRUC: TrucNguoiInfo = {
   tenNguoitruc: "",
@@ -396,7 +372,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                 Cấp bậc <span className={styles.required}>*</span>
               </label>
               <CustomSelect
-                options={CAP_BAC_CHI_HUY_OPTIONS.map((cb) => ({
+                options={(isSuDoan ? CAP_BAC_CHI_HUY_SU_DOAN : CAP_BAC_CHI_HUY_DEFAULT).map((cb) => ({
                   value: cb,
                   label: cb,
                 }))}
@@ -472,7 +448,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                 Cấp bậc <span className={styles.required}>*</span>
               </label>
               <CustomSelect
-                options={CAP_BAC_TAC_CHIEN_OPTIONS.map((cb) => ({
+                options={(isSuDoan ? CAP_BAC_TAC_CHIEN_SU_DOAN : CAP_BAC_TAC_CHIEN_DEFAULT).map((cb) => ({
                   value: cb,
                   label: cb,
                 }))}
@@ -602,17 +578,14 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                         />
                       </td>
                       <td>
-                        <CustomSelect
-                          options={CHUC_VU_OPTIONS.map((cv) => ({
-                            value: cv,
-                            label: cv,
-                          }))}
+                        <input
+                          type="text"
+                          className={styles.tableInput}
                           value={row.chucVu}
-                          onChange={(val) =>
-                            handleUpdateRow(row.id, "chucVu", val)
+                          onChange={(e) =>
+                            handleUpdateRow(row.id, "chucVu", e.target.value)
                           }
-                          variant="table"
-                          placeholder="-- Chọn chức vụ --"
+                          placeholder="Nhập chức vụ..."
                         />
                       </td>
                       <td>
