@@ -380,12 +380,12 @@ export default function DailyTroopReport() {
       setActiveMenuUnit(null);
     } else {
       const rect = event.currentTarget.getBoundingClientRect();
-      const menuHeight = 120; // ước tính chiều cao dropdown
+      const menuHeight = 120;
       const spaceBelow = window.innerHeight - rect.bottom;
       const top =
         spaceBelow < menuHeight
-          ? rect.top - menuHeight - 4 // flip lên trên
-          : rect.bottom + 4; // hiện xuống dưới bình thường
+          ? rect.top - menuHeight - 4
+          : rect.bottom + 4;
       setMenuPosition({
         top,
         left: rect.right - 230,
@@ -622,26 +622,53 @@ export default function DailyTroopReport() {
           notSubmitted: true,
         };
 
-    const childRows = childUnits.map((unit) => {
-      const submitted = filteredRows.find((r) => r.donVi === unit.maDonVi);
-      if (submitted) return { ...submitted, notSubmitted: false };
-      return {
-        idDonBaoCao: unit.maDonVi,
-        donVi: unit.maDonVi,
-        tenDonVi: unit.tenDonvi,
-        kyhieuDonVi: unit.kyhieuDonvi,
-        quanSoTong: 0,
-        quanSoHienDien: 0,
-        quanSoVang: 0,
-        vang: { ...EMPTY_VANG },
-        chiTietVangList: [],
-        status: "Chưa_Nộp",
-        ghiChu: "",
-        rawItem: {} as CreateReportResponse["Result"],
-        notSubmitted: true,
-      };
-    });
-    const allRows = !isTrungDoan ? [ownRow, ...childRows] : childRows;
+    const q = query.trim().toLowerCase();
+
+    const childRows = childUnits
+      .filter((unit) => {
+        if (!q) return true;
+        const submitted = filteredRows.find((r) => r.donVi === unit.maDonVi);
+        if (submitted) return true; // đã có trong filteredRows (đã match query)
+        // unit chưa nộp: filter theo tên/mã/ký hiệu
+        return [unit.tenDonvi, unit.maDonVi, unit.kyhieuDonvi ?? ""]
+          .join(" ")
+          .toLowerCase()
+          .includes(q);
+      })
+      .map((unit) => {
+        const submitted = filteredRows.find((r) => r.donVi === unit.maDonVi);
+        if (submitted) return { ...submitted, notSubmitted: false };
+        return {
+          idDonBaoCao: unit.maDonVi,
+          donVi: unit.maDonVi,
+          tenDonVi: unit.tenDonvi,
+          kyhieuDonVi: unit.kyhieuDonvi,
+          quanSoTong: 0,
+          quanSoHienDien: 0,
+          quanSoVang: 0,
+          vang: { ...EMPTY_VANG },
+          chiTietVangList: [],
+          status: "Chưa_Nộp",
+          ghiChu: "",
+          rawItem: {} as CreateReportResponse["Result"],
+          notSubmitted: true,
+        };
+      });
+
+    // Với ownRow: chỉ thêm khi không có query hoặc ownRow match query
+    const ownRowMatches =
+      !q ||
+      [ownRow.tenDonVi ?? "", ownRow.donVi ?? "", ownRow.kyhieuDonVi ?? ""]
+        .join(" ")
+        .toLowerCase()
+        .includes(q);
+
+    const allRows = !isTrungDoan
+      ? ownRowMatches
+        ? [ownRow, ...childRows]
+        : childRows
+      : childRows;
+
     if (isCommander) {
       return allRows.filter((r) => r.notSubmitted || r.status !== "Nháp");
     }
@@ -655,6 +682,7 @@ export default function DailyTroopReport() {
     account,
     isCommander,
     parentReportData,
+    query,
   ]);
 
   const displayTotals = useMemo(() => {
@@ -1243,6 +1271,7 @@ export default function DailyTroopReport() {
           tongQuanSoBienChe={donViQuanSoTong || undefined}
           caTrucInfo={caTrucInfo}
           isSuDoan={isSuDoan}
+          reportDate={reportDate}
         />
       )}
 
