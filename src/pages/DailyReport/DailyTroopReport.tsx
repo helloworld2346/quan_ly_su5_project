@@ -1123,7 +1123,7 @@ export default function DailyTroopReport() {
                 <>
                   {isTrungDoan && displayRows.length > 0 && (
                     <tr className={styles.separatorRow}>
-                      <td colSpan={22}>Báo cáo đơn vị con</td>
+                      <td colSpan={22}>Báo cáo các đơn vị</td>
                     </tr>
                   )}
                   {displayRows.map((row) => renderReportRow(row, false))}
