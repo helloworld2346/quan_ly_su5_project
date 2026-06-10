@@ -14,10 +14,10 @@ import { useToast } from "./useToast";
 
 function mapApiNotification(n: ApiNotification): Notification {
   return {
-    id: n.id,
+    id: n.idThongbao,
     title: n.tieuDe,
     message: n.noiDung,
-    time: n.thoiGian,
+    time: n.thoiGian ?? new Date().toISOString(),
     isRead: n.daDoc,
   };
 }
@@ -64,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setDonVi(donViData || null);
         }
 
-        const notifId = accountResponse.Result.vaiTro?.idVaiTro;
+        const notifId = accountResponse.Result.donVi?.maDonVi;
         console.log("[Auth] notifId for notifications:", notifId);
 
         if (notifId) {

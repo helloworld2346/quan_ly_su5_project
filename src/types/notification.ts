@@ -1,9 +1,10 @@
 export interface ApiNotification {
-  id: string;
+  idThongbao: string;
   tieuDe: string;
   noiDung: string;
-  thoiGian: string;
+  thoiGian?: string;
   daDoc: boolean;
+  loaiThongBao?: string;
 }
 
 export interface NotificationListResponse {

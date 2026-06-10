@@ -90,7 +90,6 @@ export const dailyReportService = {
     const response = await apiNoPrefix.put<ApproveResponse>(
       `/donbaocao/submit/${id}`,
       null,
-      { params: { id } },
     );
     return response.data;
   },
@@ -99,7 +98,6 @@ export const dailyReportService = {
     const response = await apiNoPrefix.put<ApproveResponse>(
       `/donbaocao/recall/${id}`,
       null,
-      { params: { id } },
     );
     return response.data;
   },
