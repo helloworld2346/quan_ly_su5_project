@@ -186,11 +186,11 @@
 }    
     
 .ratePositive {    
-  color: #dc2626;    
+  color: #16a34a;    
 }    
     
 .rateNegative {    
-  color: #16a34a;    
+  color: #dc2626;   
 }    
 .chartPanel {
   display: flex;
