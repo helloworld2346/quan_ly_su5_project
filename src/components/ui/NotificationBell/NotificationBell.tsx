@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
+import { useAuth } from "../../../context/useAuth"; 
 import { createPortal } from "react-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faCheck, faTrash } from "@fortawesome/free-solid-svg-icons";
 import styles from "./NotificationBell.module.css";
-import { notificationStorage } from "../../../utils/notificationStorage";
 
 export interface Notification {
   id: string;
@@ -49,9 +49,7 @@ function formatRelativeTime(isoString: string): string {
 }
 
 export default function NotificationBell() {
-  const [notifications, setNotifications] = useState<Notification[]>(() =>
-    notificationStorage.get(),
-  );
+  const { notifications, markRead, markAllRead, clearRead } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 });
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -108,44 +106,6 @@ export default function NotificationBell() {
       window.removeEventListener("resize", update);
     };
   }, [isOpen]);
-
-  useEffect(() => {
-    const handler = (e: Event) => {
-      const notification = (e as CustomEvent<Notification>).detail;
-      setNotifications((prev) => {
-        const filtered = prev.filter((n) => n.id !== notification.id);
-        return [notification, ...filtered];
-      });
-    };
-    window.addEventListener("new-notification", handler);
-    return () => window.removeEventListener("new-notification", handler);
-  }, []);
-
-  const markAllRead = () => {
-    setNotifications((prev) => {
-      const updated = prev.map((n) => ({ ...n, isRead: true }));
-      notificationStorage.set(updated);
-      return updated;
-    });
-  };
-
-  const clearRead = () => {
-    setNotifications((prev) => {
-      const updated = prev.filter((n) => !n.isRead);
-      notificationStorage.set(updated);
-      return updated;
-    });
-  };
-
-  const markRead = (id: string) => {
-    setNotifications((prev) => {
-      const updated = prev.map((n) =>
-        n.id === id ? { ...n, isRead: true } : n,
-      );
-      notificationStorage.set(updated);
-      return updated;
-    });
-  };
 
   const dropdown = isOpen
     ? createPortal(

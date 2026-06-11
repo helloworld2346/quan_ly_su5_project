@@ -493,12 +493,13 @@ export default function DailyTroopReport() {
     try {
       await dailyReportService.submitReport(id);
       showSuccess("Đã trình phê duyệt thành công");
-      fetchReports();
     } catch (error) {
       handleApiError(error, {
         showError,
         errorMessage: "Không thể trình phê duyệt",
       });
+    } finally {
+      fetchReports();
     }
   };
 
@@ -506,14 +507,15 @@ export default function DailyTroopReport() {
     try {
       await dailyReportService.recallReport(id);
       showSuccess("Đã thu hồi báo cáo thành công");
-      fetchReports();
     } catch (error) {
       handleApiError(error, {
         showError,
         errorMessage: "Không thể thu hồi báo cáo",
       });
+    } finally {
+      fetchReports();
     }
-  };
+  };  
 
   const handleRefuseConfirm = async (reason: string) => {
     if (!refuseReportId) return;
@@ -1068,7 +1070,6 @@ export default function DailyTroopReport() {
         }
         onExportWord={handleExportWord}
         onExportExcel={handleExportExcel}
-        showExport={isCommander || isSuDoan}
         isPastDate={isPastDate}
         hasReport={checkIfDateHasReport}
         showExport={isSuDoan}

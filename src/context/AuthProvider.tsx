@@ -73,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               await notificationService.getNotifications(notifId);
             const mapped = (apiNotifs.Result ?? []).map(mapApiNotification);
             notificationStorage.set(mapped);
-            setNotifications(mapped);
+            setNotifications(mapped); 
             mapped.forEach((n) => {
               window.dispatchEvent(
                 new CustomEvent("new-notification", { detail: n }),
