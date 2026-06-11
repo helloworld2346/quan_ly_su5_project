@@ -56,9 +56,10 @@ function formatRate(rate: number) {
   return Number.isInteger(rate) ? `${rate}%` : `${rate.toFixed(1)}%`;
 }
 
-const COMPANY_SORT_PREFIX: Record<string, number> = {
-  "sửa chữa": 4,
-  "kho": 5,
+// Đại đội: số trước (19, 20, 23), sau đó Sửa chữa rồi Kho
+const COMPANY_SORT_SUFFIX: Record<string, number> = {
+  "sửa chữa": 1,
+  "kho": 2,
 };
 
 function sortDonVi(items: DonViItem[], unitType: SubordinateUnitType): DonViItem[] {
@@ -67,11 +68,12 @@ function sortDonVi(items: DonViItem[], unitType: SubordinateUnitType): DonViItem
     const nameB = b.tenDonVi.toLowerCase();
 
     if (unitType === "company") {
-      const prefixA = Object.entries(COMPANY_SORT_PREFIX).find(([k]) => nameA.includes(k));
-      const prefixB = Object.entries(COMPANY_SORT_PREFIX).find(([k]) => nameB.includes(k));
-      if (prefixA && !prefixB) return -1;
-      if (!prefixA && prefixB) return 1;
-      if (prefixA && prefixB) return prefixA[1] - prefixB[1];
+      const suffixA = Object.entries(COMPANY_SORT_SUFFIX).find(([k]) => nameA.includes(k));
+      const suffixB = Object.entries(COMPANY_SORT_SUFFIX).find(([k]) => nameB.includes(k));
+      // có số → lên trước; không số (sửa chữa/kho) → xuống sau
+      if (!suffixA && suffixB) return -1;
+      if (suffixA && !suffixB) return 1;
+      if (suffixA && suffixB) return suffixA[1] - suffixB[1];
     }
 
     const numA = parseInt(nameA.match(/\d+/)?.[0] ?? "9999", 10);
