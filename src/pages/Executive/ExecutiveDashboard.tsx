@@ -56,6 +56,30 @@ function formatRate(rate: number) {
   return Number.isInteger(rate) ? `${rate}%` : `${rate.toFixed(1)}%`;
 }
 
+const COMPANY_SORT_PREFIX: Record<string, number> = {
+  "sửa chữa": 4,
+  "kho": 5,
+};
+
+function sortDonVi(items: DonViItem[], unitType: SubordinateUnitType): DonViItem[] {
+  return [...items].sort((a, b) => {
+    const nameA = a.tenDonVi.toLowerCase();
+    const nameB = b.tenDonVi.toLowerCase();
+
+    if (unitType === "company") {
+      const prefixA = Object.entries(COMPANY_SORT_PREFIX).find(([k]) => nameA.includes(k));
+      const prefixB = Object.entries(COMPANY_SORT_PREFIX).find(([k]) => nameB.includes(k));
+      if (prefixA && !prefixB) return -1;
+      if (!prefixA && prefixB) return 1;
+      if (prefixA && prefixB) return prefixA[1] - prefixB[1];
+    }
+
+    const numA = parseInt(nameA.match(/\d+/)?.[0] ?? "9999", 10);
+    const numB = parseInt(nameB.match(/\d+/)?.[0] ?? "9999", 10);
+    return numA - numB;
+  });
+}
+
 function groupDonVi(danhSach: DonViItem[], filter: FilterKey) {
   const grouped: Record<SubordinateUnitType, DonViItem[]> = {
     department: [], regiment: [], battalion: [], company: [],
@@ -74,7 +98,7 @@ function groupDonVi(danhSach: DonViItem[], filter: FilterKey) {
     .map((unitType) => ({
       unitType,
       label: CHART_GROUP_LABELS[unitType],
-      items: grouped[unitType],
+      items: sortDonVi(grouped[unitType], unitType),
     }))
     .filter((g) => g.items.length > 0);
 }
