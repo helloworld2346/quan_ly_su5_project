@@ -73,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               await notificationService.getNotifications(notifId);
             const mapped = (apiNotifs.Result ?? []).map(mapApiNotification);
             notificationStorage.set(mapped);
-            setNotifications(mapped); 
+            setNotifications(mapped);
             mapped.forEach((n) => {
               window.dispatchEvent(
                 new CustomEvent("new-notification", { detail: n }),
@@ -212,12 +212,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const clearRead = useCallback(() => {
+    const maDonVi = account?.donVi?.maDonVi;
+    if (maDonVi) {
+      void notificationService.deleteReadNotifications(maDonVi);
+    }
     setNotifications((prev) => {
       const updated = prev.filter((n) => !n.isRead);
       notificationStorage.set(updated);
       return updated;
     });
-  }, []);
+  }, [account?.donVi?.maDonVi]);
 
   const refreshAccount = useCallback(async () => {
     setLoading(true);

@@ -8,4 +8,8 @@ export const notificationService = {
     );
     return res.data;
   },
+
+  deleteReadNotifications: async (maDonVi: string): Promise<void> => {
+    await apiNoPrefix.delete(`/thongbao/dadoc/${maDonVi}`);
+  },
 };
