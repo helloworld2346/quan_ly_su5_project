@@ -205,12 +205,20 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
         maDonViCurrent!,
         yesterday,
       );
-      if (res.success && res.Result?.chiTietVang) {
-        const rows = JSON.parse(res.Result.chiTietVang) as AbsentRow[];
-        setAbsentRows(rows.map((r) => ({ ...r, id: crypto.randomUUID() })));
-      } else {
-        showWarning(`Không tìm thấy báo cáo ngày ${yesterday}.`);
-      }
+     if (res.success && res.Result) {
+       if (res.Result.chiTietVang) {
+         const rows = JSON.parse(res.Result.chiTietVang) as AbsentRow[];
+         if (rows.length > 0) {
+           setAbsentRows(rows.map((r) => ({ ...r, id: crypto.randomUUID() })));
+         } else {
+           showWarning("Hôm qua không có quân nhân vắng.");
+         }
+       } else {
+         showWarning("Hôm qua không có quân nhân vắng.");
+       }
+     } else {
+       showWarning(`Không tìm thấy báo cáo ngày ${yesterday}.`);
+     }
     } catch {
       showWarning(`Không tìm thấy báo cáo ngày ${yesterday}.`);
     } finally {
