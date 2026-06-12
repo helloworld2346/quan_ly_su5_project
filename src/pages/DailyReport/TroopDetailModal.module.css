@@ -13,14 +13,12 @@
 .modal {
   background: var(--dialog-bg);
   border-radius: 16px;
-  width: min(940px, calc(100% - 32px)); 
+  width: min(1080px, calc(100% - 32px)); 
   max-height: 95vh;                  
   display: flex;
   flex-direction: column;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
   overflow: hidden;
-  margin-left: min(var(--modal-offset, 0px), calc(100% - 300px));
-  transition: margin-left 0.25s ease;
 }
   
 .header {  
@@ -34,7 +32,7 @@
 }  
   
 .title {  
-  font-size: 16px;  
+  font-size: 20px;  
   font-weight: 700;  
   color: var(--dialog-title-text);  
   margin: 0;
@@ -57,7 +55,7 @@
   background: transparent;  
   color: var(--dialog-message-text);  
   cursor: pointer;  
-  font-size: 16px;  
+  font-size: 22px;  
   transition: background 0.15s, color 0.15s;  
 }  
   
@@ -67,7 +65,7 @@
   
 .subTitle {  
   margin-top: 6px;  
-  font-size: 17px;  
+  font-size: 20px;  
   font-weight: 800;  
   color: var(--dialog-message-text);  
 }  
@@ -94,7 +92,7 @@
 .summaryCard span {  
   display: block;  
   margin-bottom: 10px;  
-  font-size: 13px;  
+  font-size: 15px;  
   color: var(--dialog-message-text);  
 }  
   
@@ -134,7 +132,7 @@
   width: max-content;  
   min-width: 100%;  
   border-collapse: collapse;  
-  font-size: 14px;  
+  font-size: 16px;  
 }  
   
 .table th {  
@@ -208,7 +206,7 @@
 }  
   
 .trucTitle {  
-  font-size: 16px;  
+  font-size: 20px;  
   font-weight: 700;  
   letter-spacing: 0.8px;  
   margin-bottom: 10px;  
@@ -239,7 +237,7 @@
 }  
   
 .trucRole {  
-  font-size: 12px;  
+  font-size: 14px;  
   font-weight: 700;  
   text-transform: uppercase;  
   letter-spacing: 0.4px;  
@@ -253,18 +251,18 @@
 }  
   
 .trucName {  
-  font-size: 15px;  
+  font-size: 18px;  
   font-weight: 700;  
   color: var(--dialog-title-text, #111);  
 }  
   
 .trucMeta {  
-  font-size: 14px;  
+  font-size: 16px;  
   color: var(--dialog-message-text, #666);  
 }  
   
 .trucPhone {  
-  font-size: 14px;  
+  font-size: 16px;  
   font-weight: 600;  
   color: #218673;  
   text-decoration: none;  
@@ -272,7 +270,7 @@
 }
   
 .trucEmpty {  
-  font-size: 13px;  
+  font-size: 15px;  
   color: var(--dialog-message-text, #aaa);  
   font-style: italic;  
 }  
@@ -290,14 +288,6 @@
   font-size: 15px;  
   font-style: italic;  
 }
-
-.recalledNotice {  
-  padding: 48px 24px;  
-  text-align: center;  
-  color: var(--dialog-message-text);  
-  font-size: 15px;  
-  font-style: italic;  
-}  
   
 .recalledNotice p {  
   margin: 0;  

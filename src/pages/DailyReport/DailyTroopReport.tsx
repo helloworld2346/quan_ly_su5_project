@@ -172,6 +172,7 @@ export default function DailyTroopReport() {
   const [refuseReportId, setRefuseReportId] = useState<string | null>(null);
   const [refuseUnitName, setRefuseUnitName] = useState("");
   const [caTrucFromApi, setCaTrucFromApi] = useState<CaTrucDetail | null>(null);
+const [showConsolidatedDetail, setShowConsolidatedDetail] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
@@ -1159,7 +1160,54 @@ export default function DailyTroopReport() {
                       <td>{displayTotals.lyDoVangKhac}</td>
                       <td></td>
                       <td></td>
-                      <td></td>
+                      <td className={styles.actionCell}>
+                        {isParentUnit &&
+                          consolidatedData && (
+                            <div className={styles.actionWrapper}>
+                              <button
+                                type="button"
+                                className={`${styles.ellipsisBtn} ${activeMenuUnit === "total-row" ? styles.activeEllipsis : ""}`}
+                                aria-label="Tùy chọn thao tác"
+                                onClick={(e) =>
+                                  handleToggleMenu(e, "total-row")
+                                }
+                              >
+                                <FontAwesomeIcon icon={faEllipsisVertical} />
+                              </button>
+
+                              {activeMenuUnit === "total-row" &&
+                                createPortal(
+                                  <div
+                                    ref={dropdownRef}
+                                    className={styles.dropdownMenu}
+                                    role="menu"
+                                    style={{
+                                      top: `${menuPosition.top}px`,
+                                      left: `${menuPosition.left}px`,
+                                    }}
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    <button
+                                      type="button"
+                                      className={styles.menuItem}
+                                      role="menuitem"
+                                      onClick={() => {
+                                        setShowConsolidatedDetail(true);
+                                        setActiveMenuUnit(null);
+                                      }}
+                                    >
+                                      <FontAwesomeIcon
+                                        icon={faEye}
+                                        className={styles.menuIcon}
+                                      />
+                                      Xem chi tiết
+                                    </button>
+                                  </div>,
+                                  document.body,
+                                )}
+                            </div>
+                          )}
+                      </td>
                     </tr>
                   )}
                   {isTrungDoan && (
@@ -1206,6 +1254,20 @@ export default function DailyTroopReport() {
           trucBanTacChien={selectedReportRow.rawItem.trucBanTacChien}
           status={selectedReportRow.status}
           isCommander={isCommander}
+        />
+      )}
+
+      {showConsolidatedDetail && consolidatedData && (
+        <TroopDetailModal
+          unit="Tổng hợp tất cả đơn vị"
+          members={consolidatedData.absentRows.map((r) => ({
+            id: r.id,
+            name: r.hoTen,
+            rank: r.capBac,
+            position: r.chucVu,
+            reason: r.lyDoVang,
+          }))}
+          onClose={() => setShowConsolidatedDetail(false)}
         />
       )}
 

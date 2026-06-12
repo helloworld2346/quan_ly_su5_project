@@ -59,6 +59,7 @@ const CAP_BAC_CHI_HUY_DEFAULT = [
   "Đại úy",
   "Thiếu tá",
   "Trung tá",
+  "Thượng tá",
   "Đại tá",
 ];
 const CAP_BAC_CHI_HUY_SU_DOAN = ["Trung tá", "Thượng tá", "Đại tá"];
