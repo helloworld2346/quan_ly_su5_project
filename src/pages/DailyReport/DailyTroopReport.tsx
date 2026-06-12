@@ -1089,7 +1089,7 @@ const [showConsolidatedDetail, setShowConsolidatedDetail] = useState(false);
           <div className={styles.loadingState}>Đang tải dữ liệu...</div>
         ) : (
           <table className={styles.reportTable}>
-            <thead>
+            <thead className={styles.sticky}>
               <tr>
                 <th rowSpan={3}>Đơn vị</th>
                 <th rowSpan={3}>Tổng quân số</th>
@@ -1112,13 +1112,13 @@ const [showConsolidatedDetail, setShowConsolidatedDetail] = useState(false);
                 <th rowSpan={2}>Lý do khác</th>
               </tr>
               <tr>
-                <th>Ngoài Sư Đoàn</th>
+                <th>Ngoài  Sư đoàn</th>
                 <th>Trung đoàn, Sư đoàn</th>
-                <th>Ngoài Sư Đoàn</th>
+                <th>Ngoài Sư đoàn</th>
                 <th>Trung đoàn, Sư đoàn</th>
-                <th>Ngoài Sư Đoàn</th>
+                <th>Ngoài Sư đoàn</th>
                 <th>Trung đoàn, Sư đoàn</th>
-                <th>Ngoài Sư Đoàn</th>
+                <th>Ngoài Sư đoàn</th>
                 <th>Sư đoàn</th>
                 <th>SQ</th>
                 <th>CS</th>
@@ -1161,52 +1161,49 @@ const [showConsolidatedDetail, setShowConsolidatedDetail] = useState(false);
                       <td></td>
                       <td></td>
                       <td className={styles.actionCell}>
-                        {isParentUnit &&
-                          consolidatedData && (
-                            <div className={styles.actionWrapper}>
-                              <button
-                                type="button"
-                                className={`${styles.ellipsisBtn} ${activeMenuUnit === "total-row" ? styles.activeEllipsis : ""}`}
-                                aria-label="Tùy chọn thao tác"
-                                onClick={(e) =>
-                                  handleToggleMenu(e, "total-row")
-                                }
-                              >
-                                <FontAwesomeIcon icon={faEllipsisVertical} />
-                              </button>
+                        {isParentUnit && consolidatedData && (
+                          <div className={styles.actionWrapper}>
+                            <button
+                              type="button"
+                              className={`${styles.ellipsisBtn} ${activeMenuUnit === "total-row" ? styles.activeEllipsis : ""}`}
+                              aria-label="Tùy chọn thao tác"
+                              onClick={(e) => handleToggleMenu(e, "total-row")}
+                            >
+                              <FontAwesomeIcon icon={faEllipsisVertical} />
+                            </button>
 
-                              {activeMenuUnit === "total-row" &&
-                                createPortal(
-                                  <div
-                                    ref={dropdownRef}
-                                    className={styles.dropdownMenu}
-                                    role="menu"
-                                    style={{
-                                      top: `${menuPosition.top}px`,
-                                      left: `${menuPosition.left}px`,
+                            {activeMenuUnit === "total-row" &&
+                              createPortal(
+                                <div
+                                  ref={dropdownRef}
+                                  className={styles.dropdownMenu}
+                                  role="menu"
+                                  style={{
+                                    top: `${menuPosition.top}px`,
+                                    left: `${menuPosition.left}px`,
+                                  }}
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <button
+                                    type="button"
+                                    className={styles.menuItem}
+                                    role="menuitem"
+                                    onClick={() => {
+                                      setShowConsolidatedDetail(true);
+                                      setActiveMenuUnit(null);
                                     }}
-                                    onClick={(e) => e.stopPropagation()}
                                   >
-                                    <button
-                                      type="button"
-                                      className={styles.menuItem}
-                                      role="menuitem"
-                                      onClick={() => {
-                                        setShowConsolidatedDetail(true);
-                                        setActiveMenuUnit(null);
-                                      }}
-                                    >
-                                      <FontAwesomeIcon
-                                        icon={faEye}
-                                        className={styles.menuIcon}
-                                      />
-                                      Xem chi tiết
-                                    </button>
-                                  </div>,
-                                  document.body,
-                                )}
-                            </div>
-                          )}
+                                    <FontAwesomeIcon
+                                      icon={faEye}
+                                      className={styles.menuIcon}
+                                    />
+                                    Xem chi tiết
+                                  </button>
+                                </div>,
+                                document.body,
+                              )}
+                          </div>
+                        )}
                       </td>
                     </tr>
                   )}
