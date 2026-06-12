@@ -11,9 +11,8 @@ import type { NguoiTrucWithCaTruc, CaTrucDetail } from "../../types/duty";
 import CustomSelect from "../../components/ui/CustomSelect/CustomSelect";
 import CaTrucInfoCard from "../../components/ui/CaTrucInfoCard/CaTrucInfoCard";  
 
-function getTomorrow(): string {
+function getToday(): string {
   const d = new Date();
-  d.setDate(d.getDate() + 1);
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
@@ -22,7 +21,7 @@ function getTomorrow(): string {
 
 export default function CreateDutyShift() {
   const { showSuccess, showError } = useToast();
-  const tomorrow = getTomorrow();
+  const today = getToday();
 
   const [chiHuyList, setChiHuyList] = useState<NguoiTrucWithCaTruc[]>([]);
   const [tacChienList, setTacChienList] = useState<NguoiTrucWithCaTruc[]>([]);
@@ -31,7 +30,7 @@ export default function CreateDutyShift() {
   const [selectedChiHuyId, setSelectedChiHuyId] = useState("");
   const [selectedTacChienId, setSelectedTacChienId] = useState("");
 
-  const [ngayTruc, setNgayTruc] = useState(tomorrow);
+  const [ngayTruc, setNgayTruc] = useState(today);
   const [matKhau, setMatKhau] = useState("");
   const [ghiChu, setGhiChu] = useState("");
 
@@ -114,7 +113,7 @@ export default function CreateDutyShift() {
     setCreatedCaTruc(null);
     setSelectedChiHuyId("");
     setSelectedTacChienId("");
-    setNgayTruc(getTomorrow());
+    setNgayTruc(getToday());
     setMatKhau("");
     setGhiChu("");
   };
@@ -162,7 +161,7 @@ export default function CreateDutyShift() {
               type="date"
               className={styles.input}
               value={ngayTruc}
-              min={tomorrow}
+              min={today}
               onChange={(e) => setNgayTruc(e.target.value)}
             />
           </div>
