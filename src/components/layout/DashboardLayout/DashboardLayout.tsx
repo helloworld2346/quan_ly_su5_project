@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
@@ -6,6 +6,7 @@ import { faBars } from "@fortawesome/free-solid-svg-icons";
 import Sidebar from "../Sidebar/Sidebar";
 import styles from "./DashboardLayout.module.css";
 import NotificationBell from "../../ui/NotificationBell/NotificationBell";
+import ScrollToTop from "../../ui/ScrollToTop/ScrollToTop";
 
 import { getNavGroupLabel, type NavItemId } from "../../../types/navigation";
 import { accountService } from "../../../services/account/accountService";
@@ -86,6 +87,7 @@ export default function DashboardLayout({
     activeId === "executive" || activeId === "executive-training";
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { isDark, toggleTheme } = useTheme();
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     document.body.style.setProperty(
@@ -167,7 +169,11 @@ export default function DashboardLayout({
           <TopBarActions isDark={isDark} onToggleTheme={toggleTheme} />
         </header>
 
-        <div className={styles.content}>{children}</div>
+        <div id="main-content" ref={contentRef} className={styles.content}>
+          {children}
+        </div>
+
+        <ScrollToTop />
       </div>
     </div>
   );

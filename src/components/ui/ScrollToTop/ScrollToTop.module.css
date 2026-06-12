@@ -1,0 +1,35 @@
+.btn {  
+  position: fixed;  
+  bottom: 28px;  
+  right: 28px;  
+  z-index: 9999;  
+  width: 48px;  
+  height: 48px;  
+  border-radius: 50%;  
+  border: 1px solid var(--login-border);  
+  background: var(--primary-color);  
+  color: var(--text-white);  
+  display: flex;  
+  align-items: center;  
+  justify-content: center;  
+  cursor: pointer;  
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);  
+  transition: background 0.15s, transform 0.15s, opacity 0.15s;  
+  animation: fadeIn 0.2s ease;  
+}  
+  
+.btn:hover {  
+  background: var(--primary-hover, var(--primary-color));  
+  transform: translateY(-2px);  
+}  
+  
+@keyframes fadeIn {  
+  from {  
+    opacity: 0;  
+    transform: translateY(8px);  
+  }  
+  to {  
+    opacity: 1;  
+    transform: translateY(0);  
+  }  
+}
