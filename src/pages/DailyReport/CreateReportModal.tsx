@@ -435,11 +435,12 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
           <hr className={styles.divider} />
 
           {/* TRỰC BAN TÁC CHIẾN ĐƠN VỊ */}
-          <div className={styles.trucSectionHeader}>
-            <span className={styles.trucSectionTitle}>
-              Trực ban nội vụ
-            </span>
-          </div>
+          {/* TRỰC BAN TÁC CHIẾN ĐƠN VỊ */}
+<div className={styles.trucSectionHeader}>
+  <span className={styles.trucSectionTitle}>
+    {isSuDoan ? "Trực ban tác chiến" : "Trực ban nội vụ"}
+  </span>
+</div>
           <div className={styles.coreGrid}>
             <div className={styles.field}>
               <label className={styles.label}>
