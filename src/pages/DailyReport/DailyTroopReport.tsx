@@ -193,10 +193,11 @@ export default function DailyTroopReport() {
   const isCommander = normalizedRole === "Chỉ huy";
   const isReporter = normalizedRole === "Báo cáo";
   const isSuDoan = normalizedRole === "Sư đoàn";
-  const TRUNG_DOAN_KY_HIEU = ["e4", "e5", "e271"];
-  const isTrungDoan = TRUNG_DOAN_KY_HIEU.includes(
-    account?.donVi?.kyhieuDonvi ?? "",
-  );
+  const capDonVi = account?.donVi?.capDonVi ?? null;
+  const isTrungDoan = capDonVi === "TRUNG_DOAN";
+  const isTieuDoan = capDonVi === "TIEU_DOAN";
+  const needsApproval = isTrungDoan || isTieuDoan;
+  const selfApprove = !needsApproval;
 
   const fetchReports = useCallback(async () => {
     if (!maDonViCurrent) return;
@@ -384,9 +385,7 @@ export default function DailyTroopReport() {
       const menuHeight = 120;
       const spaceBelow = window.innerHeight - rect.bottom;
       const top =
-        spaceBelow < menuHeight
-          ? rect.top - menuHeight - 4
-          : rect.bottom + 4;
+        spaceBelow < menuHeight ? rect.top - menuHeight - 4 : rect.bottom + 4;
       setMenuPosition({
         top,
         left: rect.right - 230,
@@ -516,7 +515,7 @@ export default function DailyTroopReport() {
     } finally {
       fetchReports();
     }
-  };  
+  };
 
   const handleRefuseConfirm = async (reason: string) => {
     if (!refuseReportId) return;
@@ -828,16 +827,23 @@ export default function DailyTroopReport() {
     return isCommander && commanderReport.status === "Chờ_Duyệt";
   }, [commanderReport, isCommander]);
   const canSubmit = useMemo(() => {
-    if ((!isReporter && !isSuDoan) || !ownReport || ownReport.notSubmitted)
+    if (
+      (!isReporter && !isSuDoan && !selfApprove) ||
+      !ownReport ||
+      ownReport.notSubmitted
+    )
       return false;
     return ownReport.status === "Nháp";
-  }, [isReporter, isSuDoan, ownReport]);
-
+  }, [isReporter, isSuDoan, selfApprove, ownReport]);
   const canRecall = useMemo(() => {
-    if ((!isReporter && !isSuDoan) || !ownReport || ownReport.notSubmitted)
+    if (
+      (!isReporter && !isSuDoan && !selfApprove) ||
+      !ownReport ||
+      ownReport.notSubmitted
+    )
       return false;
     return ownReport.status === "Chờ_Duyệt";
-  }, [isReporter, isSuDoan, ownReport]);
+  }, [isReporter, isSuDoan, selfApprove, ownReport]);
 
   const currentEditingReport = useMemo(() => {
     if (!editModalData) return null;
