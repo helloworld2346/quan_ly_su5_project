@@ -56,6 +56,32 @@ function formatRate(rate: number) {
   return Number.isInteger(rate) ? `${rate}%` : `${rate.toFixed(1)}%`;
 }
 
+// Đại đội: số trước (19, 20, 23), sau đó Sửa chữa rồi Kho
+const COMPANY_SORT_SUFFIX: Record<string, number> = {
+  "sửa chữa": 1,
+  "kho": 2,
+};
+
+function sortDonVi(items: DonViItem[], unitType: SubordinateUnitType): DonViItem[] {
+  return [...items].sort((a, b) => {
+    const nameA = a.tenDonVi.toLowerCase();
+    const nameB = b.tenDonVi.toLowerCase();
+
+    if (unitType === "company") {
+      const suffixA = Object.entries(COMPANY_SORT_SUFFIX).find(([k]) => nameA.includes(k));
+      const suffixB = Object.entries(COMPANY_SORT_SUFFIX).find(([k]) => nameB.includes(k));
+      // có số → lên trước; không số (sửa chữa/kho) → xuống sau
+      if (!suffixA && suffixB) return -1;
+      if (suffixA && !suffixB) return 1;
+      if (suffixA && suffixB) return suffixA[1] - suffixB[1];
+    }
+
+    const numA = parseInt(nameA.match(/\d+/)?.[0] ?? "9999", 10);
+    const numB = parseInt(nameB.match(/\d+/)?.[0] ?? "9999", 10);
+    return numA - numB;
+  });
+}
+
 function groupDonVi(danhSach: DonViItem[], filter: FilterKey) {
   const grouped: Record<SubordinateUnitType, DonViItem[]> = {
     department: [], regiment: [], battalion: [], company: [],
@@ -74,7 +100,7 @@ function groupDonVi(danhSach: DonViItem[], filter: FilterKey) {
     .map((unitType) => ({
       unitType,
       label: CHART_GROUP_LABELS[unitType],
-      items: grouped[unitType],
+      items: sortDonVi(grouped[unitType], unitType),
     }))
     .filter((g) => g.items.length > 0);
 }
