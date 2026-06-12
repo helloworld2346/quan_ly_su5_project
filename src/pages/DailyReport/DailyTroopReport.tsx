@@ -28,6 +28,7 @@ import { handleApiError } from "../../utils/errorHandler";
 import ReportStatusBadge from "../../components/ui/ReportStatusBadge/ReportStatusBadge";
 import { dutyService } from "../../services/duty/dutyService";
 import type { CaTrucDetail } from "../../types/duty";
+import CaTrucInfoCard from "../../components/ui/CaTrucInfoCard/CaTrucInfoCard";
 export interface ChiTietVangQuanNhan {
   id: string;
   hoTen: string;
@@ -1174,63 +1175,13 @@ export default function DailyTroopReport() {
       </div>
 
       {caTrucInfo && (
-        <div className={styles.caTrucSection}>
-          <div className={styles.caTrucHeader}>Thông tin ca trực</div>
-          <div className={styles.caTrucNgay}>
-            {caTrucInfo.ngaytruc
-              ? new Date(caTrucInfo.ngaytruc).toLocaleDateString("vi-VN", {
-                  weekday: "long",
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                })
-              : ""}
-          </div>
-          <div className={styles.caTrucBody}>
-            <div className={styles.caTrucLeft}>
-              {[
-                { label: "Trực chỉ huy", data: trucInfoFromReport?.trucChiHuy },
-                {
-                  label: "Trực ban tác chiến",
-                  data: trucInfoFromReport?.trucBanTacChien,
-                },
-              ].map(({ label, data }) => (
-                <div key={label} className={styles.caTrucCard}>
-                  <span className={styles.caTrucRole}>{label}</span>
-                  {data ? (
-                    <div className={styles.caTrucCardBody}>
-                      <div className={styles.caTrucPersonName}>
-                        {data.tenNguoitruc || "—"}
-                      </div>
-                      <div className={styles.caTrucPersonMeta}>
-                        {[data.capbacNguoitruc, data.chucvuNguoitruc]
-                          .filter(Boolean)
-                          .join(" · ")}
-                      </div>
-                      {data.sodienthoai && (
-                        <a
-                          href={`tel:${data.sodienthoai}`}
-                          className={styles.caTrucPhone}
-                        >
-                          {data.sodienthoai}
-                        </a>
-                      )}
-                    </div>
-                  ) : (
-                    <div className={styles.caTrucEmpty}>Chưa có thông tin</div>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <div className={styles.caTrucRight}>
-              <span className={styles.caTrucMatKhauLabel}>Mật khẩu</span>
-              <span className={styles.caTrucMatKhau}>
-                {caTrucInfo.matkhau || "—"}
-              </span>
-            </div>
-          </div>
-        </div>
+        <CaTrucInfoCard
+          ngaytruc={caTrucInfo.ngaytruc ?? ""}
+          matkhau={caTrucInfo.matkhau}
+          ghichu={caTrucInfo.ghichu}
+          trucChiHuy={trucInfoFromReport?.trucChiHuy}
+          trucBanTacChien={trucInfoFromReport?.trucBanTacChien}
+        />
       )}
 
       {selectedReportRow && (
