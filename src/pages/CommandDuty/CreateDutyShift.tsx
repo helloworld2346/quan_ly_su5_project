@@ -130,7 +130,7 @@ export default function CreateDutyShift() {
         <CaTrucInfoCard
           ngaytruc={createdCaTruc.ngaytruc}
           matkhau={createdCaTruc.matkhau}
-          ghichu={createdCaTruc.ghichu}
+          ghichu={createdCaTruc.ghichu ?? undefined}
           trucChiHuy={createdCaTruc.trucChiHuy}
           trucBanTacChien={createdCaTruc.trucBanTacChien}
         />
