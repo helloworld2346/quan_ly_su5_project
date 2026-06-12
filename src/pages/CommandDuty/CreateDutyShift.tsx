@@ -198,40 +198,11 @@ export default function CreateDutyShift() {
               ))}
             </div>
 
-          <div className={styles.caTrucRight}>
+            <div className={styles.caTrucRight}>
               <span className={styles.caTrucMatKhauLabel}>Mật khẩu</span>
-              {createdCaTruc.matkhau ? (
-                (() => {
-                  const parts = createdCaTruc.matkhau.split("-").map((s) => s.trim());
-                  const hoi = parts[0] || "—";
-                  const dap = parts[1] || "—";
-                  return (
-                    <div className={styles.matKhauWrapper}>
-                      <div className={styles.matKhauRow}>
-                        <span className={styles.matKhauTag}>Hỏi</span>
-                        <span className={styles.matKhauValue}>{hoi}</span>
-                      </div>
-                      <div className={styles.matKhauDivider} />
-                      <div className={styles.matKhauRow}>
-                        <span className={styles.matKhauTag}>Đáp</span>
-                        <span className={styles.matKhauValue}>{dap}</span>
-                      </div>
-                    </div>
-                  );
-                })()
-              ) : (
-                <div className={styles.matKhauWrapper}>
-                  <div className={styles.matKhauRow}>
-                    <span className={styles.matKhauTag}>Hỏi</span>
-                    <span className={styles.matKhauValue}>—</span>
-                  </div>
-                  <div className={styles.matKhauDivider} />
-                  <div className={styles.matKhauRow}>
-                    <span className={styles.matKhauTag}>Đáp</span>
-                    <span className={styles.matKhauValue}>—</span>
-                  </div>
-                </div>
-              )}
+              <span className={styles.caTrucMatKhau}>
+                {createdCaTruc.matkhau || "—"}
+              </span>
             </div>
           </div>
 

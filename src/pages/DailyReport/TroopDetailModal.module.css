@@ -10,18 +10,18 @@
   padding: 16px;  
 }  
   
-.modal {  
-  background: var(--dialog-bg);  
-  border-radius: 16px;  
-  width: min(720px, calc(100% - 32px));  
-  max-height: 80vh;  
-  display: flex;  
-  flex-direction: column;  
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);  
-  overflow: hidden;  
-  margin-left: min(var(--modal-offset, 0px), calc(100% - 300px));  
-  transition: margin-left 0.25s ease;  
-}  
+.modal {
+  background: var(--dialog-bg);
+  border-radius: 16px;
+  width: min(940px, calc(100% - 32px)); 
+  max-height: 95vh;                  
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  margin-left: min(var(--modal-offset, 0px), calc(100% - 300px));
+  transition: margin-left 0.25s ease;
+}
   
 .header {  
   position: relative;  
