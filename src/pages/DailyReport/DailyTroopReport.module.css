@@ -101,9 +101,9 @@
 }
 
 .actionCell {
-  position: relative; /* Trực quan hóa điểm neo cho menu */
+  position: relative;
   text-align: center;
-  width: 80px; /* Cố định độ rộng cho cột Thao tác */
+  width: 80px;
 }
 
 .actionWrapper {
@@ -283,7 +283,6 @@
   line-height: 1.5;
   vertical-align: top;
 }
-
 
 .tableShell {
   width: 100%;
@@ -671,6 +670,17 @@
   line-height: 1.3;
 }
 
+.draftRow td {
+  background: #ffe9e9 !important;
+  color: #b42318;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .draftRow td {
+  background: rgba(239, 68, 68, 0.15) !important;
+  color: #fca5a5;
+}
+
 @media (max-width: 768px) {
   .caTrucBody {
     flex-direction: column;
@@ -688,8 +698,6 @@
   background: #ffe9e9 !important;
   color: #b42318;
 }
-
-
 
 .notSubmittedRow .unitCell {
   font-weight: 700;

@@ -940,6 +940,7 @@ export default function DailyTroopReport() {
               : isParentUnit
                 ? styles.childRow
                 : "",
+            row.status === "Nháp" ? styles.draftRow : "",
           ]
             .filter(Boolean)
             .join(" ") || undefined
