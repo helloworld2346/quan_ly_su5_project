@@ -45,7 +45,8 @@ export default function Sidebar({
   collapsed = false,
   onExpand,
 }: Props) {
-  const { account, isParentUnit } = useAuth();
+ const { account, donVi, isParentUnit } = useAuth();
+const unitName = donVi?.tenDonvi || account?.donVi?.tenDonvi || "Chưa phân đơn vị";
   const userRole = account?.vaiTro?.tenVaiTro || null;
   const allowedNavItems = getNavItemsByRole(userRole);
 
@@ -128,9 +129,9 @@ export default function Sidebar({
           <img src={logo} alt="Logo Sư đoàn 5" className={styles.logo} />
           {!collapsed && (
             <>
-              <p className={styles.unitName}>Sư đoàn 5</p>
+             <p className={styles.unitName}>{unitName}</p>
               <p className={styles.appName}>
-                Phần mềm thống kê báo ban quân số
+              Thống kê quân số. Công tác Đảng. Công tác chính trị 
               </p>
             </>
           )}
