@@ -172,7 +172,7 @@ export default function DailyTroopReport() {
   const [refuseReportId, setRefuseReportId] = useState<string | null>(null);
   const [refuseUnitName, setRefuseUnitName] = useState("");
   const [caTrucFromApi, setCaTrucFromApi] = useState<CaTrucDetail | null>(null);
-const [showConsolidatedDetail, setShowConsolidatedDetail] = useState(false);
+  const [showConsolidatedDetail, setShowConsolidatedDetail] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
@@ -1089,10 +1089,35 @@ const [showConsolidatedDetail, setShowConsolidatedDetail] = useState(false);
           <div className={styles.loadingState}>Đang tải dữ liệu...</div>
         ) : (
           <table className={styles.reportTable}>
-            <thead className={styles.sticky}>
+            <colgroup>
+              <col style={{ width: "9%" }} /> {/* Đơn vị */}
+              <col style={{ width: "4%" }} /> {/* Tổng quân số */}
+              <col style={{ width: "5%" }} /> {/* Hiện diện */}
+              <col style={{ width: "5%" }} /> {/* Tổng vắng */}
+              <col style={{ width: "6%" }} /> {/* Hội thao - Ngoài SD */}
+              <col style={{ width: "6%" }} /> {/* Hội thao - TĐ/SD */}
+              <col style={{ width: "6%" }} /> {/* Xây dựng - Ngoài SD */}
+              <col style={{ width: "6%" }} /> {/* Xây dựng - TĐ/SD */}
+              <col style={{ width: "6%" }} /> {/* Chờ hưu */}
+              <col style={{ width: "6%" }} /> {/* Nghỉ tranh thủ */}
+              <col style={{ width: "6%" }} /> {/* Phép */}
+              <col style={{ width: "6%" }} /> {/* Viện - Ngoài SD */}
+              <col style={{ width: "6%" }} /> {/* Viện - SD */}
+              <col style={{ width: "6%" }} /> {/* Công tác - Ngoài SD */}
+              <col style={{ width: "6%" }} /> {/* Công tác - SD */}
+              <col style={{ width: "6%" }} /> {/* Học - SQ */}
+              <col style={{ width: "6%" }} /> {/* Học - CS */}
+              <col style={{ width: "4%" }} /> {/* Lý do khác */}
+              <col style={{ width: "8%" }} /> {/* Trạng thái */}
+              <col style={{ width: "10%" }} /> {/* Ghi chú */}
+              <col style={{ width: "5%" }} /> {/* Thao tác */}
+            </colgroup>
+            <thead>
               <tr>
                 <th rowSpan={3}>Đơn vị</th>
-                <th rowSpan={3}>Tổng quân số</th>
+                <th rowSpan={3}>
+                  Tổng quân <br></br> số
+                </th>
                 <th rowSpan={3}>Hiện diện</th>
                 <th rowSpan={3}>Tổng vắng</th>
                 <th colSpan={14}>Quân số vắng</th>
@@ -1112,7 +1137,7 @@ const [showConsolidatedDetail, setShowConsolidatedDetail] = useState(false);
                 <th rowSpan={2}>Lý do khác</th>
               </tr>
               <tr>
-                <th>Ngoài  Sư đoàn</th>
+                <th>Ngoài Sư đoàn</th>
                 <th>Trung đoàn, Sư đoàn</th>
                 <th>Ngoài Sư đoàn</th>
                 <th>Trung đoàn, Sư đoàn</th>
