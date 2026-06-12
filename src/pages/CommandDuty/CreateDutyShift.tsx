@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheck,
-  faShieldHalved,
   faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./CreateDutyShift.module.css";
@@ -10,6 +9,7 @@ import { dutyService } from "../../services/duty/dutyService";
 import { useToast } from "../../context/useToast";
 import type { NguoiTrucWithCaTruc, CaTrucDetail } from "../../types/duty";
 import CustomSelect from "../../components/ui/CustomSelect/CustomSelect";
+import CaTrucInfoCard from "../../components/ui/CaTrucInfoCard/CaTrucInfoCard";  
 
 function getTomorrow(): string {
   const d = new Date();
@@ -55,7 +55,7 @@ export default function CreateDutyShift() {
       }
     };
     void load();
-  }, []);
+  }, [showError]);
 
   const selectedChiHuy =
     chiHuyList.find((p) => p.idNguoitruc === selectedChiHuyId) ?? null;
@@ -119,33 +119,6 @@ export default function CreateDutyShift() {
     setGhiChu("");
   };
 
-  const renderPersonCard = (
-    person: NguoiTrucWithCaTruc | null,
-    roleLabel: string,
-    icon: typeof faShieldHalved,
-  ) => (
-    <div className={styles.trucColumn}>
-      <div className={styles.trucColumnHeader}>
-        <FontAwesomeIcon icon={icon} className={styles.trucColumnIcon} />
-        <span className={styles.trucColumnLabel}>{roleLabel}</span>
-      </div>
-      {person ? (
-        <div className={styles.personCard}>
-          <span className={styles.personRole}>{roleLabel}</span>
-          <div className={styles.personName}>
-            {person.capbacNguoitruc} {person.tenNguoitruc}
-          </div>
-          <div className={styles.personMeta}>{person.chucvuNguoitruc}</div>
-          {person.sodienthoai && (
-            <a className={styles.personPhone}>{person.sodienthoai}</a>
-          )}
-        </div>
-      ) : (
-        <div className={styles.personEmpty}>Chưa chọn người trực</div>
-      )}
-    </div>
-  );
-
   if (createdCaTruc) {
     return (
       <section className={styles.page}>
@@ -154,67 +127,13 @@ export default function CreateDutyShift() {
           <span>Ca trực đã được tạo thành công</span>
         </div>
 
-        <div className={styles.caTrucSection}>
-          <div className={styles.caTrucHeader}>Thông tin ca trực</div>
-          <div className={styles.caTrucNgay}>
-            {new Date(createdCaTruc.ngaytruc + "T00:00:00").toLocaleDateString(
-              "vi-VN",
-              {
-                weekday: "long",
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-              },
-            )}
-          </div>
-
-          <div className={styles.caTrucBody}>
-            <div className={styles.caTrucLeft}>
-              {[
-                { label: "Trực chỉ huy", data: createdCaTruc.trucChiHuy },
-                {
-                  label: "Trực ban tác chiến",
-                  data: createdCaTruc.trucBanTacChien,
-                },
-              ].map(({ label, data }) => (
-                <div key={label} className={styles.caTrucCard}>
-                  <span className={styles.caTrucRole}>{label}</span>
-                  {data ? (
-                    <div className={styles.caTrucCardBody}>
-                      <div className={styles.caTrucPersonName}>
-                        {data.capbacNguoitruc} {data.tenNguoitruc}
-                      </div>
-                      <div className={styles.caTrucPersonMeta}>
-                        {data.chucvuNguoitruc}
-                      </div>
-                      {data.sodienthoai && (
-                        <a className={styles.caTrucPhone}>{data.sodienthoai}</a>
-                      )}
-                    </div>
-                  ) : (
-                    <div className={styles.caTrucEmpty}>Chưa có thông tin</div>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <div className={styles.caTrucRight}>
-              <span className={styles.caTrucMatKhauLabel}>Mật khẩu</span>
-              <span className={styles.caTrucMatKhau}>
-                {createdCaTruc.matkhau || "—"}
-              </span>
-            </div>
-          </div>
-
-          {createdCaTruc.ghichu && (
-            <div className={styles.caTrucGhiChu}>
-              <span className={styles.caTrucGhiChuLabel}>Ghi chú</span>
-              <span className={styles.caTrucGhiChuText}>
-                {createdCaTruc.ghichu}
-              </span>
-            </div>
-          )}
-        </div>
+        <CaTrucInfoCard
+          ngaytruc={createdCaTruc.ngaytruc}
+          matkhau={createdCaTruc.matkhau}
+          ghichu={createdCaTruc.ghichu}
+          trucChiHuy={createdCaTruc.trucChiHuy}
+          trucBanTacChien={createdCaTruc.trucBanTacChien}
+        />
 
         <div className={styles.actions}>
           <button

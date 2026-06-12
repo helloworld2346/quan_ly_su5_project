@@ -28,6 +28,7 @@ import { handleApiError } from "../../utils/errorHandler";
 import ReportStatusBadge from "../../components/ui/ReportStatusBadge/ReportStatusBadge";
 import { dutyService } from "../../services/duty/dutyService";
 import type { CaTrucDetail } from "../../types/duty";
+import CaTrucInfoCard from "../../components/ui/CaTrucInfoCard/CaTrucInfoCard";
 export interface ChiTietVangQuanNhan {
   id: string;
   hoTen: string;
@@ -192,10 +193,11 @@ export default function DailyTroopReport() {
   const isCommander = normalizedRole === "Chỉ huy";
   const isReporter = normalizedRole === "Báo cáo";
   const isSuDoan = normalizedRole === "Sư đoàn";
-  const TRUNG_DOAN_KY_HIEU = ["e4", "e5", "e271"];
-  const isTrungDoan = TRUNG_DOAN_KY_HIEU.includes(
-    account?.donVi?.kyhieuDonvi ?? "",
-  );
+  const capDonVi = account?.donVi?.capDonVi ?? null;
+  const isTrungDoan = capDonVi === "TRUNG_DOAN";
+  const isTieuDoan = capDonVi === "TIEU_DOAN";
+  const needsApproval = isTrungDoan || isTieuDoan;
+  const selfApprove = !needsApproval;
 
   const fetchReports = useCallback(async () => {
     if (!maDonViCurrent) return;
@@ -383,9 +385,7 @@ export default function DailyTroopReport() {
       const menuHeight = 120;
       const spaceBelow = window.innerHeight - rect.bottom;
       const top =
-        spaceBelow < menuHeight
-          ? rect.top - menuHeight - 4
-          : rect.bottom + 4;
+        spaceBelow < menuHeight ? rect.top - menuHeight - 4 : rect.bottom + 4;
       setMenuPosition({
         top,
         left: rect.right - 230,
@@ -515,7 +515,7 @@ export default function DailyTroopReport() {
     } finally {
       fetchReports();
     }
-  };  
+  };
 
   const handleRefuseConfirm = async (reason: string) => {
     if (!refuseReportId) return;
@@ -827,16 +827,23 @@ export default function DailyTroopReport() {
     return isCommander && commanderReport.status === "Chờ_Duyệt";
   }, [commanderReport, isCommander]);
   const canSubmit = useMemo(() => {
-    if ((!isReporter && !isSuDoan) || !ownReport || ownReport.notSubmitted)
+    if (
+      (!isReporter && !isSuDoan && !selfApprove) ||
+      !ownReport ||
+      ownReport.notSubmitted
+    )
       return false;
     return ownReport.status === "Nháp";
-  }, [isReporter, isSuDoan, ownReport]);
-
+  }, [isReporter, isSuDoan, selfApprove, ownReport]);
   const canRecall = useMemo(() => {
-    if ((!isReporter && !isSuDoan) || !ownReport || ownReport.notSubmitted)
+    if (
+      (!isReporter && !isSuDoan && !selfApprove) ||
+      !ownReport ||
+      ownReport.notSubmitted
+    )
       return false;
     return ownReport.status === "Chờ_Duyệt";
-  }, [isReporter, isSuDoan, ownReport]);
+  }, [isReporter, isSuDoan, selfApprove, ownReport]);
 
   const currentEditingReport = useMemo(() => {
     if (!editModalData) return null;
@@ -933,6 +940,7 @@ export default function DailyTroopReport() {
               : isParentUnit
                 ? styles.childRow
                 : "",
+            row.status === "Nháp" ? styles.draftRow : "",
           ]
             .filter(Boolean)
             .join(" ") || undefined
@@ -1174,63 +1182,13 @@ export default function DailyTroopReport() {
       </div>
 
       {caTrucInfo && (
-        <div className={styles.caTrucSection}>
-          <div className={styles.caTrucHeader}>Thông tin ca trực</div>
-          <div className={styles.caTrucNgay}>
-            {caTrucInfo.ngaytruc
-              ? new Date(caTrucInfo.ngaytruc).toLocaleDateString("vi-VN", {
-                  weekday: "long",
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                })
-              : ""}
-          </div>
-          <div className={styles.caTrucBody}>
-            <div className={styles.caTrucLeft}>
-              {[
-                { label: "Trực chỉ huy", data: trucInfoFromReport?.trucChiHuy },
-                {
-                  label: "Trực ban tác chiến",
-                  data: trucInfoFromReport?.trucBanTacChien,
-                },
-              ].map(({ label, data }) => (
-                <div key={label} className={styles.caTrucCard}>
-                  <span className={styles.caTrucRole}>{label}</span>
-                  {data ? (
-                    <div className={styles.caTrucCardBody}>
-                      <div className={styles.caTrucPersonName}>
-                        {data.tenNguoitruc || "—"}
-                      </div>
-                      <div className={styles.caTrucPersonMeta}>
-                        {[data.capbacNguoitruc, data.chucvuNguoitruc]
-                          .filter(Boolean)
-                          .join(" · ")}
-                      </div>
-                      {data.sodienthoai && (
-                        <a
-                          href={`tel:${data.sodienthoai}`}
-                          className={styles.caTrucPhone}
-                        >
-                          {data.sodienthoai}
-                        </a>
-                      )}
-                    </div>
-                  ) : (
-                    <div className={styles.caTrucEmpty}>Chưa có thông tin</div>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <div className={styles.caTrucRight}>
-              <span className={styles.caTrucMatKhauLabel}>Mật khẩu</span>
-              <span className={styles.caTrucMatKhau}>
-                {caTrucInfo.matkhau || "—"}
-              </span>
-            </div>
-          </div>
-        </div>
+        <CaTrucInfoCard
+          ngaytruc={caTrucInfo.ngaytruc ?? ""}
+          matkhau={caTrucInfo.matkhau}
+          ghichu={caTrucInfo.ghichu}
+          trucChiHuy={trucInfoFromReport?.trucChiHuy}
+          trucBanTacChien={trucInfoFromReport?.trucBanTacChien}
+        />
       )}
 
       {selectedReportRow && (

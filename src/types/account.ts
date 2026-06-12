@@ -10,6 +10,7 @@ export interface DonVi {
   donViCha: string | null;
   donViCon: string[];
   kyhieuDonvi: string;
+  capDonVi: string | null;
   quanSoHsqBs: number;
   quanSoQncn: number;
   quanSoSiQuan: number;
