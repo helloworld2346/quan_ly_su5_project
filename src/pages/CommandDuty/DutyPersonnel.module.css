@@ -1,5 +1,5 @@
 .page {  
-  height: calc(100vh - 112px);
+  height: calc(100vh - 112px);  
   display: flex;  
   flex-direction: column;  
   gap: 20px;  
@@ -17,7 +17,7 @@
   display: flex;  
   flex-direction: column;  
   gap: 18px;  
-  flex-shrink: 0;
+  flex-shrink: 0;  
 }  
   
 .formTitle {  
@@ -128,6 +128,8 @@
   cursor: not-allowed;  
 }  
   
+/* ── Lists ── */  
+  
 .loading {  
   text-align: center;  
   color: var(--login-text-muted);  
@@ -158,10 +160,10 @@
   display: flex;  
   align-items: center;  
   gap: 10px;  
-  padding: 16px 20px;  
+  padding: 14px 20px;  
   background: var(--table-row-odd);  
   border-bottom: 1px solid var(--login-border);  
-  font-size: 16px;  
+  font-size: 15px;  
   font-weight: 700;  
   color: var(--login-text);  
   flex-shrink: 0;  
@@ -169,14 +171,14 @@
   
 .listHeaderIcon {  
   color: var(--primary-color, #218673);  
-  font-size: 18px;  
+  font-size: 16px;  
 }  
   
 .listCount {  
   margin-left: auto;  
   background: var(--primary-color, #218673);  
   color: #fff;  
-  font-size: 14px;  
+  font-size: 13px;  
   font-weight: 700;  
   padding: 2px 10px;  
   border-radius: 20px;  
@@ -187,7 +189,6 @@
 .listBody {  
   display: flex;  
   flex-direction: column;  
-  gap: 0;  
   flex: 1;  
   min-height: 0;  
   overflow-y: auto;  
@@ -201,11 +202,9 @@
   font-style: italic;  
 }  
   
+/* ── Person Card ── */  
+  
 .personCard {  
-  display: flex;  
-  flex-direction: column;  
-  gap: 4px;  
-  padding: 16px 20px;  
   border-bottom: 1px solid var(--login-border);  
   transition: background 0.12s;  
 }  
@@ -218,31 +217,208 @@
   background: var(--table-row-even);  
 }  
   
-.personName {  
-  font-size: 16px;  
+.personRow {  
+  display: flex;  
+  align-items: center;  
+  gap: 14px;  
+  padding: 14px 16px;  
+}  
+  
+.personAvatar {  
+  width: 42px;  
+  height: 42px;  
+  border-radius: 50%;  
+  background: color-mix(in srgb, var(--primary-color, #218673) 15%, transparent);  
+  color: var(--primary-color, #218673);  
+  font-size: 18px;  
   font-weight: 700;  
+  display: flex;  
+  align-items: center;  
+  justify-content: center;  
+  flex-shrink: 0;  
+  border: 1.5px solid color-mix(in srgb, var(--primary-color, #218673) 30%, transparent);  
+}  
+  
+.personInfo {  
+  flex: 1;  
+  min-width: 0;  
+  display: flex;  
+  flex-direction: column;  
+  gap: 3px;  
+}  
+  
+.personName {  
+  font-size: 14px;  
+  font-weight: 500;  
   color: var(--login-text);  
+  white-space: nowrap;  
+  overflow: hidden;  
+  text-overflow: ellipsis;  
+}  
+  
+.personNameBold {  
+  font-weight: 700;  
 }  
   
 .personMeta {  
-  font-size: 14px;  
+  font-size: 13px;  
   color: var(--login-text-muted);  
 }  
   
 .personPhone {  
   display: flex;  
   align-items: center;  
-  gap: 6px;  
-  font-size: 14px;  
+  gap: 5px;  
+  font-size: 13px;  
   font-weight: 600;  
   color: var(--primary-color, #218673);  
-  text-decoration: none;  
-  margin-top: 2px;  
+  margin-top: 1px;  
 }  
   
-.personPhone:hover {  
-  text-decoration: underline;  
+.personActions {  
+  display: flex;  
+  gap: 6px;  
+  flex-shrink: 0;  
+  opacity: 0;  
+  transition: opacity 0.15s;  
 }  
+  
+.personCard:hover .personActions {  
+  opacity: 1;  
+}  
+  
+.btnEdit {  
+  width: 32px;  
+  height: 32px;  
+  border-radius: 8px;  
+  border: 1px solid var(--login-border);  
+  background: transparent;  
+  color: var(--login-text-muted);  
+  font-size: 14px;  
+  cursor: pointer;  
+  display: flex;  
+  align-items: center;  
+  justify-content: center;  
+  transition: background 0.12s, color 0.12s, border-color 0.12s;  
+}  
+  
+.btnEdit:hover {  
+  background: color-mix(in srgb, var(--primary-color, #218673) 10%, transparent);  
+  color: var(--primary-color, #218673);  
+  border-color: var(--primary-color, #218673);  
+}  
+  
+.btnDelete {  
+  width: 32px;  
+  height: 32px;  
+  border-radius: 8px;  
+  border: 1px solid var(--login-border);  
+  background: transparent;  
+  color: var(--login-text-muted);  
+  font-size: 14px;  
+  cursor: pointer;  
+  display: flex;  
+  align-items: center;  
+  justify-content: center;  
+  transition: background 0.12s, color 0.12s, border-color 0.12s;  
+}  
+  
+.btnDelete:hover:not(:disabled) {  
+  background: #fff5f5;  
+  color: #e53e3e;  
+  border-color: #e53e3e;  
+}  
+  
+.btnDelete:disabled {  
+  opacity: 0.5;  
+  cursor: not-allowed;  
+}  
+  
+/* ── Inline Edit Form ── */  
+  
+.editInlineForm {  
+  padding: 16px;  
+  background: color-mix(in srgb, var(--primary-color, #218673) 4%, transparent);  
+  border-left: 3px solid var(--primary-color, #218673);  
+  display: flex;  
+  flex-direction: column;  
+  gap: 14px;  
+}  
+  
+.editFormGrid {  
+  display: grid;  
+  grid-template-columns: 1fr 1fr;  
+  gap: 10px 16px;  
+}  
+  
+.editFormGroup {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 5px;  
+}  
+  
+.editFormGroup label {  
+  font-size: 13px;  
+  font-weight: 600;  
+  color: var(--login-text);  
+}  
+  
+.editActions {  
+  display: flex;  
+  gap: 8px;  
+  justify-content: flex-end;  
+}  
+  
+.btnSave {  
+  display: flex;  
+  align-items: center;  
+  gap: 6px;  
+  padding: 8px 18px;  
+  background: var(--primary-color, #218673);  
+  color: #fff;  
+  border: none;  
+  border-radius: 7px;  
+  font-size: 14px;  
+  font-weight: 600;  
+  cursor: pointer;  
+  transition: opacity 0.15s;  
+}  
+  
+.btnSave:hover:not(:disabled) {  
+  opacity: 0.88;  
+}  
+  
+.btnSave:disabled {  
+  opacity: 0.6;  
+  cursor: not-allowed;  
+}  
+  
+.btnCancelEdit {  
+  display: flex;  
+  align-items: center;  
+  gap: 6px;  
+  padding: 8px 18px;  
+  background: transparent;  
+  color: var(--login-text-muted);  
+  border: 1px solid var(--login-border);  
+  border-radius: 7px;  
+  font-size: 14px;  
+  font-weight: 600;  
+  cursor: pointer;  
+  transition: background 0.12s, color 0.12s;  
+}  
+  
+.btnCancelEdit:hover:not(:disabled) {  
+  background: var(--table-row-even);  
+  color: var(--login-text);  
+}  
+  
+.btnCancelEdit:disabled {  
+  opacity: 0.6;  
+  cursor: not-allowed;  
+}  
+  
+/* ── Responsive ── */  
   
 @media (max-width: 768px) {  
   .page {  
@@ -272,5 +448,9 @@
   
   .typeToggle {  
     flex-direction: column;  
+  }  
+  
+  .editFormGrid {  
+    grid-template-columns: 1fr;  
   }  
 }

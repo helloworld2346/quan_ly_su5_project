@@ -122,5 +122,41 @@ export const dutyService = {
     );
     return res.data;
   },
+
+  updateTrucChiHuy: async (
+    id: string,
+    payload: TrucNguoiPayload,
+  ): Promise<TrucNguoiResponse> => {
+    const res = await apiNoPrefix.put<TrucNguoiResponse>(
+      `/truc-chi-huy/${id}`,
+      payload,
+    );
+    return res.data;
+  },
+
+  deleteTrucChiHuy: async (id: string): Promise<TrucNguoiResponse> => {
+    const res = await apiNoPrefix.delete<TrucNguoiResponse>(
+      `/truc-chi-huy/${id}`,
+    );
+    return res.data;
+  },
+
+  updateTrucBanTacChien: async (
+    id: string,
+    payload: TrucNguoiPayload,
+  ): Promise<TrucNguoiResponse> => {
+    const res = await apiNoPrefix.put<TrucNguoiResponse>(
+      `/truc-ban-tac-chien/${id}`,
+      payload,
+    );
+    return res.data;
+  },
+
+  deleteTrucBanTacChien: async (id: string): Promise<TrucNguoiResponse> => {
+    const res = await apiNoPrefix.delete<TrucNguoiResponse>(
+      `/truc-ban-tac-chien/${id}`,
+    );
+    return res.data;
+  },
 };
 

@@ -44,19 +44,35 @@ const CAP_BAC_OPTIONS = [
   "Đại úy",
   "Thiếu tá",
   "Trung tá",
+  "Đại tá",
   "Thiếu úy QNCN",
   "Trung úy QNCN",
   "Thượng úy QNCN",
   "Đại úy QNCN",
   "Thiếu tá QNCN",
   "Trung tá QNCN",
+  "Thượng tá QNCN",
 ];
 
-const CAP_BAC_CHI_HUY_DEFAULT = ["Đại úy", "Thiếu tá", "Trung tá"];
+const CAP_BAC_CHI_HUY_DEFAULT = [
+  "Thượng úy",
+  "Đại úy",
+  "Thiếu tá",
+  "Trung tá",
+  "Thượng tá",
+  "Đại tá",
+];
 const CAP_BAC_CHI_HUY_SU_DOAN = ["Trung tá", "Thượng tá", "Đại tá"];
 
-const CAP_BAC_TAC_CHIEN_DEFAULT = ["Thượng úy", "Đại úy", "Thiếu tá", "Trung tá"];
-const CAP_BAC_TAC_CHIEN_SU_DOAN = ["Thiếu tá", "Trung tá", "Thượng tá", "Đại tá"];
+const CAP_BAC_TAC_CHIEN_DEFAULT = [
+  "Thiếu úy",
+  "Trung úy",
+  "Thượng úy",
+  "Đại úy",
+  "Thiếu tá",
+  "Trung tá",
+];
+const CAP_BAC_TAC_CHIEN_SU_DOAN = ["Trung tá", "Thượng tá", "Đại tá"];
 
 const EMPTY_TRUC: TrucNguoiInfo = {
   tenNguoitruc: "",
@@ -205,20 +221,20 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
         maDonViCurrent!,
         yesterday,
       );
-     if (res.success && res.Result) {
-       if (res.Result.chiTietVang) {
-         const rows = JSON.parse(res.Result.chiTietVang) as AbsentRow[];
-         if (rows.length > 0) {
-           setAbsentRows(rows.map((r) => ({ ...r, id: crypto.randomUUID() })));
-         } else {
-           showWarning("Hôm qua không có quân nhân vắng.");
-         }
-       } else {
-         showWarning("Hôm qua không có quân nhân vắng.");
-       }
-     } else {
-       showWarning(`Không tìm thấy báo cáo ngày ${yesterday}.`);
-     }
+      if (res.success && res.Result) {
+        if (res.Result.chiTietVang) {
+          const rows = JSON.parse(res.Result.chiTietVang) as AbsentRow[];
+          if (rows.length > 0) {
+            setAbsentRows(rows.map((r) => ({ ...r, id: crypto.randomUUID() })));
+          } else {
+            showWarning("Hôm qua không có quân nhân vắng.");
+          }
+        } else {
+          showWarning("Hôm qua không có quân nhân vắng.");
+        }
+      } else {
+        showWarning(`Không tìm thấy báo cáo ngày ${yesterday}.`);
+      }
     } catch {
       showWarning(`Không tìm thấy báo cáo ngày ${yesterday}.`);
     } finally {
@@ -388,7 +404,10 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                 Cấp bậc <span className={styles.required}>*</span>
               </label>
               <CustomSelect
-                options={(isSuDoan ? CAP_BAC_CHI_HUY_SU_DOAN : CAP_BAC_CHI_HUY_DEFAULT).map((cb) => ({
+                options={(isSuDoan
+                  ? CAP_BAC_CHI_HUY_SU_DOAN
+                  : CAP_BAC_CHI_HUY_DEFAULT
+                ).map((cb) => ({
                   value: cb,
                   label: cb,
                 }))}
@@ -465,7 +484,10 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                 Cấp bậc <span className={styles.required}>*</span>
               </label>
               <CustomSelect
-                options={(isSuDoan ? CAP_BAC_TAC_CHIEN_SU_DOAN : CAP_BAC_TAC_CHIEN_DEFAULT).map((cb) => ({
+                options={(isSuDoan
+                  ? CAP_BAC_TAC_CHIEN_SU_DOAN
+                  : CAP_BAC_TAC_CHIEN_DEFAULT
+                ).map((cb) => ({
                   value: cb,
                   label: cb,
                 }))}
