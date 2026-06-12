@@ -21,10 +21,8 @@ interface DropdownPos {
   top: number;
   left: number;
   width: number;
-  openUpward: boolean;
 }
 
-const DROPDOWN_MAX_HEIGHT = 220;
 const DROPDOWN_OFFSET = 4;
 
 export default function CustomSelect({
@@ -37,32 +35,26 @@ export default function CustomSelect({
   const [isOpen, setIsOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const [dropdownPos, setDropdownPos] = useState<DropdownPos | null>(null);
+
   const wrapperRef = useRef<HTMLDivElement>(null);
+
   const selectedLabel =
     options.find((o) => o.value === value)?.label ?? placeholder;
 
   const calcPos = useCallback(
-    (rect: DOMRect): DropdownPos => {
-      const spaceBelow = window.innerHeight - rect.bottom;
-      const openUpward =
-        spaceBelow < DROPDOWN_MAX_HEIGHT + DROPDOWN_OFFSET &&
-        rect.top > DROPDOWN_MAX_HEIGHT + DROPDOWN_OFFSET;
-
-      return {
-        top: openUpward
-          ? rect.top + window.scrollY - DROPDOWN_MAX_HEIGHT - DROPDOWN_OFFSET
-          : rect.bottom + window.scrollY + DROPDOWN_OFFSET,
-        left: rect.left + window.scrollX,
-        width: Math.max(rect.width, variant === "table" ? 180 : rect.width),
-        openUpward,
-      };
-    },
+    (rect: DOMRect): DropdownPos => ({
+      top: rect.bottom + window.scrollY + DROPDOWN_OFFSET,
+      left: rect.left + window.scrollX,
+      width: Math.max(rect.width, variant === "table" ? 180 : rect.width),
+    }),
     [variant],
   );
 
   const openDropdown = useCallback(() => {
     if (!wrapperRef.current) return;
+
     const rect = wrapperRef.current.getBoundingClientRect();
+
     setDropdownPos(calcPos(rect));
     setIsOpen(true);
     setFocusedIndex(options.findIndex((o) => o.value === value));
@@ -75,6 +67,7 @@ export default function CustomSelect({
 
   useEffect(() => {
     if (!isOpen) return;
+
     const handleClick = (e: MouseEvent) => {
       if (
         wrapperRef.current &&
@@ -83,19 +76,27 @@ export default function CustomSelect({
         closeDropdown();
       }
     };
+
     document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+    };
   }, [isOpen, closeDropdown]);
 
   useEffect(() => {
     if (!isOpen) return;
+
     const update = () => {
       if (!wrapperRef.current) return;
+
       const rect = wrapperRef.current.getBoundingClientRect();
       setDropdownPos(calcPos(rect));
     };
+
     window.addEventListener("scroll", update, true);
     window.addEventListener("resize", update);
+
     return () => {
       window.removeEventListener("scroll", update, true);
       window.removeEventListener("resize", update);
@@ -110,10 +111,12 @@ export default function CustomSelect({
       }
       return;
     }
+
     if (e.key === "Escape") {
       closeDropdown();
       return;
     }
+
     if (e.key === "ArrowDown") {
       e.preventDefault();
       setFocusedIndex((i) => Math.min(i + 1, options.length - 1));
@@ -131,7 +134,7 @@ export default function CustomSelect({
     isOpen && dropdownPos
       ? createPortal(
           <ul
-            className={`${styles.dropdown} ${dropdownPos.openUpward ? styles.dropdownUpward : ""}`}
+            className={styles.dropdown}
             style={{
               position: "absolute",
               top: dropdownPos.top,
@@ -145,6 +148,7 @@ export default function CustomSelect({
           >
             {options.map((opt, i) => {
               const isSelected = opt.value === value;
+
               return (
                 <li
                   key={opt.value}
@@ -160,6 +164,7 @@ export default function CustomSelect({
                   }}
                 >
                   {opt.label}
+
                   {isSelected && (
                     <FontAwesomeIcon
                       icon={faCheck}
@@ -178,21 +183,29 @@ export default function CustomSelect({
   return (
     <div
       ref={wrapperRef}
-      className={`${styles.wrapper} ${variant === "table" ? styles.tableVariant : ""}`}
+      className={`${styles.wrapper} ${
+        variant === "table" ? styles.tableVariant : ""
+      }`}
     >
       <button
         type="button"
-        className={`${styles.trigger} ${isOpen ? styles.triggerOpen : ""}`}
+        className={`${styles.trigger} ${
+          isOpen ? styles.triggerOpen : ""
+        }`}
         onClick={() => (isOpen ? closeDropdown() : openDropdown())}
         onKeyDown={handleKeyDown}
       >
         <span className={styles.triggerLabel}>{selectedLabel}</span>
+
         <FontAwesomeIcon
           icon={faChevronDown}
-          className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ""}`}
+          className={`${styles.chevron} ${
+            isOpen ? styles.chevronOpen : ""
+          }`}
           size="xs"
         />
       </button>
+
       {dropdownEl}
     </div>
   );

@@ -147,41 +147,45 @@
 --chart-cyan: #06b6d4;
 --chart-pink: #ec4899;
 
-/* Loại quân */
---chart-sq: #3b82f6;        /* Sĩ quan - Xanh dương */
---chart-qncn: #a855f7;      /* QNCN - Tím */
---chart-hsn1: #22c55e;      /* HSQ-CS Năm 1 - Xanh lá */
---chart-hsn2: #f97316;      /* HSQ-CS Năm 2 - Cam */
+--chart-sq: #3b82f6;      
+--chart-qncn: #a855f7;     
+--chart-hsn1: #22c55e;    
+--chart-hsn2: #f97316;     
 
-/* Tham gia / Vắng */
+
 --chart-present: #22c55e;
 --chart-absent: #ef4444;
 
-/* Bar chart */
+
 --bar-bg: rgba(59, 130, 246, 0.12);
 --bar-hover: rgba(59, 130, 246, 0.2);
 
-/* Nút Phê duyệt (Màu Xanh lá - Approve) */  
 --btn-approve-fg: #065f46;  
 --btn-approve-bg: #d1fae5;  
 --btn-approve-border: #6ee7b7;  
 --btn-approve-hover-bg: #a7f3d0;  
 --btn-approve-hover-border: #34d399;  
   
-/* Nút Từ chối (Màu Đỏ - Refuse) */  
+ 
 --btn-refuse-fg: #991b1b;  
 --btn-refuse-bg: #fee2e2;  
 --btn-refuse-border: #fca5a5;  
 --btn-refuse-hover-bg: #fecaca;  
 --btn-refuse-hover-border: #f87171;  
   
-/* Nút Thu hồi (Màu Vàng hổ phách - Recall) */  
+
 --btn-recall-fg: #92400e;  
 --btn-recall-bg: #fef3c7;  
 --btn-recall-border: #fde68a;  
 --btn-recall-hover-bg: #fde68a;  
 --btn-recall-hover-border: #f59e0b;
+
+--info-field-bg: #cfe9da;      
+--info-field-border: #7fb095; 
+
 }
+
+
 
 /* ==========================================================================  
    DARK THEME SYSTEM  
@@ -345,4 +349,8 @@
 --btn-recall-border: rgba(245, 158, 11, 0.35);  
 --btn-recall-hover-bg: rgba(245, 158, 11, 0.25);  
 --btn-recall-hover-border: #fbbf24;
+
+--info-field-bg: #2a3d35; 
+--info-field-border: #5c8a70;  
+
 }

@@ -16,14 +16,14 @@ import { useToast } from "../../context/useToast";
 import ConfirmDialog from "../../components/ui/ConfirmDialog/ConfirmDialog";
 
 const LY_DO_OPTIONS: { value: keyof VangChiTiet; label: string }[] = [
-  { value: "hoiThaiNgoaiSuDoan", label: "Hội thao - Ngoài Sư Đoàn" },
+  { value: "hoiThaiNgoaiSuDoan", label: "Hội thao - Ngoài Sư đoàn" },
   { value: "hoiThaiEF", label: "Hội thao - e, f" },
-  { value: "xayDungNgoaiSuDoan", label: "Xây dựng - Ngoài Sư Đoàn" },
+  { value: "xayDungNgoaiSuDoan", label: "Xây dựng - Ngoài Sư đoàn" },
   { value: "xayDungEF", label: "Xây dựng - e, f" },
-  { value: "vienNgoaiSuDoan", label: "Viện - Ngoài Sư Đoàn" },
+  { value: "vienNgoaiSuDoan", label: "Viện - Ngoài Sư đoàn" },
   { value: "vienEF", label: "Viện - e, f" },
-  { value: "congTacNgoaiSuDoan", label: "Công tác - Ngoài Sư Đoàn" },
-  { value: "congTacSuDoan", label: "Công tác - Sư Đoàn" },
+  { value: "congTacNgoaiSuDoan", label: "Công tác - Ngoài Sư đoàn" },
+  { value: "congTacSuDoan", label: "Công tác - Sư đoàn" },
   { value: "hocSQ", label: "Học - Sĩ quan" },
   { value: "hocCS", label: "Học - Chiến sĩ" },
   { value: "choHuu", label: "Chờ hưu" },
@@ -377,7 +377,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
           <hr className={styles.divider} />
 
           <div className={styles.trucSectionHeader}>
-            <span className={styles.trucSectionTitle}>Trực chỉ huy đơn vị</span>
+            <span className={styles.trucSectionTitle}>Trực chỉ huy</span>
           </div>
           <div className={styles.coreGrid}>
             <div className={styles.field}>
@@ -455,7 +455,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
           {/* TRỰC BAN TÁC CHIẾN ĐƠN VỊ */}
           <div className={styles.trucSectionHeader}>
             <span className={styles.trucSectionTitle}>
-              Trực ban tác chiến đơn vị
+              Trực ban nội vụ
             </span>
           </div>
           <div className={styles.coreGrid}>
@@ -538,7 +538,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
             <h3 className={styles.sectionTitle}>
               {isConsolidation
                 ? "Danh sách tổng hợp quân nhân vắng mặt (từ các đơn vị con)"
-                : "Danh sách chi tiết quân nhân vắng mặt trong ngày"}
+                : "Danh sách quân nhân vắng mặt"}
             </h3>
             <div className={styles.sectionActions}>
               {!isConsolidation && !initialData && (

@@ -4,7 +4,7 @@ import Toast from "./Toast";
 import styles from "./Toast.module.css";
 
 export default function ToastContainer() {
-  const { toasts, removeToast } = useContext(ToastContext);
+  const { toasts, removeToast } = useContext(ToastContext)!;
 
   return (
     <div className={styles.container}>

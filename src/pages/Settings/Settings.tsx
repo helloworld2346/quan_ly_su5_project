@@ -189,7 +189,7 @@ export default function Settings() {
 
       <div className={styles.card}>
         <div className={styles.cardHeader}>
-          <h2 className={styles.cardTitle}>Thông tin cá nhân</h2>
+          <h2 className={styles.cardTitle}>Thông tin đơn vị</h2>
         </div>
 
         <div className={styles.form}>
@@ -301,6 +301,49 @@ export default function Settings() {
                   </button>
                 </div>
               </div>
+              <div className={styles.formGroup}>
+                <label>Quân số QNCN</label>
+                <div className={styles.numberInput}>
+                  <button
+                    type="button"
+                    className={`${styles.numberInputBtn} ${styles.numberInputBtnLeft}`}
+                    onClick={() => {
+                      const v = Math.max(0, quanSoQncn - 1);
+                      setQuanSoQncn(v);
+                      setQncnStr(String(v));
+                    }}
+                  >
+                    −
+                  </button>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={qncnStr}
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/[^0-9]/g, "");
+                      setQncnStr(raw);
+                      setQuanSoQncn(raw === "" ? 0 : parseInt(raw, 10));
+                    }}
+                    onBlur={() => {
+                      if (qncnStr === "") setQncnStr("0");
+                    }}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className={`${styles.numberInputBtn} ${styles.numberInputBtnRight}`}
+                    onClick={() => {
+                      const v = quanSoQncn + 1;
+                      setQuanSoQncn(v);
+                      setQncnStr(String(v));
+                    }}
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
 
               <div className={styles.formGroup}>
                 <label>Quân số HSQ-BS</label>
@@ -338,49 +381,6 @@ export default function Settings() {
                       const v = quanSoHsqBs + 1;
                       setQuanSoHsqBs(v);
                       setHsqBsStr(String(v));
-                    }}
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label>Quân số QNCN</label>
-                <div className={styles.numberInput}>
-                  <button
-                    type="button"
-                    className={`${styles.numberInputBtn} ${styles.numberInputBtnLeft}`}
-                    onClick={() => {
-                      const v = Math.max(0, quanSoQncn - 1);
-                      setQuanSoQncn(v);
-                      setQncnStr(String(v));
-                    }}
-                  >
-                    −
-                  </button>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    value={qncnStr}
-                    onChange={(e) => {
-                      const raw = e.target.value.replace(/[^0-9]/g, "");
-                      setQncnStr(raw);
-                      setQuanSoQncn(raw === "" ? 0 : parseInt(raw, 10));
-                    }}
-                    onBlur={() => {
-                      if (qncnStr === "") setQncnStr("0");
-                    }}
-                    required
-                  />
-                  <button
-                    type="button"
-                    className={`${styles.numberInputBtn} ${styles.numberInputBtnRight}`}
-                    onClick={() => {
-                      const v = quanSoQncn + 1;
-                      setQuanSoQncn(v);
-                      setQncnStr(String(v));
                     }}
                   >
                     +

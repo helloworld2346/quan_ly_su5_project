@@ -91,7 +91,7 @@ export default function Login({ onSuccess }: Props) {
 
         <header className={styles.branding}>
           <p className={styles.unitName}>Sư đoàn 5</p>
-          <p className={styles.appName}>Phần mềm thống kê báo ban quân số</p>
+          <p className={styles.appName}>Phần mềm thống kê quân số</p>
         </header>
 
         <div className={styles.divider} role="presentation" />
