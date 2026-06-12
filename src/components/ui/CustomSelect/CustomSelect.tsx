@@ -18,12 +18,16 @@ export interface CustomSelectProps {
 }
 
 interface DropdownPos {
-  top: number;
+  top?: number;
+  bottom?: number;
   left: number;
   width: number;
+  maxHeight: number;
 }
 
 const DROPDOWN_OFFSET = 4;
+const DEFAULT_MAX_HEIGHT = 220;
+const MIN_DROPDOWN_HEIGHT = 120;
 
 export default function CustomSelect({
   options,
@@ -42,11 +46,40 @@ export default function CustomSelect({
     options.find((o) => o.value === value)?.label ?? placeholder;
 
   const calcPos = useCallback(
-    (rect: DOMRect): DropdownPos => ({
-      top: rect.bottom + window.scrollY + DROPDOWN_OFFSET,
-      left: rect.left + window.scrollX,
-      width: Math.max(rect.width, variant === "table" ? 180 : rect.width),
-    }),
+    (rect: DOMRect): DropdownPos => {
+      const viewportHeight = window.innerHeight;
+      const spaceBelow = viewportHeight - rect.bottom - DROPDOWN_OFFSET;
+      const spaceAbove = rect.top - DROPDOWN_OFFSET;
+
+      const width = Math.max(
+        rect.width,
+        variant === "table" ? 180 : rect.width,
+      );
+
+      // Ưu tiên mở xuống nếu đủ chỗ (hoặc không gian dưới >= không gian trên)
+      if (spaceBelow >= MIN_DROPDOWN_HEIGHT || spaceBelow >= spaceAbove) {
+        return {
+          top: rect.bottom + window.scrollY + DROPDOWN_OFFSET,
+          left: rect.left + window.scrollX,
+          width,
+          maxHeight: Math.min(
+            DEFAULT_MAX_HEIGHT,
+            Math.max(spaceBelow, MIN_DROPDOWN_HEIGHT),
+          ),
+        };
+      }
+
+      // Không đủ chỗ dưới -> mở lên trên
+      return {
+        bottom: viewportHeight - rect.top + window.scrollY + DROPDOWN_OFFSET,
+        left: rect.left + window.scrollX,
+        width,
+        maxHeight: Math.min(
+          DEFAULT_MAX_HEIGHT,
+          Math.max(spaceAbove, MIN_DROPDOWN_HEIGHT),
+        ),
+      };
+    },
     [variant],
   );
 
@@ -137,9 +170,12 @@ export default function CustomSelect({
             className={styles.dropdown}
             style={{
               position: "absolute",
-              top: dropdownPos.top,
+              ...(dropdownPos.top !== undefined
+                ? { top: dropdownPos.top }
+                : { bottom: dropdownPos.bottom }),
               left: dropdownPos.left,
               width: dropdownPos.width,
+              maxHeight: dropdownPos.maxHeight,
             }}
             onMouseDown={(e) => {
               e.preventDefault();
