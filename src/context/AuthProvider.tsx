@@ -32,6 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>(() =>
     notificationStorage.get(),
   );
+  const [showForceLogout, setShowForceLogout] = useState(false);
   const { showError, showSuccess } = useToast();
 
   const fetchData = useCallback(async () => {
@@ -74,11 +75,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const mapped = (apiNotifs.Result ?? []).map(mapApiNotification);
             notificationStorage.set(mapped);
             setNotifications(mapped);
-            mapped.forEach((n) => {
-              window.dispatchEvent(
-                new CustomEvent("new-notification", { detail: n }),
-              );
-            });
           } catch {
             // Không block auth nếu notification lỗi
           }
@@ -105,6 +101,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             message?: string;
             id?: string;
           };
+
+          if (msg.type === "FORCE_LOGOUT") {
+            setShowForceLogout(true);
+            setTimeout(() => {
+              localStorage.clear();
+              window.location.href = "/login";
+            }, 2500);
+            return;
+          }
 
           if (msg.title || msg.message) {
             const newNotif: Notification = {
@@ -182,6 +187,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       donViCha: donVi.tenDonvi,
       donViCon: [],
       kyhieuDonvi: "",
+      capDonVi: null,
       quanSoHsqBs: 0,
       quanSoQncn: 0,
       quanSoSiQuan: 0,
@@ -255,6 +261,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }}
     >
       {children}
+      {showForceLogout && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.6)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+          }}
+        >
+          <div
+            style={{
+              background: "#fff",
+              borderRadius: "12px",
+              padding: "32px 40px",
+              textAlign: "center",
+              maxWidth: "360px",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+            }}
+          >
+            <p
+              style={{
+                fontSize: "18px",
+                fontWeight: 600,
+                marginBottom: "8px",
+                color: "#d32f2f",
+              }}
+            >
+              Phiên đăng nhập bị ngắt
+            </p>
+            <p style={{ color: "#444", marginBottom: "16px" }}>
+              Tài khoản này vừa đăng nhập ở thiết bị khác.
+            </p>
+            <p style={{ color: "#999", fontSize: "14px" }}>
+              Tự động đăng xuất sau vài giây...
+            </p>
+          </div>
+        </div>
+      )}
     </AuthContext.Provider>
   );
 }
