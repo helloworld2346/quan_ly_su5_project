@@ -5,6 +5,7 @@ export type NavItemId =
   | "executive"
   | "executive-training"
   | "report-troop"
+  | "report-political-work"
   | "report-training"
   | "report-family"
   | "report-communication"
@@ -27,24 +28,36 @@ export type NavItem = {
 const ExecutiveDashboard = lazy(
   () => import("../pages/Executive/ExecutiveDashboard"),
 );
+
 const DailyTroopReport = lazy(
   () => import("../pages/DailyReport/DailyTroopReport"),
 );
+
+const PoliticalWorkReport = lazy(
+  () => import("../pages/PoliticalWorkReport/PoliticalWorkReport"),
+);
+
 const TrainingReport = lazy(
   () => import("../pages/TrainingReport/TrainingReport"),
 );
+
 const FamilyReport = lazy(() => import("../pages/FamilyReport/FamilyReport"));
+
 const CommunicationReport = lazy(
   () => import("../pages/CommunicationReport/CommunicationReport"),
 );
+
 const ReportStatistics = lazy(
   () => import("../pages/ReportStatistics/ReportStatistics"),
 );
+
 const DutyPersonnel = lazy(() => import("../pages/CommandDuty/DutyPersonnel"));
 const DutyShifts = lazy(() => import("../pages/CommandDuty/DutyShifts"));
+
 const CreateDutyShift = lazy(
   () => import("../pages/CommandDuty/CreateDutyShift"),
 );
+
 const Settings = lazy(() => import("../pages/Settings/Settings"));
 
 const Trainningstatistical = lazy(
@@ -77,18 +90,27 @@ export const EXECUTIVE_NAV_GROUP = {
 };
 
 export const REPORT_NAV_GROUP = {
-  label: "Báo ban",
+  label: "Thống kê",
   labelByRole: {
     "Báo cáo": "Báo ban",
   },
   items: [
     {
       id: "report-troop" as const,
-      label: "Báo ban ngày",
+      label: "Thống kê quân số hoạt động trong ngày ",
       path: "/daily-report",
       loadingTitle: "Đang tải báo cáo ngày",
       loadingSubtitle: "Đang tải dữ liệu…",
       component: DailyTroopReport,
+      allowedRoles: ["Quản Trị Viên", "Sư đoàn", "Chỉ huy", "Báo cáo"],
+    },
+    {
+      id: "report-political-work" as const,
+      label: "Hoạt động Công tác Đảng, công tác chính trị",
+      path: "/political-work-report",
+      loadingTitle: "Đang tải công tác Đảng, công tác chính trị",
+      loadingSubtitle: "Đang tải dữ liệu…",
+      component: PoliticalWorkReport,
       allowedRoles: ["Quản Trị Viên", "Sư đoàn", "Chỉ huy", "Báo cáo"],
     },
     {
@@ -178,6 +200,7 @@ export const NAV_PAGE_TITLES: Record<NavItemId, string> = {
   executive: "Tổng hợp ngày",
   "executive-training": "Tổng hợp huấn luyện",
   "report-troop": "Báo ban ngày",
+  "report-political-work": "Công tác Đảng, công tác chính trị",
   "report-training": "Thống kê quân số huấn luyện",
   "report-family": "Báo ban thân nhân thăm nuôi",
   "report-communication": "Báo ban thông tin liên lạc",
@@ -222,18 +245,23 @@ export function getNavGroupLabel(activeId: NavItemId): string | null {
   return null;
 }
 
+
+
 export function getNavGroupLabelByRole(
   groupLabel: string,
   userRole: string | null,
   isParentUnit: boolean = false,
 ): string {
   const normalized = userRole ? normalizeRoleName(userRole) : null;
+
   if (groupLabel === "Thống kê báo cáo" && normalized === "Báo cáo") {
     return isParentUnit ? "Tổng Hợp - Báo Ban" : "Báo Ban";
   }
+
   if (groupLabel === "Thống kê báo cáo" && normalized === "Chỉ huy") {
     return "Phê duyệt báo ban";
   }
+
   return groupLabel;
 }
 
@@ -291,6 +319,7 @@ export function getLoadingText(id: NavItemId): {
   subtitle: string;
 } {
   const item = getNavItemById(id);
+
   return {
     title: item?.loadingTitle || "Đang tải",
     subtitle: item?.loadingSubtitle || "Vui lòng chờ…",

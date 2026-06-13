@@ -212,7 +212,8 @@
   display: flex;  
   align-items: center;  
   position: relative;  
-  white-space: nowrap;  
+  white-space: normal;  
+   word-break: break-word;
 }  
   
 .subItem::before {  
@@ -292,45 +293,4 @@
   border-color: var(--sidebar-logout-border-hover);  
 }  
     
-.collapsed {  
-  width: var(--sidebar-collapsed-width);  
-  padding: 24px 10px 20px;  
-  overflow-x: hidden;  
-}  
-  
-.collapsed .logout {  
-  padding: 11px 0;  
-}  
-  
-.collapsed .navItem,  
-.collapsed .subItem,  
-.collapsed .groupToggle {  
-  position: relative;  
-  justify-content: center;  
-  padding: 14px 0;  
-}  
-  
-.collapsed .subList {  
-  padding-left: 0;  
-}  
-  
-.collapsed .chevron,  
-.collapsed .chevronOpen {  
-  display: none;  
-}  
-  
-.collapsed .brand {  
-  padding: 0 4px 16px;  
-  margin-bottom: 16px;  
-}  
-  
-.collapsed .logo {  
-  width: 56px;  
-  height: 56px;  
-  margin-bottom: 0;  
-}  
-  
-.collapsed .navIcon {  
-  width: 26px;  
-  font-size: 22px;  
-}
+   
