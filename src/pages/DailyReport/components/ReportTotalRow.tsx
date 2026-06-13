@@ -1,7 +1,7 @@
 import { createPortal } from "react-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisVertical, faEye } from "@fortawesome/free-solid-svg-icons";
-import styles from "./DailyTroopReport.module.css";
+import styles from "../DailyTroopReport.module.css";
 
 type DisplayTotals = {
   quanSoTong: number;

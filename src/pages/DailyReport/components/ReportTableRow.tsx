@@ -5,9 +5,9 @@ import {
   faEye,
   faPenToSquare,
 } from "@fortawesome/free-solid-svg-icons";
-import ReportStatusBadge from "../../components/ui/ReportStatusBadge/ReportStatusBadge";
-import styles from "./DailyTroopReport.module.css";
-import type { ReportRow } from "../../types/dailyReport";
+import ReportStatusBadge from "../../../components/ui/ReportStatusBadge/ReportStatusBadge";
+import styles from "../DailyTroopReport.module.css";
+import type { ReportRow } from "../../../types/dailyReport";
 
 type Props = {
   row: ReportRow;

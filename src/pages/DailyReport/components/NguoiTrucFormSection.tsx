@@ -1,6 +1,6 @@
-import styles from "./CreateReportModal.module.css";
-import CustomSelect from "../../components/ui/CustomSelect/CustomSelect";
-import type { TrucNguoiInfo } from "../../types/dailyReport";
+import styles from "../CreateReportModal.module.css";
+import CustomSelect from "../../../components/ui/CustomSelect/CustomSelect";
+import type { TrucNguoiInfo } from "../../../types/dailyReport";
 
 type Props = {
   title: string;

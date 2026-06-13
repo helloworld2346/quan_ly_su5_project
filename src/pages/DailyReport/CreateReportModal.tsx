@@ -19,8 +19,8 @@ import {
   EMPTY_TRUC,
   parseTrucNguoi,
 } from "../../utils/reportUtils";
-import TrucNguoiFormSection from "../DailyReport/NguoiTrucFormSection";
-import AbsentRowsTable from "./AbsentRowsTable";  
+import TrucNguoiFormSection from "./components/NguoiTrucFormSection";
+import AbsentRowsTable from "./components/AbsentRowsTable";
 
 interface CreateReportModalProps {
   isOpen: boolean;

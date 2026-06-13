@@ -23,9 +23,9 @@ import {
   normalizeRoleName,
   EMPTY_VANG,
 } from "../../utils/reportUtils";
-import ReportTableHeader from "./ReportTableHeader";
-import ReportTableRow from "./ReportTableRow";
-import ReportTotalRow from "./ReportTotalRow";
+import ReportTableHeader from "./components/ReportTableHeader";
+import ReportTableRow from "./components/ReportTableRow";
+import ReportTotalRow from "./components/ReportTotalRow";
 import { useReportPermissions } from "./hooks/useReportPermissions";
 
 export default function DailyTroopReport() {

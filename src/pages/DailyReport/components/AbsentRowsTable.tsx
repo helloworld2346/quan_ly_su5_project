@@ -1,9 +1,9 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
-import CustomSelect from "../../components/ui/CustomSelect/CustomSelect";
-import styles from "./CreateReportModal.module.css";
-import type { AbsentRow, VangChiTiet } from "../../types/dailyReport";
-import { LY_DO_OPTIONS, CAP_BAC_OPTIONS } from "../../utils/reportUtils";
+import CustomSelect from "../../../components/ui/CustomSelect/CustomSelect";
+import styles from "../CreateReportModal.module.css";
+import type { AbsentRow, VangChiTiet } from "../../../types/dailyReport";
+import { LY_DO_OPTIONS, CAP_BAC_OPTIONS } from "../../../utils/reportUtils";
 
 type Props = {
   rows: AbsentRow[];
