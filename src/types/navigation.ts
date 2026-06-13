@@ -175,7 +175,7 @@ export const SETTINGS_NAV: NavItem = {
   allowedRoles: ["Quản Trị Viên", "Sư đoàn", "Chỉ huy", "Báo cáo"],
 };
 
-export const NAV_PAGE_TITLES: Record<NavItemId, string | undefined> = {
+export const NAV_PAGE_TITLES: Record<NavItemId, string> = {
   executive: "Tổng hợp ngày",
   "executive-training": "Tổng hợp huấn luyện",
   "report-troop": "Báo ban ngày",

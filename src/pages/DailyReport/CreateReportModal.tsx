@@ -9,86 +9,18 @@ import type {
   TrucNguoiInfo,
 } from "../../types/dailyReport";
 import { dailyReportService } from "../../services/dailyReport/dailyReportService";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
-import CustomSelect from "../../components/ui/CustomSelect/CustomSelect";
 import { useToast } from "../../context/useToast";
 import ConfirmDialog from "../../components/ui/ConfirmDialog/ConfirmDialog";
-
-const LY_DO_OPTIONS: { value: keyof VangChiTiet; label: string }[] = [
-  { value: "hoiThaiNgoaiSuDoan", label: "Hội thao - Ngoài Sư đoàn" },
-  { value: "hoiThaiEF", label: "Hội thao - e, f" },
-  { value: "xayDungNgoaiSuDoan", label: "Xây dựng - Ngoài Sư đoàn" },
-  { value: "xayDungEF", label: "Xây dựng - e, f" },
-  { value: "vienNgoaiSuDoan", label: "Viện - Ngoài Sư đoàn" },
-  { value: "vienEF", label: "Viện - e, f" },
-  { value: "congTacNgoaiSuDoan", label: "Công tác - Ngoài Sư đoàn" },
-  { value: "congTacSuDoan", label: "Công tác - Sư đoàn" },
-  { value: "hocSQ", label: "Học - Sĩ quan" },
-  { value: "hocCS", label: "Học - Chiến sĩ" },
-  { value: "choHuu", label: "Chờ hưu" },
-  { value: "nghiTranhThu", label: "Nghỉ tranh thủ" },
-  { value: "phep", label: "Phép" },
-  { value: "lyDoVangKhac", label: "Lý do khác" },
-];
-
-const CAP_BAC_OPTIONS = [
-  "Binh nhất",
-  "Binh nhì",
-  "Hạ sĩ",
-  "Trung sĩ",
-  "Thượng sĩ",
-  "Thiếu úy",
-  "Trung úy",
-  "Thượng úy",
-  "Đại úy",
-  "Thiếu tá",
-  "Trung tá",
-  "Đại tá",
-  "Thiếu úy QNCN",
-  "Trung úy QNCN",
-  "Thượng úy QNCN",
-  "Đại úy QNCN",
-  "Thiếu tá QNCN",
-  "Trung tá QNCN",
-  "Thượng tá QNCN",
-];
-
-const CAP_BAC_CHI_HUY_DEFAULT = [
-  "Thượng úy",
-  "Đại úy",
-  "Thiếu tá",
-  "Trung tá",
-  "Thượng tá",
-  "Đại tá",
-];
-const CAP_BAC_CHI_HUY_SU_DOAN = ["Trung tá", "Thượng tá", "Đại tá"];
-
-const CAP_BAC_TAC_CHIEN_DEFAULT = [
-  "Thiếu úy",
-  "Trung úy",
-  "Thượng úy",
-  "Đại úy",
-  "Thiếu tá",
-  "Trung tá",
-];
-const CAP_BAC_TAC_CHIEN_SU_DOAN = ["Trung tá", "Thượng tá", "Đại tá"];
-
-const EMPTY_TRUC: TrucNguoiInfo = {
-  tenNguoitruc: "",
-  capbacNguoitruc: "",
-  chucvuNguoitruc: "",
-  sodienthoai: "",
-};
-
-function parseTrucNguoi(raw?: string): TrucNguoiInfo {
-  if (!raw) return { ...EMPTY_TRUC };
-  try {
-    return JSON.parse(raw) as TrucNguoiInfo;
-  } catch {
-    return { ...EMPTY_TRUC };
-  }
-}
+import {
+  CAP_BAC_CHI_HUY_DEFAULT,
+  CAP_BAC_CHI_HUY_SU_DOAN,
+  CAP_BAC_TAC_CHIEN_DEFAULT,
+  CAP_BAC_TAC_CHIEN_SU_DOAN,
+  EMPTY_TRUC,
+  parseTrucNguoi,
+} from "../../utils/reportUtils";
+import TrucNguoiFormSection from "../DailyReport/NguoiTrucFormSection";
+import AbsentRowsTable from "./AbsentRowsTable";  
 
 interface CreateReportModalProps {
   isOpen: boolean;
@@ -377,162 +309,23 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
 
           <hr className={styles.divider} />
 
-          <div className={styles.trucSectionHeader}>
-            <span className={styles.trucSectionTitle}>Trực chỉ huy</span>
-          </div>
-          <div className={styles.coreGrid}>
-            <div className={styles.field}>
-              <label className={styles.label}>
-                Họ và tên <span className={styles.required}>*</span>
-              </label>
-              <input
-                type="text"
-                className={styles.input}
-                value={trucChiHuy.tenNguoitruc}
-                onChange={(e) =>
-                  setTrucChiHuy((prev) => ({
-                    ...prev,
-                    tenNguoitruc: e.target.value,
-                  }))
-                }
-                placeholder="Nhập họ và tên..."
-                required
-              />
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label}>
-                Cấp bậc <span className={styles.required}>*</span>
-              </label>
-              <CustomSelect
-                options={(isSuDoan
-                  ? CAP_BAC_CHI_HUY_SU_DOAN
-                  : CAP_BAC_CHI_HUY_DEFAULT
-                ).map((cb) => ({
-                  value: cb,
-                  label: cb,
-                }))}
-                value={trucChiHuy.capbacNguoitruc}
-                onChange={(val) =>
-                  setTrucChiHuy((prev) => ({ ...prev, capbacNguoitruc: val }))
-                }
-                placeholder="Chọn cấp bậc"
-              />
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label}>
-                Chức vụ <span className={styles.required}>*</span>
-              </label>
-              <input
-                type="text"
-                className={styles.input}
-                value={trucChiHuy.chucvuNguoitruc}
-                onChange={(e) =>
-                  setTrucChiHuy((prev) => ({
-                    ...prev,
-                    chucvuNguoitruc: e.target.value,
-                  }))
-                }
-                placeholder="Nhập chức vụ..."
-                required
-              />
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label}>Số điện thoại</label>
-              <input
-                type="text"
-                className={styles.input}
-                value={trucChiHuy.sodienthoai}
-                onChange={(e) => {
-                  const val = e.target.value.replace(/[^\d+\-\s]/g, "");
-                  setTrucChiHuy((prev) => ({ ...prev, sodienthoai: val }));
-                }}
-                placeholder="Nhập số điện thoại..."
-              />
-            </div>
-          </div>
-
+          <TrucNguoiFormSection
+            title="Trực chỉ huy"
+            value={trucChiHuy}
+            onChange={setTrucChiHuy}
+            capBacOptions={
+              isSuDoan ? CAP_BAC_CHI_HUY_SU_DOAN : CAP_BAC_CHI_HUY_DEFAULT
+            }
+          />
           <hr className={styles.divider} />
-
-          {/* TRỰC BAN TÁC CHIẾN ĐƠN VỊ */}
-          {/* TRỰC BAN TÁC CHIẾN ĐƠN VỊ */}
-<div className={styles.trucSectionHeader}>
-  <span className={styles.trucSectionTitle}>
-    {isSuDoan ? "Trực ban tác chiến" : "Trực ban nội vụ"}
-  </span>
-</div>
-          <div className={styles.coreGrid}>
-            <div className={styles.field}>
-              <label className={styles.label}>
-                Họ và tên <span className={styles.required}>*</span>
-              </label>
-              <input
-                type="text"
-                className={styles.input}
-                value={trucBanTacChien.tenNguoitruc}
-                onChange={(e) =>
-                  setTrucBanTacChien((prev) => ({
-                    ...prev,
-                    tenNguoitruc: e.target.value,
-                  }))
-                }
-                placeholder="Nhập họ và tên..."
-                required
-              />
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label}>
-                Cấp bậc <span className={styles.required}>*</span>
-              </label>
-              <CustomSelect
-                options={(isSuDoan
-                  ? CAP_BAC_TAC_CHIEN_SU_DOAN
-                  : CAP_BAC_TAC_CHIEN_DEFAULT
-                ).map((cb) => ({
-                  value: cb,
-                  label: cb,
-                }))}
-                value={trucBanTacChien.capbacNguoitruc}
-                onChange={(val) =>
-                  setTrucBanTacChien((prev) => ({
-                    ...prev,
-                    capbacNguoitruc: val,
-                  }))
-                }
-                placeholder="Chọn cấp bậc"
-              />
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label}>
-                Chức vụ <span className={styles.required}>*</span>
-              </label>
-              <input
-                type="text"
-                className={styles.input}
-                value={trucBanTacChien.chucvuNguoitruc}
-                onChange={(e) =>
-                  setTrucBanTacChien((prev) => ({
-                    ...prev,
-                    chucvuNguoitruc: e.target.value,
-                  }))
-                }
-                placeholder="Nhập chức vụ..."
-                required
-              />
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label}>Số điện thoại</label>
-              <input
-                type="text"
-                className={styles.input}
-                value={trucBanTacChien.sodienthoai}
-                onChange={(e) => {
-                  const val = e.target.value.replace(/[^\d+\-\s]/g, "");
-                  setTrucBanTacChien((prev) => ({ ...prev, sodienthoai: val }));
-                }}
-                placeholder="Nhập số điện thoại..."
-              />
-            </div>
-          </div>
+          <TrucNguoiFormSection
+            title={isSuDoan ? "Trực ban tác chiến" : "Trực ban nội vụ"}
+            value={trucBanTacChien}
+            onChange={setTrucBanTacChien}
+            capBacOptions={
+              isSuDoan ? CAP_BAC_TAC_CHIEN_SU_DOAN : CAP_BAC_TAC_CHIEN_DEFAULT
+            }
+          />
 
           <hr className={styles.divider} />
 
@@ -564,110 +357,11 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
           </div>
 
           <div className={styles.tableContainer}>
-            {absentRows.length === 0 ? (
-              <div className={styles.emptyState}>
-                Không có quân nhân vắng mặt. Bấm nút "+ Thêm quân nhân vắng" để
-                bắt đầu nhập liệu.
-              </div>
-            ) : (
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th style={{ width: "60px" }} className={styles.textCenter}>
-                      STT
-                    </th>
-                    <th style={{ minWidth: "200px" }}>Họ và tên</th>
-                    <th style={{ width: "150px" }}>Cấp bậc</th>
-                    <th style={{ width: "180px" }}>Chức vụ</th>
-                    <th style={{ width: "240px" }}>Lý do vắng</th>
-                    <th style={{ minWidth: "200px" }}>Ghi chú chi tiết</th>
-                    <th style={{ width: "60px" }} className={styles.textCenter}>
-                      Xóa
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {absentRows.map((row, index) => (
-                    <tr key={row.id}>
-                      <td className={styles.textCenter}>{index + 1}</td>
-                      <td>
-                        <input
-                          type="text"
-                          className={styles.tableInput}
-                          value={row.hoTen}
-                          onChange={(e) =>
-                            handleUpdateRow(row.id, "hoTen", e.target.value)
-                          }
-                          placeholder="Nhập họ và tên..."
-                          required
-                        />
-                      </td>
-                      <td>
-                        <CustomSelect
-                          options={CAP_BAC_OPTIONS.map((cb) => ({
-                            value: cb,
-                            label: cb,
-                          }))}
-                          value={row.capBac}
-                          onChange={(val) =>
-                            handleUpdateRow(row.id, "capBac", val)
-                          }
-                          variant="table"
-                          placeholder="-- Chọn cấp bậc --"
-                        />
-                      </td>
-                      <td>
-                        <input
-                          type="text"
-                          className={styles.tableInput}
-                          value={row.chucVu}
-                          onChange={(e) =>
-                            handleUpdateRow(row.id, "chucVu", e.target.value)
-                          }
-                          placeholder="Nhập chức vụ..."
-                        />
-                      </td>
-                      <td>
-                        <CustomSelect
-                          options={LY_DO_OPTIONS}
-                          value={row.lyDoVang}
-                          onChange={(val) =>
-                            handleUpdateRow(
-                              row.id,
-                              "lyDoVang",
-                              val as keyof VangChiTiet,
-                            )
-                          }
-                          variant="table"
-                          placeholder="-- Chọn lý do vắng --"
-                        />
-                      </td>
-                      <td>
-                        <input
-                          type="text"
-                          className={styles.tableInput}
-                          value={row.ghiChu}
-                          onChange={(e) =>
-                            handleUpdateRow(row.id, "ghiChu", e.target.value)
-                          }
-                          placeholder="Nơi đi công tác, bệnh xá, học viện..."
-                        />
-                      </td>
-                      <td className={styles.textCenter}>
-                        <button
-                          type="button"
-                          className={styles.btnDeleteRow}
-                          onClick={() => handleRemoveRow(row.id)}
-                          title="Xóa dòng"
-                        >
-                          <FontAwesomeIcon icon={faTrash} />{" "}
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+            <AbsentRowsTable
+              rows={absentRows}
+              onUpdate={handleUpdateRow}
+              onRemove={handleRemoveRow}
+            />
           </div>
         </div>
 

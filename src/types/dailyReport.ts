@@ -292,3 +292,33 @@ export interface RecallReportResponse {
     caTruc: CaTrucInfo;
   };
 }
+
+export interface ChiTietVangQuanNhan {
+  id: string;
+  hoTen: string;
+  capBac: string;
+  chucVu: string;
+  lyDoVang: string;
+  ghiChu: string;
+}
+
+export interface ReportRow {
+  idDonBaoCao: string;
+  donVi: string;
+  tenDonVi: string;
+  kyhieuDonVi?: string;
+  quanSoTong: number;
+  quanSoHienDien: number;
+  quanSoVang: number;
+  vang: VangChiTiet;
+  chiTietVangList: ChiTietVangQuanNhan[];
+  status: string;
+  ghiChu: string;
+  rawItem: CreateReportResponse["Result"];
+  notSubmitted?: boolean;
+}
+
+export type EditModalData = {
+  reportId: string;
+  ngayBaoCao: string;
+};

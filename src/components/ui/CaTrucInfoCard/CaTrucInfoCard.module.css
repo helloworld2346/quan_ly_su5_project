@@ -11,7 +11,7 @@
 }
 
 .caTrucHeader {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -20,7 +20,7 @@
 }
 
 .caTrucNgay {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -55,7 +55,7 @@
 }
 
 .caTrucRole {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
@@ -69,18 +69,18 @@
 }
 
 .caTrucPersonName {
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--login-text);
 }
 
 .caTrucPersonMeta {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--login-text-muted);
 }
 
 .caTrucPhone {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--primary-color, #218673);
   text-decoration: none;

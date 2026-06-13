@@ -1,187 +1,51 @@
-import { useMemo, useState, useEffect, useRef, useCallback } from "react";
-import { createPortal } from "react-dom";
+import { useMemo, useState, useEffect, useRef } from "react";
 import styles from "./DailyTroopReport.module.css";
 import ReportToolbar from "../../components/report/ReportToolbar";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faEllipsisVertical,
-  faEye,
-  faPenToSquare,
-} from "@fortawesome/free-solid-svg-icons";
 import TroopDetailModal from "./TroopDetailModal";
 import CreateReportModal from "./CreateReportModal";
 import RefuseDialog from "../../components/ui/RefuseDialog/RefuseDialog";
 import { dailyReportService } from "../../services/dailyReport/dailyReportService";
-import { donviService } from "../../services/unit/unitService";
 import { useAuth } from "../../context/useAuth";
 import { useToast } from "../../context/useToast";
 import type {
-  AbsentRow,
-  VangChiTiet,
   CreateReportResponse,
   UpdateReportRequest,
-  ReportItemInput,
   CaTrucInfo,
+  ReportRow,
+  EditModalData,
 } from "../../types/dailyReport";
-import type { DonVi } from "../../types/account";
 import { handleApiError } from "../../utils/errorHandler";
-import ReportStatusBadge from "../../components/ui/ReportStatusBadge/ReportStatusBadge";
-import { dutyService } from "../../services/duty/dutyService";
-import type { CaTrucDetail } from "../../types/duty";
 import CaTrucInfoCard from "../../components/ui/CaTrucInfoCard/CaTrucInfoCard";
-export interface ChiTietVangQuanNhan {
-  id: string;
-  hoTen: string;
-  capBac: string;
-  chucVu: string;
-  lyDoVang: string;
-  ghiChu: string;
-}
-
-interface ReportRow {
-  idDonBaoCao: string;
-  donVi: string;
-  tenDonVi: string;
-  kyhieuDonVi?: string;
-  quanSoTong: number;
-  quanSoHienDien: number;
-  quanSoVang: number;
-  vang: VangChiTiet;
-  chiTietVangList: ChiTietVangQuanNhan[];
-  status: string;
-  ghiChu: string;
-  rawItem: CreateReportResponse["Result"];
-  notSubmitted?: boolean;
-}
-
-type EditModalData = {
-  reportId: string;
-  ngayBaoCao: string;
-};
-
-function todayIsoDate() {
-  const d = new Date();
-  return [
-    d.getFullYear(),
-    String(d.getMonth() + 1).padStart(2, "0"),
-    String(d.getDate()).padStart(2, "0"),
-  ].join("-");
-}
-
-function normalizeRoleName(role: string | undefined): string {
-  if (!role) return "";
-  const r = role.toLowerCase();
-
-  if (
-    r.includes("báo ban") ||
-    r.includes("báo cáo") ||
-    r.includes("trực ban")
-  ) {
-    return "Báo cáo";
-  }
-  if (r.includes("chỉ huy")) {
-    return "Chỉ huy";
-  }
-  if (r.includes("sư đoàn") || r.includes("sư đoan")) {
-    return "Sư đoàn";
-  }
-  if (r.includes("quản trị viên") || r.includes("admin")) {
-    return "Quản Trị Viên";
-  }
-  return role;
-}
-
-const EMPTY_VANG: VangChiTiet = {
-  hoiThaiNgoaiSuDoan: 0,
-  hoiThaiEF: 0,
-  xayDungNgoaiSuDoan: 0,
-  xayDungEF: 0,
-  choHuu: 0,
-  nghiTranhThu: 0,
-  phep: 0,
-  vienNgoaiSuDoan: 0,
-  vienEF: 0,
-  congTacNgoaiSuDoan: 0,
-  congTacSuDoan: 0,
-  hocSQ: 0,
-  hocCS: 0,
-  lyDoVangKhac: 0,
-};
-
-function mapItemToRow(item: ReportItemInput): ReportRow {
-  let vang: VangChiTiet = { ...EMPTY_VANG };
-  let chiTietVangList: ChiTietVangQuanNhan[] = [];
-
-  try {
-    vang = JSON.parse(item.thongTinVang) as VangChiTiet;
-  } catch (e) {
-    console.error("Error parsing thongTinVang:", e);
-  }
-
-  try {
-    if (item.chiTietVang) {
-      chiTietVangList = JSON.parse(item.chiTietVang) as ChiTietVangQuanNhan[];
-    }
-  } catch (e) {
-    console.error("Error parsing chiTietVang:", e);
-  }
-
-  return {
-    idDonBaoCao: item.idDonBaoCao,
-    donVi: item.donVi.maDonVi,
-    tenDonVi: item.donVi.tenDonvi,
-    kyhieuDonVi: item.donVi.kyhieuDonvi,
-    quanSoTong: item.quanSoTong,
-    quanSoHienDien: item.quanSoHienDien,
-    quanSoVang: item.quanSoVang,
-    vang,
-    chiTietVangList,
-    status: item.status,
-    ghiChu: (item.ghiChu ?? "") || "",
-    rawItem: item as unknown as CreateReportResponse["Result"],
-  };
-}
+import { useReportData } from "../../hooks/useReportData";
+import { useReportActions } from "../../hooks/useReportActions";
+import {
+  todayIsoDate,
+  normalizeRoleName,
+  EMPTY_VANG,
+} from "../../utils/reportUtils";
+import ReportTableHeader from "./ReportTableHeader";
+import ReportTableRow from "./ReportTableRow";
+import ReportTotalRow from "./ReportTotalRow";
 
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
   const [reportDate, setReportDate] = useState(todayIsoDate());
-
   const [selectedReportRow, setSelectedReportRow] = useState<ReportRow | null>(
     null,
   );
-
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editModalData, setEditModalData] = useState<EditModalData | null>(
     null,
   );
-  const [reportData, setReportData] = useState<ReportRow[]>([]);
-  const [parentReportData, setParentReportData] = useState<ReportRow | null>(
-    null,
-  );
   const [showConsolidateModal, setShowConsolidateModal] = useState(false);
-
-  const [loading, setLoading] = useState(false);
-
-  const [donViQuanSoTong, setDonViQuanSoTong] = useState<number>(0);
-  const [childUnits, setChildUnits] = useState<DonVi[]>([]);
-
   const [activeMenuUnit, setActiveMenuUnit] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
-
-  const [showRefuseDialog, setShowRefuseDialog] = useState(false);
-  const [refuseReportId, setRefuseReportId] = useState<string | null>(null);
-  const [refuseUnitName, setRefuseUnitName] = useState("");
-  const [caTrucFromApi, setCaTrucFromApi] = useState<CaTrucDetail | null>(null);
   const [showConsolidatedDetail, setShowConsolidatedDetail] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const { account } = useAuth();
   const { showError, showSuccess } = useToast();
-  const showErrorRef = useRef(showError);
-  useEffect(() => {
-    showErrorRef.current = showError;
-  }, [showError]);
 
   const maDonViCurrent = account?.donVi?.maDonVi;
 
@@ -200,185 +64,39 @@ export default function DailyTroopReport() {
   const needsApproval = isTrungDoan || isTieuDoan;
   const selfApprove = !needsApproval;
 
-  const fetchReports = useCallback(async () => {
-    if (!maDonViCurrent) return;
+  const {
+    reportData,
+    parentReportData,
+    loading,
+    donViQuanSoTong,
+    childUnits,
+    caTrucFromApi,
+    consolidatedData,
+    fetchReports,
+  } = useReportData({
+    maDonViCurrent,
+    isParentUnit,
+    isSuDoan,
+    reportDate,
+    showError,
+  });
 
-    setLoading(true);
-    try {
-      let response;
-
-      if (isParentUnit) {
-        response = await dailyReportService.searchChildrenReports(
-          maDonViCurrent,
-          reportDate,
-        );
-
-        try {
-          const parentRes = await dailyReportService.searchReportByUnitAndDate(
-            maDonViCurrent,
-            reportDate,
-          );
-          if (parentRes.success && parentRes.Result) {
-            setParentReportData(mapItemToRow(parentRes.Result));
-          } else {
-            setParentReportData(null);
-          }
-        } catch {
-          setParentReportData(null);
-        }
-      } else {
-        response = await dailyReportService.searchReportByUnitAndDate(
-          maDonViCurrent,
-          reportDate,
-        );
-        setParentReportData(null);
-      }
-
-      if (response.success && response.Result) {
-        const data = Array.isArray(response.Result)
-          ? response.Result
-          : [response.Result];
-
-        const mappedData: ReportRow[] = data.map((item) => mapItemToRow(item));
-        setReportData(mappedData);
-      } else {
-        setReportData([]);
-      }
-    } catch (error) {
-      handleApiError(error, {
-        showError: showErrorRef.current,
-        errorMessage: "Không thể tải dữ liệu báo cáo",
-        clearData: () => setReportData([]),
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [maDonViCurrent, isParentUnit, reportDate]);
-
-  useEffect(() => {
-    if (!maDonViCurrent) return;
-    const id = setTimeout(() => {
-      void fetchReports();
-    }, 0);
-    return () => clearTimeout(id);
-  }, [fetchReports]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    const handler = () => {
-      void fetchReports();
-    };
-    window.addEventListener("report-data-changed", handler);
-    return () => {
-      window.removeEventListener("report-data-changed", handler);
-    };
-  }, [fetchReports]);
-
-  useEffect(() => {
-    const fetchDonViInfo = async () => {
-      if (!maDonViCurrent) return;
-      try {
-        const allUnits = await donviService.getDonVi();
-        const unit = allUnits.find((u) => u.maDonVi === maDonViCurrent);
-        if (unit) {
-          setDonViQuanSoTong(unit.quanSoTong);
-        }
-        if (isParentUnit) {
-          const children = allUnits.filter((u) => {
-            if (!u.maDonVi.startsWith(maDonViCurrent + ".")) return false;
-            const suffix = u.maDonVi.slice(maDonViCurrent.length + 1);
-            return !suffix.includes(".");
-          });
-          setChildUnits(children);
-        }
-      } catch (err) {
-        console.error("Không thể tải thông tin đơn vị:", err);
-      }
-    };
-    fetchDonViInfo();
-  }, [maDonViCurrent, isParentUnit]);
-
-  useEffect(() => {
-    if (!isSuDoan) return;
-    const fetchCaTruc = async () => {
-      try {
-        const res = await dutyService.getCaTrucByDate(reportDate);
-        if (res.success && res.Result) {
-          setCaTrucFromApi(res.Result);
-        } else {
-          setCaTrucFromApi(null);
-        }
-      } catch {
-        setCaTrucFromApi(null);
-      }
-    };
-    void fetchCaTruc();
-  }, [isSuDoan, reportDate]);
-
-  const consolidatedData = useMemo(() => {
-    if (!isParentUnit || reportData.length === 0) return null;
-
-    const submittedReports = reportData.filter(
-      (r) => r.status !== "Chưa_Nộp" && r.status !== "Chưa nộp",
-    );
-
-    const quanSoTong = submittedReports.reduce(
-      (sum, r) => sum + r.quanSoTong,
-      0,
-    );
-    const quanSoVang = submittedReports.reduce(
-      (sum, r) => sum + r.quanSoVang,
-      0,
-    );
-    const quanSoHienDien = quanSoTong - quanSoVang;
-
-    const thongTinVang: VangChiTiet = submittedReports.reduce(
-      (acc, r) => ({
-        hoiThaiNgoaiSuDoan: acc.hoiThaiNgoaiSuDoan + r.vang.hoiThaiNgoaiSuDoan,
-        hoiThaiEF: acc.hoiThaiEF + r.vang.hoiThaiEF,
-        xayDungNgoaiSuDoan: acc.xayDungNgoaiSuDoan + r.vang.xayDungNgoaiSuDoan,
-        xayDungEF: acc.xayDungEF + r.vang.xayDungEF,
-        choHuu: acc.choHuu + r.vang.choHuu,
-        nghiTranhThu: acc.nghiTranhThu + r.vang.nghiTranhThu,
-        phep: acc.phep + r.vang.phep,
-        vienNgoaiSuDoan: acc.vienNgoaiSuDoan + r.vang.vienNgoaiSuDoan,
-        vienEF: acc.vienEF + r.vang.vienEF,
-        congTacNgoaiSuDoan: acc.congTacNgoaiSuDoan + r.vang.congTacNgoaiSuDoan,
-        congTacSuDoan: acc.congTacSuDoan + r.vang.congTacSuDoan,
-        hocSQ: acc.hocSQ + r.vang.hocSQ,
-        hocCS: acc.hocCS + r.vang.hocCS,
-        lyDoVangKhac: acc.lyDoVangKhac + (r.vang.lyDoVangKhac ?? 0),
-      }),
-      { ...EMPTY_VANG },
-    );
-
-    const absentRows: AbsentRow[] = submittedReports.flatMap((r) =>
-      r.chiTietVangList.map((m) => ({
-        id: crypto.randomUUID(),
-        hoTen: m.hoTen,
-        capBac: m.capBac,
-        chucVu: m.chucVu,
-        lyDoVang: m.lyDoVang as keyof VangChiTiet,
-        ghiChu: m.ghiChu,
-      })),
-    );
-
-    return {
-      quanSoTong,
-      quanSoVang,
-      quanSoHienDien,
-      thongTinVang,
-      absentRows,
-      submittedCount: submittedReports.length,
-      totalCount: reportData.length,
-    };
-  }, [isParentUnit, reportData]);
+  const {
+    showRefuseDialog,
+    refuseUnitName,
+    handleApproveReport,
+    handleSubmitReport,
+    handleRecallReport,
+    handleRefuseReportClick,
+    handleRefuseConfirm,
+    handleRefuseCancel,
+  } = useReportActions({ showSuccess, showError, fetchReports });
 
   const handleToggleMenu = (
     event: React.MouseEvent<HTMLButtonElement>,
     menuKey: string,
   ) => {
     event.stopPropagation();
-
     if (activeMenuUnit === menuKey) {
       setActiveMenuUnit(null);
     } else {
@@ -387,10 +105,7 @@ export default function DailyTroopReport() {
       const spaceBelow = window.innerHeight - rect.bottom;
       const top =
         spaceBelow < menuHeight ? rect.top - menuHeight - 4 : rect.bottom + 4;
-      setMenuPosition({
-        top,
-        left: rect.right - 230,
-      });
+      setMenuPosition({ top, left: rect.right - 230 });
       setActiveMenuUnit(menuKey);
     }
   };
@@ -404,12 +119,10 @@ export default function DailyTroopReport() {
         setActiveMenuUnit(null);
       }
     }
-
     if (activeMenuUnit) {
       document.addEventListener("mousedown", handleGlobalClose);
       window.addEventListener("scroll", handleGlobalClose, { passive: true });
     }
-
     return () => {
       document.removeEventListener("mousedown", handleGlobalClose);
       window.removeEventListener("scroll", handleGlobalClose);
@@ -425,17 +138,11 @@ export default function DailyTroopReport() {
 
   const checkIfDateHasReport = useMemo(() => {
     if (!maDonViCurrent) return false;
-
     const selectedDate = new Date(reportDate);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
-    const isPastDate = selectedDate < today;
-    if (isPastDate) return true;
-
-    if (isParentUnit) {
-      return parentReportData !== null;
-    }
+    if (selectedDate < today) return true;
+    if (isParentUnit) return parentReportData !== null;
     return reportData.some((report) => report.donVi === maDonViCurrent);
   }, [reportData, maDonViCurrent, reportDate, isParentUnit, parentReportData]);
 
@@ -443,113 +150,32 @@ export default function DailyTroopReport() {
     const selectedDate = new Date(reportDate);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
     if (selectedDate < today) {
       showError("Không thể tạo báo cáo cho ngày trong quá khứ!");
       return;
     }
-
     if (checkIfDateHasReport) {
       showError("Ngày này đã tồn tại báo cáo hoặc không hợp lệ!");
       return;
     }
-
     setShowCreateModal(true);
   };
 
-  const handleCreateSuccess = useCallback(async () => {
+  const handleCreateSuccess = () => {
     fetchReports();
-  }, [fetchReports]);
+  };
 
   const handleEditReport = (row: ReportRow) => {
-    setEditModalData({
-      reportId: row.idDonBaoCao,
-      ngayBaoCao: reportDate,
-    });
+    setEditModalData({ reportId: row.idDonBaoCao, ngayBaoCao: reportDate });
     setActiveMenuUnit(null);
-  };
-
-  const handleApproveReport = async (reportId: string) => {
-    try {
-      await dailyReportService.approveReport(reportId);
-      showSuccess("Phê duyệt báo cáo thành công");
-      fetchReports();
-    } catch (error) {
-      handleApiError(error, {
-        showError,
-        errorMessage: "Không thể phê duyệt báo cáo",
-      });
-    }
-    setActiveMenuUnit(null);
-  };
-
-  const handleRefuseReportClick = (row: ReportRow) => {
-    setRefuseReportId(row.idDonBaoCao);
-    setRefuseUnitName(row.kyhieuDonVi || row.tenDonVi);
-    setShowRefuseDialog(true);
-    setActiveMenuUnit(null);
-  };
-
-  const handleSubmitReport = async (id: string) => {
-    try {
-      await dailyReportService.submitReport(id);
-      showSuccess("Đã trình phê duyệt thành công");
-    } catch (error) {
-      handleApiError(error, {
-        showError,
-        errorMessage: "Không thể trình phê duyệt",
-      });
-    } finally {
-      fetchReports();
-    }
-  };
-
-  const handleRecallReport = async (id: string) => {
-    try {
-      await dailyReportService.recallReport(id);
-      showSuccess("Đã thu hồi báo cáo thành công");
-    } catch (error) {
-      handleApiError(error, {
-        showError,
-        errorMessage: "Không thể thu hồi báo cáo",
-      });
-    } finally {
-      fetchReports();
-    }
-  };
-
-  const handleRefuseConfirm = async (reason: string) => {
-    if (!refuseReportId) return;
-
-    try {
-      await dailyReportService.refuseReport(refuseReportId, { ghiChu: reason });
-      showSuccess("Từ chối báo cáo thành công");
-      setShowRefuseDialog(false);
-      setRefuseReportId(null);
-      setRefuseUnitName("");
-      fetchReports();
-    } catch (error) {
-      handleApiError(error, {
-        showError,
-        errorMessage: "Không thể từ chối báo cáo",
-      });
-    }
-  };
-
-  const handleRefuseCancel = () => {
-    setShowRefuseDialog(false);
-    setRefuseReportId(null);
-    setRefuseUnitName("");
   };
 
   const handleExportWord = () => {
     console.log("Xuất file Word");
   };
-
   const handleExportExcel = () => {
     console.log("Xuất file Excel");
   };
-
   const handleConsolidate = () => {
     setShowConsolidateModal(true);
   };
@@ -557,7 +183,6 @@ export default function DailyTroopReport() {
   const filteredRows = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return reportData;
-
     return reportData.filter((row) => {
       const rowText = [
         row.tenDonVi,
@@ -583,7 +208,6 @@ export default function DailyTroopReport() {
       ]
         .join(" ")
         .toLowerCase();
-
       return rowText.includes(q);
     });
   }, [query, reportData]);
@@ -594,19 +218,15 @@ export default function DailyTroopReport() {
         const rows: ReportRow[] = parentReportData
           ? [{ ...parentReportData, notSubmitted: false }]
           : [];
-        if (isCommander) {
+        if (isCommander)
           return rows.filter((r) => r.notSubmitted || r.status !== "Nháp");
-        }
         return rows;
       }
-      if (isCommander) {
-        return filteredRows.filter((r) => r.status !== "Nháp");
-      }
+      if (isCommander) return filteredRows.filter((r) => r.status !== "Nháp");
       return filteredRows;
     }
 
     const ownReport = parentReportData;
-
     const ownRow: ReportRow = ownReport
       ? { ...ownReport, notSubmitted: false }
       : {
@@ -626,13 +246,11 @@ export default function DailyTroopReport() {
         };
 
     const q = query.trim().toLowerCase();
-
     const childRows = childUnits
       .filter((unit) => {
         if (!q) return true;
         const submitted = filteredRows.find((r) => r.donVi === unit.maDonVi);
-        if (submitted) return true; // đã có trong filteredRows (đã match query)
-        // unit chưa nộp: filter theo tên/mã/ký hiệu
+        if (submitted) return true;
         return [unit.tenDonvi, unit.maDonVi, unit.kyhieuDonvi ?? ""]
           .join(" ")
           .toLowerCase()
@@ -658,7 +276,6 @@ export default function DailyTroopReport() {
         };
       });
 
-    // Với ownRow: chỉ thêm khi không có query hoặc ownRow match query
     const ownRowMatches =
       !q ||
       [ownRow.tenDonVi ?? "", ownRow.donVi ?? "", ownRow.kyhieuDonVi ?? ""]
@@ -672,9 +289,8 @@ export default function DailyTroopReport() {
         : childRows
       : childRows;
 
-    if (isCommander) {
+    if (isCommander)
       return allRows.filter((r) => r.notSubmitted || r.status !== "Nháp");
-    }
     return allRows;
   }, [
     isParentUnit,
@@ -737,9 +353,8 @@ export default function DailyTroopReport() {
 
   const caTrucInfo = useMemo((): CaTrucInfo | null => {
     if (isParentUnit) {
-      if (parentReportData) {
+      if (parentReportData)
         return parentReportData.rawItem.caTruc as CaTrucInfo;
-      }
       if (isSuDoan && caTrucFromApi) {
         return {
           idCatruc: caTrucFromApi.idCatruc,
@@ -785,7 +400,6 @@ export default function DailyTroopReport() {
         ? reportData[0]
         : null;
     if (!currentReport) return null;
-
     let trucChiHuy: {
       tenNguoitruc?: string;
       capbacNguoitruc?: string;
@@ -798,23 +412,18 @@ export default function DailyTroopReport() {
       chucvuNguoitruc?: string;
       sodienthoai?: string;
     } | null = null;
-
     try {
-      if (currentReport.rawItem.trucBanChiHuy) {
+      if (currentReport.rawItem.trucBanChiHuy)
         trucChiHuy = JSON.parse(currentReport.rawItem.trucBanChiHuy);
-      }
     } catch {
       /* ignore */
     }
-
     try {
-      if (currentReport.rawItem.trucBanTacChien) {
+      if (currentReport.rawItem.trucBanTacChien)
         trucBanTacChien = JSON.parse(currentReport.rawItem.trucBanTacChien);
-      }
     } catch {
       /* ignore */
     }
-
     return { trucChiHuy, trucBanTacChien };
   }, [isParentUnit, parentReportData, reportData]);
 
@@ -827,6 +436,7 @@ export default function DailyTroopReport() {
     if (!commanderReport || commanderReport.notSubmitted) return false;
     return isCommander && commanderReport.status === "Chờ_Duyệt";
   }, [commanderReport, isCommander]);
+
   const canSubmit = useMemo(() => {
     if (
       (!isReporter && !isSuDoan && !selfApprove) ||
@@ -836,6 +446,7 @@ export default function DailyTroopReport() {
       return false;
     return ownReport.status === "Nháp";
   }, [isReporter, isSuDoan, selfApprove, ownReport]);
+
   const canRecall = useMemo(() => {
     if (
       (!isReporter && !isSuDoan && !selfApprove) ||
@@ -861,174 +472,23 @@ export default function DailyTroopReport() {
     return null;
   }, [editModalData, reportData, parentReportData]);
 
-  const renderReportRow = (row: ReportRow, isConsolidatedRow = false) => {
-    if (row.notSubmitted) {
-      return (
-        <tr
-          key={row.idDonBaoCao}
-          className={
-            [
-              isConsolidatedRow
-                ? styles.consolidatedRow
-                : isParentUnit
-                  ? styles.childRow
-                  : "",
-              styles.notSubmittedRow,
-            ]
-              .filter(Boolean)
-              .join(" ") || undefined
-          }
-        >
-          <td className={styles.unitCell}>{row.kyhieuDonVi || row.tenDonVi}</td>
-          <td>—</td>
-          <td>—</td>
-          <td>—</td>
-          <td>—</td>
-          <td>—</td>
-          <td>—</td>
-          <td>—</td>
-          <td>—</td>
-          <td>—</td>
-          <td>—</td>
-          <td>—</td>
-          <td>—</td>
-          <td>—</td>
-          <td>—</td>
-          <td>—</td>
-          <td>—</td>
-          <td>—</td>
-          <td>
-            <ReportStatusBadge status="Chưa_Nộp" />
-          </td>
-          <td>—</td>
-          <td>—</td>
-        </tr>
-      );
-    }
-
-    const menuKey = isConsolidatedRow ? `parent-${row.idDonBaoCao}` : row.donVi;
-    const isMenuOpen = activeMenuUnit === menuKey;
-    const canEdit =
-      isReporter &&
-      !isParentUnit &&
-      (row.status === "Nháp" ||
-        row.status === "Từ_Chối" ||
-        row.status === "Từ chối");
-
-    const canEditParent =
-      isReporter &&
-      isParentUnit &&
-      isConsolidatedRow &&
-      (row.status === "Nháp" ||
-        row.status === "Từ_Chối" ||
-        row.status === "Từ chối");
-
-    const canEditOwn =
-      (isReporter || isSuDoan) &&
-      isParentUnit &&
-      !isConsolidatedRow &&
-      row.donVi === maDonViCurrent &&
-      (row.status === "Nháp" ||
-        row.status === "Từ_Chối" ||
-        row.status === "Từ chối");
-    return (
-      <tr
-        key={row.idDonBaoCao}
-        className={
-          [
-            isConsolidatedRow
-              ? styles.consolidatedRow
-              : isParentUnit
-                ? styles.childRow
-                : "",
-            row.status === "Nháp" ? styles.draftRow : "",
-          ]
-            .filter(Boolean)
-            .join(" ") || undefined
-        }
-      >
-        <td className={styles.unitCell}>{row.kyhieuDonVi || row.tenDonVi}</td>
-        <td>{row.quanSoTong}</td>
-        <td>{row.quanSoHienDien}</td>
-        <td>{row.quanSoVang}</td>
-        <td>{row.vang.hoiThaiNgoaiSuDoan}</td>
-        <td>{row.vang.hoiThaiEF}</td>
-        <td>{row.vang.xayDungNgoaiSuDoan}</td>
-        <td>{row.vang.xayDungEF}</td>
-        <td>{row.vang.choHuu}</td>
-        <td>{row.vang.nghiTranhThu}</td>
-        <td>{row.vang.phep}</td>
-        <td>{row.vang.vienNgoaiSuDoan}</td>
-        <td>{row.vang.vienEF}</td>
-        <td>{row.vang.congTacNgoaiSuDoan}</td>
-        <td>{row.vang.congTacSuDoan}</td>
-        <td>{row.vang.hocSQ}</td>
-        <td>{row.vang.hocCS}</td>
-        <td>{row.vang.lyDoVangKhac ?? 0}</td>
-        <td>
-          <ReportStatusBadge status={row.status} />
-        </td>
-        <td className={styles.noteCell}>{row.ghiChu}</td>
-        <td className={styles.actionCell}>
-          <div className={styles.actionWrapper}>
-            <button
-              type="button"
-              className={`${styles.ellipsisBtn} ${isMenuOpen ? styles.activeEllipsis : ""}`}
-              aria-label="Tùy chọn thao tác"
-              onClick={(e) => handleToggleMenu(e, menuKey)}
-            >
-              <FontAwesomeIcon icon={faEllipsisVertical} />
-            </button>
-
-            {isMenuOpen &&
-              createPortal(
-                <div
-                  ref={dropdownRef}
-                  className={styles.dropdownMenu}
-                  role="menu"
-                  style={{
-                    top: `${menuPosition.top}px`,
-                    left: `${menuPosition.left}px`,
-                  }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <button
-                    type="button"
-                    className={styles.menuItem}
-                    role="menuitem"
-                    onClick={() => {
-                      setSelectedReportRow(row);
-                      setActiveMenuUnit(null);
-                    }}
-                  >
-                    <FontAwesomeIcon icon={faEye} className={styles.menuIcon} />
-                    Xem chi tiết
-                  </button>
-
-                  {(canEdit || canEditParent || canEditOwn) && (
-                    <button
-                      type="button"
-                      className={styles.menuItem}
-                      role="menuitem"
-                      onClick={() => handleEditReport(row)}
-                    >
-                      <FontAwesomeIcon
-                        icon={faPenToSquare}
-                        className={styles.menuIcon}
-                      />
-                      Chỉnh Sửa
-                    </button>
-                  )}
-                </div>,
-                document.body,
-              )}
-          </div>
-        </td>
-      </tr>
-    );
-  };
-
   const totalRequiredCount = childUnits.length;
+
+  const sharedRowProps = {
+    isParentUnit,
+    isReporter,
+    isSuDoan,
+    maDonViCurrent,
+    activeMenuUnit,
+    menuPosition,
+    dropdownRef,
+    onToggleMenu: handleToggleMenu,
+    onViewDetail: (r: ReportRow) => {
+      setSelectedReportRow(r);
+      setActiveMenuUnit(null);
+    },
+    onEditReport: handleEditReport,
+  };
 
   return (
     <section className={styles.report} aria-labelledby="dashboard-page-heading">
@@ -1090,65 +550,29 @@ export default function DailyTroopReport() {
         ) : (
           <table className={styles.reportTable}>
             <colgroup>
-              <col style={{ width: "9%" }} /> {/* Đơn vị */}
-              <col style={{ width: "4%" }} /> {/* Tổng quân số */}
-              <col style={{ width: "5%" }} /> {/* Hiện diện */}
-              <col style={{ width: "5%" }} /> {/* Tổng vắng */}
-              <col style={{ width: "6%" }} /> {/* Hội thao - Ngoài SD */}
-              <col style={{ width: "6%" }} /> {/* Hội thao - TĐ/SD */}
-              <col style={{ width: "6%" }} /> {/* Xây dựng - Ngoài SD */}
-              <col style={{ width: "6%" }} /> {/* Xây dựng - TĐ/SD */}
-              <col style={{ width: "6%" }} /> {/* Chờ hưu */}
-              <col style={{ width: "6%" }} /> {/* Nghỉ tranh thủ */}
-              <col style={{ width: "6%" }} /> {/* Phép */}
-              <col style={{ width: "6%" }} /> {/* Viện - Ngoài SD */}
-              <col style={{ width: "6%" }} /> {/* Viện - SD */}
-              <col style={{ width: "6%" }} /> {/* Công tác - Ngoài SD */}
-              <col style={{ width: "6%" }} /> {/* Công tác - SD */}
-              <col style={{ width: "6%" }} /> {/* Học - SQ */}
-              <col style={{ width: "6%" }} /> {/* Học - CS */}
-              <col style={{ width: "4%" }} /> {/* Lý do khác */}
-              <col style={{ width: "8%" }} /> {/* Trạng thái */}
-              <col style={{ width: "10%" }} /> {/* Ghi chú */}
-              <col style={{ width: "5%" }} /> {/* Thao tác */}
+              <col style={{ width: "9%" }} />
+              <col style={{ width: "4%" }} />
+              <col style={{ width: "5%" }} />
+              <col style={{ width: "5%" }} />
+              <col style={{ width: "6%" }} />
+              <col style={{ width: "6%" }} />
+              <col style={{ width: "6%" }} />
+              <col style={{ width: "6%" }} />
+              <col style={{ width: "6%" }} />
+              <col style={{ width: "6%" }} />
+              <col style={{ width: "6%" }} />
+              <col style={{ width: "6%" }} />
+              <col style={{ width: "6%" }} />
+              <col style={{ width: "6%" }} />
+              <col style={{ width: "6%" }} />
+              <col style={{ width: "6%" }} />
+              <col style={{ width: "6%" }} />
+              <col style={{ width: "4%" }} />
+              <col style={{ width: "8%" }} />
+              <col style={{ width: "10%" }} />
+              <col style={{ width: "5%" }} />
             </colgroup>
-            <thead>
-              <tr>
-                <th rowSpan={3}>Đơn vị</th>
-                <th rowSpan={3}>
-                  Tổng quân <br></br> số
-                </th>
-                <th rowSpan={3}>Hiện diện</th>
-                <th rowSpan={3}>Tổng vắng</th>
-                <th colSpan={14}>Quân số vắng</th>
-                <th rowSpan={3}>Trạng thái</th>
-                <th rowSpan={3}>Ghi chú</th>
-                <th rowSpan={3}>Thao tác</th>
-              </tr>
-              <tr>
-                <th colSpan={2}>Hội thao</th>
-                <th colSpan={2}>Xây dựng</th>
-                <th rowSpan={2}>Chờ hưu</th>
-                <th rowSpan={2}>Nghỉ tranh thủ</th>
-                <th rowSpan={2}>Phép</th>
-                <th colSpan={2}>Viện</th>
-                <th colSpan={2}>Công tác</th>
-                <th colSpan={2}>Học</th>
-                <th rowSpan={2}>Lý do khác</th>
-              </tr>
-              <tr>
-                <th>Ngoài Sư đoàn</th>
-                <th>Trung đoàn, Sư đoàn</th>
-                <th>Ngoài Sư đoàn</th>
-                <th>Trung đoàn, Sư đoàn</th>
-                <th>Ngoài Sư đoàn</th>
-                <th>Trung đoàn, Sư đoàn</th>
-                <th>Ngoài Sư đoàn</th>
-                <th>Sư đoàn</th>
-                <th>SQ</th>
-                <th>CS</th>
-              </tr>
-            </thead>
+            <ReportTableHeader />
 
             <tbody>
               {displayRows.length === 0 && !parentReportData ? (
@@ -1162,88 +586,51 @@ export default function DailyTroopReport() {
                       <td colSpan={22}>Báo cáo các đơn vị</td>
                     </tr>
                   )}
-                  {displayRows.map((row) => renderReportRow(row, false))}
-                  {displayRows.some((r) => !r.notSubmitted) && (
-                    <tr className={styles.totalRow}>
-                      <td className={styles.unitCell}>Tổng</td>
-                      <td>{displayTotals.quanSoTong}</td>
-                      <td>{displayTotals.quanSoHienDien}</td>
-                      <td>{displayTotals.quanSoVang}</td>
-                      <td>{displayTotals.hoiThaiNgoaiSuDoan}</td>
-                      <td>{displayTotals.hoiThaiEF}</td>
-                      <td>{displayTotals.xayDungNgoaiSuDoan}</td>
-                      <td>{displayTotals.xayDungEF}</td>
-                      <td>{displayTotals.choHuu}</td>
-                      <td>{displayTotals.nghiTranhThu}</td>
-                      <td>{displayTotals.phep}</td>
-                      <td>{displayTotals.vienNgoaiSuDoan}</td>
-                      <td>{displayTotals.vienEF}</td>
-                      <td>{displayTotals.congTacNgoaiSuDoan}</td>
-                      <td>{displayTotals.congTacSuDoan}</td>
-                      <td>{displayTotals.hocSQ}</td>
-                      <td>{displayTotals.hocCS}</td>
-                      <td>{displayTotals.lyDoVangKhac}</td>
-                      <td></td>
-                      <td></td>
-                      <td className={styles.actionCell}>
-                        {isParentUnit && consolidatedData && (
-                          <div className={styles.actionWrapper}>
-                            <button
-                              type="button"
-                              className={`${styles.ellipsisBtn} ${activeMenuUnit === "total-row" ? styles.activeEllipsis : ""}`}
-                              aria-label="Tùy chọn thao tác"
-                              onClick={(e) => handleToggleMenu(e, "total-row")}
-                            >
-                              <FontAwesomeIcon icon={faEllipsisVertical} />
-                            </button>
 
-                            {activeMenuUnit === "total-row" &&
-                              createPortal(
-                                <div
-                                  ref={dropdownRef}
-                                  className={styles.dropdownMenu}
-                                  role="menu"
-                                  style={{
-                                    top: `${menuPosition.top}px`,
-                                    left: `${menuPosition.left}px`,
-                                  }}
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <button
-                                    type="button"
-                                    className={styles.menuItem}
-                                    role="menuitem"
-                                    onClick={() => {
-                                      setShowConsolidatedDetail(true);
-                                      setActiveMenuUnit(null);
-                                    }}
-                                  >
-                                    <FontAwesomeIcon
-                                      icon={faEye}
-                                      className={styles.menuIcon}
-                                    />
-                                    Xem chi tiết
-                                  </button>
-                                </div>,
-                                document.body,
-                              )}
-                          </div>
-                        )}
-                      </td>
-                    </tr>
+                  {displayRows.map((row) => (
+                    <ReportTableRow
+                      key={row.idDonBaoCao}
+                      row={row}
+                      isConsolidatedRow={false}
+                      {...sharedRowProps}
+                    />
+                  ))}
+
+                  {displayRows.some((r) => !r.notSubmitted) && (
+                    <ReportTotalRow
+                      displayTotals={displayTotals}
+                      isParentUnit={isParentUnit}
+                      hasConsolidatedData={Boolean(consolidatedData)}
+                      activeMenuUnit={activeMenuUnit}
+                      menuPosition={menuPosition}
+                      dropdownRef={dropdownRef}
+                      onToggleMenu={handleToggleMenu}
+                      onViewConsolidatedDetail={() => {
+                        setShowConsolidatedDetail(true);
+                        setActiveMenuUnit(null);
+                      }}
+                    />
                   )}
+
                   {isTrungDoan && (
                     <tr className={styles.separatorRow}>
                       <td colSpan={22}>Báo cáo tổng hợp</td>
                     </tr>
                   )}
-                  {isTrungDoan && parentReportData
-                    ? renderReportRow(parentReportData, true)
-                    : isTrungDoan && (
-                        <tr className={styles.noConsolidatedRow}>
-                          <td colSpan={22}>Chưa có báo cáo tổng hợp</td>
-                        </tr>
-                      )}
+                  {isTrungDoan && parentReportData ? (
+                    <ReportTableRow
+                      key={`parent-${parentReportData.idDonBaoCao}`}
+                      row={parentReportData}
+                      isConsolidatedRow={true}
+                      {...sharedRowProps}
+                    />
+                  ) : (
+                    isTrungDoan && (
+                      <tr className={styles.noConsolidatedRow}>
+                        <td colSpan={22}>Chưa có báo cáo tổng hợp</td>
+                      </tr>
+                    )
+                  )}
                 </>
               )}
             </tbody>
@@ -1254,10 +641,10 @@ export default function DailyTroopReport() {
       {caTrucInfo && (
         <CaTrucInfoCard
           ngaytruc={caTrucInfo.ngaytruc ?? ""}
-          matkhau={caTrucInfo.matkhau}
+          matkhau={caTrucInfo.matkhau ?? ""}
           ghichu={caTrucInfo.ghichu}
-          trucChiHuy={trucInfoFromReport?.trucChiHuy}
-          trucBanTacChien={trucInfoFromReport?.trucBanTacChien}
+          trucChiHuy={trucInfoFromReport?.trucChiHuy ?? undefined}
+          trucBanTacChien={trucInfoFromReport?.trucBanTacChien ?? undefined}
         />
       )}
 

@@ -1,0 +1,163 @@
+import type { TrucNguoiInfo } from "../types/dailyReport";
+
+import type {
+  VangChiTiet,
+  ReportItemInput,
+  CreateReportResponse,
+  ChiTietVangQuanNhan,
+  ReportRow,
+} from "../types/dailyReport";
+
+export const EMPTY_VANG: VangChiTiet = {
+  hoiThaiNgoaiSuDoan: 0,
+  hoiThaiEF: 0,
+  xayDungNgoaiSuDoan: 0,
+  xayDungEF: 0,
+  choHuu: 0,
+  nghiTranhThu: 0,
+  phep: 0,
+  vienNgoaiSuDoan: 0,
+  vienEF: 0,
+  congTacNgoaiSuDoan: 0,
+  congTacSuDoan: 0,
+  hocSQ: 0,
+  hocCS: 0,
+  lyDoVangKhac: 0,
+};
+
+export function todayIsoDate(): string {
+  const d = new Date();
+  return [
+    d.getFullYear(),
+    String(d.getMonth() + 1).padStart(2, "0"),
+    String(d.getDate()).padStart(2, "0"),
+  ].join("-");
+}
+
+export function normalizeRoleName(role: string | undefined): string {
+  if (!role) return "";
+  const r = role.toLowerCase();
+  if (
+    r.includes("báo ban") ||
+    r.includes("báo cáo") ||
+    r.includes("trực ban")
+  ) {
+    return "Báo cáo";
+  }
+  if (r.includes("chỉ huy")) return "Chỉ huy";
+  if (r.includes("sư đoàn") || r.includes("sư đoan")) return "Sư đoàn";
+  if (r.includes("quản trị viên") || r.includes("admin"))
+    return "Quản Trị Viên";
+  return role;
+}
+
+export function mapItemToRow(item: ReportItemInput): ReportRow {
+  let vang: VangChiTiet = { ...EMPTY_VANG };
+  let chiTietVangList: ChiTietVangQuanNhan[] = [];
+
+  try {
+    vang = JSON.parse(item.thongTinVang) as VangChiTiet;
+  } catch (e) {
+    console.error("Error parsing thongTinVang:", e);
+  }
+
+  try {
+    if (item.chiTietVang) {
+      chiTietVangList = JSON.parse(item.chiTietVang) as ChiTietVangQuanNhan[];
+    }
+  } catch (e) {
+    console.error("Error parsing chiTietVang:", e);
+  }
+
+  return {
+    idDonBaoCao: item.idDonBaoCao,
+    donVi: item.donVi.maDonVi,
+    tenDonVi: item.donVi.tenDonvi,
+    kyhieuDonVi: item.donVi.kyhieuDonvi,
+    quanSoTong: item.quanSoTong,
+    quanSoHienDien: item.quanSoHienDien,
+    quanSoVang: item.quanSoVang,
+    vang,
+    chiTietVangList,
+    status: item.status,
+    ghiChu: (item.ghiChu ?? "") || "",
+    rawItem: item as unknown as CreateReportResponse["Result"],
+  };
+}
+
+export const LY_DO_OPTIONS: { value: keyof VangChiTiet; label: string }[] = [
+  { value: "hoiThaiNgoaiSuDoan", label: "Hội thao - Ngoài Sư đoàn" },
+  { value: "hoiThaiEF", label: "Hội thao - e, f" },
+  { value: "xayDungNgoaiSuDoan", label: "Xây dựng - Ngoài Sư đoàn" },
+  { value: "xayDungEF", label: "Xây dựng - e, f" },
+  { value: "vienNgoaiSuDoan", label: "Viện - Ngoài Sư đoàn" },
+  { value: "vienEF", label: "Viện - e, f" },
+  { value: "congTacNgoaiSuDoan", label: "Công tác - Ngoài Sư đoàn" },
+  { value: "congTacSuDoan", label: "Công tác - Sư đoàn" },
+  { value: "hocSQ", label: "Học - Sĩ quan" },
+  { value: "hocCS", label: "Học - Chiến sĩ" },
+  { value: "choHuu", label: "Chờ hưu" },
+  { value: "nghiTranhThu", label: "Nghỉ tranh thủ" },
+  { value: "phep", label: "Phép" },
+  { value: "lyDoVangKhac", label: "Lý do khác" },
+];
+
+export const CAP_BAC_OPTIONS = [
+  "Binh nhất",
+  "Binh nhì",
+  "Hạ sĩ",
+  "Trung sĩ",
+  "Thượng sĩ",
+  "Thiếu úy",
+  "Trung úy",
+  "Thượng úy",
+  "Đại úy",
+  "Thiếu tá",
+  "Trung tá",
+  "Đại tá",
+  "Thiếu úy QNCN",
+  "Trung úy QNCN",
+  "Thượng úy QNCN",
+  "Đại úy QNCN",
+  "Thiếu tá QNCN",
+  "Trung tá QNCN",
+  "Thượng tá QNCN",
+];
+
+export const CAP_BAC_CHI_HUY_DEFAULT = [
+  "Thượng úy",
+  "Đại úy",
+  "Thiếu tá",
+  "Trung tá",
+  "Thượng tá",
+  "Đại tá",
+];
+
+export const CAP_BAC_CHI_HUY_SU_DOAN = ["Trung tá", "Thượng tá", "Đại tá"];
+
+export const CAP_BAC_TAC_CHIEN_DEFAULT = [
+  "Thiếu úy",
+  "Trung úy",
+  "Thượng úy",
+  "Đại úy",
+  "Thiếu tá",
+  "Trung tá",
+];
+
+export const CAP_BAC_TAC_CHIEN_SU_DOAN = ["Trung tá", "Thượng tá", "Đại tá"];
+
+export const EMPTY_TRUC: TrucNguoiInfo = {
+  tenNguoitruc: "",
+  capbacNguoitruc: "",
+  chucvuNguoitruc: "",
+  sodienthoai: "",
+};
+
+export function parseTrucNguoi(raw?: string): TrucNguoiInfo {
+  if (!raw) return { ...EMPTY_TRUC };
+  try {
+    return JSON.parse(raw) as TrucNguoiInfo;
+  } catch {
+    return { ...EMPTY_TRUC };
+  }
+}
