@@ -1,6 +1,8 @@
+import { THEME_KEY } from "../theme/theme";
+
 export const themeSession = {
   applyOnLogin: () => {
-    const saved = localStorage.getItem("theme") ?? "light";
+    const saved = localStorage.getItem(THEME_KEY) ?? "light";
     if (saved === "dark") {
       document.documentElement.setAttribute("data-theme", "dark");
     } else {
@@ -17,7 +19,7 @@ export const themeSession = {
       document.documentElement.removeAttribute("data-theme");
       return;
     }
-    const saved = localStorage.getItem("theme") ?? "light";
+    const saved = localStorage.getItem(THEME_KEY) ?? "light";
     if (saved === "dark") {
       document.documentElement.setAttribute("data-theme", "dark");
     }

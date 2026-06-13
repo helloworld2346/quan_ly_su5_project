@@ -1,4 +1,5 @@
 import { lazy } from "react";
+import { normalizeRoleName } from "../utils/reportUtils";
 
 export type NavItemId =
   | "executive"
@@ -45,8 +46,6 @@ const CreateDutyShift = lazy(
   () => import("../pages/CommandDuty/CreateDutyShift"),
 );
 const Settings = lazy(() => import("../pages/Settings/Settings"));
-
-
 
 const Trainningstatistical = lazy(
   () => import("../pages/TrainingReport/Trainningstatistical"),
@@ -208,20 +207,20 @@ export function getIdByPath(path: string): NavItemId {
   );
 }
 
-export function getNavGroupLabel(activeId: NavItemId): string | null {  
-  if (activeId === "settings" || activeId === "statistics") return null;  
-  
-  if (EXECUTIVE_NAV_GROUP.items.some((i) => i.id === activeId))  
-    return EXECUTIVE_NAV_GROUP.label;  
-  
-  if (REPORT_NAV_GROUP.items.some((i) => i.id === activeId))  
-    return REPORT_NAV_GROUP.label;  
-  
-  if (DUTY_NAV_GROUP.items.some((i) => i.id === activeId))  
-    return DUTY_NAV_GROUP.label;  
-  
+export function getNavGroupLabel(activeId: NavItemId): string | null {
+  if (activeId === "settings" || activeId === "statistics") return null;
+
+  if (EXECUTIVE_NAV_GROUP.items.some((i) => i.id === activeId))
+    return EXECUTIVE_NAV_GROUP.label;
+
+  if (REPORT_NAV_GROUP.items.some((i) => i.id === activeId))
+    return REPORT_NAV_GROUP.label;
+
+  if (DUTY_NAV_GROUP.items.some((i) => i.id === activeId))
+    return DUTY_NAV_GROUP.label;
+
   return null;
-  }
+}
 
 export function getNavGroupLabelByRole(
   groupLabel: string,
@@ -240,28 +239,6 @@ export function getNavGroupLabelByRole(
 
 export function getNavItemById(id: NavItemId): NavItem | undefined {
   return ALL_NAV_ITEMS.find((item) => item.id === id);
-}
-
-function normalizeRoleName(role: string): string {
-  const r = role.toLowerCase();
-
-  if (
-    r.includes("báo ban") ||
-    r.includes("báo cáo") ||
-    r.includes("trực ban")
-  ) {
-    return "Báo cáo";
-  }
-  if (r.includes("chỉ huy")) {
-    return "Chỉ huy";
-  }
-  if (r.includes("sư đoàn") || r.includes("sư đoan")) {
-    return "Sư đoàn";
-  }
-  if (r.includes("quản trị viên") || r.includes("admin")) {
-    return "Quản Trị Viên";
-  }
-  return role;
 }
 
 export function getNavItemsByRole(userRole: string | null): NavItem[] {
