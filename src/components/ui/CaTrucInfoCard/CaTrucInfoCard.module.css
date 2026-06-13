@@ -1,191 +1,192 @@
-.caTrucSection {
-  margin-top: 20px;
-  padding: 20px 28px;
-  background: var(--table-row-odd);
-  border: 1px solid var(--login-border);
-  border-radius: 14px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-}
-
-.caTrucHeader {
-  font-size: 20px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--login-text-muted);
-  margin-bottom: 2px;
-}
-
-.caTrucNgay {
-  font-size: 14px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--login-text-muted);
-}
-
-.caTrucBody {
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 24px;
-  width: 100%;
-  max-width: 900px;
-  margin-top: 12px;
-}
-
-.caTrucLeft {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  flex: 1;
-}
-
-.caTrucCard {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 12px 16px;
-  border: 1px solid var(--login-border);
-  border-radius: 10px;
-  background: var(--dialog-bg, #fff);
-}
-
-.caTrucRole {
-  font-size: 14px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: var(--primary-color);
-}
-
-.caTrucCardBody {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.caTrucPersonName {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--login-text);
-}
-
-.caTrucPersonMeta {
-  font-size: 15px;
-  color: var(--login-text-muted);
-}
-
-.caTrucPhone {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--primary-color, #218673);
-  text-decoration: none;
-  margin-top: 2px;
-}
-
-.caTrucEmpty {
-  font-size: 14px;
-  color: var(--login-text-muted);
-  font-style: italic;
-}
-
-.caTrucRight {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 16px 28px;
-  border: 1.5px dashed var(--login-border);
-  border-radius: 12px;
-  min-width: 200px;
-  background: var(--table-row-even);
-  align-self: center;
-}
-
-.caTrucMatKhauLabel {
-  font-size: 14 px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--login-text-muted);
-}
-
-.caTrucMatKhau {
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--login-text);
-  letter-spacing: 0.5px;
-  text-align: center;
-  line-height: 1.3;
-}
-
+.caTrucSection {  
+  margin-top: 20px;  
+  padding: 20px 28px;  
+  background: var(--table-row-odd);  
+  border: 1px solid var(--login-border);  
+  border-radius: 14px;  
+  display: flex;  
+  flex-direction: column;  
+  align-items: center;  
+  gap: 5px;  
+}  
+  
+.caTrucHeader {  
+  font-size: 20px;  
+  font-weight: 700;  
+  text-transform: uppercase;  
+  letter-spacing: 1px;  
+  color: var(--login-text-muted);  
+  margin-bottom: 2px;  
+}  
+  
+.caTrucNgay {  
+  font-size: 14px;  
+  font-weight: 600;  
+  text-transform: uppercase;  
+  letter-spacing: 1px;  
+  color: var(--login-text-muted);  
+}  
+  
+.caTrucBody {  
+  display: flex;  
+  align-items: flex-start;  
+  justify-content: center;  
+  gap: 24px;  
+  width: 100%;  
+  max-width: 900px;  
+  margin-top: 12px;  
+}  
+  
+.caTrucLeft {  
+  display: grid;  
+  grid-template-columns: 1fr 1fr;  
+  gap: 12px;  
+  flex: 1;  
+}  
+  
+.caTrucCard {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 6px;  
+  padding: 12px 16px;  
+  border: 1px solid var(--login-border);  
+  border-radius: 10px;  
+  background: var(--dialog-bg);  
+}  
+  
+.caTrucRole {  
+  font-size: 14px;  
+  font-weight: 700;  
+  text-transform: uppercase;  
+  letter-spacing: 0.8px;  
+  color: var(--primary-color);  
+}  
+  
+.caTrucCardBody {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 2px;  
+}  
+  
+.caTrucPersonName {  
+  font-size: 18px;  
+  font-weight: 700;  
+  color: var(--login-text);  
+}  
+  
+.caTrucPersonMeta {  
+  font-size: 15px;  
+  color: var(--login-text-muted);  
+}  
+  
+.caTrucPhone {  
+  font-size: 15px;  
+  font-weight: 600;  
+  color: var(--primary-color);  
+  text-decoration: none;  
+  margin-top: 2px;  
+}  
+  
+.caTrucEmpty {  
+  font-size: 14px;  
+  color: var(--login-text-muted);  
+  font-style: italic;  
+}  
+  
+.caTrucRight {  
+  display: flex;  
+  flex-direction: column;  
+  align-items: center;  
+  gap: 6px;  
+  padding: 16px 28px;  
+  border: 1.5px dashed var(--login-border);  
+  border-radius: 12px;  
+  min-width: 200px;  
+  background: var(--table-row-even);  
+  align-self: center;  
+}  
+  
+.caTrucMatKhauLabel {  
+  font-size: 14px;  
+  font-weight: 700;  
+  text-transform: uppercase;  
+  letter-spacing: 1px;  
+  color: var(--login-text-muted);  
+}  
+  
+.caTrucMatKhau {  
+  font-size: 22px;  
+  font-weight: 800;  
+  color: var(--login-text);  
+  letter-spacing: 0.5px;  
+  text-align: center;  
+  line-height: 1.3;  
+}  
+  
 .caTrucHoiDap {  
   font-size: 14px;  
   font-weight: 600;  
-  font-style: italic;
+  font-style: italic;  
   text-transform: uppercase;  
   letter-spacing: 0.5px;  
   color: var(--login-text-muted);  
-  opacity: 0.7; 
+  opacity: 0.7;  
+}  
   
-}.caTrucGhiChu {
-  width: 100%;
-  margin-top: 14px;
-  padding: 16px 22px;
-  background: color-mix(in srgb, var(--primary-color, #218673) 8%, transparent);
-  border: 1px solid
-    color-mix(in srgb, var(--primary-color, #218673) 25%, transparent);
-  border-left: 4px solid var(--primary-color, #218673);
-  border-radius: 0 10px 10px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.caTrucGhiChuLabel {
-  font-size: 14px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: var(--primary-color, #218673);
-}
-
-.caTrucGhiChuText {
-  font-size: 15px;
-  color: var(--login-text);
-  font-style: italic;
-  line-height: 1.6;
-}
-
-@media (max-width: 768px) {
-  .page {
-    padding: 16px;
-  }
-
-  .formCard {
-    padding: 20px;
-    gap: 20px;
-  }
-
-  .formGrid,
-  .trucGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .caTrucBody {
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .caTrucLeft {
-    grid-template-columns: 1fr;
-  }
-
-  .caTrucRight {
-    width: 100%;
-  }
+.caTrucGhiChu {  
+  width: 100%;  
+  margin-top: 14px;  
+  padding: 16px 22px;  
+  background: color-mix(in srgb, var(--primary-color) 8%, transparent);  
+  border: 1px solid color-mix(in srgb, var(--primary-color) 25%, transparent);  
+  border-left: 4px solid var(--primary-color);  
+  border-radius: 0 10px 10px 0;  
+  display: flex;  
+  flex-direction: column;  
+  gap: 5px;  
+}  
+  
+.caTrucGhiChuLabel {  
+  font-size: 14px;  
+  font-weight: 700;  
+  text-transform: uppercase;  
+  letter-spacing: 0.8px;  
+  color: var(--primary-color);  
+}  
+  
+.caTrucGhiChuText {  
+  font-size: 15px;  
+  color: var(--login-text);  
+  font-style: italic;  
+  line-height: 1.6;  
+}  
+  
+@media (max-width: 768px) {  
+  .caTrucBody {  
+    flex-direction: column;  
+    gap: 16px;  
+  }  
+  
+  .caTrucLeft {  
+    grid-template-columns: 1fr;  
+  }  
+  
+  .caTrucRight {  
+    width: 100%;  
+  }  
+}  
+  
+@media (max-width: 480px) {  
+  .caTrucSection {  
+    padding: 16px;  
+  }  
+  
+  .caTrucRight {  
+    padding: 12px 16px;  
+    min-width: unset;  
+  }  
+  
+  .caTrucMatKhau {  
+    font-size: 18px;  
+  }  
 }

@@ -48,18 +48,13 @@ export default function CaTrucInfoCard({
               {data ? (
                 <div className={styles.caTrucCardBody}>
                   <div className={styles.caTrucPersonName}>
-                    {data.capbacNguoitruc} {data.tenNguoitruc}
+                    {data.capbacNguoitruc} - {data.tenNguoitruc}
                   </div>
                   <div className={styles.caTrucPersonMeta}>
                     {data.chucvuNguoitruc}
                   </div>
                   {data.sodienthoai && (
-                    <a
-                      href={`tel:${data.sodienthoai}`}
-                      className={styles.caTrucPhone}
-                    >
-                      {data.sodienthoai}
-                    </a>
+                    <a className={styles.caTrucPhone}>{data.sodienthoai}</a>
                   )}
                 </div>
               ) : (

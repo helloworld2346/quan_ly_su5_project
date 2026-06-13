@@ -1,207 +1,248 @@
-.page {
-  padding: 32px;
-  max-width: 1100px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-}
-
-.formCard {
-  background: var(--dialog-bg, #fff);
-  border: 1px solid var(--login-border);
-  border-radius: 16px;
-  padding: 40px;
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-}
-
-.cardTitle {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--login-text);
-  margin: 0;
-}
-
-.formGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-}
-
-.formGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.fullWidth {
-  grid-column: 1 / -1;
-}
-
-.label {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--modal-label-text, #555);
-}
-
-.required {
-  color: var(--error-color, #dc2626);
-}
-
-.input {
-  padding: 14px 18px;
-  border: 1px solid var(--modal-input-border);
-  border-radius: 8px;
-  font-size: 15px;
-  background: var(--modal-input-bg);
-  color: var(--modal-input-text);
-  transition: border-color 0.15s;
-  width: 100%;
-  box-sizing: border-box;
-  font-family: inherit;
-}
-
-.input:focus {
-  outline: none;
-  border-color: var(--modal-input-focus-border);
-  box-shadow: 0 0 0 2px
-    color-mix(in srgb, var(--primary-color, #218673) 15%, transparent);
-}
-
-.textarea {
-  height: 80px;
-  min-height: 80px;
-  resize: vertical;
-}
-
-.trucGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 28px;
-}
-
-.trucColumn {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.trucColumnHeader {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.trucColumnIcon {
-  font-size: 18px;
-  color: var(--primary-color, #218673);
-}
-
-.trucColumnLabel {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--login-text);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.personCard {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  padding: 20px 24px;
-  border: 1px solid var(--login-border);
-  border-radius: 12px;
-  background: var(--table-row-even);
-}
-
-.personRole {
-  font-size: 14px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: var(--primary-color, #218673);
-  margin-bottom: 2px;
-}
-
-.personName {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--login-text);
-}
-
-.personMeta {
-  font-size: 15px;
-  color: var(--login-text-muted);
-}
-
-.personPhone {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--primary-color, #218673);
-  text-decoration: none;
-  margin-top: 4px;
-}
-
-.personEmpty {
-  font-size: 14px;
-  color: var(--login-text-muted);
-  font-style: italic;
-  padding: 14px 0;
-}
-
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-}
-
-.btnSubmit {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 14px 40px;
-  border: none;
-  border-radius: 8px;
-  background: var(--primary-color, #218673);
-  color: #fff;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
-
-.btnSubmit:hover:not(:disabled) {
-  opacity: 0.88;
-}
-
-.btnSubmit:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.successBanner {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 20px 28px;
-  background: color-mix(
-    in srgb,
-    var(--primary-color, #218673) 12%,
-    transparent
-  );
-  border: 1.5px solid var(--primary-color, #218673);
-  border-radius: 12px;
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--primary-color, #218673);
-}
-
-.successIcon {
-  font-size: 22px;
+.page {  
+  padding: 32px;  
+  max-width: 1100px;  
+  margin: 0 auto;  
+  display: flex;  
+  flex-direction: column;  
+  gap: 32px;  
+}  
+  
+.formCard {  
+  background: var(--dialog-bg);  
+  border: 1px solid var(--login-border);  
+  border-radius: 16px;  
+  padding: 40px;  
+  display: flex;  
+  flex-direction: column;  
+  gap: 32px;  
+}  
+  
+.cardTitle {  
+  font-size: 22px;  
+  font-weight: 700;  
+  color: var(--login-text);  
+  margin: 0;  
+}  
+    
+.formGrid {  
+  display: grid;  
+  grid-template-columns: 1fr 1fr;  
+  gap: 24px;  
+}  
+  
+.formGroup {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 10px;  
+}  
+  
+.fullWidth {  
+  grid-column: 1 / -1;  
+}  
+  
+.label {  
+  font-size: 15px;  
+  font-weight: 600;  
+  color: var(--modal-label-text);  
+}  
+  
+.required {  
+  color: var(--dialog-danger-icon);  
+}  
+  
+.input {  
+  padding: 14px 18px;  
+  border: 1px solid var(--modal-input-border);  
+  border-radius: 8px;  
+  font-size: 15px;  
+  background: var(--modal-input-bg);  
+  color: var(--modal-input-text);  
+  transition: border-color 0.15s;  
+  width: 100%;  
+  box-sizing: border-box;  
+  font-family: inherit;  
+}  
+  
+.input:focus {  
+  outline: none;  
+  border-color: var(--modal-input-focus-border);  
+  box-shadow: 0 0 0 2px var(--modal-input-focus-shadow);  
+}  
+  
+.textarea {  
+  height: 80px;  
+  min-height: 80px;  
+  resize: vertical;  
+}  
+    
+.trucGrid {  
+  display: grid;  
+  grid-template-columns: 1fr 1fr;  
+  gap: 28px;  
+}  
+  
+.trucColumn {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 14px;  
+}  
+  
+.trucColumnHeader {  
+  display: flex;  
+  align-items: center;  
+  gap: 8px;  
+}  
+  
+.trucColumnLabel {  
+  font-size: 16px;  
+  font-weight: 700;  
+  color: var(--login-text);  
+  text-transform: uppercase;  
+  letter-spacing: 0.5px;  
+}  
+    
+.personCard {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 5px;  
+  padding: 20px 24px;  
+  border: 1px solid var(--login-border);  
+  border-radius: 12px;  
+  background: var(--surface-muted);  
+}  
+  
+.personRole {  
+  font-size: 14px;  
+  font-weight: 700;  
+  text-transform: uppercase;  
+  letter-spacing: 0.8px;  
+  color: var(--primary-color);  
+  margin-bottom: 2px;  
+}  
+  
+.personName {  
+  font-size: 18px;  
+  font-weight: 700;  
+  color: var(--login-text);  
+}  
+  
+.personMeta {  
+  font-size: 15px;  
+  color: var(--login-text-muted);  
+}  
+  
+.personPhone {  
+  display: flex;  
+  align-items: center;  
+  gap: 6px;  
+  font-size: 15px;  
+  font-weight: 600;  
+  color: var(--primary-color);  
+  text-decoration: none;  
+  margin-top: 4px;  
+}  
+  
+.personEmpty {  
+  font-size: 14px;  
+  color: var(--login-text-muted);  
+  font-style: italic;  
+  padding: 14px 0;  
+}  
+    
+.actions {  
+  display: flex;  
+  justify-content: flex-end;  
+  gap: 12px;  
+}  
+  
+.btnSubmit {  
+  display: flex;  
+  align-items: center;  
+  gap: 8px;  
+  padding: 14px 40px;  
+  border: none;  
+  border-radius: 8px;  
+  background: var(--primary-color);  
+  color: var(--text-white);  
+  font-size: 16px;  
+  font-weight: 700;  
+  cursor: pointer;  
+  transition: opacity 0.15s;  
+}  
+  
+.btnSubmit:hover:not(:disabled) {  
+  opacity: 0.88;  
+}  
+  
+.btnSubmit:disabled {  
+  opacity: 0.55;  
+  cursor: not-allowed;  
+}  
+  
+  
+.successBanner {  
+  display: flex;  
+  align-items: center;  
+  gap: 12px;  
+  padding: 20px 28px;  
+  background: color-mix(in srgb, var(--primary-color) 12%, transparent);  
+  border: 1.5px solid var(--primary-color);  
+  border-radius: 12px;  
+  font-size: 17px;  
+  font-weight: 600;  
+  color: var(--primary-color);  
+}  
+  
+.successIcon {  
+  font-size: 22px;  
+}  
+  
+  
+@media (max-width: 768px) {  
+  .page {  
+    padding: 16px;  
+    gap: 20px;  
+  }  
+  
+  .formCard {  
+    padding: 24px 20px;  
+    gap: 24px;  
+  }  
+  
+  .formGrid {  
+    grid-template-columns: 1fr;  
+  }  
+  
+  .trucGrid {  
+    grid-template-columns: 1fr;  
+    gap: 20px;  
+  }  
+  
+  .btnSubmit {  
+    width: 100%;  
+    justify-content: center;  
+  }  
+  
+  .actions {  
+    justify-content: stretch;  
+  }  
+}  
+  
+@media (max-width: 480px) {  
+  .formCard {  
+    padding: 16px;  
+  }  
+  
+  .cardTitle {  
+    font-size: 18px;  
+  }  
+  
+  .personCard {  
+    padding: 14px 16px;  
+  }  
+  
+  .successBanner {  
+    padding: 14px 16px;  
+    font-size: 15px;  
+  }  
 }

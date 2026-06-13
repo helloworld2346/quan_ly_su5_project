@@ -189,6 +189,18 @@
 --row-danger-text: #b42318;  
 --row-danger-text-strong: #8f1010;
 
+--sidebar-text: rgba(255, 255, 255, 0.9);  
+--sidebar-text-muted: rgba(255, 255, 255, 0.75);  
+--sidebar-text-sub: rgba(255, 255, 255, 0.7);  
+--sidebar-border-bottom: rgba(255, 255, 255, 0.12);  
+--sidebar-border-right: rgba(255, 255, 255, 0.08);  
+--sidebar-hover-bg: rgba(255, 255, 255, 0.08);  
+--sidebar-hover-bg-sub: rgba(255, 255, 255, 0.05);  
+--sidebar-scrollbar: rgba(255, 255, 255, 0.3);  
+--sidebar-scrollbar-hover: rgba(255, 255, 255, 0.5);  
+--sidebar-connector: rgba(255, 255, 255, 0.35);  
+--sidebar-logout-border: rgba(255, 255, 255, 0.25);  
+--sidebar-logout-border-hover: rgba(255, 255, 255, 0.4);
 }
 
 /* ==========================================================================  
@@ -305,12 +317,12 @@
   --modal-input-disabled-bg: #1c2822;
   --modal-input-disabled-text: #6b7d75;
 
-  /* --- TOAST NOTIFICATIONS (Dark Mode) --- */
-  --toast-bg-dark: #1c2822;
-  --toast-message-text-dark: #d8e4de;
-  --toast-close-text-dark: #9fb0a8;
-  --toast-close-hover-text-dark: #d8e4de;
-  --toast-info-color-dark: #6bb892;
+/* --- TOAST NOTIFICATIONS (Dark Mode) --- */  
+--toast-bg: #1c2822;  
+--toast-message-text: #d8e4de;  
+--toast-close-text: #9fb0a8;  
+--toast-close-hover-text: #d8e4de;  
+--toast-info-color: #6bb892;
 
   /* --- CHART COLORS (Dark Mode) --- */
 --chart-green: #4ade80;

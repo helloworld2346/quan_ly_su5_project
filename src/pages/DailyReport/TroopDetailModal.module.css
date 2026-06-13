@@ -10,16 +10,16 @@
   padding: 16px;  
 }  
   
-.modal {
-  background: var(--dialog-bg);
-  border-radius: 16px;
-  width: min(1080px, calc(100% - 32px)); 
-  max-height: 95vh;                  
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-}
+.modal {  
+  background: var(--dialog-bg);  
+  border-radius: 16px;  
+  width: min(1080px, calc(100% - 32px));  
+  max-height: 95vh;  
+  display: flex;  
+  flex-direction: column;  
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);  
+  overflow: hidden;  
+}  
   
 .header {  
   position: relative;  
@@ -35,9 +35,8 @@
   font-size: 20px;  
   font-weight: 700;  
   color: var(--dialog-title-text);  
-  margin: 0;
-  text-align: center;
-  margin-bottom: 12px;
+  margin: 0 0 12px;  
+  text-align: center;  
 }  
   
 .closeBtn {  
@@ -57,6 +56,11 @@
   cursor: pointer;  
   font-size: 22px;  
   transition: background 0.15s, color 0.15s;  
+}  
+  
+.closeBtn:hover {  
+  background: var(--dialog-cancel-hover-bg);  
+  color: var(--dialog-title-text);  
 }  
   
 .headerContent {  
@@ -103,11 +107,6 @@
   color: var(--dialog-title-text);  
 }  
   
-.closeBtn:hover {  
-  background: var(--dialog-cancel-hover-bg);  
-  color: var(--dialog-title-text);  
-}  
-  
 .body {  
   flex: 1;  
   overflow-y: auto;  
@@ -121,6 +120,8 @@
   padding: 32px 0;  
   font-weight: 700;  
 }  
+  
+/* ── Table ── */  
   
 .tableWrapper {  
   width: 100%;  
@@ -136,8 +137,8 @@
 }  
   
 .table th {  
-  background: #218673;  
-  color: white;  
+  background: var(--table-header-bg, var(--surface-table));  
+  color: var(--text-white);  
   padding: 10px 12px;  
   text-align: left;  
   font-weight: 600;  
@@ -168,39 +169,15 @@
   left: 0;  
   z-index: 3;  
 }  
-.table th:nth-child(1) { background: #218673; }  
+  
+.table th:nth-child(1) { background: var(--table-header-bg, var(--surface-table)); }  
 .table td:nth-child(1) { background: var(--dialog-bg); }  
 .table tr:hover td:nth-child(1) { background: var(--dialog-cancel-bg); }  
   
 .nameCell {  
   font-weight: 600;  
 }  
-  
-@media (max-width: 768px) {  
-  .overlay {  
-    left: 0;  
-  }  
-  
-  .modal {  
-    width: calc(100% - 32px);  
-    max-height: 90vh;  
-    border-radius: 12px;  
-    margin-left: 0 !important;  
-  }  
-  
-  .header {  
-    padding: 16px;  
-  }  
-  
-  .body {  
-    padding: 12px;  
-  }  
-  
-  .table {  
-    font-size: 13px;  
-  }  
-}  
-  
+
 .trucSection {  
   margin-bottom: 16px;  
 }  
@@ -211,6 +188,7 @@
   letter-spacing: 0.8px;  
   margin-bottom: 10px;  
   text-align: center;  
+  color: var(--dialog-title-text);  
 }  
   
 .trucGrid {  
@@ -241,7 +219,7 @@
   font-weight: 700;  
   text-transform: uppercase;  
   letter-spacing: 0.4px;  
-  color: var(--dialog-message-text, #888);  
+  color: var(--dialog-message-text);  
 }  
   
 .trucCardBody {  
@@ -253,42 +231,66 @@
 .trucName {  
   font-size: 18px;  
   font-weight: 700;  
-  color: var(--dialog-title-text, #111);  
+  color: var(--dialog-title-text);  
 }  
   
 .trucMeta {  
   font-size: 16px;  
-  color: var(--dialog-message-text, #666);  
+  color: var(--dialog-message-text);  
 }  
   
 .trucPhone {  
   font-size: 16px;  
   font-weight: 600;  
-  color: #218673;  
+  color: var(--primary-color);  
   text-decoration: none;  
   margin-top: 2px;  
-}
+}  
   
 .trucEmpty {  
   font-size: 15px;  
-  color: var(--dialog-message-text, #aaa);  
+  color: var(--dialog-message-text);  
   font-style: italic;  
 }  
-  
-@media (max-width: 480px) {  
-  .trucGrid {  
-    grid-template-columns: 1fr;  
-  }  
-}
-
+    
 .recalledNotice {  
   padding: 48px 24px;  
   text-align: center;  
   color: var(--login-text-muted);  
   font-size: 15px;  
   font-style: italic;  
-}
+}  
   
 .recalledNotice p {  
   margin: 0;  
+}  
+    
+@media (max-width: 768px) {  
+  .overlay {  
+    left: 0;  
+  }  
+  
+  .modal {  
+    width: calc(100% - 32px);  
+    max-height: 90vh;  
+    border-radius: 12px;  
+  }  
+  
+  .header {  
+    padding: 16px;  
+  }  
+  
+  .body {  
+    padding: 12px;  
+  }  
+  
+  .table {  
+    font-size: 13px;  
+  }  
+}  
+  
+@media (max-width: 480px) {  
+  .trucGrid {  
+    grid-template-columns: 1fr;  
+  }  
 }

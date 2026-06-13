@@ -1,23 +1,27 @@
-.badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-}
-.pending {
-  background: #fef3c7;
-  color: #92400e;
-}
-.approved {
-  background: #d1fae5;
-  color: #065f46;
-}
-.rejected {
-  background: #fee2e2;
-  color: #991b1b;
-}
-.draft {
-  background: #f1f5f9;
-  color: #475569;
+.badge {  
+  display: inline-block;  
+  padding: 4px 12px;  
+  border-radius: 12px;  
+  font-size: 12px;  
+  font-weight: 600;  
+}  
+  
+.pending {  
+  background: var(--btn-recall-bg);  
+  color: var(--btn-recall-fg);  
+}  
+  
+.approved {  
+  background: var(--btn-approve-bg);  
+  color: var(--btn-approve-fg);  
+}  
+  
+.rejected {  
+  background: var(--btn-refuse-bg);  
+  color: var(--btn-refuse-fg);  
+}  
+  
+.draft {  
+  background: var(--modal-btn-draft-bg);  
+  color: var(--modal-btn-draft-text);  
 }
