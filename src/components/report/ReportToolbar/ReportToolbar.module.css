@@ -45,7 +45,7 @@
   margin: 7px 0;  
   background: var(--input-divider);  
   flex-shrink: 0;  
-} 
+}  
   
 .searchIconBtn {  
   display: flex;  
@@ -87,7 +87,6 @@
   min-width: 150px;  
   cursor: pointer;  
   outline: none;  
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);  
   transition: border-color 0.15s, box-shadow 0.15s;  
 }  
   
@@ -97,7 +96,12 @@
   
 .dateInput:focus {  
   border-color: var(--primary-color);  
-  box-shadow: 0 0 0 3px rgba(31, 92, 63, 0.12);  
+  box-shadow: 0 0 0 3px var(--modal-input-focus-shadow);  
+}  
+  
+[data-theme="dark"] .dateInput::-webkit-calendar-picker-indicator {  
+  filter: invert(0.7) brightness(1.5) sepia(0.3) hue-rotate(90deg);  
+  opacity: 0.8;  
 }  
   
 .actionGroup {  
@@ -108,63 +112,7 @@
   margin-left: auto;  
 }  
   
-.actionBtn {  
-  height: 40px;  
-  padding: 0 16px;  
-  border-radius: 10px;  
-  font-size: 13px;  
-  font-weight: 700;  
-  font-family: inherit;  
-  cursor: pointer;  
-  border: 1px solid transparent;  
-  white-space: nowrap;  
-  transition: background 0.15s, border-color 0.15s, transform 0.1s;  
-  display: flex;  
-  align-items: center;  
-  gap: 8px;  
-}  
-  
-.actionBtn:hover {  
-  filter: brightness(0.97);  
-}  
-  
-.actionBtn:active {  
-  transform: scale(0.98);  
-}  
-  
-.addBtn {  
-  color: var(--btn-yellow-fg);  
-  background: var(--btn-yellow-bg);  
-  border-color: var(--btn-yellow-border);  
-}  
-  
-.addBtn:hover {  
-  background: var(--btn-yellow-hover-bg);  
-  border-color: var(--btn-yellow-hover-border);  
-}  
-
-.disabledBtn,
-.disabledBtn:hover,
-.disabledBtn:active {
-  background-color: var(--modal-input-disabled-bg, #e2e8f0) !important;
-  border-color: var(--modal-border, #cbd5e1) !important;
-  color: var(--modal-input-disabled-text, #94a3b8) !important;
-  cursor: not-allowed !important;
-  transform: none !important;
-  filter: none !important;
-}
-  
-.addIcon {  
-  font-size: 14px;  
-}  
-  
-.exportGroup {  
-  display: flex;  
-  flex-wrap: wrap;  
-  align-items: center;  
-  gap: 10px;  
-}  
-  
+.actionBtn,  
 .exportBtn {  
   height: 40px;  
   padding: 0 16px;  
@@ -181,12 +129,47 @@
   gap: 8px;  
 }  
   
+.actionBtn:hover,  
 .exportBtn:hover {  
   filter: brightness(0.97);  
 }  
   
+.actionBtn:active,  
 .exportBtn:active {  
   transform: scale(0.98);  
+}  
+  
+.addBtn {  
+  color: var(--btn-yellow-fg);  
+  background: var(--btn-yellow-bg);  
+  border-color: var(--btn-yellow-border);  
+}  
+  
+.addBtn:hover {  
+  background: var(--btn-yellow-hover-bg);  
+  border-color: var(--btn-yellow-hover-border);  
+}  
+  
+.disabledBtn,  
+.disabledBtn:hover,  
+.disabledBtn:active {  
+  background-color: var(--modal-input-disabled-bg) !important;  
+  border-color: var(--modal-border) !important;  
+  color: var(--modal-input-disabled-text) !important;  
+  cursor: not-allowed !important;  
+  transform: none !important;  
+  filter: none !important;  
+}  
+  
+.addIcon {  
+  font-size: 14px;  
+}  
+  
+.exportGroup {  
+  display: flex;  
+  flex-wrap: wrap;  
+  align-items: center;  
+  gap: 10px;  
 }  
   
 .exportWord {  
@@ -211,43 +194,6 @@
   border-color: var(--btn-excel-hover-border);  
 }  
   
-[data-theme="dark"] .dateInput:focus {  
-  box-shadow: 0 0 0 3px rgba(107, 184, 146, 0.15);  
-}  
-  
-[data-theme="dark"] .dateInput::-webkit-calendar-picker-indicator {  
-  filter: invert(0.7) brightness(1.5) sepia(0.3) hue-rotate(90deg);  
-  opacity: 0.8;  
-}  
-
-@media (max-width: 768px) {  
-  .toolbar {  
-    flex-direction: column;  
-    align-items: stretch;  
-  }  
-  
-  .searchWrap {  
-    width: 100%;  
-  }  
-  
-  .actionGroup {  
-    margin-left: 0;  
-    width: 100%;  
-    flex-direction: column;  
-  }  
-  
-  .actionBtn,  
-  .exportBtn {  
-    width: 100%;  
-    justify-content: center;  
-  }  
-  
-  .exportGroup {  
-    width: 100%;  
-    flex-direction: column;  
-  }  
-}
-
 .consolidateBtn {  
   color: var(--text-white);  
   background: var(--primary-color);  
@@ -257,17 +203,17 @@
 .consolidateBtn:hover:not(:disabled) {  
   background: var(--primary-hover);  
   border-color: var(--primary-hover);  
-}
-
+}  
+  
 .submitBtn {  
   color: var(--text-white);  
-  background: var(--primary-color, #218673);  
-  border-color: var(--primary-color, #218673);  
+  background: var(--primary-color);  
+  border-color: var(--primary-color);  
 }  
   
 .submitBtn:hover {  
-  background: var(--primary-hover, #1a6b5c);  
-  border-color: var(--primary-hover, #1a6b5c);  
+  background: var(--primary-hover);  
+  border-color: var(--primary-hover);  
 }  
   
 .recallBtn {  
@@ -301,4 +247,32 @@
 .refuseBtn:hover {  
   background: var(--btn-refuse-hover-bg);  
   border-color: var(--btn-refuse-hover-border);  
+}  
+  
+@media (max-width: 768px) {  
+  .toolbar {  
+    flex-direction: column;  
+    align-items: stretch;  
+  }  
+  
+  .searchWrap {  
+    width: 100%;  
+  }  
+  
+  .actionGroup {  
+    margin-left: 0;  
+    width: 100%;  
+    flex-direction: column;  
+  }  
+  
+  .actionBtn,  
+  .exportBtn {  
+    width: 100%;  
+    justify-content: center;  
+  }  
+  
+  .exportGroup {  
+    width: 100%;  
+    flex-direction: column;  
+  }  
 }

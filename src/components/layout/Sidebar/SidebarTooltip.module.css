@@ -9,11 +9,7 @@
   white-space: nowrap;  
   max-width: 240px;  
   color: var(--tooltip-fg);  
-  background: var(--primary-color);  
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);  
-  pointer-events: none;  
-}  
-  
-[data-theme="dark"] .tooltip {  
   background: var(--tooltip-bg);  
+  box-shadow: 0 8px 20px var(--shadow-color);  
+  pointer-events: none;  
 }
