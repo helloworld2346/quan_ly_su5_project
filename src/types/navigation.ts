@@ -94,7 +94,7 @@ export const REPORT_NAV_GROUP = {
     },
     {
       id: "report-training" as const,
-      label: "Báo ban quân số huấn luyện",
+      label: "Thống kê quân số huấn luyện",
       path: "/training-report",
       loadingTitle: "Đang tải báo cáo huấn luyện",
       loadingSubtitle: "Đang tải dữ liệu…",
@@ -179,7 +179,7 @@ export const NAV_PAGE_TITLES: Record<NavItemId, string> = {
   executive: "Tổng hợp ngày",
   "executive-training": "Tổng hợp huấn luyện",
   "report-troop": "Báo ban ngày",
-  "report-training": "Báo ban quân số huấn luyện",
+  "report-training": "Thống kê quân số huấn luyện",
   "report-family": "Báo ban thân nhân thăm nuôi",
   "report-communication": "Báo ban thông tin liên lạc",
   statistics: "Thống kê báo ban",

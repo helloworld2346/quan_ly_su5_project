@@ -3,12 +3,12 @@ import { normalizeRoleName } from "../utils/reportUtils";
 import type { ReportRow } from "../types/dailyReport";
 
 export function useReportPermissions(
-  userRole: string | undefined,
+  userRole: string | null | undefined,
   capDonVi: string | null | undefined,
   ownReport: ReportRow | null,
   commanderReport: ReportRow | null,
 ) {
-  const normalizedRole = normalizeRoleName(userRole);
+  const normalizedRole = normalizeRoleName(userRole ?? undefined);
   const isCommander = normalizedRole === "Chỉ huy";
   const isReporter = normalizedRole === "Báo cáo";
   const isSuDoan = normalizedRole === "Sư đoàn";

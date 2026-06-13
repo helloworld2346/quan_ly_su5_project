@@ -3,45 +3,7 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import CustomSelect from "../../components/ui/CustomSelect/CustomSelect";
 import styles from "./CreateReportModal.module.css";
 import type { AbsentRow, VangChiTiet } from "../../types/dailyReport";
-
-const LY_DO_OPTIONS: { value: keyof VangChiTiet; label: string }[] = [
-  { value: "hoiThaiNgoaiSuDoan", label: "Hội thao - Ngoài Sư đoàn" },
-  { value: "hoiThaiEF", label: "Hội thao - e, f" },
-  { value: "xayDungNgoaiSuDoan", label: "Xây dựng - Ngoài Sư đoàn" },
-  { value: "xayDungEF", label: "Xây dựng - e, f" },
-  { value: "vienNgoaiSuDoan", label: "Viện - Ngoài Sư đoàn" },
-  { value: "vienEF", label: "Viện - e, f" },
-  { value: "congTacNgoaiSuDoan", label: "Công tác - Ngoài Sư đoàn" },
-  { value: "congTacSuDoan", label: "Công tác - Sư đoàn" },
-  { value: "hocSQ", label: "Học - Sĩ quan" },
-  { value: "hocCS", label: "Học - Chiến sĩ" },
-  { value: "choHuu", label: "Chờ hưu" },
-  { value: "nghiTranhThu", label: "Nghỉ tranh thủ" },
-  { value: "phep", label: "Phép" },
-  { value: "lyDoVangKhac", label: "Lý do khác" },
-];
-
-const CAP_BAC_OPTIONS = [
-  "Binh nhất",
-  "Binh nhì",
-  "Hạ sĩ",
-  "Trung sĩ",
-  "Thượng sĩ",
-  "Thiếu úy",
-  "Trung úy",
-  "Thượng úy",
-  "Đại úy",
-  "Thiếu tá",
-  "Trung tá",
-  "Đại tá",
-  "Thiếu úy QNCN",
-  "Trung úy QNCN",
-  "Thượng úy QNCN",
-  "Đại úy QNCN",
-  "Thiếu tá QNCN",
-  "Trung tá QNCN",
-  "Thượng tá QNCN",
-];
+import { LY_DO_OPTIONS, CAP_BAC_OPTIONS } from "../../utils/reportUtils";
 
 type Props = {
   rows: AbsentRow[];

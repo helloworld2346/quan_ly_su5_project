@@ -26,6 +26,7 @@ import {
 import ReportTableHeader from "./ReportTableHeader";
 import ReportTableRow from "./ReportTableRow";
 import ReportTotalRow from "./ReportTotalRow";
+import { useReportPermissions } from "../../hooks/useReportPermissions";
 
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
@@ -54,15 +55,10 @@ export default function DailyTroopReport() {
   }, [maDonViCurrent]);
 
   const userRole = account?.vaiTro?.tenVaiTro;
-  const normalizedRole = normalizeRoleName(userRole ?? undefined);
-  const isCommander = normalizedRole === "Chỉ huy";
-  const isReporter = normalizedRole === "Báo cáo";
-  const isSuDoan = normalizedRole === "Sư đoàn";
-  const capDonVi = account?.donVi?.capDonVi ?? null;
+  const isCommander = normalizeRoleName(userRole ?? undefined) === "Chỉ huy";
+  const capDonVi = account?.donVi?.capDonVi;
+  const isSuDoan = normalizeRoleName(userRole ?? undefined) === "Sư đoàn";
   const isTrungDoan = capDonVi === "TRUNG_DOAN";
-  const isTieuDoan = capDonVi === "TIEU_DOAN";
-  const needsApproval = isTrungDoan || isTieuDoan;
-  const selfApprove = !needsApproval;
 
   const {
     reportData,
@@ -393,6 +389,9 @@ export default function DailyTroopReport() {
     return reportData.length > 0 ? reportData[0] : null;
   }, [isCommander, isParentUnit, parentReportData, reportData]);
 
+  const { isReporter, canApprove, canRefuse, canSubmit, canRecall } =
+    useReportPermissions(userRole, capDonVi, ownReport, commanderReport);
+
   const trucInfoFromReport = useMemo(() => {
     const currentReport = isParentUnit
       ? parentReportData
@@ -426,36 +425,6 @@ export default function DailyTroopReport() {
     }
     return { trucChiHuy, trucBanTacChien };
   }, [isParentUnit, parentReportData, reportData]);
-
-  const canApprove = useMemo(() => {
-    if (!commanderReport || commanderReport.notSubmitted) return false;
-    return isCommander && commanderReport.status === "Chờ_Duyệt";
-  }, [commanderReport, isCommander]);
-
-  const canRefuse = useMemo(() => {
-    if (!commanderReport || commanderReport.notSubmitted) return false;
-    return isCommander && commanderReport.status === "Chờ_Duyệt";
-  }, [commanderReport, isCommander]);
-
-  const canSubmit = useMemo(() => {
-    if (
-      (!isReporter && !isSuDoan && !selfApprove) ||
-      !ownReport ||
-      ownReport.notSubmitted
-    )
-      return false;
-    return ownReport.status === "Nháp";
-  }, [isReporter, isSuDoan, selfApprove, ownReport]);
-
-  const canRecall = useMemo(() => {
-    if (
-      (!isReporter && !isSuDoan && !selfApprove) ||
-      !ownReport ||
-      ownReport.notSubmitted
-    )
-      return false;
-    return ownReport.status === "Chờ_Duyệt";
-  }, [isReporter, isSuDoan, selfApprove, ownReport]);
 
   const currentEditingReport = useMemo(() => {
     if (!editModalData) return null;

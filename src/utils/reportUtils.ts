@@ -1,6 +1,5 @@
-import type { TrucNguoiInfo } from "../types/dailyReport";
-
 import type {
+  TrucNguoiInfo,
   VangChiTiet,
   ReportItemInput,
   CreateReportResponse,
