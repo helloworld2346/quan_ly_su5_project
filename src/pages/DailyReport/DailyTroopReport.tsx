@@ -16,8 +16,8 @@ import type {
 } from "../../types/dailyReport";
 import { handleApiError } from "../../utils/errorHandler";
 import CaTrucInfoCard from "../../components/ui/CaTrucInfoCard/CaTrucInfoCard";
-import { useReportData } from "../../hooks/useReportData";
-import { useReportActions } from "../../hooks/useReportActions";
+import { useReportData } from "./hooks/useReportData";
+import { useReportActions } from "./hooks/useReportActions";
 import {
   todayIsoDate,
   normalizeRoleName,
@@ -26,7 +26,7 @@ import {
 import ReportTableHeader from "./ReportTableHeader";
 import ReportTableRow from "./ReportTableRow";
 import ReportTotalRow from "./ReportTotalRow";
-import { useReportPermissions } from "../../hooks/useReportPermissions";
+import { useReportPermissions } from "./hooks/useReportPermissions";
 
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");

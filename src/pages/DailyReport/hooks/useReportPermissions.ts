@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { normalizeRoleName } from "../utils/reportUtils";
-import type { ReportRow } from "../types/dailyReport";
+import { normalizeRoleName } from "../../../utils/reportUtils";
+import type { ReportRow } from "../../../types/dailyReport";
 
 export function useReportPermissions(
   userRole: string | null | undefined,

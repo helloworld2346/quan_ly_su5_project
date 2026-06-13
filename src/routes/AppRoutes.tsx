@@ -2,10 +2,11 @@ import { Navigate, Route, Routes } from "react-router-dom";
 
 import Dashboard from "../pages/Dashboard/Dashboard";
 import Login from "../pages/Login/Login";
-import ProtectedRoute from "./ProtectedRoute";
 import RequireRole from "./RequireRole";
 import { ALL_NAV_ITEMS } from "../types/navigation";
 import { useAuth } from "../context/useAuth";
+import RequireAuth from "./RequireAuth";
+
 
 type Props = {
   isAuthenticated: boolean;
@@ -40,7 +41,7 @@ export default function AppRoutes({
           key={path}
           path={path}
           element={
-            <ProtectedRoute isAuthenticated={isAuthenticated}>
+            <RequireAuth isAuthenticated={isAuthenticated}>
               {allowedRoles ? (
                 <RequireRole allowedRoles={allowedRoles}>
                   <Dashboard onLogout={onLogout} />
@@ -48,7 +49,7 @@ export default function AppRoutes({
               ) : (
                 <Dashboard onLogout={onLogout} />
               )}
-            </ProtectedRoute>
+            </RequireAuth>
           }
         />
       ))}

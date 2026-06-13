@@ -1,33 +1,11 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
+import { normalizeRoleName } from "../utils/reportUtils";
 
 type Props = {
   children: React.ReactNode;
   allowedRoles: string[];
 };
-
-function normalizeRoleName(role: string | undefined): string {
-  if (!role) return "";
-  const r = role.toLowerCase();
-
-  if (
-    r.includes("báo ban") ||
-    r.includes("báo cáo") ||
-    r.includes("trực ban")
-  ) {
-    return "Báo cáo";
-  }
-  if (r.includes("chỉ huy")) {
-    return "Chỉ huy";
-  }
-  if (r.includes("sư đoàn") || r.includes("sư đoan")) {
-    return "Sư đoàn";
-  }
-  if (r.includes("quản trị viên") || r.includes("admin")) {
-    return "Quản Trị Viên";
-  }
-  return role;
-}
 
 export default function RequireRole({ children, allowedRoles }: Props) {
   const { account, donVi, loading } = useAuth();
