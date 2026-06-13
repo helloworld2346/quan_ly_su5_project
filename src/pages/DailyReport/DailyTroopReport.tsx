@@ -536,7 +536,7 @@ export default function DailyTroopReport() {
               <col style={{ width: "6%" }} />
               <col style={{ width: "6%" }} />
               <col style={{ width: "6%" }} />
-              <col style={{ width: "4%" }} />
+              <col style={{ width: "6%" }} />
               <col style={{ width: "8%" }} />
               <col style={{ width: "10%" }} />
               <col style={{ width: "5%" }} />
