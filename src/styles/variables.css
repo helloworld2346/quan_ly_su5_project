@@ -183,9 +183,13 @@
 --info-field-bg: #cfe9da;      
 --info-field-border: #7fb095; 
 
+/* --- DANGER ROW (báo cáo chưa nộp / nháp) --- */  
+--table-header-bg: #218673;  
+--row-danger-bg: #ffe9e9;  
+--row-danger-text: #b42318;  
+--row-danger-text-strong: #8f1010;
+
 }
-
-
 
 /* ==========================================================================  
    DARK THEME SYSTEM  
@@ -353,4 +357,8 @@
 --info-field-bg: #2a3d35; 
 --info-field-border: #5c8a70;  
 
+--table-header-bg: #1a6b5a;  
+--row-danger-bg: rgba(239, 68, 68, 0.15);  
+--row-danger-text: #fca5a5;  
+--row-danger-text-strong: #ffffff;
 }
