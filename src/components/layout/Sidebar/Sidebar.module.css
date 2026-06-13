@@ -219,7 +219,8 @@
     display: flex;  
     align-items: center;  
     position: relative;  
-    white-space: nowrap;  
+    white-space: normal;  
+    word-break: break-word;
   }  
     
   .subItem::before {  

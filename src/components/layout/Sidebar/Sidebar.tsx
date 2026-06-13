@@ -48,7 +48,17 @@ export default function Sidebar({
  const { account, donVi, isParentUnit } = useAuth();
 const unitName = donVi?.tenDonvi || account?.donVi?.tenDonvi || "Chưa phân đơn vị";
   const userRole = account?.vaiTro?.tenVaiTro || null;
-  const allowedNavItems = getNavItemsByRole(userRole);
+  const hiddenSidebarIds: NavItemId[] = [
+  "executive-training", // Tổng hợp huấn luyện
+  "report-training", // Thống kê quân số huấn luyện
+  "report-family", // Báo ban thân nhân thăm nuôi
+  "report-communication", // Báo ban thông tin liên lạc
+  "statistics", // Thống kê báo cáo
+];
+
+const allowedNavItems = getNavItemsByRole(userRole).filter(
+  (item) => !hiddenSidebarIds.includes(item.id),
+);
 
   const executiveActive = EXECUTIVE_NAV_GROUP.items.some(
     (item) =>
