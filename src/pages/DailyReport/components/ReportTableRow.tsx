@@ -14,7 +14,7 @@ type Props = {
   isConsolidatedRow?: boolean;
   isParentUnit: boolean;
   isReporter: boolean;
-  isSuDoan: boolean;
+  isTacChien: boolean;
   maDonViCurrent: string | undefined;
   activeMenuUnit: string | null;
   menuPosition: { top: number; left: number };
@@ -29,7 +29,7 @@ export default function ReportTableRow({
   isConsolidatedRow = false,
   isParentUnit,
   isReporter,
-  isSuDoan,
+  isTacChien,
   maDonViCurrent,
   activeMenuUnit,
   menuPosition,
@@ -84,7 +84,7 @@ export default function ReportTableRow({
       row.status === "Từ_Chối" ||
       row.status === "Từ chối");
   const canEditOwn =
-    (isReporter || isSuDoan) &&
+    (isReporter || isTacChien) &&
     isParentUnit &&
     !isConsolidatedRow &&
     row.donVi === maDonViCurrent &&

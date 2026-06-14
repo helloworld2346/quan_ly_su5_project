@@ -71,7 +71,7 @@ export const EXECUTIVE_NAV: NavItem = {
   loadingTitle: "Đang tải tổng hợp ngày",
   loadingSubtitle: "Đang đồng bộ dữ liệu quân số...",
   component: ExecutiveDashboard,
-  allowedRoles: ["Quản Trị Viên", "Sư đoàn"],
+  allowedRoles: ["Quản Trị Viên", "Trực ban tác chiến"],
 };
 
 export const EXECUTIVE_TRAINING_NAV: NavItem = {
@@ -81,7 +81,7 @@ export const EXECUTIVE_TRAINING_NAV: NavItem = {
   loadingTitle: "Đang tải tổng hợp huấn luyện",
   loadingSubtitle: "Đang tải dữ liệu huấn luyện...",
   component: Trainningstatistical,
-  allowedRoles: ["Quản Trị Viên", "Sư đoàn"],
+  allowedRoles: ["Quản Trị Viên", "Trực ban tác chiến"],
 };
 
 export const EXECUTIVE_NAV_GROUP = {
@@ -92,7 +92,8 @@ export const EXECUTIVE_NAV_GROUP = {
 export const REPORT_NAV_GROUP = {
   label: "Thống kê",
   labelByRole: {
-    "Báo cáo": "Báo ban",
+    "Trực ban tác chiến": "Báo ban",
+    "Trực ban nội vụ": "Báo ban",
   },
   items: [
     {
@@ -102,7 +103,12 @@ export const REPORT_NAV_GROUP = {
       loadingTitle: "Đang tải báo cáo ngày",
       loadingSubtitle: "Đang tải dữ liệu…",
       component: DailyTroopReport,
-      allowedRoles: ["Quản Trị Viên", "Sư đoàn", "Chỉ huy", "Báo cáo"],
+      allowedRoles: [
+        "Quản Trị Viên",
+        "Trực ban tác chiến",
+        "Trực chỉ huy",
+        "Trực ban nội vụ",
+      ],
     },
     {
       id: "report-political-work" as const,
@@ -150,7 +156,7 @@ export const STATISTICS_NAV: NavItem = {
   loadingTitle: "Đang tải thống kê",
   loadingSubtitle: "Đang tải dữ liệu…",
   component: ReportStatistics,
-  allowedRoles: ["Quản Trị Viên", "Sư đoàn", "Chỉ huy", "Báo cáo"],
+  allowedRoles: ["Quản Trị Viên", "Trực ban tác chiến", "Trực chỉ huy", "Trực ban nội vụ"],
 };
 
 export const DUTY_NAV_GROUP = {
@@ -163,7 +169,7 @@ export const DUTY_NAV_GROUP = {
       loadingTitle: "Đang tải quản lý trực ban",
       loadingSubtitle: "Đang tải dữ liệu…",
       component: DutyPersonnel,
-      allowedRoles: ["Quản Trị Viên", "Sư đoàn"],
+      allowedRoles: ["Quản Trị Viên", "Trực ban tác chiến"],
     },
     {
       id: "duty-shifts" as const,
@@ -172,7 +178,7 @@ export const DUTY_NAV_GROUP = {
       loadingTitle: "Đang tải quản lý ca trực",
       loadingSubtitle: "Đang tải dữ liệu…",
       component: DutyShifts,
-      allowedRoles: ["Quản Trị Viên", "Sư đoàn"],
+      allowedRoles: ["Quản Trị Viên", "Trực ban tác chiến"],
     },
     {
       id: "duty-create" as const,
@@ -181,7 +187,7 @@ export const DUTY_NAV_GROUP = {
       loadingTitle: "Đang tải tạo ca trực",
       loadingSubtitle: "Đang tải dữ liệu…",
       component: CreateDutyShift,
-      allowedRoles: ["Quản Trị Viên", "Sư đoàn"],
+      allowedRoles: ["Quản Trị Viên", "Trực ban tác chiến"],
     },
   ],
 };
@@ -193,7 +199,7 @@ export const SETTINGS_NAV: NavItem = {
   loadingTitle: "Đang tải cài đặt",
   loadingSubtitle: "Đang tải dữ liệu…",
   component: Settings,
-  allowedRoles: ["Quản Trị Viên", "Sư đoàn", "Chỉ huy", "Báo cáo"],
+  allowedRoles: ["Quản Trị Viên", "Trực ban tác chiến", "Trực chỉ huy", "Trực ban nội vụ"],
 };
 
 export const NAV_PAGE_TITLES: Record<NavItemId, string> = {
@@ -245,8 +251,6 @@ export function getNavGroupLabel(activeId: NavItemId): string | null {
   return null;
 }
 
-
-
 export function getNavGroupLabelByRole(
   groupLabel: string,
   userRole: string | null,
@@ -254,12 +258,12 @@ export function getNavGroupLabelByRole(
 ): string {
   const normalized = userRole ? normalizeRoleName(userRole) : null;
 
-  if (groupLabel === "Thống kê báo cáo" && normalized === "Báo cáo") {
-    return isParentUnit ? "Tổng Hợp - Báo Ban" : "Báo Ban";
-  }
-
-  if (groupLabel === "Thống kê báo cáo" && normalized === "Chỉ huy") {
-    return "Phê duyệt báo ban";
+  if (groupLabel === "Thống kê") {
+    if (normalized === "Trực ban tác chiến") {
+      return isParentUnit ? "Tổng Hợp - Báo Ban" : "Báo Ban";
+    }
+    if (normalized === "Trực ban nội vụ") return "Báo Ban";
+    if (normalized === "Trực chỉ huy") return "Phê duyệt báo ban";
   }
 
   return groupLabel;
@@ -271,14 +275,11 @@ export function getNavItemById(id: NavItemId): NavItem | undefined {
 
 export function getNavItemsByRole(userRole: string | null): NavItem[] {
   if (!userRole) return [];
-
   const normalizedRole = normalizeRoleName(userRole);
 
-  if (normalizedRole === "Quản Trị Viên") {
-    return ALL_NAV_ITEMS;
-  }
+  if (normalizedRole === "Quản Trị Viên") return ALL_NAV_ITEMS;
 
-  if (normalizedRole === "Sư đoàn") {
+  if (normalizedRole === "Trực ban tác chiến") {
     return ALL_NAV_ITEMS.filter(
       (item) =>
         item.id === "executive" ||
@@ -290,16 +291,10 @@ export function getNavItemsByRole(userRole: string | null): NavItem[] {
     );
   }
 
-  if (normalizedRole === "Chỉ huy") {
-    return ALL_NAV_ITEMS.filter(
-      (item) =>
-        item.id.startsWith("report-") ||
-        item.id === "statistics" ||
-        item.id === "settings",
-    );
-  }
-
-  if (normalizedRole === "Báo cáo") {
+  if (
+    normalizedRole === "Trực chỉ huy" ||
+    normalizedRole === "Trực ban nội vụ"
+  ) {
     return ALL_NAV_ITEMS.filter(
       (item) =>
         item.id.startsWith("report-") ||

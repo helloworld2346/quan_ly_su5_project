@@ -1,3 +1,4 @@
+// src/pages/DailyReport/DailyTroopReport.tsx
 import { useMemo, useState, useEffect, useRef } from "react";
 import styles from "./DailyTroopReport.module.css";
 import ReportToolbar from "../../components/report/ReportToolbar";
@@ -55,9 +56,12 @@ export default function DailyTroopReport() {
   }, [maDonViCurrent]);
 
   const userRole = account?.vaiTro?.tenVaiTro;
-  const isCommander = normalizeRoleName(userRole ?? undefined) === "Chỉ huy";
+  // ── THAY ĐỔI: isCommander → isChiHuy, "Chỉ huy" → "Trực chỉ huy"
+  const isChiHuy = normalizeRoleName(userRole ?? undefined) === "Trực chỉ huy";
   const capDonVi = account?.donVi?.capDonVi;
-  const isSuDoan = normalizeRoleName(userRole ?? undefined) === "Sư đoàn";
+  // ── THAY ĐỔI: isSuDoan → isTacChien, "Sư đoàn" → "Trực ban tác chiến"
+  const isTacChien =
+    normalizeRoleName(userRole ?? undefined) === "Trực ban tác chiến";
   const isTrungDoan = capDonVi === "TRUNG_DOAN";
 
   const {
@@ -72,7 +76,7 @@ export default function DailyTroopReport() {
   } = useReportData({
     maDonViCurrent,
     isParentUnit,
-    isSuDoan,
+    isTacChien, // ── THAY ĐỔI: isSuDoan → isTacChien
     reportDate,
     showError,
   });
@@ -214,11 +218,13 @@ export default function DailyTroopReport() {
         const rows: ReportRow[] = parentReportData
           ? [{ ...parentReportData, notSubmitted: false }]
           : [];
-        if (isCommander)
+        // ── THAY ĐỔI: isCommander → isChiHuy
+        if (isChiHuy)
           return rows.filter((r) => r.notSubmitted || r.status !== "Nháp");
         return rows;
       }
-      if (isCommander) return filteredRows.filter((r) => r.status !== "Nháp");
+      // ── THAY ĐỔI: isCommander → isChiHuy
+      if (isChiHuy) return filteredRows.filter((r) => r.status !== "Nháp");
       return filteredRows;
     }
 
@@ -285,7 +291,8 @@ export default function DailyTroopReport() {
         : childRows
       : childRows;
 
-    if (isCommander)
+    // ── THAY ĐỔI: isCommander → isChiHuy
+    if (isChiHuy)
       return allRows.filter((r) => r.notSubmitted || r.status !== "Nháp");
     return allRows;
   }, [
@@ -295,7 +302,7 @@ export default function DailyTroopReport() {
     filteredRows,
     maDonViCurrent,
     account,
-    isCommander,
+    isChiHuy, // ── THAY ĐỔI: isCommander → isChiHuy
     parentReportData,
     query,
   ]);
@@ -351,7 +358,8 @@ export default function DailyTroopReport() {
     if (isParentUnit) {
       if (parentReportData)
         return parentReportData.rawItem.caTruc as CaTrucInfo;
-      if (isSuDoan && caTrucFromApi) {
+      // ── THAY ĐỔI: isSuDoan → isTacChien
+      if (isTacChien && caTrucFromApi) {
         return {
           idCatruc: caTrucFromApi.idCatruc,
           matkhau: caTrucFromApi.matkhau,
@@ -376,7 +384,7 @@ export default function DailyTroopReport() {
     return reportData.length > 0
       ? (reportData[0].rawItem.caTruc as CaTrucInfo)
       : null;
-  }, [isParentUnit, isSuDoan, parentReportData, reportData, caTrucFromApi]);
+  }, [isParentUnit, isTacChien, parentReportData, reportData, caTrucFromApi]); // ── THAY ĐỔI: isSuDoan → isTacChien
 
   const ownReport = useMemo(() => {
     if (isParentUnit) return parentReportData;
@@ -384,10 +392,11 @@ export default function DailyTroopReport() {
   }, [isParentUnit, parentReportData, reportData]);
 
   const commanderReport = useMemo(() => {
-    if (!isCommander) return null;
+    // ── THAY ĐỔI: isCommander → isChiHuy
+    if (!isChiHuy) return null;
     if (isParentUnit) return parentReportData;
     return reportData.length > 0 ? reportData[0] : null;
-  }, [isCommander, isParentUnit, parentReportData, reportData]);
+  }, [isChiHuy, isParentUnit, parentReportData, reportData]); // ── THAY ĐỔI: isCommander → isChiHuy
 
   const { isReporter, canApprove, canRefuse, canSubmit, canRecall } =
     useReportPermissions(userRole, capDonVi, ownReport, commanderReport);
@@ -446,7 +455,7 @@ export default function DailyTroopReport() {
   const sharedRowProps = {
     isParentUnit,
     isReporter,
-    isSuDoan,
+    isTacChien, // ── THAY ĐỔI: isSuDoan → isTacChien
     maDonViCurrent,
     activeMenuUnit,
     menuPosition,
@@ -466,7 +475,8 @@ export default function DailyTroopReport() {
         onQueryChange={setQuery}
         reportDate={reportDate}
         onReportDateChange={setReportDate}
-        onAddReport={isCommander || isTrungDoan ? undefined : handleAddReport}
+        // ── THAY ĐỔI: isCommander → isChiHuy
+        onAddReport={isChiHuy || isTrungDoan ? undefined : handleAddReport}
         onConsolidate={isTrungDoan ? handleConsolidate : undefined}
         consolidateDisabled={
           !consolidatedData ||
@@ -510,7 +520,7 @@ export default function DailyTroopReport() {
         onExportExcel={handleExportExcel}
         isPastDate={isPastDate}
         hasReport={checkIfDateHasReport}
-        showExport={isSuDoan}
+        showExport={isTacChien} // ── THAY ĐỔI: isSuDoan → isTacChien
       />
 
       <div className={styles.tableShell}>
@@ -631,7 +641,7 @@ export default function DailyTroopReport() {
           trucBanChiHuy={selectedReportRow.rawItem.trucBanChiHuy}
           trucBanTacChien={selectedReportRow.rawItem.trucBanTacChien}
           status={selectedReportRow.status}
-          isCommander={isCommander}
+          isChiHuy={isChiHuy}
         />
       )}
 
@@ -669,7 +679,7 @@ export default function DailyTroopReport() {
           maDonViCurrent={account?.donVi?.maDonVi}
           tongQuanSoBienChe={donViQuanSoTong || undefined}
           caTrucInfo={caTrucInfo}
-          isSuDoan={isSuDoan}
+          isTacChien={isTacChien} // ── THAY ĐỔI: isSuDoan → isTacChien
           reportDate={reportDate}
         />
       )}
@@ -702,7 +712,7 @@ export default function DailyTroopReport() {
           maDonViCurrent={account?.donVi?.maDonVi}
           tongQuanSoBienChe={donViQuanSoTong || undefined}
           caTrucInfo={caTrucInfo}
-          isSuDoan={isSuDoan}
+          isTacChien={isTacChien} // ── THAY ĐỔI: isSuDoan → isTacChien
         />
       )}
 

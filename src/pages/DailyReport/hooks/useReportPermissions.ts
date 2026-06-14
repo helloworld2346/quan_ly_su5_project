@@ -9,9 +9,10 @@ export function useReportPermissions(
   commanderReport: ReportRow | null,
 ) {
   const normalizedRole = normalizeRoleName(userRole ?? undefined);
-  const isCommander = normalizedRole === "Chỉ huy";
-  const isReporter = normalizedRole === "Báo cáo";
-  const isSuDoan = normalizedRole === "Sư đoàn";
+  const isChiHuy = normalizedRole === "Trực chỉ huy"; // replaces isCommander
+  const isTacChien = normalizedRole === "Trực ban tác chiến"; // replaces isSuDoan
+  const isNoiVu = normalizedRole === "Trực ban nội vụ"; // replaces isReporter
+  const isReporter = isTacChien || isNoiVu; // can submit/recall
   const isTrungDoan = capDonVi === "TRUNG_DOAN";
   const isTieuDoan = capDonVi === "TIEU_DOAN";
   const needsApproval = isTrungDoan || isTieuDoan;
@@ -19,38 +20,31 @@ export function useReportPermissions(
 
   const canApprove = useMemo(() => {
     if (!commanderReport || commanderReport.notSubmitted) return false;
-    return isCommander && commanderReport.status === "Chờ_Duyệt";
-  }, [commanderReport, isCommander]);
+    return isChiHuy && commanderReport.status === "Chờ_Duyệt";
+  }, [commanderReport, isChiHuy]);
 
   const canRefuse = useMemo(() => {
     if (!commanderReport || commanderReport.notSubmitted) return false;
-    return isCommander && commanderReport.status === "Chờ_Duyệt";
-  }, [commanderReport, isCommander]);
+    return isChiHuy && commanderReport.status === "Chờ_Duyệt";
+  }, [commanderReport, isChiHuy]);
 
   const canSubmit = useMemo(() => {
-    if (
-      (!isReporter && !isSuDoan && !selfApprove) ||
-      !ownReport ||
-      ownReport.notSubmitted
-    )
+    if ((!isReporter && !selfApprove) || !ownReport || ownReport.notSubmitted)
       return false;
     return ownReport.status === "Nháp";
-  }, [isReporter, isSuDoan, selfApprove, ownReport]);
+  }, [isReporter, selfApprove, ownReport]);
 
   const canRecall = useMemo(() => {
-    if (
-      (!isReporter && !isSuDoan && !selfApprove) ||
-      !ownReport ||
-      ownReport.notSubmitted
-    )
+    if ((!isReporter && !selfApprove) || !ownReport || ownReport.notSubmitted)
       return false;
     return ownReport.status === "Chờ_Duyệt";
-  }, [isReporter, isSuDoan, selfApprove, ownReport]);
+  }, [isReporter, selfApprove, ownReport]);
 
   return {
-    isCommander,
+    isChiHuy,
     isReporter,
-    isSuDoan,
+    isTacChien,
+    isNoiVu,
     isTrungDoan,
     isTieuDoan,
     needsApproval,

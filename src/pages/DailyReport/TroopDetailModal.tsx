@@ -45,7 +45,7 @@ type Props = {
   trucBanChiHuy?: string;
   trucBanTacChien?: string;
   status?: string;
-  isCommander?: boolean;
+  isChiHuy?: boolean;
 };
 
 export default function TroopDetailModal({
@@ -55,7 +55,7 @@ export default function TroopDetailModal({
   trucBanChiHuy,
   trucBanTacChien,
   status,
-  isCommander,
+  isChiHuy,
 }: Props) {
   const parsedTrucChiHuy = parseTruc(trucBanChiHuy);
   const parsedTrucBanTacChien = parseTruc(trucBanTacChien);
@@ -90,7 +90,7 @@ export default function TroopDetailModal({
         </div>
 
         <div className={styles.body}>
-          {isCommander && status === "Nháp" ? (
+          {isChiHuy && status === "Nháp" ? (
             <div className={styles.recalledNotice}>
               <p>Đơn báo cáo đã được thu hồi, không thể xem tiếp.</p>
             </div>

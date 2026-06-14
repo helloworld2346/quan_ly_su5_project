@@ -17,13 +17,13 @@ export type { ReportRow };
 export function useReportData({
   maDonViCurrent,
   isParentUnit,
-  isSuDoan,
+  isTacChien,
   reportDate,
   showError,
 }: {
   maDonViCurrent: string | undefined;
   isParentUnit: boolean;
-  isSuDoan: boolean;
+  isTacChien: boolean;
   reportDate: string;
   showError: (msg: string) => void;
 }) {
@@ -128,7 +128,7 @@ export function useReportData({
   }, [maDonViCurrent, isParentUnit]);
 
   useEffect(() => {
-    if (!isSuDoan) return;
+    if (!isTacChien) return;
     const fetchCaTruc = async () => {
       try {
         const res = await dutyService.getCaTrucByDate(reportDate);
@@ -142,7 +142,7 @@ export function useReportData({
       }
     };
     void fetchCaTruc();
-  }, [isSuDoan, reportDate]);
+  }, [isTacChien, reportDate]);
 
   const consolidatedData = useMemo(() => {
     if (!isParentUnit || reportData.length === 0) return null;

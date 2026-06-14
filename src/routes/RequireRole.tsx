@@ -22,16 +22,19 @@ export default function RequireRole({ children, allowedRoles }: Props) {
   const userRole = account.vaiTro?.tenVaiTro;
   const normalizedRole = normalizeRoleName(account?.vaiTro?.tenVaiTro?? undefined);
   if (
-    normalizedRole === "Báo cáo" &&
+    normalizedRole === "Trực ban nội vụ" &&
     donVi !== null &&
     donVi.quanSoTong === 0 &&
     location.pathname !== "/settings"
   ) {
     return <Navigate to="/settings" replace />;
-  }
+  }  
   
   if (!userRole || !allowedRoles.includes(normalizedRole)) {
-    if (normalizedRole === "Sư đoàn" || normalizedRole === "Quản Trị Viên") {
+    if (
+      normalizedRole === "Trực ban tác chiến" ||
+      normalizedRole === "Quản Trị Viên"
+    ) {
       return <Navigate to="/dashboard" replace />;
     }
     return <Navigate to="/settings" replace />;

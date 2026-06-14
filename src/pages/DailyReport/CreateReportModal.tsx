@@ -31,7 +31,7 @@ interface CreateReportModalProps {
   tongQuanSoBienChe?: number;
   consolidatedAbsentRows?: AbsentRow[];
   caTrucInfo?: CaTrucInfo | null;
-  isSuDoan?: boolean;
+  isTacChien?: boolean;
   reportDate?: string;
 }
 
@@ -44,7 +44,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   tongQuanSoBienChe,
   consolidatedAbsentRows,
   caTrucInfo,
-  isSuDoan,
+  isTacChien,
   reportDate,
 }) => {
   const { showWarning } = useToast();
@@ -85,7 +85,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   const [trucChiHuy, setTrucChiHuy] = useState<TrucNguoiInfo>(() => {
     if (initialData?.trucBanChiHuy)
       return parseTrucNguoi(initialData.trucBanChiHuy);
-    if (isSuDoan && caTrucInfo?.trucChiHuy) {
+    if (isTacChien && caTrucInfo?.trucChiHuy) {
       return {
         tenNguoitruc: caTrucInfo.trucChiHuy.tenNguoitruc ?? "",
         capbacNguoitruc: caTrucInfo.trucChiHuy.capbacNguoitruc ?? "",
@@ -99,7 +99,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   const [trucBanTacChien, setTrucBanTacChien] = useState<TrucNguoiInfo>(() => {
     if (initialData?.trucBanTacChien)
       return parseTrucNguoi(initialData.trucBanTacChien);
-    if (isSuDoan && caTrucInfo?.trucBanTacChien) {
+    if (isTacChien && caTrucInfo?.trucBanTacChien) {
       return {
         tenNguoitruc: caTrucInfo.trucBanTacChien.tenNguoitruc ?? "",
         capbacNguoitruc: caTrucInfo.trucBanTacChien.capbacNguoitruc ?? "",
@@ -314,16 +314,16 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
             value={trucChiHuy}
             onChange={setTrucChiHuy}
             capBacOptions={
-              isSuDoan ? CAP_BAC_CHI_HUY_SU_DOAN : CAP_BAC_CHI_HUY_DEFAULT
+              isTacChien ? CAP_BAC_CHI_HUY_SU_DOAN : CAP_BAC_CHI_HUY_DEFAULT
             }
           />
           <hr className={styles.divider} />
           <TrucNguoiFormSection
-            title={isSuDoan ? "Trực ban tác chiến" : "Trực ban nội vụ"}
+            title={isTacChien ? "Trực ban tác chiến" : "Trực ban nội vụ"}
             value={trucBanTacChien}
             onChange={setTrucBanTacChien}
             capBacOptions={
-              isSuDoan ? CAP_BAC_TAC_CHIEN_SU_DOAN : CAP_BAC_TAC_CHIEN_DEFAULT
+              isTacChien ? CAP_BAC_TAC_CHIEN_SU_DOAN : CAP_BAC_TAC_CHIEN_DEFAULT
             }
           />
 
