@@ -6,6 +6,8 @@
 .tableShell {  
   width: 100%;  
   overflow-x: auto;  
+  overflow-y: auto;  
+  max-height: calc(100vh - 260px);  
   -webkit-overflow-scrolling: touch;  
   background: var(--table-header-bg);  
   border-radius: 12px;  
@@ -17,13 +19,21 @@
   width: 100%;  
   min-width: 1200px;  
   table-layout: fixed;  
-  border-collapse: collapse;  
+  border-collapse: separate;
+  border-spacing: 0;
+}  
+  
+.reportTable thead {  
+  position: sticky;  
+  top: 0;  
+  z-index: 2;  
 }  
   
 .reportTable th {  
-  background: transparent;  
+  background: var(--table-header-bg);  
   color: #fff;  
-  border: 1px solid var(--login-border);  
+  border-right: 1px solid var(--login-border);
+  border-bottom: 1px solid var(--login-border);
   font-size: 12px;  
   font-weight: 600;  
   text-transform: uppercase;  
@@ -33,9 +43,19 @@
   vertical-align: middle;  
 }  
   
+.reportTable thead tr:first-child th {  
+  border-top: 1px solid var(--login-border);  
+}  
+/* 
+.reportTable th:first-child,  
+.reportTable td:first-child {  
+  border-left: 1px solid var(--login-border);  
+}   */
+  
 .reportTable td {  
   color: var(--login-text);  
-  border: 1px solid var(--login-border);  
+  border-right: 1px solid var(--login-border);
+  border-bottom: 1px solid var(--login-border);
   padding: 12px 8px;  
   text-align: center;  
   vertical-align: middle;  
@@ -247,6 +267,22 @@
   overflow-wrap: break-word;  
   line-height: 1.5;  
   vertical-align: top;  
+}  
+  
+.separatorRow td {  
+  background: var(--surface-muted) !important;  
+  color: var(--login-text-muted);  
+  font-weight: 600;  
+  font-size: 13px;  
+  text-align: center;  
+  padding: 8px;  
+}  
+  
+.noConsolidatedRow td {  
+  text-align: center;  
+  padding: 16px;  
+  color: var(--login-text-muted);  
+  font-style: italic;  
 }  
   
 @keyframes dropdownFadeIn {  
