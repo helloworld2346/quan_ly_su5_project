@@ -309,6 +309,29 @@
     min-width: 60px;  
   }  
 }  
+
+@media (max-width: 1340px) {  
+  .reportTable {  
+    min-width: 1050px;  
+  }  
+  
+  .reportTable th,  
+  .reportTable td {  
+    font-size: clamp(9px, 0.7vw, 11px);  
+    padding: 7px 4px;  
+    min-width: 40px;  
+  }  
+  
+  .reportTable th:first-child,  
+  .reportTable td:first-child {  
+    min-width: 55px;  
+  }  
+  
+  .reportTable th:last-child,  
+  .reportTable td:last-child {  
+    min-width: 50px;  
+  }  
+}
   
 @media (max-width: 1024px) {  
   .reportTable {  
