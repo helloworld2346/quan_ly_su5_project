@@ -62,7 +62,7 @@ export default function NavGroup({
       <button
         ref={groupToggleRef}
         type="button"
-        className={`${styles.groupToggle} ${isActive && collapsed ? styles.active : ""} ${isActive ? styles.groupActive : ""}`}
+        className={`${styles.groupToggle} ${isActive ? styles.groupActive : ""}`}
         aria-expanded={isOpen}
         aria-label={collapsed ? label : undefined}
         onClick={handleClick}

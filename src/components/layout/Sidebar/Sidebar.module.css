@@ -111,9 +111,21 @@
   background: var(--sidebar-hover-bg);  
 }  
   
-.navItem.active .navIcon {  
+.navItem.active {  
   color: var(--gold-color);  
 }  
+  
+.navItem.active .navIcon {  
+  color: var(--gold-color);  
+}
+
+.groupActive {  
+  color: var(--gold-color);  
+}  
+  
+.groupActive .navIcon {  
+  color: var(--gold-color);  
+}
   
 .group {  
   display: flex;  
