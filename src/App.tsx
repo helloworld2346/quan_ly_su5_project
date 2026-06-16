@@ -9,6 +9,9 @@ import ConfirmDialog from "./components/ui/ConfirmDialog/ConfirmDialog";
 import { useConfirmDialog } from "./components/ui/ConfirmDialog/useConfirmDialog";
 import { setToastErrorHandler } from "./services/api";
 import { AuthProvider } from "./context/AuthProvider";
+import { LoadingProvider } from "./context/LoadingContext";
+import { useLoading } from "./context/useLoading";
+import { setLoadingHandler } from "./context/useLoadingContext";
 import AppRoutes from "./routes/AppRoutes";
 
 function AppContent() {
@@ -18,11 +21,16 @@ function AppContent() {
   });
 
   const { showError } = useToast();
+  const { increment, decrement } = useLoading();
   const { confirm, isOpen, options, onConfirm, onCancel } = useConfirmDialog();
 
   useEffect(() => {
     setToastErrorHandler(showError);
   }, [showError]);
+
+  useEffect(() => {
+    setLoadingHandler({ increment, decrement });
+  }, [increment, decrement]);
 
   const handleLogout = async () => {
     const confirmed = await confirm({
@@ -78,7 +86,9 @@ function AppContent() {
 export default function App() {
   return (
     <ToastProvider>
-      <AppContent />
+      <LoadingProvider>
+        <AppContent />
+      </LoadingProvider>
     </ToastProvider>
   );
 }
