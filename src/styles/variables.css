@@ -117,6 +117,8 @@
   --modal-card-bg: #f8fafc;
   --modal-card-border: #e2e8f0;
   --modal-card-title: #334155;
+  --modal-card-hover-border: rgba(31, 92, 63, 0.35);
+  --modal-card-hover-shadow: rgba(31, 92, 63, 0.08);
   --modal-btn-draft-bg: #f1f5f9;
   --modal-btn-draft-text: #475569;
   --modal-btn-draft-hover-bg: #e2e8f0;
@@ -307,6 +309,8 @@
   --modal-card-bg: #243329;
   --modal-card-border: #354840;
   --modal-card-title: #c8d9d0;
+  --modal-card-hover-border: rgba(107, 184, 146, 0.35);
+  --modal-card-hover-shadow: rgba(107, 184, 146, 0.15);
   --modal-btn-draft-bg: #2a3a32;
   --modal-btn-draft-text: #d8e4de;
   --modal-btn-draft-hover-bg: #3a4a42;

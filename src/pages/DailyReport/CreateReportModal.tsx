@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import styles from "./CreateReportModal.module.css";
+import DailyReportDetailStep from "./DailyReportDetailStep";
 import type {
   AbsentRow,
   VangChiTiet,
@@ -48,7 +49,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   reportDate,
 }) => {
   const { showWarning } = useToast();
-
+  const [step, setStep] = useState(1);
   const [ngayBaoCao] = useState<string>(() => {
     if (initialData?.thoiGianBaoCao) {
       return initialData.thoiGianBaoCao.split("T")[0];
@@ -228,9 +229,13 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       trucBanTacChien: JSON.stringify(trucBanTacChien),
     };
 
+
     onSubmit(payload);
   };
-
+  const handleCloseModal = () => {
+    setStep(1);
+    onClose();
+  };
   if (!isOpen) return null;
 
   const isConsolidation = !!consolidatedAbsentRows;
@@ -240,146 +245,179 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       <form className={styles.modal} onSubmit={handleLocalSubmit}>
         <div className={styles.header}>
           <h2 className={styles.title}>
-            {isConsolidation
-              ? "TỔNG HỢP BÁO CÁO QUÂN SỐ"
-              : initialData
-                ? "CẬP NHẬT BÁO CÁO QUÂN SỐ"
-                : "TẠO BÁO CÁO QUÂN SỐ HẰNG NGÀY"}
+            {step === 2
+              ? "TÌNH HÌNH HOẠT ĐỘNG NHIỆM VỤ NGÀY"
+              : isConsolidation
+                ? "TỔNG HỢP BÁO CÁO QUÂN SỐ"
+                : initialData
+                  ? "CẬP NHẬT BÁO CÁO QUÂN SỐ"
+                  : "TẠO BÁO CÁO QUÂN SỐ HẰNG NGÀY"}
           </h2>
-          <button type="button" className={styles.closeBtn} onClick={onClose}>
+          <button
+            type="button"
+            className={styles.closeBtn}
+            onClick={handleCloseModal}
+          >
             &times;
           </button>
         </div>
 
         <div className={styles.body}>
-          {caTrucInfo?.matkhau && (
-            <div className={styles.caTrucBanner}>
-              <span className={styles.caTrucBannerLabel}>
-                Mật khẩu ca trực:
-              </span>
-              <span className={styles.caTrucBannerValue}>
-                {caTrucInfo.matkhau}
-              </span>
-            </div>
+          {step === 1 && (
+            <>
+              {caTrucInfo?.matkhau && (
+                <div className={styles.caTrucBanner}>
+                  <span className={styles.caTrucBannerLabel}>
+                    Mật khẩu ca trực:
+                  </span>
+                  <span className={styles.caTrucBannerValue}>
+                    {caTrucInfo.matkhau}
+                  </span>
+                </div>
+              )}
+
+
+              <div className={styles.coreGrid}>
+                <div className={styles.field}>
+                  <label className={styles.label}>Ngày báo cáo</label>
+                  <input
+                    type="date"
+                    className={styles.input}
+                    value={ngayBaoCao}
+                    readOnly
+                    disabled
+                    required
+                  />
+                </div>
+                <div className={styles.field}>
+                  <label className={styles.label}>Tổng quân số biên chế</label>
+                  <input
+                    type="number"
+                    className={`${styles.input} ${styles.inputDisabled}`}
+                    value={tongQuanSo || ""}
+                    readOnly
+                    disabled
+                    required
+                    min={0}
+                  />
+                </div>
+                <div className={styles.field}>
+                  <label className={styles.label}>Quân số hiện diện</label>
+                  <input
+                    type="number"
+                    className={styles.input}
+                    value={quanSoHienDien}
+                    disabled
+                  />
+                </div>
+                <div className={styles.field}>
+                  <label className={styles.label}>Tổng vắng</label>
+                  <input
+                    type="number"
+                    className={styles.input}
+                    value={quanSoVang}
+                    disabled
+                  />
+                </div>
+              </div>
+
+              <hr className={styles.divider} />
+
+              <TrucNguoiFormSection
+                title="Trực chỉ huy"
+                value={trucChiHuy}
+                onChange={setTrucChiHuy}
+                capBacOptions={
+                  isTacChien ? CAP_BAC_CHI_HUY_SU_DOAN : CAP_BAC_CHI_HUY_DEFAULT
+                }
+              />
+              <hr className={styles.divider} />
+              <TrucNguoiFormSection
+                title={isTacChien ? "Trực ban tác chiến" : "Trực ban nội vụ"}
+                value={trucBanTacChien}
+                onChange={setTrucBanTacChien}
+                capBacOptions={
+                  isTacChien ? CAP_BAC_TAC_CHIEN_SU_DOAN : CAP_BAC_TAC_CHIEN_DEFAULT
+                }
+              />
+
+              <hr className={styles.divider} />
+
+              <div className={styles.sectionHeader}>
+                <h3 className={styles.sectionTitle}>
+                  {isConsolidation
+                    ? "Danh sách tổng hợp quân nhân vắng mặt (từ các đơn vị con)"
+                    : "Danh sách quân nhân vắng mặt"}
+                </h3>
+                <div className={styles.sectionActions}>
+                  {!isConsolidation && !initialData && (
+                    <button
+                      type="button"
+                      className={styles.btnLoadYesterday}
+                      onClick={handleLoadYesterday}
+                      disabled={isLoadingYesterday}
+                    >
+                      {isLoadingYesterday ? "Đang tải..." : "Sao chép từ hôm qua"}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className={styles.btnAddRow}
+                    onClick={handleAddRow}
+                  >
+                    + Thêm quân nhân vắng
+                  </button>
+                </div>
+              </div>
+
+              <div className={styles.tableContainer}>
+                <AbsentRowsTable
+                  rows={absentRows}
+                  onUpdate={handleUpdateRow}
+                  onRemove={handleRemoveRow}
+                />
+              </div>
+
+            </>
           )}
 
-          <div className={styles.coreGrid}>
-            <div className={styles.field}>
-              <label className={styles.label}>Ngày báo cáo</label>
-              <input
-                type="date"
-                className={styles.input}
-                value={ngayBaoCao}
-                readOnly
-                disabled
-                required
-              />
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label}>Tổng quân số biên chế</label>
-              <input
-                type="number"
-                className={`${styles.input} ${styles.inputDisabled}`}
-                value={tongQuanSo || ""}
-                readOnly
-                disabled
-                required
-                min={0}
-              />
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label}>Quân số hiện diện</label>
-              <input
-                type="number"
-                className={styles.input}
-                value={quanSoHienDien}
-                disabled
-              />
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label}>Tổng vắng</label>
-              <input
-                type="number"
-                className={styles.input}
-                value={quanSoVang}
-                disabled
-              />
-            </div>
-          </div>
-
-          <hr className={styles.divider} />
-
-          <TrucNguoiFormSection
-            title="Trực chỉ huy"
-            value={trucChiHuy}
-            onChange={setTrucChiHuy}
-            capBacOptions={
-              isTacChien ? CAP_BAC_CHI_HUY_SU_DOAN : CAP_BAC_CHI_HUY_DEFAULT
-            }
-          />
-          <hr className={styles.divider} />
-          <TrucNguoiFormSection
-            title={isTacChien ? "Trực ban tác chiến" : "Trực ban nội vụ"}
-            value={trucBanTacChien}
-            onChange={setTrucBanTacChien}
-            capBacOptions={
-              isTacChien ? CAP_BAC_TAC_CHIEN_SU_DOAN : CAP_BAC_TAC_CHIEN_DEFAULT
-            }
-          />
-
-          <hr className={styles.divider} />
-
-          <div className={styles.sectionHeader}>
-            <h3 className={styles.sectionTitle}>
-              {isConsolidation
-                ? "Danh sách tổng hợp quân nhân vắng mặt (từ các đơn vị con)"
-                : "Danh sách quân nhân vắng mặt"}
-            </h3>
-            <div className={styles.sectionActions}>
-              {!isConsolidation && !initialData && (
-                <button
-                  type="button"
-                  className={styles.btnLoadYesterday}
-                  onClick={handleLoadYesterday}
-                  disabled={isLoadingYesterday}
-                >
-                  {isLoadingYesterday ? "Đang tải..." : "Sao chép từ hôm qua"}
-                </button>
-              )}
-              <button
-                type="button"
-                className={styles.btnAddRow}
-                onClick={handleAddRow}
-              >
-                + Thêm quân nhân vắng
-              </button>
-            </div>
-          </div>
-
-          <div className={styles.tableContainer}>
-            <AbsentRowsTable
-              rows={absentRows}
-              onUpdate={handleUpdateRow}
-              onRemove={handleRemoveRow}
-            />
-          </div>
+          {step === 2 && (
+            <DailyReportDetailStep />
+          )}
         </div>
-
         <div className={styles.footer}>
           <button
             type="button"
             className={`${styles.btn} ${styles.btnCancel}`}
-            onClick={onClose}
+            onClick={
+              step === 1
+                ? handleCloseModal
+                : () => setStep(1)
+            }
           >
-            Hủy bỏ
+            {step === 1 ? "Hủy bỏ" : "Quay lại"}
           </button>
-          <button type="submit" className={`${styles.btn} ${styles.btnSubmit}`}>
-            {isConsolidation
-              ? "Lưu báo cáo tổng hợp"
-              : initialData
-                ? "Cập nhật báo cáo"
-                : "Lưu báo cáo"}
-          </button>
+
+          {step === 1 ? (
+            <button
+              type="button"
+              className={`${styles.btn} ${styles.btnSubmit}`}
+              onClick={() => setStep(2)}
+            >
+              Tiếp tục
+            </button>
+          ) : (
+            <button
+              type="submit"
+              className={`${styles.btn} ${styles.btnSubmit}`}
+            >
+              {isConsolidation
+                ? "Lưu báo cáo tổng hợp"
+                : initialData
+                  ? "Cập nhật báo cáo"
+                  : "Lưu báo cáo"}
+            </button>
+          )}
         </div>
       </form>
 

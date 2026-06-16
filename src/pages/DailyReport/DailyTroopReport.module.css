@@ -248,6 +248,15 @@
   line-height: 1.5;  
   vertical-align: top;  
 }  
+
+.sectionTitle {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--modal-card-title);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 16px 0 10px 0;
+}
   
 @keyframes dropdownFadeIn {  
   from {  

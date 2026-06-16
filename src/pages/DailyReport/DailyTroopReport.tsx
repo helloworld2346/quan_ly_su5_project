@@ -1,4 +1,4 @@
-// src/pages/DailyReport/DailyTroopReport.tsx
+
 import { useMemo, useState, useEffect, useRef } from "react";
 import styles from "./DailyTroopReport.module.css";
 import ReportToolbar from "../../components/report/ReportToolbar";
@@ -28,6 +28,8 @@ import ReportTableHeader from "./components/ReportTableHeader";
 import ReportTableRow from "./components/ReportTableRow";
 import ReportTotalRow from "./components/ReportTotalRow";
 import { useReportPermissions } from "./hooks/useReportPermissions";
+import DailyReportSummary from "./DailyReportSummary.module"
+import type { NhiemVuNgay } from "../../services/dailyReport/dailyReportService";
 
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
@@ -56,10 +58,8 @@ export default function DailyTroopReport() {
   }, [maDonViCurrent]);
 
   const userRole = account?.vaiTro?.tenVaiTro;
-  // ── THAY ĐỔI: isCommander → isChiHuy, "Chỉ huy" → "Trực chỉ huy"
   const isChiHuy = normalizeRoleName(userRole ?? undefined) === "Trực chỉ huy";
   const capDonVi = account?.donVi?.capDonVi;
-  // ── THAY ĐỔI: isSuDoan → isTacChien, "Sư đoàn" → "Trực ban tác chiến"
   const isTacChien =
     normalizeRoleName(userRole ?? undefined) === "Trực ban tác chiến";
   const isTrungDoan = capDonVi === "TRUNG_DOAN";
@@ -109,6 +109,7 @@ export default function DailyTroopReport() {
       setActiveMenuUnit(menuKey);
     }
   };
+  
 
   useEffect(() => {
     function handleGlobalClose(event: Event) {
@@ -468,6 +469,16 @@ export default function DailyTroopReport() {
     onEditReport: handleEditReport,
   };
 
+  const [nhiemVuData, setNhiemVuData] = useState<NhiemVuNgay | null>(null);
+
+useEffect(() => {
+  dailyReportService.getNhiemVuNgay().then((res) => {
+    if (res.success && res.result.length > 0) {
+      setNhiemVuData(res.result[0]);
+    }
+  }).catch(() => {});
+}, []);
+
   return (
     <section className={styles.report} aria-labelledby="dashboard-page-heading">
       <ReportToolbar
@@ -522,7 +533,8 @@ export default function DailyTroopReport() {
         hasReport={checkIfDateHasReport}
         showExport={isTacChien} // ── THAY ĐỔI: isSuDoan → isTacChien
       />
-
+<h2 className={styles.sectionTitle}>THỐNG KÊ QUÂN SỐ</h2>
+<div className={styles.tableShell}></div>
       <div className={styles.tableShell}>
         {loading ? (
           <div className={styles.loadingState}>Đang tải dữ liệu...</div>
@@ -616,7 +628,21 @@ export default function DailyTroopReport() {
           </table>
         )}
       </div>
-
+{nhiemVuData && (
+  <DailyReportSummary
+    data={{
+      securityStatus: nhiemVuData.nhiemVuPhandoi === "safe" ? "safe" : "unsafe",
+      incidentStatus: nhiemVuData.noiDungDotXuat ? "yes" : "no",
+      incidentDetail: nhiemVuData.noiDungDotXuat,
+      advantageStatus: nhiemVuData.noiDungUuDiem ? "yes" : "no",
+      advantageDetail: nhiemVuData.noiDungUuDiem,
+      disadvantageStatus: nhiemVuData.noiDungKhuyetDiem ? "yes" : "no",
+      disadvantageDetail: nhiemVuData.noiDungKhuyetDiem,
+      pendingStatus: nhiemVuData.noiDungCanGiaiQuyet ? "yes" : "no",
+      pendingDetail: nhiemVuData.noiDungCanGiaiQuyet,
+    }}
+  />
+)}
       {caTrucInfo && (
         <CaTrucInfoCard
           ngaytruc={caTrucInfo.ngaytruc ?? ""}

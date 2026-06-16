@@ -1,0 +1,67 @@
+.wrapper {
+  margin-top: 24px;
+}
+
+.header {
+  margin-bottom: 16px;
+}
+
+.header h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1f3b63;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #dfe7e3;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.05);
+}
+
+.title {
+  font-weight: 700;
+  color: #1f3b63;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.status {
+  margin-bottom: 12px;
+}
+
+.success {
+  color: #1b7f4c;
+  font-weight: 600;
+}
+
+.danger {
+  color: #d14343;
+  font-weight: 600;
+}
+
+.warning {
+  color: #d08a00;
+  font-weight: 600;
+}
+
+.muted {
+  color: #6b7280;
+}
+
+.content {
+  background: #f8faf8;
+  border: 1px solid #e5ece7;
+  border-radius: 8px;
+  padding: 12px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
