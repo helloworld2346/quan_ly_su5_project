@@ -197,6 +197,25 @@
   font-size: 22px;  
 }  
   
+@media (max-width: 1024px) {  
+  .page {  
+    padding: 24px;  
+    gap: 24px;  
+  }  
+  
+  .formCard {  
+    padding: 28px 24px;  
+    gap: 24px;  
+  }  
+  
+  .formGrid {  
+    gap: 16px;  
+  }  
+  
+  .trucGrid {  
+    gap: 20px;  
+  }  
+}
   
 @media (max-width: 768px) {  
   .page {  

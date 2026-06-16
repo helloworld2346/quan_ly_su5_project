@@ -144,11 +144,12 @@
   flex: 1;  
   min-height: 0;  
   overflow-y: auto;  
+  overflow-x: auto;
   border: 1.5px solid var(--login-border);  
   border-radius: 16px;  
   background: var(--surface-card);  
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);  
-}  
+}
   
 .loading,  
 .empty {  
@@ -441,7 +442,13 @@
     grid-template-columns: 1fr 1fr;  
     gap: 12px 20px;  
   }  
-}  
+  
+  .table th,  
+  .table td {  
+    padding: 12px 14px;  
+    font-size: 13px;  
+  }  
+}
   
 @media (max-width: 768px) {  
   .page {  

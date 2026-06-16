@@ -285,12 +285,10 @@
   }  
   
   .table {  
-    font-size: 13px;  
+    font-size: 13px;
   }  
-}  
   
-@media (max-width: 480px) {  
   .trucGrid {  
-    grid-template-columns: 1fr;  
+    grid-template-columns: 1fr; 
   }  
 }
