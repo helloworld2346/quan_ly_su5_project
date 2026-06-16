@@ -319,6 +319,16 @@
   border-left: 1px solid var(--login-border);  
 }  
   
+@media (max-width: 1024px) {  
+  .card,  
+  .cardSection {  
+    padding: 20px 24px;  
+  }  
+  
+  .infoGrid {  
+    gap: 14px;  
+  }  
+}
   
 @media (max-width: 768px) {  
   .container { padding: 0; }  

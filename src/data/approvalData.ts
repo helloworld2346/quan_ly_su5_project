@@ -28,7 +28,7 @@ export interface ApprovalReport {
 }
 
 export const REPORT_TYPE_LABELS: Record<ReportType, string> = {
-  [ReportType.DAILY]: "Báo ban ngày",
+  [ReportType.DAILY]: "Thống kê quân số hoạt động trong ngày",
   [ReportType.TRAINING]: "Thống kê quân số huấn luyện",
   [ReportType.FAMILY]: "Báo ban thân nhân thăm nuôi",
   [ReportType.COMMUNICATION]: "Báo ban thông tin liên lạc",

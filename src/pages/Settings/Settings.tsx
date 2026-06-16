@@ -189,7 +189,9 @@ export default function Settings() {
 
       <div className={styles.card}>
         <div className={styles.cardHeader}>
-          <h2 className={styles.cardTitle}>Thông tin đơn vị</h2>
+          <h2 className={styles.cardTitle}>
+            Thông tin đơn vị — {donVi?.tenDonvi ?? ""}
+          </h2>
         </div>
 
         <div className={styles.form}>
@@ -241,9 +243,7 @@ export default function Settings() {
       {donVi && (
         <div className={styles.cardSection}>
           <div className={styles.cardHeader}>
-            <h2 className={styles.cardTitle}>
-              Cập nhật thông tin đơn vị — {donVi.tenDonvi}
-            </h2>
+            <h2 className={styles.cardTitle}>Cập nhật thông tin đơn vị</h2>
           </div>
 
           <form className={styles.form} onSubmit={handleUpdateDonVi}>
@@ -343,7 +343,6 @@ export default function Settings() {
                   </button>
                 </div>
               </div>
-
 
               <div className={styles.formGroup}>
                 <label>Quân số HSQ-BS</label>

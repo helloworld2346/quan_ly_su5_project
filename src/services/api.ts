@@ -1,5 +1,6 @@
 import axios from "axios";
 import { storage } from "../utils/storage";
+import { getLoadingHandler } from "../context/useLoadingContext";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api",
@@ -26,6 +27,7 @@ export function setToastErrorHandler(handler: ToastErrorHandler) {
 
 function setupInterceptors(instance: typeof api) {
   instance.interceptors.request.use((config) => {
+    getLoadingHandler()?.increment();
     const token = storage.getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -34,14 +36,17 @@ function setupInterceptors(instance: typeof api) {
   });
 
   instance.interceptors.response.use(
-    (response) => response,
+    (response) => {
+      getLoadingHandler()?.decrement();
+      return response;
+    },
     (error) => {
+      getLoadingHandler()?.decrement();
       if (error.response?.status === 401 && storage.getToken()) {
         storage.removeToken();
         storage.clearNavState();
         window.location.href = "/login";
       }
-
       if (
         toastErrorHandler &&
         error.response?.status !== 401 &&
@@ -51,7 +56,6 @@ function setupInterceptors(instance: typeof api) {
           error.response?.data?.message || error.message || "Có lỗi xảy ra";
         toastErrorHandler(message);
       }
-
       return Promise.reject(error);
     },
   );

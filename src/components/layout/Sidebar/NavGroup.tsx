@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useLayoutEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { IconProp } from "@fortawesome/fontawesome-svg-core";
 
@@ -35,6 +35,35 @@ export default function NavGroup({
   onTooltipLeave,
 }: Props) {
   const groupToggleRef = useRef<HTMLButtonElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+  const connectorRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const connector = connectorRef.current;
+    if (!connector) return;
+
+    if (!isOpen || collapsed || !listRef.current) {
+      connector.style.display = "none";
+      return;
+    }
+
+    const activeIndex = items.findIndex((item) => item.id === activeId);
+    if (activeIndex === -1) {
+      connector.style.display = "none";
+      return;
+    }
+
+    const liElements =
+      listRef.current.querySelectorAll<HTMLElement>(":scope > li");
+    const activeLi = liElements[activeIndex];
+    if (!activeLi) {
+      connector.style.display = "none";
+      return;
+    }
+
+    connector.style.height = `${activeLi.offsetTop + activeLi.offsetHeight / 2}px`;
+    connector.style.display = "block";
+  }, [activeId, isOpen, collapsed, items]);
 
   const handleClick = () => {
     if (collapsed) {
@@ -62,7 +91,7 @@ export default function NavGroup({
       <button
         ref={groupToggleRef}
         type="button"
-        className={`${styles.groupToggle} ${isActive && collapsed ? styles.active : ""} ${isActive ? styles.groupActive : ""}`}
+        className={`${styles.groupToggle} ${isActive ? styles.groupActive : ""}`}
         aria-expanded={isOpen}
         aria-label={collapsed ? label : undefined}
         onClick={handleClick}
@@ -84,7 +113,11 @@ export default function NavGroup({
       </button>
 
       {isOpen && !collapsed && (
-        <ul className={styles.subList}>
+        <ul ref={listRef} className={styles.subList}>
+          <div
+            ref={connectorRef}
+            className={styles.activeConnector}
+          />
           {items.map((item) => (
             <li key={item.id} className={styles.subLi}>
               <button
