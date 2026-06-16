@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import styles from "./CreateReportModal.module.css";
 import DailyReportDetailStep from "./DailyReportDetailStep";
+import type { DetailStepData } from "./DailyReportDetailStep";
 import type {
   AbsentRow,
   VangChiTiet,
@@ -50,6 +51,8 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
 }) => {
   const { showWarning } = useToast();
   const [step, setStep] = useState(1);
+  const [detailData, setDetailData] = useState<DetailStepData | null>(null);
+
   const [ngayBaoCao] = useState<string>(() => {
     if (initialData?.thoiGianBaoCao) {
       return initialData.thoiGianBaoCao.split("T")[0];
@@ -227,15 +230,17 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       donVi: initialData?.donVi?.maDonVi || maDonViCurrent || "",
       trucBanChiHuy: JSON.stringify(trucChiHuy),
       trucBanTacChien: JSON.stringify(trucBanTacChien),
+      tinhHinhHoatDong: detailData ? JSON.stringify(detailData) : "",
     };
-
 
     onSubmit(payload);
   };
+
   const handleCloseModal = () => {
     setStep(1);
     onClose();
   };
+
   if (!isOpen) return null;
 
   const isConsolidation = !!consolidatedAbsentRows;
@@ -263,8 +268,11 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
         </div>
 
         <div className={styles.body}>
-          {step === 1 && (
-            <>
+          <div
+            className={`${styles.stepsTrack} ${step === 2 ? styles.stepsTrackStep2 : ""}`}
+          >
+            {/* Step 1 */}
+            <div className={styles.stepPanel}>
               {caTrucInfo?.matkhau && (
                 <div className={styles.caTrucBanner}>
                   <span className={styles.caTrucBannerLabel}>
@@ -275,7 +283,6 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                   </span>
                 </div>
               )}
-
 
               <div className={styles.coreGrid}>
                 <div className={styles.field}>
@@ -337,7 +344,9 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                 value={trucBanTacChien}
                 onChange={setTrucBanTacChien}
                 capBacOptions={
-                  isTacChien ? CAP_BAC_TAC_CHIEN_SU_DOAN : CAP_BAC_TAC_CHIEN_DEFAULT
+                  isTacChien
+                    ? CAP_BAC_TAC_CHIEN_SU_DOAN
+                    : CAP_BAC_TAC_CHIEN_DEFAULT
                 }
               />
 
@@ -357,7 +366,9 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                       onClick={handleLoadYesterday}
                       disabled={isLoadingYesterday}
                     >
-                      {isLoadingYesterday ? "Đang tải..." : "Sao chép từ hôm qua"}
+                      {isLoadingYesterday
+                        ? "Đang tải..."
+                        : "Sao chép từ hôm qua"}
                     </button>
                   )}
                   <button
@@ -377,23 +388,20 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                   onRemove={handleRemoveRow}
                 />
               </div>
+            </div>
 
-            </>
-          )}
-
-          {step === 2 && (
-            <DailyReportDetailStep />
-          )}
+            {/* Step 2 */}
+            <div className={styles.stepPanel}>
+              <DailyReportDetailStep onChange={setDetailData} />
+            </div>
+          </div>
         </div>
+
         <div className={styles.footer}>
           <button
             type="button"
             className={`${styles.btn} ${styles.btnCancel}`}
-            onClick={
-              step === 1
-                ? handleCloseModal
-                : () => setStep(1)
-            }
+            onClick={step === 1 ? handleCloseModal : () => setStep(1)}
           >
             {step === 1 ? "Hủy bỏ" : "Quay lại"}
           </button>

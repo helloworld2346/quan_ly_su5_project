@@ -77,6 +77,7 @@ export interface CreateReportRequest {
   donVi: string;
   trucBanChiHuy?: string;
   trucBanTacChien?: string;
+  tinhHinhHoatDong?: string;
 }
 
 export interface CreateReportResponse {
