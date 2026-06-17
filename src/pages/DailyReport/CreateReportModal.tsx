@@ -180,23 +180,18 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
 
   const handleLoadYesterday = async () => {
     if (!maDonViCurrent) return;
-
     const d = new Date(ngayBaoCao);
     d.setDate(d.getDate() - 1);
     const yesterday = d.toISOString().split("T")[0];
-
     if (absentRows.length > 0) {
       setPendingYesterday(yesterday);
       setConfirmOpen(true);
       return;
     }
-
     await doLoadYesterday(yesterday);
   };
 
-  const handleLocalSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const handleFinalSubmit = () => {
     const thongTinVangObj: VangChiTiet = {
       hoiThaiNgoaiSuDoan: 0,
       hoiThaiEF: 0,
@@ -233,21 +228,21 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       tinhHinhHoatDong: detailData ? JSON.stringify(detailData) : "",
     };
 
-    onSubmit(payload);
+    onSubmit(payload, detailData ?? undefined);
   };
 
   const handleCloseModal = () => {
     setStep(1);
+    setDetailData(null);
     onClose();
   };
 
   if (!isOpen) return null;
-
   const isConsolidation = !!consolidatedAbsentRows;
 
   return (
     <div className={styles.overlay}>
-      <form className={styles.modal} onSubmit={handleLocalSubmit}>
+      <div className={styles.modal}>
         <div className={styles.header}>
           <h2 className={styles.title}>
             {step === 2
@@ -266,12 +261,10 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
             &times;
           </button>
         </div>
-
         <div className={styles.body}>
           <div
             className={`${styles.stepsTrack} ${step === 2 ? styles.stepsTrackStep2 : ""}`}
           >
-            {/* Step 1 */}
             <div className={styles.stepPanel}>
               {caTrucInfo?.matkhau && (
                 <div className={styles.caTrucBanner}>
@@ -283,7 +276,6 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                   </span>
                 </div>
               )}
-
               <div className={styles.coreGrid}>
                 <div className={styles.field}>
                   <label className={styles.label}>Ngày báo cáo</label>
@@ -327,9 +319,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                   />
                 </div>
               </div>
-
               <hr className={styles.divider} />
-
               <TrucNguoiFormSection
                 title="Trực chỉ huy"
                 value={trucChiHuy}
@@ -349,13 +339,11 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                     : CAP_BAC_TAC_CHIEN_DEFAULT
                 }
               />
-
               <hr className={styles.divider} />
-
               <div className={styles.sectionHeader}>
                 <h3 className={styles.sectionTitle}>
                   {isConsolidation
-                    ? "Danh sách tổng hợp quân nhân vắng mặt (từ các đơn vị con)"
+                    ? "Danh sách tổng hợp quân nhân vắng mặt"
                     : "Danh sách quân nhân vắng mặt"}
                 </h3>
                 <div className={styles.sectionActions}>
@@ -380,7 +368,6 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                   </button>
                 </div>
               </div>
-
               <div className={styles.tableContainer}>
                 <AbsentRowsTable
                   rows={absentRows}
@@ -389,14 +376,11 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                 />
               </div>
             </div>
-
-            {/* Step 2 */}
             <div className={styles.stepPanel}>
               <DailyReportDetailStep onChange={setDetailData} />
             </div>
           </div>
         </div>
-
         <div className={styles.footer}>
           <button
             type="button"
@@ -405,7 +389,6 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
           >
             {step === 1 ? "Hủy bỏ" : "Quay lại"}
           </button>
-
           {step === 1 ? (
             <button
               type="button"
@@ -416,8 +399,9 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
             </button>
           ) : (
             <button
-              type="submit"
+              type="button"
               className={`${styles.btn} ${styles.btnSubmit}`}
+              onClick={handleFinalSubmit}
             >
               {isConsolidation
                 ? "Lưu báo cáo tổng hợp"
@@ -427,8 +411,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
             </button>
           )}
         </div>
-      </form>
-
+      </div>
       <ConfirmDialog
         isOpen={confirmOpen}
         title="Xác nhận sao chép"

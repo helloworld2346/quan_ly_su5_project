@@ -26,7 +26,7 @@ import ReportTableHeader from "./components/ReportTableHeader";
 import ReportTableRow from "./components/ReportTableRow";
 import ReportTotalRow from "./components/ReportTotalRow";
 import { useReportPermissions } from "./hooks/useReportPermissions";
-import DailyReportSummary from "./DailyReportSummary.module";
+import DailyReportSummary from "./DailyReportSummary";
 import type { NhiemVuNgay } from "../../services/dailyReport/dailyReportService";
 
 export default function DailyTroopReport() {
@@ -74,7 +74,7 @@ export default function DailyTroopReport() {
   } = useReportData({
     maDonViCurrent,
     isParentUnit,
-    isTacChien, // ── THAY ĐỔI: isSuDoan → isTacChien
+    isTacChien,
     reportDate,
     showError,
   });
@@ -178,6 +178,7 @@ export default function DailyTroopReport() {
     setShowConsolidateModal(true);
   };
 
+  // ── 1. filteredRows ──
   const filteredRows = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return reportData;
@@ -210,25 +211,48 @@ export default function DailyTroopReport() {
     });
   }, [query, reportData]);
 
+  // ── 2. ownReport ──
+  const ownReport = useMemo(() => {
+    if (isParentUnit) return parentReportData;
+    return reportData.length > 0 ? reportData[0] : null;
+  }, [isParentUnit, parentReportData, reportData]);
+
+  // ── 3. commanderReport ──
+  const commanderReport = useMemo(() => {
+    if (!isChiHuy) return null;
+    if (isParentUnit) return parentReportData;
+    return reportData.length > 0 ? reportData[0] : null;
+  }, [isChiHuy, isParentUnit, parentReportData, reportData]);
+
+  // ── 4. useReportPermissions (khai báo selfApprove trước displayRows) ──
+  const {
+    isReporter,
+    canApprove,
+    canRefuse,
+    canSubmit,
+    canRecall,
+    selfApprove,
+  } = useReportPermissions(userRole, capDonVi, ownReport, commanderReport);
+
+  // ── 5. displayRows ──
   const displayRows = useMemo((): ReportRow[] => {
     if (!isParentUnit || childUnits.length === 0) {
       if (isParentUnit && !isTrungDoan) {
         const rows: ReportRow[] = parentReportData
           ? [{ ...parentReportData, notSubmitted: false }]
           : [];
-        // ── THAY ĐỔI: isCommander → isChiHuy
-        if (isChiHuy)
+        if (isChiHuy && !selfApprove)
           return rows.filter((r) => r.notSubmitted || r.status !== "Nháp");
         return rows;
       }
-      // ── THAY ĐỔI: isCommander → isChiHuy
-      if (isChiHuy) return filteredRows.filter((r) => r.status !== "Nháp");
+      if (isChiHuy && !selfApprove)
+        return filteredRows.filter((r) => r.status !== "Nháp");
       return filteredRows;
     }
 
-    const ownReport = parentReportData;
-    const ownRow: ReportRow = ownReport
-      ? { ...ownReport, notSubmitted: false }
+    const parentRow = parentReportData;
+    const ownRow: ReportRow = parentRow
+      ? { ...parentRow, notSubmitted: false }
       : {
           idDonBaoCao: maDonViCurrent!,
           donVi: maDonViCurrent!,
@@ -289,8 +313,7 @@ export default function DailyTroopReport() {
         : childRows
       : childRows;
 
-    // ── THAY ĐỔI: isCommander → isChiHuy
-    if (isChiHuy)
+    if (isChiHuy && !selfApprove)
       return allRows.filter((r) => r.notSubmitted || r.status !== "Nháp");
     return allRows;
   }, [
@@ -300,11 +323,13 @@ export default function DailyTroopReport() {
     filteredRows,
     maDonViCurrent,
     account,
-    isChiHuy, // ── THAY ĐỔI: isCommander → isChiHuy
+    isChiHuy,
     parentReportData,
     query,
+    selfApprove,
   ]);
 
+  // ── 6. displayTotals (sau displayRows) ──
   const displayTotals = useMemo(() => {
     const submittedRows = displayRows.filter((r) => !r.notSubmitted);
     return submittedRows.reduce(
@@ -352,11 +377,11 @@ export default function DailyTroopReport() {
     );
   }, [displayRows]);
 
+  // ── 7. caTrucInfo ──
   const caTrucInfo = useMemo((): CaTrucInfo | null => {
     if (isParentUnit) {
       if (parentReportData)
         return parentReportData.rawItem.caTruc as CaTrucInfo;
-      // ── THAY ĐỔI: isSuDoan → isTacChien
       if (isTacChien && caTrucFromApi) {
         return {
           idCatruc: caTrucFromApi.idCatruc,
@@ -382,23 +407,9 @@ export default function DailyTroopReport() {
     return reportData.length > 0
       ? (reportData[0].rawItem.caTruc as CaTrucInfo)
       : null;
-  }, [isParentUnit, isTacChien, parentReportData, reportData, caTrucFromApi]); // ── THAY ĐỔI: isSuDoan → isTacChien
+  }, [isParentUnit, isTacChien, parentReportData, reportData, caTrucFromApi]);
 
-  const ownReport = useMemo(() => {
-    if (isParentUnit) return parentReportData;
-    return reportData.length > 0 ? reportData[0] : null;
-  }, [isParentUnit, parentReportData, reportData]);
-
-  const commanderReport = useMemo(() => {
-    // ── THAY ĐỔI: isCommander → isChiHuy
-    if (!isChiHuy) return null;
-    if (isParentUnit) return parentReportData;
-    return reportData.length > 0 ? reportData[0] : null;
-  }, [isChiHuy, isParentUnit, parentReportData, reportData]); // ── THAY ĐỔI: isCommander → isChiHuy
-
-  const { isReporter, canApprove, canRefuse, canSubmit, canRecall } =
-    useReportPermissions(userRole, capDonVi, ownReport, commanderReport);
-
+  // ── 8. trucInfoFromReport ──
   const trucInfoFromReport = useMemo(() => {
     const currentReport = isParentUnit
       ? parentReportData
@@ -433,6 +444,7 @@ export default function DailyTroopReport() {
     return { trucChiHuy, trucBanTacChien };
   }, [isParentUnit, parentReportData, reportData]);
 
+  // ── 9. currentEditingReport ──
   const currentEditingReport = useMemo(() => {
     if (!editModalData) return null;
     const childRow = reportData.find(
@@ -453,7 +465,7 @@ export default function DailyTroopReport() {
   const sharedRowProps = {
     isParentUnit,
     isReporter,
-    isTacChien, // ── THAY ĐỔI: isSuDoan → isTacChien
+    isTacChien,
     maDonViCurrent,
     activeMenuUnit,
     menuPosition,
@@ -486,8 +498,11 @@ export default function DailyTroopReport() {
         onQueryChange={setQuery}
         reportDate={reportDate}
         onReportDateChange={setReportDate}
-        // ── THAY ĐỔI: isCommander → isChiHuy
-        onAddReport={isChiHuy || isTrungDoan ? undefined : handleAddReport}
+        onAddReport={
+          isTrungDoan || (isChiHuy && !selfApprove)
+            ? undefined
+            : handleAddReport
+        }
         onConsolidate={isTrungDoan ? handleConsolidate : undefined}
         consolidateDisabled={
           !consolidatedData ||
@@ -692,7 +707,6 @@ export default function DailyTroopReport() {
           onSubmit={async (payload, detailData) => {
             try {
               const res = await dailyReportService.createReport(payload);
-              // Gọi API nhiemvungay nếu có detailData
               if (detailData && res.Result?.idDonBaoCao) {
                 try {
                   await dailyReportService.createNhiemVuNgay({
@@ -732,8 +746,20 @@ export default function DailyTroopReport() {
           initialData={currentEditingReport}
           onSubmit={async (payload, detailData) => {
             try {
-              const res = await dailyReportService.createReport(payload);
-              if (detailData && res.Result?.idDonBaoCao) {
+              await dailyReportService.updateReport(editModalData.reportId, {
+                quanSoTong: payload.quanSoTong,
+                quanSoHienDien: payload.quanSoHienDien,
+                quanSoVang: payload.quanSoVang,
+                thoiGianBaoCao: payload.thoiGianBaoCao,
+                chiTietVang: payload.chiTietVang,
+                thongTinVang: payload.thongTinVang,
+                trucBanChiHuy: payload.trucBanChiHuy,
+                trucBanTacChien: payload.trucBanTacChien,
+                tinhHinhHoatDong: payload.tinhHinhHoatDong,
+                account: account?.idTaiKhoan ?? "",
+                donVi: account?.donVi?.maDonVi ?? "",
+              });
+              if (detailData) {
                 try {
                   await dailyReportService.createNhiemVuNgay({
                     nhiemVuPhandoi: detailData.securityStatus,
@@ -741,19 +767,19 @@ export default function DailyTroopReport() {
                     noiDungUuDiem: detailData.advantageDetail,
                     noiDungKhuyetDiem: detailData.disadvantageDetail,
                     noiDungCanGiaiQuyet: detailData.pendingDetail,
-                    donBaoCao: res.Result.idDonBaoCao,
+                    donBaoCao: editModalData.reportId,
                   });
                 } catch {
-                  // Không block nếu nhiemvungay fail
+                  //
                 }
               }
-              showSuccess("Tạo báo cáo quân số thành công");
+              showSuccess("Cập nhật báo cáo quân số thành công");
               await handleCreateSuccess();
-              setShowCreateModal(false);
+              setEditModalData(null);
             } catch (error) {
               handleApiError(error, {
                 showError,
-                errorMessage: "Không thể tạo báo cáo",
+                errorMessage: "Không thể cập nhật báo cáo",
               });
             }
           }}

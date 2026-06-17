@@ -116,6 +116,7 @@ export interface UpdateReportRequest {
   donVi: string;
   trucBanChiHuy?: string;
   trucBanTacChien?: string;
+  tinhHinhHoatDong?: string;
 }
 
 export interface UpdateReportResponse {

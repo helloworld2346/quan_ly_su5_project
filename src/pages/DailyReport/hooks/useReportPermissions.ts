@@ -9,10 +9,10 @@ export function useReportPermissions(
   commanderReport: ReportRow | null,
 ) {
   const normalizedRole = normalizeRoleName(userRole ?? undefined);
-  const isChiHuy = normalizedRole === "Trực chỉ huy"; // replaces isCommander
-  const isTacChien = normalizedRole === "Trực ban tác chiến"; // replaces isSuDoan
-  const isNoiVu = normalizedRole === "Trực ban nội vụ"; // replaces isReporter
-  const isReporter = isTacChien || isNoiVu; // can submit/recall
+  const isChiHuy = normalizedRole === "Trực chỉ huy";
+  const isTacChien = normalizedRole === "Trực ban tác chiến";
+  const isNoiVu = normalizedRole === "Trực ban nội vụ";
+  const isReporter = isTacChien || isNoiVu;
   const isTrungDoan = capDonVi === "TRUNG_DOAN";
   const isTieuDoan = capDonVi === "TIEU_DOAN";
   const needsApproval = isTrungDoan || isTieuDoan;
