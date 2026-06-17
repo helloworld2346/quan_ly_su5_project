@@ -323,4 +323,5 @@ export interface ReportRow {
 export type EditModalData = {
   reportId: string;
   ngayBaoCao: string;
+  idNhiemvuNgay?: string;
 };

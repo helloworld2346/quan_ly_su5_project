@@ -15,18 +15,40 @@ export interface DetailStepData {
 
 interface Props {
   onChange?: (data: DetailStepData) => void;
+  initialData?: DetailStepData | null;
 }
 
-export default function DailyReportDetailStep({ onChange }: Props) {
-  const [securityStatus, setSecurityStatus] = useState("");
-  const [incidentStatus, setIncidentStatus] = useState("");
-  const [incidentDetail, setIncidentDetail] = useState("");
-  const [advantageStatus, setAdvantageStatus] = useState("");
-  const [advantageDetail, setAdvantageDetail] = useState("");
-  const [disadvantageStatus, setDisadvantageStatus] = useState("");
-  const [disadvantageDetail, setDisadvantageDetail] = useState("");
-  const [pendingTaskStatus, setPendingTaskStatus] = useState("");
-  const [pendingDetail, setPendingDetail] = useState("");
+export default function DailyReportDetailStep({
+  onChange,
+  initialData,
+}: Props) {
+  const [securityStatus, setSecurityStatus] = useState(
+    () => initialData?.securityStatus ?? "",
+  );
+  const [incidentStatus, setIncidentStatus] = useState(
+    () => initialData?.incidentStatus ?? "",
+  );
+  const [incidentDetail, setIncidentDetail] = useState(
+    () => initialData?.incidentDetail ?? "",
+  );
+  const [advantageStatus, setAdvantageStatus] = useState(
+    () => initialData?.advantageStatus ?? "",
+  );
+  const [advantageDetail, setAdvantageDetail] = useState(
+    () => initialData?.advantageDetail ?? "",
+  );
+  const [disadvantageStatus, setDisadvantageStatus] = useState(
+    () => initialData?.disadvantageStatus ?? "",
+  );
+  const [disadvantageDetail, setDisadvantageDetail] = useState(
+    () => initialData?.disadvantageDetail ?? "",
+  );
+  const [pendingTaskStatus, setPendingTaskStatus] = useState(
+    () => initialData?.pendingTaskStatus ?? "",
+  );
+  const [pendingDetail, setPendingDetail] = useState(
+    () => initialData?.pendingDetail ?? "",
+  );
 
   const notify = useCallback(
     (patch: Partial<DetailStepData>) => {

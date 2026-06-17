@@ -28,7 +28,6 @@ export interface NhiemVuNgayResponse {
   result: NhiemVuNgay[];
 }
 
-
 export interface CreateNhiemVuNgayRequest {
   nhiemVuPhandoi: string;
   noiDungDotXuat: string;
@@ -36,6 +35,13 @@ export interface CreateNhiemVuNgayRequest {
   noiDungKhuyetDiem: string;
   noiDungCanGiaiQuyet: string;
   donBaoCao: string;
+}
+
+export interface NhiemVuNgaySingleResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  Result: NhiemVuNgay;
 }
 
 export const dailyReportService = {
@@ -142,6 +148,37 @@ export const dailyReportService = {
       "/nhiemvungay",
       payload,
     );
+    return response.data;
+  },
+
+  getNhiemVuNgayById: async (
+    id: string,
+  ): Promise<NhiemVuNgaySingleResponse> => {
+    const response = await apiNoPrefix.get<NhiemVuNgaySingleResponse>(
+      `/nhiemvungay/${id}`,
+    );
+    return response.data;
+  },
+
+  getNhiemVuNgayByDonBaoCao: async (idDonBaoCao: string) => {
+    const response = await apiNoPrefix.get(
+      `/nhiemvungay/donbaocao/${idDonBaoCao}`,
+    );
+    return response.data as {
+      success: boolean;
+      Result: {
+        idNhiemvuNgay: string;
+        nhiemVuPhandoi: string;
+        noiDungDotXuat: string;
+        noiDungUuDiem: string;
+        noiDungKhuyetDiem: string;
+        noiDungCanGiaiQuyet: string;
+      } | null;
+    };
+  },
+
+  updateNhiemVuNgay: async (id: string, payload: CreateNhiemVuNgayRequest) => {
+    const response = await apiNoPrefix.put(`/nhiemvungay/${id}`, payload);
     return response.data;
   },
 };

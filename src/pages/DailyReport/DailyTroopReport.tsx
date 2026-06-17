@@ -28,6 +28,7 @@ import ReportTotalRow from "./components/ReportTotalRow";
 import { useReportPermissions } from "./hooks/useReportPermissions";
 import DailyReportSummary from "./DailyReportSummary";
 import type { NhiemVuNgay } from "../../services/dailyReport/dailyReportService";
+import type { DetailStepData } from "./DailyReportDetailStep";
 
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
@@ -43,6 +44,10 @@ export default function DailyTroopReport() {
   const [activeMenuUnit, setActiveMenuUnit] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const [showConsolidatedDetail, setShowConsolidatedDetail] = useState(false);
+  const [editNhiemVuData, setEditNhiemVuData] = useState<DetailStepData | null>(
+    null,
+  );
+  const [editNhiemVuId, setEditNhiemVuId] = useState<string | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
@@ -127,6 +132,42 @@ export default function DailyTroopReport() {
     };
   }, [activeMenuUnit]);
 
+  useEffect(() => {
+    void (async () => {
+      if (!editModalData) {
+        setEditNhiemVuData(null);
+        setEditNhiemVuId(null);
+        return;
+      }
+      try {
+        const res = await dailyReportService.getNhiemVuNgayByDonBaoCao(
+          editModalData.reportId,
+        );
+        const nv = res.Result;
+        if (!nv) {
+          setEditNhiemVuData(null);
+          setEditNhiemVuId(null);
+          return;
+        }
+        setEditNhiemVuId(nv.idNhiemvuNgay);
+        setEditNhiemVuData({
+          securityStatus: nv.nhiemVuPhandoi ?? "",
+          incidentStatus: nv.noiDungDotXuat ? "yes" : "",
+          incidentDetail: nv.noiDungDotXuat ?? "",
+          advantageStatus: nv.noiDungUuDiem ? "yes" : "",
+          advantageDetail: nv.noiDungUuDiem ?? "",
+          disadvantageStatus: nv.noiDungKhuyetDiem ? "yes" : "",
+          disadvantageDetail: nv.noiDungKhuyetDiem ?? "",
+          pendingTaskStatus: nv.noiDungCanGiaiQuyet ? "yes" : "",
+          pendingDetail: nv.noiDungCanGiaiQuyet ?? "",
+        });
+      } catch {
+        setEditNhiemVuData(null);
+        setEditNhiemVuId(null);
+      }
+    })();
+  }, [editModalData]);
+
   const isPastDate = useMemo(() => {
     const selectedDate = new Date(reportDate + "T00:00:00");
     const today = new Date();
@@ -178,7 +219,6 @@ export default function DailyTroopReport() {
     setShowConsolidateModal(true);
   };
 
-  // ── 1. filteredRows ──
   const filteredRows = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return reportData;
@@ -211,20 +251,17 @@ export default function DailyTroopReport() {
     });
   }, [query, reportData]);
 
-  // ── 2. ownReport ──
   const ownReport = useMemo(() => {
     if (isParentUnit) return parentReportData;
     return reportData.length > 0 ? reportData[0] : null;
   }, [isParentUnit, parentReportData, reportData]);
 
-  // ── 3. commanderReport ──
   const commanderReport = useMemo(() => {
     if (!isChiHuy) return null;
     if (isParentUnit) return parentReportData;
     return reportData.length > 0 ? reportData[0] : null;
   }, [isChiHuy, isParentUnit, parentReportData, reportData]);
 
-  // ── 4. useReportPermissions (khai báo selfApprove trước displayRows) ──
   const {
     isReporter,
     canApprove,
@@ -234,7 +271,6 @@ export default function DailyTroopReport() {
     selfApprove,
   } = useReportPermissions(userRole, capDonVi, ownReport, commanderReport);
 
-  // ── 5. displayRows ──
   const displayRows = useMemo((): ReportRow[] => {
     if (!isParentUnit || childUnits.length === 0) {
       if (isParentUnit && !isTrungDoan) {
@@ -329,7 +365,6 @@ export default function DailyTroopReport() {
     selfApprove,
   ]);
 
-  // ── 6. displayTotals (sau displayRows) ──
   const displayTotals = useMemo(() => {
     const submittedRows = displayRows.filter((r) => !r.notSubmitted);
     return submittedRows.reduce(
@@ -377,7 +412,6 @@ export default function DailyTroopReport() {
     );
   }, [displayRows]);
 
-  // ── 7. caTrucInfo ──
   const caTrucInfo = useMemo((): CaTrucInfo | null => {
     if (isParentUnit) {
       if (parentReportData)
@@ -409,7 +443,6 @@ export default function DailyTroopReport() {
       : null;
   }, [isParentUnit, isTacChien, parentReportData, reportData, caTrucFromApi]);
 
-  // ── 8. trucInfoFromReport ──
   const trucInfoFromReport = useMemo(() => {
     const currentReport = isParentUnit
       ? parentReportData
@@ -444,7 +477,6 @@ export default function DailyTroopReport() {
     return { trucChiHuy, trucBanTacChien };
   }, [isParentUnit, parentReportData, reportData]);
 
-  // ── 9. currentEditingReport ──
   const currentEditingReport = useMemo(() => {
     if (!editModalData) return null;
     const childRow = reportData.find(
@@ -744,6 +776,7 @@ export default function DailyTroopReport() {
           isOpen={Boolean(editModalData)}
           onClose={() => setEditModalData(null)}
           initialData={currentEditingReport}
+          initialDetailData={editNhiemVuData}
           onSubmit={async (payload, detailData) => {
             try {
               await dailyReportService.updateReport(editModalData.reportId, {
@@ -759,22 +792,32 @@ export default function DailyTroopReport() {
                 account: account?.idTaiKhoan ?? "",
                 donVi: account?.donVi?.maDonVi ?? "",
               });
+
               if (detailData) {
+                const nhiemVuPayload = {
+                  nhiemVuPhandoi: detailData.securityStatus,
+                  noiDungDotXuat: detailData.incidentDetail,
+                  noiDungUuDiem: detailData.advantageDetail,
+                  noiDungKhuyetDiem: detailData.disadvantageDetail,
+                  noiDungCanGiaiQuyet: detailData.pendingDetail,
+                  donBaoCao: editModalData.reportId,
+                };
                 try {
-                  await dailyReportService.createNhiemVuNgay({
-                    nhiemVuPhandoi: detailData.securityStatus,
-                    noiDungDotXuat: detailData.incidentDetail,
-                    noiDungUuDiem: detailData.advantageDetail,
-                    noiDungKhuyetDiem: detailData.disadvantageDetail,
-                    noiDungCanGiaiQuyet: detailData.pendingDetail,
-                    donBaoCao: editModalData.reportId,
-                  });
+                  if (editNhiemVuId) {
+                    await dailyReportService.updateNhiemVuNgay(
+                      editNhiemVuId,
+                      nhiemVuPayload,
+                    );
+                  } else {
+                    await dailyReportService.createNhiemVuNgay(nhiemVuPayload);
+                  }
                 } catch {
-                  //
+                  // Không block nếu nhiemvungay fail
                 }
               }
+
               showSuccess("Cập nhật báo cáo quân số thành công");
-              await handleCreateSuccess();
+              void handleCreateSuccess();
               setEditModalData(null);
             } catch (error) {
               handleApiError(error, {
