@@ -9,7 +9,6 @@ import { useAuth } from "../../context/useAuth";
 import { useToast } from "../../context/useToast";
 import type {
   CreateReportResponse,
-  UpdateReportRequest,
   CaTrucInfo,
   ReportRow,
   EditModalData,
@@ -690,9 +689,24 @@ export default function DailyTroopReport() {
         <CreateReportModal
           isOpen={showCreateModal}
           onClose={() => setShowCreateModal(false)}
-          onSubmit={async (payload) => {
+          onSubmit={async (payload, detailData) => {
             try {
-              await dailyReportService.createReport(payload);
+              const res = await dailyReportService.createReport(payload);
+              // Gọi API nhiemvungay nếu có detailData
+              if (detailData && res.Result?.idDonBaoCao) {
+                try {
+                  await dailyReportService.createNhiemVuNgay({
+                    nhiemVuPhandoi: detailData.securityStatus,
+                    noiDungDotXuat: detailData.incidentDetail,
+                    noiDungUuDiem: detailData.advantageDetail,
+                    noiDungKhuyetDiem: detailData.disadvantageDetail,
+                    noiDungCanGiaiQuyet: detailData.pendingDetail,
+                    donBaoCao: res.Result.idDonBaoCao,
+                  });
+                } catch {
+                  // Không block nếu nhiemvungay fail
+                }
+              }
               showSuccess("Tạo báo cáo quân số thành công");
               await handleCreateSuccess();
               setShowCreateModal(false);
@@ -706,7 +720,7 @@ export default function DailyTroopReport() {
           maDonViCurrent={account?.donVi?.maDonVi}
           tongQuanSoBienChe={donViQuanSoTong || undefined}
           caTrucInfo={caTrucInfo}
-          isTacChien={isTacChien} // ── THAY ĐỔI: isSuDoan → isTacChien
+          isTacChien={isTacChien}
           reportDate={reportDate}
         />
       )}
@@ -716,30 +730,37 @@ export default function DailyTroopReport() {
           isOpen={Boolean(editModalData)}
           onClose={() => setEditModalData(null)}
           initialData={currentEditingReport}
-          onSubmit={async (payload) => {
+          onSubmit={async (payload, detailData) => {
             try {
-              const updatePayload: UpdateReportRequest = {
-                ...payload,
-                account: account?.tenTaiKhoan || "",
-              };
-              await dailyReportService.updateReport(
-                editModalData.reportId,
-                updatePayload,
-              );
-              showSuccess("Cập nhật báo cáo quân số thành công");
-              void handleCreateSuccess();
-              setEditModalData(null);
+              const res = await dailyReportService.createReport(payload);
+              if (detailData && res.Result?.idDonBaoCao) {
+                try {
+                  await dailyReportService.createNhiemVuNgay({
+                    nhiemVuPhandoi: detailData.securityStatus,
+                    noiDungDotXuat: detailData.incidentDetail,
+                    noiDungUuDiem: detailData.advantageDetail,
+                    noiDungKhuyetDiem: detailData.disadvantageDetail,
+                    noiDungCanGiaiQuyet: detailData.pendingDetail,
+                    donBaoCao: res.Result.idDonBaoCao,
+                  });
+                } catch {
+                  // Không block nếu nhiemvungay fail
+                }
+              }
+              showSuccess("Tạo báo cáo quân số thành công");
+              await handleCreateSuccess();
+              setShowCreateModal(false);
             } catch (error) {
               handleApiError(error, {
                 showError,
-                errorMessage: "Không thể cập nhật báo cáo",
+                errorMessage: "Không thể tạo báo cáo",
               });
             }
           }}
           maDonViCurrent={account?.donVi?.maDonVi}
           tongQuanSoBienChe={donViQuanSoTong || undefined}
           caTrucInfo={caTrucInfo}
-          isTacChien={isTacChien} // ── THAY ĐỔI: isSuDoan → isTacChien
+          isTacChien={isTacChien}
         />
       )}
 

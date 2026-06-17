@@ -10,10 +10,7 @@ import type {
   SearchReportResponse,
   SearchChildrenResponse,
   SearchByRangeResponse,
-  
 } from "../../types/dailyReport";
-
-
 
 export interface NhiemVuNgay {
   idNhiemvuNgay: string;
@@ -31,6 +28,16 @@ export interface NhiemVuNgayResponse {
   result: NhiemVuNgay[];
 }
 
+
+export interface CreateNhiemVuNgayRequest {
+  nhiemVuPhandoi: string;
+  noiDungDotXuat: string;
+  noiDungUuDiem: string;
+  noiDungKhuyetDiem: string;
+  noiDungCanGiaiQuyet: string;
+  donBaoCao: string;
+}
+
 export const dailyReportService = {
   createReport: async (
     payload: CreateReportRequest,
@@ -43,9 +50,9 @@ export const dailyReportService = {
   },
 
   getNhiemVuNgay: async (): Promise<NhiemVuNgayResponse> => {
-  const response = await apiNoPrefix.get<NhiemVuNgayResponse>("/nhiemvungay");
-  return response.data;
-},
+    const response = await apiNoPrefix.get<NhiemVuNgayResponse>("/nhiemvungay");
+    return response.data;
+  },
 
   updateReport: async (
     id: string,
@@ -128,5 +135,13 @@ export const dailyReportService = {
     return response.data;
   },
 
-  
+  createNhiemVuNgay: async (
+    payload: CreateNhiemVuNgayRequest,
+  ): Promise<NhiemVuNgayResponse> => {
+    const response = await apiNoPrefix.post<NhiemVuNgayResponse>(
+      "/nhiemvungay",
+      payload,
+    );
+    return response.data;
+  },
 };

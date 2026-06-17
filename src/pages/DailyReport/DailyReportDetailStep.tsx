@@ -3,7 +3,6 @@ import { useState, useCallback } from "react";
 
 export interface DetailStepData {
   securityStatus: string;
-  securityReason: string;
   incidentStatus: string;
   incidentDetail: string;
   advantageStatus: string;
@@ -20,17 +19,12 @@ interface Props {
 
 export default function DailyReportDetailStep({ onChange }: Props) {
   const [securityStatus, setSecurityStatus] = useState("");
-  const [securityReason, setSecurityReason] = useState("");
-
   const [incidentStatus, setIncidentStatus] = useState("");
   const [incidentDetail, setIncidentDetail] = useState("");
-
   const [advantageStatus, setAdvantageStatus] = useState("");
   const [advantageDetail, setAdvantageDetail] = useState("");
-
   const [disadvantageStatus, setDisadvantageStatus] = useState("");
   const [disadvantageDetail, setDisadvantageDetail] = useState("");
-
   const [pendingTaskStatus, setPendingTaskStatus] = useState("");
   const [pendingDetail, setPendingDetail] = useState("");
 
@@ -38,7 +32,6 @@ export default function DailyReportDetailStep({ onChange }: Props) {
     (patch: Partial<DetailStepData>) => {
       onChange?.({
         securityStatus,
-        securityReason,
         incidentStatus,
         incidentDetail,
         advantageStatus,
@@ -53,7 +46,6 @@ export default function DailyReportDetailStep({ onChange }: Props) {
     [
       onChange,
       securityStatus,
-      securityReason,
       incidentStatus,
       incidentDetail,
       advantageStatus,
@@ -82,11 +74,7 @@ export default function DailyReportDetailStep({ onChange }: Props) {
                 checked={securityStatus === "safe"}
                 onChange={(e) => {
                   setSecurityStatus(e.target.value);
-                  setSecurityReason("");
-                  notify({
-                    securityStatus: e.target.value,
-                    securityReason: "",
-                  });
+                  notify({ securityStatus: e.target.value });
                 }}
               />
               Đảm bảo an toàn
@@ -266,7 +254,6 @@ export default function DailyReportDetailStep({ onChange }: Props) {
           </div>
         </div>
 
-        {/* IV. Việc cần giải quyết */}
         <div className={styles.card}>
           <h3 className={styles.cardTitle}>
             IV. Những việc cần tiếp tục giải quyết

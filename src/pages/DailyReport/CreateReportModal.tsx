@@ -27,7 +27,7 @@ import AbsentRowsTable from "./components/AbsentRowsTable";
 interface CreateReportModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (payload: CreateReportRequest) => void;
+  onSubmit: (payload: CreateReportRequest, detailData?: DetailStepData) => void;
   initialData?: CreateReportResponse["Result"] | null;
   maDonViCurrent?: string;
   tongQuanSoBienChe?: number;
