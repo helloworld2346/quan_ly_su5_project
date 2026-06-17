@@ -1,6 +1,7 @@
 import styles from "./DailyReportSummary.module.css";
 
 interface Props {
+  donVi?: string;
   data?: {
     securityStatus?: string;
     securityReason?: string;
@@ -36,14 +37,16 @@ function SummaryItem({ label, badge, detail, accent }: ItemProps) {
   );
 }
 
-export default function DailyReportSummary({ data }: Props) {
+export default function DailyReportSummary({ data, donVi }: Props) {
   if (!data) return null;
 
   return (
     <div className={styles.wrapper}>
       <div className={styles.sectionHeader}>
         <span className={styles.sectionTitle}>
-          Tình hình hoạt động nhiệm vụ ngày
+          {donVi
+            ? `Tình hình hoạt động nhiệm vụ ngày — ${donVi}`
+            : "Tình hình hoạt động nhiệm vụ ngày"}
         </span>
       </div>
       <div className={styles.list}>

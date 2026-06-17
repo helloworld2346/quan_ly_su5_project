@@ -90,8 +90,6 @@ export default function DailyTroopReport() {
     showError,
   });
 
-  // ── THÊM: Trực chỉ huy đơn vị lá (Đại đội, Ban, Phòng, Trung đoàn bộ, Tiểu đoàn bộ...)
-  // Phân biệt với Trực chỉ huy cấp trên (Sư đoàn, Trung đoàn, Tiểu đoàn) chỉ phê duyệt
   const isChiHuyLeaf = isChiHuy && childUnits.length === 0;
 
   const {
@@ -525,6 +523,10 @@ export default function DailyTroopReport() {
 
   const [nhiemVuData, setNhiemVuData] = useState<NhiemVuNgay | null>(null);
 
+  const [nhiemVuList, setNhiemVuList] = useState<
+    Array<{ donVi: string; data: NhiemVuNgay }>
+  >([]);
+
   useEffect(() => {
     if (!ownReport?.idDonBaoCao) return;
     dailyReportService
@@ -536,6 +538,31 @@ export default function DailyTroopReport() {
         setNhiemVuData(null);
       });
   }, [ownReport]);
+
+  useEffect(() => {
+    if (!isParentUnit || reportData.length === 0) return;
+    const rowsWithReport = reportData.filter(
+      (r) => r.idDonBaoCao && !r.notSubmitted,
+    );
+    Promise.all(
+      rowsWithReport.map((r) =>
+        dailyReportService
+          .getNhiemVuNgayByDonBaoCao(r.idDonBaoCao)
+          .then((res) =>
+            res.Result
+              ? { donVi: r.kyhieuDonVi || r.tenDonVi, data: res.Result }
+              : null,
+          )
+          .catch(() => null),
+      ),
+    ).then((results) => {
+      setNhiemVuList(
+        results.filter(
+          (x): x is { donVi: string; data: NhiemVuNgay } => x !== null,
+        ),
+      );
+    });
+  }, [isParentUnit, reportData]);
 
   return (
     <section className={styles.report} aria-labelledby="dashboard-page-heading">
@@ -634,7 +661,7 @@ export default function DailyTroopReport() {
                 </tr>
               ) : (
                 <>
-                  {isTrungDoan && displayRows.length > 0 && (
+                  {(isTrungDoan || isTieuDoan) && displayRows.length > 0 && (
                     <tr className={styles.separatorRow}>
                       <td colSpan={22}>Báo cáo các đơn vị</td>
                     </tr>
@@ -665,12 +692,12 @@ export default function DailyTroopReport() {
                     />
                   )}
 
-                  {isTrungDoan && (
+                  {(isTrungDoan || isTieuDoan) && (
                     <tr className={styles.separatorRow}>
                       <td colSpan={22}>Báo cáo tổng hợp</td>
                     </tr>
                   )}
-                  {isTrungDoan && parentReportData ? (
+                  {(isTrungDoan || isTieuDoan) && parentReportData ? (
                     <ReportTableRow
                       key={`parent-${parentReportData.idDonBaoCao}`}
                       row={parentReportData}
@@ -678,7 +705,7 @@ export default function DailyTroopReport() {
                       {...sharedRowProps}
                     />
                   ) : (
-                    isTrungDoan && (
+                    (isTrungDoan || isTieuDoan) && (
                       <tr className={styles.noConsolidatedRow}>
                         <td colSpan={22}>Chưa có báo cáo tổng hợp</td>
                       </tr>
@@ -690,7 +717,8 @@ export default function DailyTroopReport() {
           </table>
         )}
       </div>
-      {nhiemVuData && ownReport && (
+
+      {!isParentUnit && nhiemVuData && ownReport && (
         <DailyReportSummary
           data={{
             securityStatus:
@@ -706,6 +734,29 @@ export default function DailyTroopReport() {
           }}
         />
       )}
+
+      {isParentUnit &&
+        reportData.length > 0 &&
+        nhiemVuList.length > 0 &&
+        nhiemVuList.map((item) => (
+          <DailyReportSummary
+            key={item.data.idNhiemvuNgay}
+            donVi={item.donVi}
+            data={{
+              securityStatus:
+                item.data.nhiemVuPhandoi === "safe" ? "safe" : "unsafe",
+              incidentStatus: item.data.noiDungDotXuat ? "yes" : "no",
+              incidentDetail: item.data.noiDungDotXuat,
+              advantageStatus: item.data.noiDungUuDiem ? "yes" : "no",
+              advantageDetail: item.data.noiDungUuDiem,
+              disadvantageStatus: item.data.noiDungKhuyetDiem ? "yes" : "no",
+              disadvantageDetail: item.data.noiDungKhuyetDiem,
+              pendingStatus: item.data.noiDungCanGiaiQuyet ? "yes" : "no",
+              pendingDetail: item.data.noiDungCanGiaiQuyet,
+            }}
+          />
+        ))}
+
       {caTrucInfo && (
         <CaTrucInfoCard
           ngaytruc={caTrucInfo.ngaytruc ?? ""}
