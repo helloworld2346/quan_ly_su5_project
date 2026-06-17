@@ -1,138 +1,178 @@
-.container {
-  width: 100%;
-  animation: fadeSlide 0.25s ease;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 28px;
-}
-
-.card {
-  background: var(--modal-bg, #ffffff);
-  border: 1px solid var(--modal-border, #e2e8f0);
-  border-radius: 10px;
-  padding: 20px;
-  transition: all 0.2s ease;
-}
-
-.card:hover {
-  border-color: var(--modal-card-hover-border, rgba(31, 92, 63, 0.35));
-  box-shadow: 0 2px 8px var(--modal-card-hover-shadow, rgba(31, 92, 63, 0.08));
-}
-
-.cardTitle {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--modal-card-title, #334155);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  line-height: 1.5;
-  margin-bottom: 16px;
-}
-
-.section:not(:last-child) {
-  margin-bottom: 20px;
-}
-
-.label {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--modal-label-text, #64748b);
-}
-
-.radioGroup {
-  display: flex;
-  gap: 24px;
-  margin-bottom: 16px;
-}
-
-.radioLabel,
-.radioGroup label {
-  display: flex;
+.container {  
+  width: 100%;  
+  animation: fadeSlide 0.25s ease;  
+}  
+  
+.grid {  
+  display: grid;  
+  grid-template-columns: repeat(2, 1fr);  
+  gap: 14px;  
+}  
+  
+.card {  
+  border: 1px solid var(--modal-border);  
+  border-radius: 12px;  
+  overflow: hidden;  
+  background: var(--modal-bg);  
+}  
+  
+.cardHeader {  
+  display: flex;  
+  align-items: flex-start;  
+  gap: 12px;  
+  padding: 14px 18px;  
+  background: color-mix(in srgb, var(--primary-color) 7%, var(--modal-bg));  
+  border-bottom: 1px solid var(--modal-border);  
+  min-height: 80px;  
   align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--modal-input-text, #1e293b);
+}  
+  
+.cardBadge {  
+  flex-shrink: 0;  
+  width: 26px;  
+  height: 26px;  
+  border-radius: 50%;  
+  background: var(--primary-color);  
+  color: #fff;  
+  font-size: 13px;  
+  font-weight: 800;  
+  display: flex;  
+  align-items: center;  
+  justify-content: center;  
+  margin-top: 1px;  
 }
 
-input[type="radio"] {
-  accent-color: var(--primary-color, #1f5c3f);
-  cursor: pointer;
+.radioLabel.radioLabelSuccess:has(input[type="radio"]:checked) {  
+  border-color: var(--btn-approve-fg);  
+  background: var(--btn-approve-fg);  
+  color: #fff;  
+}  
+  
+.radioLabel.radioLabelDanger:has(input[type="radio"]:checked) {  
+  border-color: var(--btn-refuse-fg);  
+  background: var(--btn-refuse-fg);  
+  color: #fff;  
 }
-
-.textarea {
-  width: 100%;
-  resize: vertical;
-  min-height: 95px;
-
-  padding: 10px 12px;
-
-  border: 1px solid var(--modal-input-border, #cbd5e1);
-  border-radius: 8px;
-
-  background: var(--modal-input-bg, #ffffff);
-  color: var(--modal-input-text, #1e293b);
-
-  font-size: 14px;
-  font-family: inherit;
-  line-height: 1.6;
-
-  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
-}
-
-.textarea:hover:not(:focus) {
-  border-color: var(--primary-color);
-  background-color: var(--modal-section-bg, #f8fafc);
-}
-
-.textarea:focus {
-  outline: none;
-  border-color: var(--modal-input-focus-border, #0f766e);
-  box-shadow: 0 0 0 3px var(--modal-input-focus-shadow, rgba(15, 118, 110, 0.1));
-}
-
-
-.textarea::placeholder {
-  color: var(--modal-input-placeholder, #94a3b8);
-}
-
-.expandContent {
-  margin-top: 12px;
-  animation: expandFade 0.25s ease;
-}
-
-@keyframes expandFade {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeSlide {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@media (max-width: 992px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
+  
+.cardTitle {  
+  font-size: 14px;  
+  font-weight: 600;  
+  color: var(--modal-title-text);  
+  line-height: 1.5;  
+  margin: 0;  
+}  
+  
+.cardBody {  
+  padding: 16px 18px;  
+}  
+  
+.section:not(:last-child) {  
+  margin-bottom: 14px;  
+  padding-bottom: 14px;  
+  border-bottom: 1px dashed var(--modal-border);  
+}  
+  
+.label {  
+  display: block;  
+  margin-bottom: 8px;  
+  font-size: 12px;  
+  font-weight: 700;  
+  color: var(--modal-label-text);  
+  text-transform: uppercase;  
+  letter-spacing: 0.5px;  
+}  
+  
+.radioGroup {  
+  display: flex;  
+  gap: 8px;  
+  flex-wrap: wrap;  
+}  
+  
+.radioLabel {  
+  position: relative;  
+  display: inline-flex;  
+  align-items: center;  
+  justify-content: center;  
+  cursor: pointer;  
+  font-size: 13px;  
+  font-weight: 600;  
+  padding: 6px 18px;  
+  border: 1.5px solid var(--modal-border);  
+  border-radius: 8px;  
+  background: var(--modal-bg);  
+  color: var(--modal-label-text);  
+  transition: border-color 0.15s, background 0.15s, color 0.15s;  
+  user-select: none;  
+}  
+  
+.radioLabel:hover {  
+  border-color: var(--primary-color);  
+  color: var(--primary-color);  
+  background: color-mix(in srgb, var(--primary-color) 6%, var(--modal-bg));  
+}  
+  
+.radioLabel input[type="radio"] {  
+  position: absolute;  
+  opacity: 0;  
+  width: 0;  
+  height: 0;  
+  pointer-events: none;  
+}  
+  
+.radioLabel:has(input[type="radio"]:checked) {  
+  border-color: var(--primary-color);  
+  background: var(--primary-color);  
+  color: #fff;  
+  font-weight: 700;  
+}  
+  
+.textarea {  
+  width: 100%;  
+  resize: vertical;  
+  min-height: 88px;  
+  padding: 10px 12px;  
+  border: 1px solid var(--modal-input-border);  
+  border-radius: 8px;  
+  background: var(--modal-input-bg);  
+  color: var(--modal-input-text);  
+  font-size: 14px;  
+  font-family: inherit;  
+  line-height: 1.6;  
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;  
+  box-sizing: border-box;  
+}  
+  
+.textarea:hover:not(:focus) {  
+  border-color: var(--primary-color);  
+}  
+  
+.textarea:focus {  
+  outline: none;  
+  border-color: var(--modal-input-focus-border);  
+  box-shadow: 0 0 0 3px var(--modal-input-focus-shadow);  
+}  
+  
+.textarea::placeholder {  
+  color: var(--modal-input-placeholder);  
+}  
+  
+.expandContent {  
+  margin-top: 12px;  
+  animation: expandFade 0.2s ease;  
+}  
+  
+@keyframes expandFade {  
+  from { opacity: 0; transform: translateY(-6px); }  
+  to   { opacity: 1; transform: translateY(0); }  
+}  
+  
+@keyframes fadeSlide {  
+  from { opacity: 0; transform: translateX(20px); }  
+  to   { opacity: 1; transform: translateX(0); }  
+}  
+  
+@media (max-width: 992px) {  
+  .grid {  
+    grid-template-columns: 1fr;  
+  }  
 }
