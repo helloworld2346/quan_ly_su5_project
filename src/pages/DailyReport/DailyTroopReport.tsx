@@ -56,14 +56,18 @@ export default function DailyTroopReport() {
   const { showError, showSuccess } = useToast();
 
   const maDonViCurrent = account?.donVi?.maDonVi;
+  const capDonVi = account?.donVi?.capDonVi;
 
   const isParentUnit = useMemo(() => {
-    return maDonViCurrent ? maDonViCurrent.split(".").length < 3 : false;
-  }, [maDonViCurrent]);
+    return (
+      capDonVi === "SU_DOAN" ||
+      capDonVi === "TRUNG_DOAN" ||
+      capDonVi === "TIEU_DOAN"
+    );
+  }, [capDonVi]);
 
   const userRole = account?.vaiTro?.tenVaiTro;
   const isChiHuy = normalizeRoleName(userRole ?? undefined) === "Trực chỉ huy";
-  const capDonVi = account?.donVi?.capDonVi;
   const isTacChien =
     normalizeRoleName(userRole ?? undefined) === "Trực ban tác chiến";
   const isTrungDoan = capDonVi === "TRUNG_DOAN";
