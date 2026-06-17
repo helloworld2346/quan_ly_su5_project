@@ -63,18 +63,21 @@
   
 .body {  
   flex: 1;  
-  min-height: 0; 
-  overflow: hidden;
-  padding: 0;
+  min-height: 0;  
+  overflow: hidden;  
+  display: flex;  
+  flex-direction: column;  
+  padding: 0;  
   background-color: var(--modal-bg);  
-} 
+}
 
 .stepsTrack {  
   display: flex;  
   width: 200%;  
-  height: 100%;  
+  flex: 1;  
+  min-height: 0;  
   transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);  
-}  
+}
   
 .stepsTrackStep2 {  
   transform: translateX(-50%);  
@@ -83,6 +86,7 @@
 .stepPanel {  
   width: 50%;  
   flex-shrink: 0;  
+  min-height: 0;  
   overflow-y: auto;  
   padding: 24px;  
 }
@@ -187,13 +191,10 @@
 .tableContainer {  
   border: 1px solid var(--modal-border);  
   border-radius: 8px;  
-  max-height: 44vh;  
-  overflow-y: auto;  
   overflow-x: auto;  
   background-color: var(--modal-bg);  
   margin-bottom: 20px;  
-  -webkit-overflow-scrolling: touch;  
-}  
+}
   
 .table {  
   width: 100%;  

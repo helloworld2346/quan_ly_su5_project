@@ -1,159 +1,133 @@
 import styles from "./DailyReportSummary.module.css";
 
 interface Props {
-    data?: {
-        securityStatus?: string;
-        securityReason?: string;
+  data?: {
+    securityStatus?: string;
+    securityReason?: string;
+    incidentStatus?: string;
+    incidentDetail?: string;
+    advantageStatus?: string;
+    advantageDetail?: string;
+    disadvantageStatus?: string;
+    disadvantageDetail?: string;
+    pendingStatus?: string;
+    pendingDetail?: string;
+  };
+}
 
-        incidentStatus?: string;
-        incidentDetail?: string;
+type Accent = "success" | "danger" | "warning" | "neutral";
 
-        advantageStatus?: string;
-        advantageDetail?: string;
+interface ItemProps {
+  label: string;
+  badge: React.ReactNode;
+  detail?: string;
+  accent: Accent;
+}
 
-        disadvantageStatus?: string;
-        disadvantageDetail?: string;
-
-        pendingStatus?: string;
-        pendingDetail?: string;
-    };
+function SummaryItem({ label, badge, detail, accent }: ItemProps) {
+  return (
+    <div className={`${styles.item} ${styles[`accent_${accent}`]}`}>
+      <div className={styles.itemHeader}>
+        <span className={styles.itemLabel}>{label}</span>
+        {badge}
+      </div>
+      {detail && <div className={styles.itemDetail}>{detail}</div>}
+    </div>
+  );
 }
 
 export default function DailyReportSummary({ data }: Props) {
-    if (!data) return null;
+  if (!data) return null;
 
-    return (
-        <div className={styles.wrapper}>
-            <div className={styles.header}>
-                <h3>TÌNH HÌNH HOẠT ĐỘNG NHIỆM VỤ NGÀY</h3>
-            </div>
-
-            <div className={styles.grid}>
-
-                <div className={styles.card}>
-                    <div className={styles.title}>
-                        Nhiệm vụ các phân đội đóng quân canh phòng và các phân đội khác
-                    </div>
-
-                    <div className={styles.status}>
-                        {data.securityStatus === "safe" ? (
-                            <span className={styles.success}>
-                                ✓ Đảm bảo an toàn
-                            </span>
-                        ) : (
-                            <span className={styles.danger}>
-                                ✕ Không đảm bảo an toàn
-                            </span>
-                        )}
-                    </div>
-
-                    {data.securityReason && (
-                        <div className={styles.content}>
-                            {data.securityReason}
-                        </div>
-                    )}
-                </div>
-
-
-                <div className={styles.card}>
-                    <div className={styles.title}>
-                        Những việc đột xuất xảy ra
-                    </div>
-
-                    <div className={styles.status}>
-                        {data.incidentStatus === "yes" ? (
-                            <span className={styles.warning}>
-                                ⚠ Có phát sinh
-                            </span>
-                        ) : (
-                            <span className={styles.success}>
-                                ✓ Không phát sinh
-                            </span>
-                        )}
-                    </div>
-
-                    {data.incidentDetail && (
-                        <div className={styles.content}>
-                            {data.incidentDetail}
-                        </div>
-                    )}
-                </div>
-
-
-                <div className={styles.card}>
-                    <div className={styles.title}>
-                        Ưu điểm nội vụ, vệ sinh
-                    </div>
-
-                    <div className={styles.status}>
-                        {data.advantageStatus === "yes" ? (
-                            <span className={styles.success}>
-                                ✓ Có
-                            </span>
-                        ) : (
-                            <span className={styles.muted}>
-                                Không có
-                            </span>
-                        )}
-                    </div>
-
-                    {data.advantageDetail && (
-                        <div className={styles.content}>
-                            {data.advantageDetail}
-                        </div>
-                    )}
-                </div>
-
-
-                <div className={styles.card}>
-                    <div className={styles.title}>
-                        Khuyết điểm nội vụ, vệ sinh
-                    </div>
-
-                    <div className={styles.status}>
-                        {data.disadvantageStatus === "yes" ? (
-                            <span className={styles.danger}>
-                                ✕ Có
-                            </span>
-                        ) : (
-                            <span className={styles.success}>
-                                ✓ Không có
-                            </span>
-                        )}
-                    </div>
-
-                    {data.disadvantageDetail && (
-                        <div className={styles.content}>
-                            {data.disadvantageDetail}
-                        </div>
-                    )}
-                </div>
-
-
-                <div className={styles.card}>
-                    <div className={styles.title}>
-                        Những việc cần tiếp tục giải quyết
-                    </div>
-
-                    <div className={styles.status}>
-                        {data.pendingStatus === "yes" ? (
-                            <span className={styles.warning}>
-                                ⚠ Cần xử lý
-                            </span>
-                        ) : (
-                            <span className={styles.success}>
-                                ✓ Không có
-                            </span>
-                        )}
-                    </div>
-
-                    {data.pendingDetail && (
-                        <div className={styles.content}>
-                            {data.pendingDetail}
-                        </div>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
+  return (
+    <div className={styles.wrapper}>
+      <div className={styles.sectionHeader}>
+        <span className={styles.sectionTitle}>
+          Tình hình hoạt động nhiệm vụ ngày
+        </span>
+      </div>
+      <div className={styles.list}>
+        <SummaryItem
+          label="Nhiệm vụ các phân đội đóng quân canh phòng và các phân đội khác"
+          badge={
+            data.securityStatus === "safe" ? (
+              <span className={`${styles.badge} ${styles.badgeSuccess}`}>
+                ✓ Đảm bảo an toàn
+              </span>
+            ) : (
+              <span className={`${styles.badge} ${styles.badgeDanger}`}>
+                ✕ Không đảm bảo an toàn
+              </span>
+            )
+          }
+          detail={data.securityReason}
+          accent={data.securityStatus === "safe" ? "success" : "danger"}
+        />
+        <SummaryItem
+          label="Những việc đột xuất xảy ra"
+          badge={
+            data.incidentStatus === "yes" ? (
+              <span className={`${styles.badge} ${styles.badgeWarning}`}>
+                ⚠ Có phát sinh
+              </span>
+            ) : (
+              <span className={`${styles.badge} ${styles.badgeSuccess}`}>
+                ✓ Không phát sinh
+              </span>
+            )
+          }
+          detail={data.incidentDetail}
+          accent={data.incidentStatus === "yes" ? "warning" : "success"}
+        />
+        <SummaryItem
+          label="Ưu điểm nội vụ, vệ sinh"
+          badge={
+            data.advantageStatus === "yes" ? (
+              <span className={`${styles.badge} ${styles.badgeSuccess}`}>
+                ✓ Có
+              </span>
+            ) : (
+              <span className={`${styles.badge} ${styles.badgeNeutral}`}>
+                — Không có
+              </span>
+            )
+          }
+          detail={data.advantageDetail}
+          accent={data.advantageStatus === "yes" ? "success" : "neutral"}
+        />
+        <SummaryItem
+          label="Khuyết điểm nội vụ, vệ sinh"
+          badge={
+            data.disadvantageStatus === "yes" ? (
+              <span className={`${styles.badge} ${styles.badgeDanger}`}>
+                ✕ Có
+              </span>
+            ) : (
+              <span className={`${styles.badge} ${styles.badgeSuccess}`}>
+                ✓ Không có
+              </span>
+            )
+          }
+          detail={data.disadvantageDetail}
+          accent={data.disadvantageStatus === "yes" ? "danger" : "success"}
+        />
+        <SummaryItem
+          label="Những việc cần tiếp tục giải quyết"
+          badge={
+            data.pendingStatus === "yes" ? (
+              <span className={`${styles.badge} ${styles.badgeWarning}`}>
+                ⚠ Cần xử lý
+              </span>
+            ) : (
+              <span className={`${styles.badge} ${styles.badgeSuccess}`}>
+                ✓ Không có
+              </span>
+            )
+          }
+          detail={data.pendingDetail}
+          accent={data.pendingStatus === "yes" ? "warning" : "success"}
+        />
+      </div>
+    </div>
+  );
 }
