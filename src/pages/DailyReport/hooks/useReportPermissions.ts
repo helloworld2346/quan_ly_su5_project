@@ -7,6 +7,7 @@ export function useReportPermissions(
   capDonVi: string | null | undefined,
   ownReport: ReportRow | null,
   commanderReport: ReportRow | null,
+  hasChildren: boolean,
 ) {
   const normalizedRole = normalizeRoleName(userRole ?? undefined);
   const isChiHuy = normalizedRole === "Trực chỉ huy";
@@ -17,28 +18,38 @@ export function useReportPermissions(
   const isTieuDoan = capDonVi === "TIEU_DOAN";
   const needsApproval = isTrungDoan || isTieuDoan;
   const selfApprove = !needsApproval;
+  const isChiHuyLeaf = isChiHuy && !hasChildren;
+  const isChiHuyApprover = isChiHuy && hasChildren;
 
-  const canApprove = useMemo(() => {
-    if (!commanderReport || commanderReport.notSubmitted) return false;
-    return isChiHuy && commanderReport.status === "Chờ_Duyệt";
-  }, [commanderReport, isChiHuy]);
+const canApprove = useMemo(() => {
+  if (!commanderReport || commanderReport.notSubmitted) return false;
+  return isChiHuyApprover && commanderReport.status === "Chờ_Duyệt";
+}, [commanderReport, isChiHuyApprover]);
 
-  const canRefuse = useMemo(() => {
-    if (!commanderReport || commanderReport.notSubmitted) return false;
-    return isChiHuy && commanderReport.status === "Chờ_Duyệt";
-  }, [commanderReport, isChiHuy]);
+const canRefuse = useMemo(() => {
+  if (!commanderReport || commanderReport.notSubmitted) return false;
+  return isChiHuyApprover && commanderReport.status === "Chờ_Duyệt";
+}, [commanderReport, isChiHuyApprover]);
 
   const canSubmit = useMemo(() => {
-    if ((!isReporter && !selfApprove) || !ownReport || ownReport.notSubmitted)
+    if (
+      (!isReporter && !selfApprove && !isChiHuyLeaf) ||
+      !ownReport ||
+      ownReport.notSubmitted
+    )
       return false;
     return ownReport.status === "Nháp";
-  }, [isReporter, selfApprove, ownReport]);
+  }, [isReporter, selfApprove, isChiHuyLeaf, ownReport]);
 
   const canRecall = useMemo(() => {
-    if ((!isReporter && !selfApprove) || !ownReport || ownReport.notSubmitted)
+    if (
+      (!isReporter && !selfApprove && !isChiHuyLeaf) ||
+      !ownReport ||
+      ownReport.notSubmitted
+    )
       return false;
     return ownReport.status === "Chờ_Duyệt";
-  }, [isReporter, selfApprove, ownReport]);
+  }, [isReporter, selfApprove, isChiHuyLeaf, ownReport]);
 
   return {
     isChiHuy,
@@ -49,6 +60,8 @@ export function useReportPermissions(
     isTieuDoan,
     needsApproval,
     selfApprove,
+    isChiHuyLeaf,
+    isChiHuyApprover,
     canApprove,
     canRefuse,
     canSubmit,

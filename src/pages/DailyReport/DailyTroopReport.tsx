@@ -1,3 +1,4 @@
+// src/pages/DailyReport/DailyTroopReport.tsx
 import { useMemo, useState, useEffect, useRef } from "react";
 import styles from "./DailyTroopReport.module.css";
 import ReportToolbar from "../../components/report/ReportToolbar";
@@ -83,6 +84,10 @@ export default function DailyTroopReport() {
     reportDate,
     showError,
   });
+
+  // ── THÊM: Trực chỉ huy đơn vị lá (Đại đội, Ban, Phòng, Trung đoàn bộ, Tiểu đoàn bộ...)
+  // Phân biệt với Trực chỉ huy cấp trên (Sư đoàn, Trung đoàn, Tiểu đoàn) chỉ phê duyệt
+  const isChiHuyLeaf = isChiHuy && childUnits.length === 0;
 
   const {
     showRefuseDialog,
@@ -262,14 +267,14 @@ export default function DailyTroopReport() {
     return reportData.length > 0 ? reportData[0] : null;
   }, [isChiHuy, isParentUnit, parentReportData, reportData]);
 
-  const {
-    isReporter,
-    canApprove,
-    canRefuse,
-    canSubmit,
-    canRecall,
-    selfApprove,
-  } = useReportPermissions(userRole, capDonVi, ownReport, commanderReport);
+  const { isReporter, canApprove, canRefuse, canSubmit, canRecall } =
+    useReportPermissions(
+      userRole,
+      capDonVi,
+      ownReport,
+      commanderReport,
+      childUnits.length > 0,
+    );
 
   const displayRows = useMemo((): ReportRow[] => {
     if (!isParentUnit || childUnits.length === 0) {
@@ -277,11 +282,11 @@ export default function DailyTroopReport() {
         const rows: ReportRow[] = parentReportData
           ? [{ ...parentReportData, notSubmitted: false }]
           : [];
-        if (isChiHuy && !selfApprove)
+        if (isChiHuy && !isChiHuyLeaf)
           return rows.filter((r) => r.notSubmitted || r.status !== "Nháp");
         return rows;
       }
-      if (isChiHuy && !selfApprove)
+      if (isChiHuy && !isChiHuyLeaf)
         return filteredRows.filter((r) => r.status !== "Nháp");
       return filteredRows;
     }
@@ -349,7 +354,8 @@ export default function DailyTroopReport() {
         : childRows
       : childRows;
 
-    if (isChiHuy && !selfApprove)
+    // ── SỬA: dùng isChiHuyLeaf thay vì !selfApprove
+    if (isChiHuy && !isChiHuyLeaf)
       return allRows.filter((r) => r.notSubmitted || r.status !== "Nháp");
     return allRows;
   }, [
@@ -360,9 +366,9 @@ export default function DailyTroopReport() {
     maDonViCurrent,
     account,
     isChiHuy,
+    isChiHuyLeaf, // ── SỬA: thay selfApprove bằng isChiHuyLeaf
     parentReportData,
     query,
-    selfApprove,
   ]);
 
   const displayTotals = useMemo(() => {
@@ -498,6 +504,7 @@ export default function DailyTroopReport() {
     isParentUnit,
     isReporter,
     isTacChien,
+    isChiHuyLeaf, // ── THÊM
     maDonViCurrent,
     activeMenuUnit,
     menuPosition,
@@ -530,8 +537,9 @@ export default function DailyTroopReport() {
         onQueryChange={setQuery}
         reportDate={reportDate}
         onReportDateChange={setReportDate}
+        // ── SỬA: isChiHuyLeaf được phép thêm báo cáo, isChiHuy cấp trên thì không
         onAddReport={
-          isTrungDoan || (isChiHuy && !selfApprove)
+          isTrungDoan || (isChiHuy && !isChiHuyLeaf)
             ? undefined
             : handleAddReport
         }
