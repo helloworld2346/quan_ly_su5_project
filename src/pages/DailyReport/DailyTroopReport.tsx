@@ -520,15 +520,16 @@ export default function DailyTroopReport() {
   const [nhiemVuData, setNhiemVuData] = useState<NhiemVuNgay | null>(null);
 
   useEffect(() => {
+    if (!ownReport?.idDonBaoCao) return;
     dailyReportService
-      .getNhiemVuNgay()
+      .getNhiemVuNgayByDonBaoCao(ownReport.idDonBaoCao)
       .then((res) => {
-        if (res.success && res.result.length > 0) {
-          setNhiemVuData(res.result[0]);
-        }
+        setNhiemVuData(res.Result ?? null);
       })
-      .catch(() => {});
-  }, []);
+      .catch(() => {
+        setNhiemVuData(null);
+      });
+  }, [ownReport]);
 
   return (
     <section className={styles.report} aria-labelledby="dashboard-page-heading">
@@ -682,7 +683,7 @@ export default function DailyTroopReport() {
           </table>
         )}
       </div>
-      {nhiemVuData && (
+      {nhiemVuData && ownReport && (
         <DailyReportSummary
           data={{
             securityStatus:
