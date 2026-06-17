@@ -71,6 +71,7 @@ export default function DailyTroopReport() {
   const isTacChien =
     normalizeRoleName(userRole ?? undefined) === "Trực ban tác chiến";
   const isTrungDoan = capDonVi === "TRUNG_DOAN";
+  const isTieuDoan = capDonVi === "TIEU_DOAN";
 
   const {
     reportData,
@@ -352,25 +353,26 @@ export default function DailyTroopReport() {
         .toLowerCase()
         .includes(q);
 
-    const allRows = !isTrungDoan
-      ? ownRowMatches
-        ? [ownRow, ...childRows]
-        : childRows
-      : childRows;
+    const allRows =
+      !isTrungDoan && !isTieuDoan
+        ? ownRowMatches
+          ? [ownRow, ...childRows]
+          : childRows
+        : childRows;
 
-    // ── SỬA: dùng isChiHuyLeaf thay vì !selfApprove
     if (isChiHuy && !isChiHuyLeaf)
       return allRows.filter((r) => r.notSubmitted || r.status !== "Nháp");
     return allRows;
   }, [
     isParentUnit,
     isTrungDoan,
+    isTieuDoan,
     childUnits,
     filteredRows,
     maDonViCurrent,
     account,
     isChiHuy,
-    isChiHuyLeaf, // ── SỬA: thay selfApprove bằng isChiHuyLeaf
+    isChiHuyLeaf,
     parentReportData,
     query,
   ]);
@@ -508,7 +510,7 @@ export default function DailyTroopReport() {
     isParentUnit,
     isReporter,
     isTacChien,
-    isChiHuyLeaf, // ── THÊM
+    isChiHuyLeaf,
     maDonViCurrent,
     activeMenuUnit,
     menuPosition,
@@ -542,13 +544,14 @@ export default function DailyTroopReport() {
         onQueryChange={setQuery}
         reportDate={reportDate}
         onReportDateChange={setReportDate}
-        // ── SỬA: isChiHuyLeaf được phép thêm báo cáo, isChiHuy cấp trên thì không
         onAddReport={
-          isTrungDoan || (isChiHuy && !isChiHuyLeaf)
+          isTrungDoan || isTieuDoan || (isChiHuy && !isChiHuyLeaf)
             ? undefined
             : handleAddReport
         }
-        onConsolidate={isTrungDoan ? handleConsolidate : undefined}
+        onConsolidate={
+          isTrungDoan || isTieuDoan ? handleConsolidate : undefined
+        }
         consolidateDisabled={
           !consolidatedData ||
           consolidatedData.submittedCount === 0 ||
