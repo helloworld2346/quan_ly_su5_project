@@ -2,8 +2,6 @@ import { Suspense, useTransition } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import DashboardLayout from "../../components/layout/DashboardLayout/DashboardLayout";
 import LoadingScreen from "../../components/ui/LoadingScreen/LoadingScreen";
-import { useLoading } from "../../context/useLoading";
-
 
 import {
   NAV_PAGE_TITLES,
@@ -21,19 +19,14 @@ type Props = {
 export default function Dashboard({ onLogout }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   const activeId = getIdByPath(location.pathname);
   const navItem = getNavItemById(activeId);
   const ActiveComponent = navItem?.component;
   const loadingText = getLoadingText(activeId);
 
-  const { pendingCount, increment, decrement } = useLoading();
-  const pageLoading = isPending || pendingCount > 0;  
-
   function handleNavigate(id: NavItemId) {
-    increment();
-    decrement();
     startTransition(() => {
       navigate(getPathById(id));
     });
@@ -60,12 +53,6 @@ export default function Dashboard({ onLogout }: Props) {
       >
         <ActiveComponent />
       </Suspense>
-      {pageLoading && (
-        <LoadingScreen
-          title={loadingText.title}
-          subtitle={loadingText.subtitle}
-        />
-      )}
     </DashboardLayout>
   );
 }
