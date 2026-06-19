@@ -690,7 +690,7 @@ export default function DailyTroopReport() {
                 <tbody>
                   {displayRows.length === 0 && !parentReportData ? (
                     <tr className={styles.noReportRow}>
-                      <td colSpan={22}>Không có dữ liệu báo cáo</td>
+                      <td colSpan={22}>Chưa có dữ liệu báo cáo</td>
                     </tr>
                   ) : (
                     <>
@@ -772,7 +772,7 @@ export default function DailyTroopReport() {
           </div>
 
           <div className={styles.summaryList}>
-            {showOwnNhiemVuSummary && ownReport && (
+            {showOwnNhiemVuSummary && ownReport && nhiemVuData ? (
               <DailyReportSummary
                 data={{
                   securityStatus:
@@ -789,29 +789,44 @@ export default function DailyTroopReport() {
                   pendingDetail: nhiemVuData.noiDungCanGiaiQuyet,
                 }}
               />
-            )}
+            ) : null}
 
-            {showChildNhiemVuSummary &&
-              filteredNhiemVuList.map((item) => (
-                <DailyReportSummary
-                  key={item.data.idNhiemvuNgay}
-                  donVi={item.donVi}
-                  data={{
-                    securityStatus:
-                      item.data.nhiemVuPhandoi === "safe" ? "safe" : "unsafe",
-                    incidentStatus: item.data.noiDungDotXuat ? "yes" : "no",
-                    incidentDetail: item.data.noiDungDotXuat,
-                    advantageStatus: item.data.noiDungUuDiem ? "yes" : "no",
-                    advantageDetail: item.data.noiDungUuDiem,
-                    disadvantageStatus: item.data.noiDungKhuyetDiem
-                      ? "yes"
-                      : "no",
-                    disadvantageDetail: item.data.noiDungKhuyetDiem,
-                    pendingStatus: item.data.noiDungCanGiaiQuyet ? "yes" : "no",
-                    pendingDetail: item.data.noiDungCanGiaiQuyet,
-                  }}
-                />
-              ))}
+            {showChildNhiemVuSummary ? (
+              filteredNhiemVuList.length > 0 ? (
+                filteredNhiemVuList.map((item) => (
+                  <DailyReportSummary
+                    key={item.data.idNhiemvuNgay}
+                    donVi={item.donVi}
+                    data={{
+                      securityStatus:
+                        item.data.nhiemVuPhandoi === "safe" ? "safe" : "unsafe",
+                      incidentStatus: item.data.noiDungDotXuat ? "yes" : "no",
+                      incidentDetail: item.data.noiDungDotXuat,
+                      advantageStatus: item.data.noiDungUuDiem ? "yes" : "no",
+                      advantageDetail: item.data.noiDungUuDiem,
+                      disadvantageStatus: item.data.noiDungKhuyetDiem
+                        ? "yes"
+                        : "no",
+                      disadvantageDetail: item.data.noiDungKhuyetDiem,
+                      pendingStatus: item.data.noiDungCanGiaiQuyet
+                        ? "yes"
+                        : "no",
+                      pendingDetail: item.data.noiDungCanGiaiQuyet,
+                    }}
+                  />
+                ))
+              ) : (
+                <div className={styles.emptyState}>
+                  <p>Chưa có dữ liệu báo cáo</p>
+                </div>
+              )
+            ) : null}
+
+            {!showOwnNhiemVuSummary && !showChildNhiemVuSummary && (
+              <div className={styles.emptyState}>
+                <p>Chưa có dữ liệu báo cáo</p>
+              </div>
+            )}
           </div>
         </div>
       </section>

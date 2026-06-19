@@ -1,9 +1,18 @@
 .badge {  
-  display: inline-block;  
-  padding: 4px 12px;  
+  display: inline-flex;  
+  align-items: center;  
+  justify-content: center;  
+  max-width: 100%;  
+  min-width: 0;  
+  padding: 4px 10px;  
   border-radius: 12px;  
   font-size: 12px;  
   font-weight: 600;  
+  line-height: 1.2;  
+  text-align: center;  
+  white-space: normal;  
+  word-break: break-word;  
+  overflow-wrap: anywhere;  
 }  
   
 .pending {  
@@ -24,4 +33,12 @@
 .draft {  
   background: var(--modal-btn-draft-bg);  
   color: var(--modal-btn-draft-text);  
+}  
+  
+@media (max-width: 768px) {  
+  .badge {  
+    padding: 3px 8px;  
+    font-size: 11px;  
+    border-radius: 10px;  
+  }  
 }
