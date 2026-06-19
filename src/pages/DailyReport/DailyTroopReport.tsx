@@ -90,6 +90,7 @@ export default function DailyTroopReport() {
   });
 
   const isChiHuyLeaf = isChiHuy && childUnits.length === 0;
+
   const canAddReport = isChiHuyLeaf && !canConsolidateUnit;
 
   const {
@@ -277,7 +278,6 @@ export default function DailyTroopReport() {
       ownReport,
       commanderReport,
       childUnits.length > 0,
-      canConsolidateUnit,
     );
 
   const displayRows = useMemo((): ReportRow[] => {
