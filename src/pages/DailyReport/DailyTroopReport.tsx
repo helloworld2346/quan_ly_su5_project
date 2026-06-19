@@ -58,20 +58,19 @@ export default function DailyTroopReport() {
   const maDonViCurrent = account?.donVi?.maDonVi;
   const capDonVi = account?.donVi?.capDonVi;
 
-  const isParentUnit = useMemo(() => {
-    return (
-      capDonVi === "SU_DOAN" ||
-      capDonVi === "TRUNG_DOAN" ||
-      capDonVi === "TIEU_DOAN"
-    );
-  }, [capDonVi]);
-
   const userRole = account?.vaiTro?.tenVaiTro;
-  const isChiHuy = normalizeRoleName(userRole ?? undefined) === "Trực chỉ huy";
-  const isTacChien =
-    normalizeRoleName(userRole ?? undefined) === "Trực ban tác chiến";
+  const normalizedRole = normalizeRoleName(userRole ?? undefined);
+  const isChiHuy = normalizedRole === "Trực chỉ huy";
+  const isTacChien = normalizedRole === "Trực ban tác chiến";
+  const isNoiVu = normalizedRole === "Trực ban nội vụ";
   const isTrungDoan = capDonVi === "TRUNG_DOAN";
   const isTieuDoan = capDonVi === "TIEU_DOAN";
+
+  const canConsolidateUnit =
+    (isTacChien && (capDonVi === "SU_DOAN" || capDonVi === "TRUNG_DOAN")) ||
+    (isNoiVu && capDonVi === "TIEU_DOAN");
+
+  const isParentUnit = canConsolidateUnit;
 
   const {
     reportData,
@@ -277,6 +276,7 @@ export default function DailyTroopReport() {
       ownReport,
       commanderReport,
       childUnits.length > 0,
+      canConsolidateUnit,
     );
 
   const displayRows = useMemo((): ReportRow[] => {
@@ -571,14 +571,8 @@ export default function DailyTroopReport() {
         onQueryChange={setQuery}
         reportDate={reportDate}
         onReportDateChange={setReportDate}
-        onAddReport={
-          isTrungDoan || isTieuDoan || (isChiHuy && !isChiHuyLeaf)
-            ? undefined
-            : handleAddReport
-        }
-        onConsolidate={
-          isTrungDoan || isTieuDoan ? handleConsolidate : undefined
-        }
+        onAddReport={isChiHuyLeaf ? handleAddReport : undefined}
+        onConsolidate={canConsolidateUnit ? handleConsolidate : undefined}
         consolidateDisabled={
           !consolidatedData ||
           consolidatedData.submittedCount === 0 ||
@@ -661,7 +655,7 @@ export default function DailyTroopReport() {
                 </tr>
               ) : (
                 <>
-                  {(isTrungDoan || isTieuDoan) && displayRows.length > 0 && (
+                  {canConsolidateUnit && displayRows.length > 0 && (
                     <tr className={styles.separatorRow}>
                       <td colSpan={22}>Báo cáo các đơn vị</td>
                     </tr>
@@ -692,12 +686,13 @@ export default function DailyTroopReport() {
                     />
                   )}
 
-                  {(isTrungDoan || isTieuDoan) && (
+                  {canConsolidateUnit && (
                     <tr className={styles.separatorRow}>
                       <td colSpan={22}>Báo cáo tổng hợp</td>
                     </tr>
                   )}
-                  {(isTrungDoan || isTieuDoan) && parentReportData ? (
+
+                  {canConsolidateUnit && parentReportData ? (
                     <ReportTableRow
                       key={`parent-${parentReportData.idDonBaoCao}`}
                       row={parentReportData}
@@ -705,7 +700,7 @@ export default function DailyTroopReport() {
                       {...sharedRowProps}
                     />
                   ) : (
-                    (isTrungDoan || isTieuDoan) && (
+                    canConsolidateUnit && (
                       <tr className={styles.noConsolidatedRow}>
                         <td colSpan={22}>Chưa có báo cáo tổng hợp</td>
                       </tr>
