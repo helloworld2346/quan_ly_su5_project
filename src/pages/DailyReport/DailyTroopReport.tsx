@@ -67,7 +67,7 @@ export default function DailyTroopReport() {
   const isTieuDoan = capDonVi === "TIEU_DOAN";
 
   const canConsolidateUnit =
-    (isTacChien && (capDonVi === "SU_DOAN" || capDonVi === "TRUNG_DOAN")) ||
+    (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
     (isNoiVu && capDonVi === "TIEU_DOAN");
 
   const isParentUnit = canConsolidateUnit;
@@ -90,6 +90,7 @@ export default function DailyTroopReport() {
   });
 
   const isChiHuyLeaf = isChiHuy && childUnits.length === 0;
+  const canAddReport = isChiHuyLeaf && !canConsolidateUnit;
 
   const {
     showRefuseDialog,
@@ -571,7 +572,7 @@ export default function DailyTroopReport() {
         onQueryChange={setQuery}
         reportDate={reportDate}
         onReportDateChange={setReportDate}
-        onAddReport={isChiHuyLeaf ? handleAddReport : undefined}
+        onAddReport={canAddReport ? handleAddReport : undefined}
         onConsolidate={canConsolidateUnit ? handleConsolidate : undefined}
         consolidateDisabled={
           !consolidatedData ||
@@ -615,7 +616,7 @@ export default function DailyTroopReport() {
         onExportExcel={handleExportExcel}
         isPastDate={isPastDate}
         hasReport={checkIfDateHasReport}
-        showExport={isTacChien}
+        showExport={false}
       />
       <h2 className={styles.sectionTitle}>THỐNG KÊ QUÂN SỐ</h2>
       <div className={styles.tableShell}>
