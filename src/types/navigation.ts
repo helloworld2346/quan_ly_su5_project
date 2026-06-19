@@ -156,7 +156,12 @@ export const STATISTICS_NAV: NavItem = {
   loadingTitle: "Đang tải thống kê",
   loadingSubtitle: "Đang tải dữ liệu…",
   component: ReportStatistics,
-  allowedRoles: ["Quản Trị Viên", "Trực ban tác chiến", "Trực chỉ huy", "Trực ban nội vụ"],
+  allowedRoles: [
+    "Quản Trị Viên",
+    "Trực ban tác chiến",
+    "Trực chỉ huy",
+    "Trực ban nội vụ",
+  ],
 };
 
 export const DUTY_NAV_GROUP = {
@@ -199,7 +204,12 @@ export const SETTINGS_NAV: NavItem = {
   loadingTitle: "Đang tải cài đặt",
   loadingSubtitle: "Đang tải dữ liệu…",
   component: Settings,
-  allowedRoles: ["Quản Trị Viên", "Trực ban tác chiến", "Trực chỉ huy", "Trực ban nội vụ"],
+  allowedRoles: [
+    "Quản Trị Viên",
+    "Trực ban tác chiến",
+    "Trực chỉ huy",
+    "Trực ban nội vụ",
+  ],
 };
 
 export const NAV_PAGE_TITLES: Record<NavItemId, string> = {
@@ -254,16 +264,45 @@ export function getNavGroupLabel(activeId: NavItemId): string | null {
 export function getNavGroupLabelByRole(
   groupLabel: string,
   userRole: string | null,
-  isParentUnit: boolean = false,
+  capDonVi: string | null = null,
+  unitName: string | null = null,
+  unitSymbol: string | null = null,
 ): string {
   const normalized = userRole ? normalizeRoleName(userRole) : null;
+  const normalizedCap = capDonVi ? capDonVi.toUpperCase() : null;
+  const normalizedUnitName = unitName?.toLowerCase() ?? "";
+  const normalizedUnitSymbol = unitSymbol?.toLowerCase() ?? "";
+
+  const isDbOrEbUnit =
+    normalizedUnitSymbol.includes("ebộ") ||
+    normalizedUnitSymbol.includes("ebo") ||
+    normalizedUnitSymbol.includes("dbộ") ||
+    normalizedUnitSymbol.includes("dbo") ||
+    normalizedUnitName.includes("dbộ") ||
+    normalizedUnitName.includes("ebộ") ||
+    normalizedUnitName.includes("dbo") ||
+    normalizedUnitName.includes("ebo") ||
+    normalizedUnitName.includes("d bộ") ||
+    normalizedUnitName.includes("e bộ");
 
   if (groupLabel === "Thống kê") {
-    if (normalized === "Trực ban tác chiến") {
-      return isParentUnit ? "Tổng Hợp - Báo Ban" : "Báo Ban";
+    if (normalized === "Trực chỉ huy") {
+      if (isDbOrEbUnit) return "Thống kê";
+
+      return normalizedCap === "TRUNG_DOAN" || normalizedCap === "TIEU_DOAN"
+        ? "Phê duyệt thống kê"
+        : "Thống kê";
     }
-    if (normalized === "Trực ban nội vụ") return "Báo Ban";
-    if (normalized === "Trực chỉ huy") return "Phê duyệt báo ban";
+
+    if (normalized === "Trực ban nội vụ") {
+      return normalizedCap === "TIEU_DOAN" ? "Tổng hợp, thống kê" : "Thống kê";
+    }
+
+    if (normalized === "Trực ban tác chiến") {
+      return normalizedCap === "SU_DOAN" || normalizedCap === "TRUNG_DOAN"
+        ? "Tổng hợp, thống kê"
+        : "Thống kê";
+    }
   }
 
   return groupLabel;

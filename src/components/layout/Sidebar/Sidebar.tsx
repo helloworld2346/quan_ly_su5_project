@@ -45,20 +45,21 @@ export default function Sidebar({
   collapsed = false,
   onExpand,
 }: Props) {
- const { account, donVi, isParentUnit } = useAuth();
-const unitName = donVi?.tenDonvi || account?.donVi?.tenDonvi || "Chưa phân đơn vị";
+  const { account, donVi } = useAuth();
+  const unitName =
+    donVi?.tenDonvi || account?.donVi?.tenDonvi || "Chưa phân đơn vị";
   const userRole = account?.vaiTro?.tenVaiTro || null;
   const hiddenSidebarIds: NavItemId[] = [
-  "executive-training", // Tổng hợp huấn luyện
-  "report-training", // Thống kê quân số huấn luyện
-  "report-family", // Báo ban thân nhân thăm nuôi
-  "report-communication", // Báo ban thông tin liên lạc
-  "statistics", // Thống kê báo cáo
-];
+    "executive-training", // Tổng hợp huấn luyện
+    "report-training", // Thống kê quân số huấn luyện
+    "report-family", // Báo ban thân nhân thăm nuôi
+    "report-communication", // Báo ban thông tin liên lạc
+    "statistics", // Thống kê báo cáo
+  ];
 
-const allowedNavItems = getNavItemsByRole(userRole).filter(
-  (item) => !hiddenSidebarIds.includes(item.id),
-);
+  const allowedNavItems = getNavItemsByRole(userRole).filter(
+    (item) => !hiddenSidebarIds.includes(item.id),
+  );
 
   const executiveActive = EXECUTIVE_NAV_GROUP.items.some(
     (item) =>
@@ -122,11 +123,17 @@ const allowedNavItems = getNavItemsByRole(userRole).filter(
   );
   const showSettings = allowedNavItems.some((nav) => nav.id === "settings");
 
-  const reportLabel = getNavGroupLabelByRole(
-    REPORT_NAV_GROUP.label,
-    userRole,
-    isParentUnit(),
-  );
+const unitCapDonVi = donVi?.capDonVi ?? account?.donVi?.capDonVi ?? null;
+const unitDisplayName = donVi?.tenDonvi || account?.donVi?.tenDonvi || null;
+const unitSymbol = donVi?.kyhieuDonvi || account?.donVi?.kyhieuDonvi || null;
+
+const reportLabel = getNavGroupLabelByRole(
+  REPORT_NAV_GROUP.label,
+  userRole,
+  unitCapDonVi,
+  unitDisplayName,
+  unitSymbol,
+);
 
   return (
     <>
@@ -139,9 +146,9 @@ const allowedNavItems = getNavItemsByRole(userRole).filter(
           <img src={logo} alt="Logo Sư đoàn 5" className={styles.logo} />
           {!collapsed && (
             <>
-             <p className={styles.unitName}>{unitName}</p>
+              <p className={styles.unitName}>{unitName}</p>
               <p className={styles.appName}>
-              Thống kê quân số. Công tác Đảng. Công tác chính trị 
+                Thống kê quân số. Công tác Đảng. Công tác chính trị
               </p>
             </>
           )}
