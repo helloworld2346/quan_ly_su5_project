@@ -618,140 +618,180 @@ export default function DailyTroopReport() {
         hasReport={checkIfDateHasReport}
         showExport={false}
       />
-      <h2 className={styles.sectionTitle}>THỐNG KÊ QUÂN SỐ</h2>
-      <div className={styles.tableShell}>
-        {loading ? (
-          <div className={styles.loadingState}>Đang tải dữ liệu...</div>
-        ) : (
-          <table className={styles.reportTable}>
-            <colgroup>
-              <col style={{ width: "9%" }} />
-              <col style={{ width: "4%" }} />
-              <col style={{ width: "5%" }} />
-              <col style={{ width: "5%" }} />
-              <col style={{ width: "6%" }} />
-              <col style={{ width: "6%" }} />
-              <col style={{ width: "6%" }} />
-              <col style={{ width: "6%" }} />
-              <col style={{ width: "6%" }} />
-              <col style={{ width: "6%" }} />
-              <col style={{ width: "6%" }} />
-              <col style={{ width: "6%" }} />
-              <col style={{ width: "6%" }} />
-              <col style={{ width: "6%" }} />
-              <col style={{ width: "6%" }} />
-              <col style={{ width: "6%" }} />
-              <col style={{ width: "6%" }} />
-              <col style={{ width: "6%" }} />
-              <col style={{ width: "8%" }} />
-              <col style={{ width: "10%" }} />
-              <col style={{ width: "5%" }} />
-            </colgroup>
-            <ReportTableHeader />
+      <section className={styles.sectionBlock}>
+        <div className={styles.sectionCard}>
+          <div className={styles.sectionHeading}>
+            <div className={styles.sectionTitleGroup}>
+              <span className={styles.sectionKicker}>I</span>
+              <div>
+                <h2 className={styles.sectionTitle}>THỐNG KÊ QUÂN SỐ</h2>
+                <div className={styles.sectionSubTitle}>
+                  Tổng hợp biên chế, quân số và trạng thái báo cáo trong ngày
+                </div>
+              </div>
+            </div>
+          </div>
 
-            <tbody>
-              {displayRows.length === 0 && !parentReportData ? (
-                <tr className={styles.noReportRow}>
-                  <td colSpan={22}>Không có dữ liệu báo cáo</td>
-                </tr>
-              ) : (
-                <>
-                  {canConsolidateUnit && displayRows.length > 0 && (
-                    <tr className={styles.separatorRow}>
-                      <td colSpan={22}>Báo cáo các đơn vị</td>
+          <div className={styles.tableShell}>
+            {loading ? (
+              <div className={styles.loadingState}>Đang tải dữ liệu...</div>
+            ) : (
+              <table className={styles.reportTable}>
+                <colgroup>
+                  <col style={{ width: "9%" }} />
+                  <col style={{ width: "4%" }} />
+                  <col style={{ width: "5%" }} />
+                  <col style={{ width: "5%" }} />
+                  <col style={{ width: "6%" }} />
+                  <col style={{ width: "6%" }} />
+                  <col style={{ width: "6%" }} />
+                  <col style={{ width: "6%" }} />
+                  <col style={{ width: "6%" }} />
+                  <col style={{ width: "6%" }} />
+                  <col style={{ width: "6%" }} />
+                  <col style={{ width: "6%" }} />
+                  <col style={{ width: "6%" }} />
+                  <col style={{ width: "6%" }} />
+                  <col style={{ width: "6%" }} />
+                  <col style={{ width: "6%" }} />
+                  <col style={{ width: "6%" }} />
+                  <col style={{ width: "6%" }} />
+                  <col style={{ width: "8%" }} />
+                  <col style={{ width: "10%" }} />
+                  <col style={{ width: "5%" }} />
+                </colgroup>
+                <ReportTableHeader />
+
+                <tbody>
+                  {displayRows.length === 0 && !parentReportData ? (
+                    <tr className={styles.noReportRow}>
+                      <td colSpan={22}>Không có dữ liệu báo cáo</td>
                     </tr>
-                  )}
-
-                  {displayRows.map((row) => (
-                    <ReportTableRow
-                      key={row.idDonBaoCao}
-                      row={row}
-                      isConsolidatedRow={false}
-                      {...sharedRowProps}
-                    />
-                  ))}
-
-                  {displayRows.some((r) => !r.notSubmitted) && (
-                    <ReportTotalRow
-                      displayTotals={displayTotals}
-                      isParentUnit={isParentUnit}
-                      hasConsolidatedData={Boolean(consolidatedData)}
-                      activeMenuUnit={activeMenuUnit}
-                      menuPosition={menuPosition}
-                      dropdownRef={dropdownRef}
-                      onToggleMenu={handleToggleMenu}
-                      onViewConsolidatedDetail={() => {
-                        setShowConsolidatedDetail(true);
-                        setActiveMenuUnit(null);
-                      }}
-                    />
-                  )}
-
-                  {canConsolidateUnit && (
-                    <tr className={styles.separatorRow}>
-                      <td colSpan={22}>Báo cáo tổng hợp</td>
-                    </tr>
-                  )}
-
-                  {canConsolidateUnit && parentReportData ? (
-                    <ReportTableRow
-                      key={`parent-${parentReportData.idDonBaoCao}`}
-                      row={parentReportData}
-                      isConsolidatedRow={true}
-                      {...sharedRowProps}
-                    />
                   ) : (
-                    canConsolidateUnit && (
-                      <tr className={styles.noConsolidatedRow}>
-                        <td colSpan={22}>Chưa có báo cáo tổng hợp</td>
-                      </tr>
-                    )
+                    <>
+                      {canConsolidateUnit && displayRows.length > 0 && (
+                        <tr className={styles.separatorRow}>
+                          <td colSpan={22}>Báo cáo các đơn vị</td>
+                        </tr>
+                      )}
+
+                      {displayRows.map((row) => (
+                        <ReportTableRow
+                          key={row.idDonBaoCao}
+                          row={row}
+                          isConsolidatedRow={false}
+                          {...sharedRowProps}
+                        />
+                      ))}
+
+                      {displayRows.some((r) => !r.notSubmitted) && (
+                        <ReportTotalRow
+                          displayTotals={displayTotals}
+                          isParentUnit={isParentUnit}
+                          hasConsolidatedData={Boolean(consolidatedData)}
+                          activeMenuUnit={activeMenuUnit}
+                          menuPosition={menuPosition}
+                          dropdownRef={dropdownRef}
+                          onToggleMenu={handleToggleMenu}
+                          onViewConsolidatedDetail={() => {
+                            setShowConsolidatedDetail(true);
+                            setActiveMenuUnit(null);
+                          }}
+                        />
+                      )}
+
+                      {canConsolidateUnit && (
+                        <tr className={styles.separatorRow}>
+                          <td colSpan={22}>Báo cáo tổng hợp</td>
+                        </tr>
+                      )}
+
+                      {canConsolidateUnit && parentReportData ? (
+                        <ReportTableRow
+                          key={`parent-${parentReportData.idDonBaoCao}`}
+                          row={parentReportData}
+                          isConsolidatedRow={true}
+                          {...sharedRowProps}
+                        />
+                      ) : (
+                        canConsolidateUnit && (
+                          <tr className={styles.noConsolidatedRow}>
+                            <td colSpan={22}>Chưa có báo cáo tổng hợp</td>
+                          </tr>
+                        )
+                      )}
+                    </>
                   )}
-                </>
-              )}
-            </tbody>
-          </table>
-        )}
-      </div>
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+      </section>
 
-      {!isParentUnit && nhiemVuData && ownReport && (
-        <DailyReportSummary
-          data={{
-            securityStatus:
-              nhiemVuData.nhiemVuPhandoi === "safe" ? "safe" : "unsafe",
-            incidentStatus: nhiemVuData.noiDungDotXuat ? "yes" : "no",
-            incidentDetail: nhiemVuData.noiDungDotXuat,
-            advantageStatus: nhiemVuData.noiDungUuDiem ? "yes" : "no",
-            advantageDetail: nhiemVuData.noiDungUuDiem,
-            disadvantageStatus: nhiemVuData.noiDungKhuyetDiem ? "yes" : "no",
-            disadvantageDetail: nhiemVuData.noiDungKhuyetDiem,
-            pendingStatus: nhiemVuData.noiDungCanGiaiQuyet ? "yes" : "no",
-            pendingDetail: nhiemVuData.noiDungCanGiaiQuyet,
-          }}
-        />
-      )}
+      <section className={styles.sectionBlock}>
+        <div className={`${styles.sectionCard} ${styles.sectionCardSoft}`}>
+          <div className={styles.sectionHeading}>
+            <div className={styles.sectionTitleGroup}>
+              <span className={styles.sectionKicker}>II</span>
+              <div>
+                <h2 className={styles.sectionTitle}>
+                  TÌNH HÌNH HOẠT ĐỘNG NHIỆM VỤ NGÀY
+                </h2>
+                <div className={styles.sectionSubTitle}>
+                  Nội dung nhiệm vụ, đột xuất, ưu điểm, khuyết điểm và việc cần
+                  giải quyết
+                </div>
+              </div>
+            </div>
+          </div>
 
-      {isParentUnit &&
-        reportData.length > 0 &&
-        nhiemVuList.length > 0 &&
-        nhiemVuList.map((item) => (
-          <DailyReportSummary
-            key={item.data.idNhiemvuNgay}
-            donVi={item.donVi}
-            data={{
-              securityStatus:
-                item.data.nhiemVuPhandoi === "safe" ? "safe" : "unsafe",
-              incidentStatus: item.data.noiDungDotXuat ? "yes" : "no",
-              incidentDetail: item.data.noiDungDotXuat,
-              advantageStatus: item.data.noiDungUuDiem ? "yes" : "no",
-              advantageDetail: item.data.noiDungUuDiem,
-              disadvantageStatus: item.data.noiDungKhuyetDiem ? "yes" : "no",
-              disadvantageDetail: item.data.noiDungKhuyetDiem,
-              pendingStatus: item.data.noiDungCanGiaiQuyet ? "yes" : "no",
-              pendingDetail: item.data.noiDungCanGiaiQuyet,
-            }}
-          />
-        ))}
+          <div className={styles.summaryList}>
+            {!isParentUnit && nhiemVuData && ownReport && (
+              <DailyReportSummary
+                data={{
+                  securityStatus:
+                    nhiemVuData.nhiemVuPhandoi === "safe" ? "safe" : "unsafe",
+                  incidentStatus: nhiemVuData.noiDungDotXuat ? "yes" : "no",
+                  incidentDetail: nhiemVuData.noiDungDotXuat,
+                  advantageStatus: nhiemVuData.noiDungUuDiem ? "yes" : "no",
+                  advantageDetail: nhiemVuData.noiDungUuDiem,
+                  disadvantageStatus: nhiemVuData.noiDungKhuyetDiem
+                    ? "yes"
+                    : "no",
+                  disadvantageDetail: nhiemVuData.noiDungKhuyetDiem,
+                  pendingStatus: nhiemVuData.noiDungCanGiaiQuyet ? "yes" : "no",
+                  pendingDetail: nhiemVuData.noiDungCanGiaiQuyet,
+                }}
+              />
+            )}
+
+            {isParentUnit &&
+              reportData.length > 0 &&
+              nhiemVuList.length > 0 &&
+              nhiemVuList.map((item) => (
+                <DailyReportSummary
+                  key={item.data.idNhiemvuNgay}
+                  donVi={item.donVi}
+                  data={{
+                    securityStatus:
+                      item.data.nhiemVuPhandoi === "safe" ? "safe" : "unsafe",
+                    incidentStatus: item.data.noiDungDotXuat ? "yes" : "no",
+                    incidentDetail: item.data.noiDungDotXuat,
+                    advantageStatus: item.data.noiDungUuDiem ? "yes" : "no",
+                    advantageDetail: item.data.noiDungUuDiem,
+                    disadvantageStatus: item.data.noiDungKhuyetDiem
+                      ? "yes"
+                      : "no",
+                    disadvantageDetail: item.data.noiDungKhuyetDiem,
+                    pendingStatus: item.data.noiDungCanGiaiQuyet ? "yes" : "no",
+                    pendingDetail: item.data.noiDungCanGiaiQuyet,
+                  }}
+                />
+              ))}
+          </div>
+        </div>
+      </section>
 
       {caTrucInfo && (
         <CaTrucInfoCard
