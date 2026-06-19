@@ -966,9 +966,25 @@ export default function DailyTroopReport() {
           maDonViCurrent={account?.donVi?.maDonVi}
           tongQuanSoBienChe={consolidatedData.quanSoTong}
           consolidatedAbsentRows={consolidatedData.absentRows}
-          onSubmit={async (payload) => {
+          onSubmit={async (payload, detailData) => {
             try {
-              await dailyReportService.createReport(payload);
+              const res = await dailyReportService.createReport(payload);
+
+              if (detailData && res.Result?.idDonBaoCao) {
+                try {
+                  await dailyReportService.createNhiemVuNgay({
+                    nhiemVuPhandoi: detailData.securityStatus,
+                    noiDungDotXuat: detailData.incidentDetail,
+                    noiDungUuDiem: detailData.advantageDetail,
+                    noiDungKhuyetDiem: detailData.disadvantageDetail,
+                    noiDungCanGiaiQuyet: detailData.pendingDetail,
+                    donBaoCao: res.Result.idDonBaoCao,
+                  });
+                } catch {
+                  // Không block nếu nhiemvungay fail
+                }
+              }
+
               showSuccess("Tạo báo cáo tổng hợp thành công");
               await handleCreateSuccess();
               setShowConsolidateModal(false);

@@ -309,6 +309,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   };
 
   const handleFinalSubmit = () => {
+    console.log("Dữ liệu nhiệm vụ trước khi lưu:", detailData);
     const step1Error = validateStep1();
     if (step1Error) {
       setValidationError(step1Error);
