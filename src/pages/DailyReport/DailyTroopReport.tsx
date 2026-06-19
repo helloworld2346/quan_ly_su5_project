@@ -50,6 +50,12 @@ export default function DailyTroopReport() {
   );
   const [editNhiemVuId, setEditNhiemVuId] = useState<string | null>(null);
 
+  const [nhiemVuData, setNhiemVuData] = useState<NhiemVuNgay | null>(null);
+
+  const [nhiemVuList, setNhiemVuList] = useState<
+    Array<{ donVi: string; data: NhiemVuNgay }>
+  >([]);
+
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const { account } = useAuth();
@@ -279,6 +285,31 @@ export default function DailyTroopReport() {
       commanderReport,
       childUnits.length > 0,
     );
+
+  const filteredNhiemVuList = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return nhiemVuList;
+    return nhiemVuList.filter((item) =>
+      [item.donVi].join(" ").toLowerCase().includes(q),
+    );
+  }, [nhiemVuList, query]);
+
+  const ownNhiemVuUnitLabel =
+    account?.donVi?.kyhieuDonvi ||
+    account?.donVi?.tenDonvi ||
+    maDonViCurrent ||
+    "";
+
+  const showOwnNhiemVuSummary =
+    !isParentUnit &&
+    nhiemVuData &&
+    [ownNhiemVuUnitLabel]
+      .join(" ")
+      .toLowerCase()
+      .includes(query.trim().toLowerCase());
+
+  const showChildNhiemVuSummary =
+    isParentUnit && reportData.length > 0 && filteredNhiemVuList.length > 0;
 
   const displayRows = useMemo((): ReportRow[] => {
     if (!isParentUnit || childUnits.length === 0) {
@@ -522,12 +553,6 @@ export default function DailyTroopReport() {
     onEditReport: handleEditReport,
   };
 
-  const [nhiemVuData, setNhiemVuData] = useState<NhiemVuNgay | null>(null);
-
-  const [nhiemVuList, setNhiemVuList] = useState<
-    Array<{ donVi: string; data: NhiemVuNgay }>
-  >([]);
-
   useEffect(() => {
     if (!ownReport?.idDonBaoCao) return;
     dailyReportService
@@ -747,7 +772,7 @@ export default function DailyTroopReport() {
           </div>
 
           <div className={styles.summaryList}>
-            {!isParentUnit && nhiemVuData && ownReport && (
+            {showOwnNhiemVuSummary && ownReport && (
               <DailyReportSummary
                 data={{
                   securityStatus:
@@ -766,10 +791,8 @@ export default function DailyTroopReport() {
               />
             )}
 
-            {isParentUnit &&
-              reportData.length > 0 &&
-              nhiemVuList.length > 0 &&
-              nhiemVuList.map((item) => (
+            {showChildNhiemVuSummary &&
+              filteredNhiemVuList.map((item) => (
                 <DailyReportSummary
                   key={item.data.idNhiemvuNgay}
                   donVi={item.donVi}
