@@ -1,3 +1,4 @@
+// src/components/layout/Sidebar/Sidebar.tsx
 import { useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -23,6 +24,7 @@ import {
 import NavGroup from "./NavGroup";
 import { useNavGroupState } from "./useNavGroupState";
 import SidebarTooltip from "./SidebarTooltip";
+import ConfirmDialog from "../../ui/ConfirmDialog/ConfirmDialog";
 import { useAuth } from "../../../context/useAuth";
 
 type Props = {
@@ -49,6 +51,9 @@ export default function Sidebar({
   const unitName =
     donVi?.tenDonvi || account?.donVi?.tenDonvi || "Chưa phân đơn vị";
   const userRole = account?.vaiTro?.tenVaiTro || null;
+  const unitQuota = donVi?.quanSoTong ?? account?.donVi?.quanSoTong ?? 0;
+  const hasQuota = unitQuota > 0;
+
   const hiddenSidebarIds: NavItemId[] = [
     "executive-training", // Tổng hợp huấn luyện
     "report-training", // Thống kê quân số huấn luyện
@@ -75,6 +80,7 @@ export default function Sidebar({
   const [prevCollapsed, setPrevCollapsed] = useState(collapsed);
 
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
+  const [showQuotaDialog, setShowQuotaDialog] = useState(false);
 
   const settingsRef = useRef<HTMLButtonElement>(null);
   const statisticsRef = useRef<HTMLButtonElement>(null);
@@ -101,6 +107,19 @@ export default function Sidebar({
     setTooltip(null);
   };
 
+  const handleNavigate = (id: NavItemId) => {
+    if (id !== SETTINGS_NAV.id && !hasQuota) {
+      setShowQuotaDialog(true);
+      return;
+    }
+    onNavigate(id);
+  };
+
+  const handleQuotaConfirm = () => {
+    setShowQuotaDialog(false);
+    onNavigate(SETTINGS_NAV.id);
+  };
+
   if (collapsed !== prevCollapsed) {
     setPrevCollapsed(collapsed);
     if (!executiveActive) {
@@ -123,17 +142,10 @@ export default function Sidebar({
   );
   const showSettings = allowedNavItems.some((nav) => nav.id === "settings");
 
-const unitCapDonVi = donVi?.capDonVi ?? account?.donVi?.capDonVi ?? null;
-const unitDisplayName = donVi?.tenDonvi || account?.donVi?.tenDonvi || null;
-const unitSymbol = donVi?.kyhieuDonvi || account?.donVi?.kyhieuDonvi || null;
-
-const reportLabel = getNavGroupLabelByRole(
-  REPORT_NAV_GROUP.label,
-  userRole,
-  unitCapDonVi,
-  unitDisplayName,
-  unitSymbol,
-);
+  const reportLabel = getNavGroupLabelByRole(
+    REPORT_NAV_GROUP.label,
+    userRole,
+  );
 
   return (
     <>
@@ -165,7 +177,7 @@ const reportLabel = getNavGroupLabelByRole(
               isOpen={executiveOpen}
               onToggle={() => setExecutiveOpen(!executiveOpen)}
               activeId={activeId}
-              onNavigate={(id) => onNavigate(id as NavItemId)}
+              onNavigate={handleNavigate}
               collapsed={collapsed}
               onExpand={onExpand}
               isActive={executiveActive}
@@ -184,7 +196,7 @@ const reportLabel = getNavGroupLabelByRole(
               isOpen={reportsOpen}
               onToggle={() => setReportsOpen(!reportsOpen)}
               activeId={activeId}
-              onNavigate={(id) => onNavigate(id as NavItemId)}
+              onNavigate={handleNavigate}
               collapsed={collapsed}
               onExpand={onExpand}
               isActive={reportActive}
@@ -202,7 +214,7 @@ const reportLabel = getNavGroupLabelByRole(
                   ? `${styles.navItem} ${styles.active}`
                   : styles.navItem
               }
-              onClick={() => onNavigate(STATISTICS_NAV.id)}
+              onClick={() => handleNavigate(STATISTICS_NAV.id)}
               aria-label={collapsed ? STATISTICS_NAV.label : undefined}
               onMouseEnter={() =>
                 handleTooltipEnter(STATISTICS_NAV.label, statisticsRef)
@@ -224,7 +236,7 @@ const reportLabel = getNavGroupLabelByRole(
               isOpen={dutyOpen}
               onToggle={() => setDutyOpen(!dutyOpen)}
               activeId={activeId}
-              onNavigate={(id) => onNavigate(id as NavItemId)}
+              onNavigate={handleNavigate}
               collapsed={collapsed}
               onExpand={onExpand}
               isActive={dutyActive}
@@ -242,7 +254,7 @@ const reportLabel = getNavGroupLabelByRole(
                   ? `${styles.navItem} ${styles.active}`
                   : styles.navItem
               }
-              onClick={() => onNavigate(SETTINGS_NAV.id)}
+              onClick={() => handleNavigate(SETTINGS_NAV.id)}
               aria-label={collapsed ? SETTINGS_NAV.label : undefined}
               onMouseEnter={() =>
                 handleTooltipEnter(SETTINGS_NAV.label, settingsRef)
@@ -274,6 +286,17 @@ const reportLabel = getNavGroupLabelByRole(
           </button>
         )}
       </aside>
+
+      <ConfirmDialog
+        isOpen={showQuotaDialog}
+        title="Chưa nhập quân số biên chế"
+        message="Vui lòng nhập quân số bên dưới để có thể sử dụng các tính năng báo cáo."
+        confirmText="Vào Cài đặt"
+        cancelText="Đóng"
+        type="warning"
+        onConfirm={handleQuotaConfirm}
+        onCancel={() => setShowQuotaDialog(false)}
+      />
 
       {tooltip && (
         <SidebarTooltip
