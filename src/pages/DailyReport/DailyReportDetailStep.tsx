@@ -192,6 +192,7 @@ export default function DailyReportDetailStep({
             <h3 className={styles.cardTitle}>Ưu điểm và khuyết điểm</h3>
           </div>
           <div className={styles.cardBody}>
+            {/* Ưu điểm */}
             <div className={styles.section}>
               <label className={styles.label}>Ưu điểm</label>
               <div className={styles.radioGroup}>
@@ -220,17 +221,14 @@ export default function DailyReportDetailStep({
                     checked={advantageStatus === "no"}
                     onChange={(e) => {
                       setAdvantageStatus(e.target.value);
-                      setAdvantageDetail("");
-                      notify({
-                        advantageStatus: e.target.value,
-                        advantageDetail: "",
-                      });
+                      notify({ advantageStatus: e.target.value });
                     }}
                   />
                   Không
                 </label>
               </div>
-              {advantageStatus === "yes" && (
+
+              {advantageStatus === "yes" || advantageStatus === "no" ? (
                 <div className={styles.expandContent}>
                   <textarea
                     rows={3}
@@ -243,8 +241,10 @@ export default function DailyReportDetailStep({
                     }}
                   />
                 </div>
-              )}
+              ) : null}
             </div>
+
+            {/* Khuyết điểm */}
             <div className={styles.section}>
               <label className={styles.label}>Khuyết điểm</label>
               <div className={styles.radioGroup}>
@@ -273,17 +273,14 @@ export default function DailyReportDetailStep({
                     checked={disadvantageStatus === "no"}
                     onChange={(e) => {
                       setDisadvantageStatus(e.target.value);
-                      setDisadvantageDetail("");
-                      notify({
-                        disadvantageStatus: e.target.value,
-                        disadvantageDetail: "",
-                      });
+                      notify({ disadvantageStatus: e.target.value });
                     }}
                   />
                   Không
                 </label>
               </div>
-              {disadvantageStatus === "yes" && (
+
+              {disadvantageStatus === "yes" || disadvantageStatus === "no" ? (
                 <div className={styles.expandContent}>
                   <textarea
                     rows={3}
@@ -296,7 +293,7 @@ export default function DailyReportDetailStep({
                     }}
                   />
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
         </div>

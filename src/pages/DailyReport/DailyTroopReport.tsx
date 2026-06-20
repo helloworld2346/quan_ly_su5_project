@@ -949,7 +949,7 @@ export default function DailyTroopReport() {
                             <div className={styles.nhiemVuDetailItem}>
                               <div className={styles.nhiemVuDetailItemHeader}>
                                 <span className={styles.nhiemVuDetailLabel}>
-                                  Ưu điểm nội vụ, vệ sinh
+                                  Ưu điểm
                                 </span>
                                 <span
                                   className={`${styles.nhiemVuDetailBadge} ${
@@ -973,7 +973,7 @@ export default function DailyTroopReport() {
                             <div className={styles.nhiemVuDetailItem}>
                               <div className={styles.nhiemVuDetailItemHeader}>
                                 <span className={styles.nhiemVuDetailLabel}>
-                                  Khuyết điểm nội vụ, vệ sinh
+                                  Khuyết điểm
                                 </span>
                                 <span
                                   className={`${styles.nhiemVuDetailBadge} ${

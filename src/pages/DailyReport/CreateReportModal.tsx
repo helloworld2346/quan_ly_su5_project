@@ -211,14 +211,14 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
     }
 
     if (!data.advantageStatus) return "Mục III - Ưu điểm chưa được chọn.";
-    if (data.advantageStatus === "yes" && !data.advantageDetail.trim()) {
-      return "Mục III - Ưu điểm cần nhập chi tiết khi chọn Có.";
+    if (!data.advantageDetail.trim()) {
+      return "Mục III - Ưu điểm cần nhập chi tiết.";
     }
 
     if (!data.disadvantageStatus)
       return "Mục III - Khuyết điểm chưa được chọn.";
-    if (data.disadvantageStatus === "yes" && !data.disadvantageDetail.trim()) {
-      return "Mục III - Khuyết điểm cần nhập chi tiết khi chọn Có.";
+    if (!data.disadvantageDetail.trim()) {
+      return "Mục III - Khuyết điểm cần nhập chi tiết.";
     }
 
     if (!data.pendingTaskStatus) return "Mục IV chưa được chọn.";
