@@ -88,65 +88,85 @@ export const EXECUTIVE_NAV_GROUP = {
   label: "Tổng hợp điều hành",
   items: [EXECUTIVE_NAV, EXECUTIVE_TRAINING_NAV],
 };
-
-export const REPORT_NAV_GROUP = {
-  label: "Thống kê",
-  labelByRole: {
-    "Trực ban tác chiến": "Báo ban",
-    "Trực ban nội vụ": "Báo ban",
-  },
-  items: [
-    {
-      id: "report-troop" as const,
-      label: "Thống kê quân số hoạt động trong ngày ",
-      path: "/daily-report",
-      loadingTitle: "Đang tải báo cáo ngày",
-      loadingSubtitle: "Đang tải dữ liệu…",
-      component: DailyTroopReport,
-      allowedRoles: [
-        "Quản Trị Viên",
-        "Trực ban tác chiến",
-        "Trực chỉ huy",
-        "Trực ban nội vụ",
-      ],
-    },
-    {
-      id: "report-political-work" as const,
-      label: "Hoạt động Công tác Đảng, công tác chính trị",
-      path: "/political-work-report",
-      loadingTitle: "Đang tải công tác Đảng, công tác chính trị",
-      loadingSubtitle: "Đang tải dữ liệu…",
-      component: PoliticalWorkReport,
-      allowedRoles: ["Quản Trị Viên", "Sư đoàn", "Chỉ huy", "Báo cáo"],
-    },
-    {
-      id: "report-training" as const,
-      label: "Thống kê quân số huấn luyện",
-      path: "/training-report",
-      loadingTitle: "Đang tải báo cáo huấn luyện",
-      loadingSubtitle: "Đang tải dữ liệu…",
-      component: TrainingReport,
-      allowedRoles: ["Quản Trị Viên", "Sư đoàn", "Chỉ huy", "Báo cáo"],
-    },
-    {
-      id: "report-family" as const,
-      label: "Báo ban thân nhân thăm nuôi",
-      path: "/family-report",
-      loadingTitle: "Đang tải báo cáo thân nhân thăm nuôi",
-      loadingSubtitle: "Đang tải dữ liệu…",
-      component: FamilyReport,
-      allowedRoles: ["Quản Trị Viên", "Sư đoàn", "Chỉ huy", "Báo cáo"],
-    },
-    {
-      id: "report-communication" as const,
-      label: "Báo ban thông tin liên lạc",
-      path: "/communication-report",
-      loadingTitle: "Đang tải báo cáo thông tin liên lạc",
-      loadingSubtitle: "Đang tải dữ liệu…",
-      component: CommunicationReport,
-      allowedRoles: ["Quản Trị Viên", "Sư đoàn", "Chỉ huy", "Báo cáo"],
-    },
-  ],
+  
+export const REPORT_NAV_GROUP = {  
+  label: "Thống kê",  
+  labelByRole: {  
+    "Trực ban tác chiến": "Báo ban",  
+    "Trực ban nội vụ": "Báo ban",  
+  },  
+  items: [  
+    {  
+      id: "report-troop" as const,  
+      label: "Thống kê quân số hoạt động trong ngày ",  
+      path: "/daily-report",  
+      loadingTitle: "Đang tải báo cáo ngày",  
+      loadingSubtitle: "Đang tải dữ liệu…",  
+      component: DailyTroopReport,  
+      allowedRoles: [  
+        "Quản Trị Viên",  
+        "Trực ban tác chiến",  
+        "Trực chỉ huy",  
+        "Trực ban nội vụ",  
+      ],  
+    },  
+    {  
+      id: "report-political-work" as const,  
+      label: "Hoạt động Công tác Đảng, công tác chính trị",  
+      path: "/political-work-report",  
+      loadingTitle: "Đang tải công tác Đảng, công tác chính trị",  
+      loadingSubtitle: "Đang tải dữ liệu…",  
+      component: PoliticalWorkReport,  
+      allowedRoles: [  
+        "Quản Trị Viên",  
+        "Trực ban tác chiến",  
+        "Trực chỉ huy",  
+        "Trực ban nội vụ",  
+      ],  
+    },  
+    {  
+      id: "report-training" as const,  
+      label: "Thống kê quân số huấn luyện",  
+      path: "/training-report",  
+      loadingTitle: "Đang tải báo cáo huấn luyện",  
+      loadingSubtitle: "Đang tải dữ liệu…",  
+      component: TrainingReport,  
+      allowedRoles: [  
+        "Quản Trị Viên",  
+        "Trực ban tác chiến",  
+        "Trực chỉ huy",  
+        "Trực ban nội vụ",  
+      ],  
+    },  
+    {  
+      id: "report-family" as const,  
+      label: "Báo ban thân nhân thăm nuôi",  
+      path: "/family-report",  
+      loadingTitle: "Đang tải báo cáo thân nhân thăm nuôi",  
+      loadingSubtitle: "Đang tải dữ liệu…",  
+      component: FamilyReport,  
+      allowedRoles: [  
+        "Quản Trị Viên",  
+        "Trực ban tác chiến",  
+        "Trực chỉ huy",  
+        "Trực ban nội vụ",  
+      ],  
+    },  
+    {  
+      id: "report-communication" as const,  
+      label: "Báo ban thông tin liên lạc",  
+      path: "/communication-report",  
+      loadingTitle: "Đang tải báo cáo thông tin liên lạc",  
+      loadingSubtitle: "Đang tải dữ liệu…",  
+      component: CommunicationReport,  
+      allowedRoles: [  
+        "Quản Trị Viên",  
+        "Trực ban tác chiến",  
+        "Trực chỉ huy",  
+        "Trực ban nội vụ",  
+      ],  
+    },  
+  ],  
 };
 
 export const STATISTICS_NAV: NavItem = {

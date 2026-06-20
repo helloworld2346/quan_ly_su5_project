@@ -329,9 +329,9 @@
 .summaryList {  
   display: flex;  
   flex-direction: column;  
-  gap: 14px;  
-  padding: 16px;  
-}  
+  gap: 8px;  
+  padding: 8px 12px 12px;  
+}
   
 :global([data-theme="dark"]) .sectionCard {  
   background: linear-gradient(180deg, rgba(24, 34, 30, 0.98), rgba(18, 26, 22, 0.98));  
@@ -465,5 +465,211 @@
   
   .reportTable td:nth-child(19) {  
     padding: 6px 4px;  
+  }  
+}
+
+.nhiemVuAccordionItem {  
+  border: 1px solid var(--login-border);  
+  border-radius: 14px;  
+  overflow: hidden;  
+  background: var(--surface-card);  
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);  
+}  
+  
+.nhiemVuAccordionHeader {  
+  width: 100%;  
+  display: flex;  
+  align-items: center;  
+  justify-content: space-between;  
+  gap: 12px;  
+  padding: 14px 18px;  
+  border: 0;  
+  background: color-mix(in srgb, var(--primary-color) 6%, transparent);  
+  cursor: pointer;  
+  text-align: left;  
+  font: inherit;  
+  color: inherit;  
+  transition: background 0.2s ease;  
+}  
+  
+.nhiemVuAccordionHeader:hover {  
+  background: color-mix(in srgb, var(--primary-color) 10%, transparent);  
+}  
+  
+.nhiemVuAccordionHeaderLeft {  
+  min-width: 0;  
+  display: flex;  
+  flex-direction: column;  
+  gap: 4px;  
+}  
+  
+.nhiemVuAccordionHeaderRight {  
+  display: flex;  
+  align-items: center;  
+  gap: 10px;  
+  flex-shrink: 0;  
+}  
+  
+.nhiemVuAccordionTitle {  
+  font-size: 15px;  
+  font-weight: 700;  
+  color: var(--login-text);  
+  line-height: 1.4;  
+}  
+  
+.nhiemVuAccordionSubTitle {  
+  font-size: 12px;  
+  color: var(--login-text-muted);  
+  line-height: 1.4;  
+}  
+  
+.nhiemVuAccordionStatus {  
+  font-size: 12px;  
+  font-weight: 700;  
+  padding: 4px 10px;  
+  border-radius: 999px;  
+  white-space: nowrap;  
+}  
+  
+.nhiemVuAccordionStatusSuccess {  
+  color: var(--btn-approve-fg);  
+  background: var(--btn-approve-bg);  
+  border: 1px solid var(--btn-approve-border);  
+}  
+  
+.nhiemVuAccordionStatusEmpty {  
+  color: var(--login-text-muted);  
+  background: var(--surface-muted);  
+  border: 1px solid var(--login-border);  
+}  
+  
+.nhiemVuAccordionArrow {  
+  color: var(--primary-color);  
+  font-size: 14px;  
+  font-weight: 700;  
+  transition: transform 220ms ease;  
+  transform: rotate(0deg);  
+}  
+  
+.nhiemVuAccordionArrowOpen {  
+  transform: rotate(180deg);  
+}  
+  
+.nhiemVuAccordionBody {  
+  display: grid;  
+  grid-template-rows: 0fr;  
+  opacity: 0;  
+  transition: grid-template-rows 280ms ease, opacity 220ms ease;  
+}  
+  
+.nhiemVuAccordionBodyOpen {  
+  grid-template-rows: 1fr;  
+  opacity: 1;  
+}  
+  
+.nhiemVuAccordionBodyInner {  
+  overflow: hidden;  
+  padding: 0 18px 18px;  
+}  
+  
+.nhiemVuDetailGrid {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 10px;  
+  margin-top: 12px;  
+}  
+  
+.nhiemVuDetailItem {  
+  border: 1px solid var(--login-border);  
+  border-radius: 10px;  
+  background: var(--surface-muted);  
+  padding: 12px 14px;  
+}  
+  
+.nhiemVuDetailItemHeader {  
+  display: flex;  
+  align-items: flex-start;  
+  justify-content: space-between;  
+  gap: 10px;  
+}  
+  
+.nhiemVuDetailLabel {  
+  font-size: 13px;  
+  font-weight: 600;  
+  color: var(--login-text);  
+  line-height: 1.5;  
+}  
+  
+.nhiemVuDetailBadge {  
+  flex-shrink: 0;  
+  font-size: 12px;  
+  font-weight: 700;  
+  padding: 4px 10px;  
+  border-radius: 999px;  
+  white-space: nowrap;  
+}  
+  
+.nhiemVuDetailSuccess {  
+  color: var(--btn-approve-fg);  
+  background: var(--btn-approve-bg);  
+  border: 1px solid var(--btn-approve-border);  
+}  
+  
+.nhiemVuDetailDanger {  
+  color: var(--btn-refuse-fg);  
+  background: var(--btn-refuse-bg);  
+  border: 1px solid var(--btn-refuse-border);  
+}  
+  
+.nhiemVuDetailWarning {  
+  color: var(--btn-recall-fg);  
+  background: var(--btn-recall-bg);  
+  border: 1px solid var(--btn-recall-border);  
+}  
+  
+.nhiemVuDetailNeutral {  
+  color: var(--login-text-muted);  
+  background: var(--surface-muted);  
+  border: 1px solid var(--login-border);  
+}  
+  
+.nhiemVuDetailText {  
+  margin-top: 8px;  
+  font-size: 13px;  
+  line-height: 1.6;  
+  color: var(--login-text-muted);  
+  white-space: pre-wrap;  
+}  
+  
+:global([data-theme="dark"]) .nhiemVuAccordionItem {  
+  background: var(--surface-card);  
+}  
+  
+:global([data-theme="dark"]) .nhiemVuAccordionHeader {  
+  background: color-mix(in srgb, var(--primary-color) 10%, transparent);  
+}  
+  
+@media (max-width: 600px) {  
+  .nhiemVuAccordionHeader {  
+    align-items: flex-start;  
+    flex-wrap: wrap;  
+  }  
+  
+  .nhiemVuAccordionHeaderRight {  
+    width: 100%;  
+    justify-content: space-between;  
+  }  
+  
+  .nhiemVuAccordionStatus {  
+    white-space: normal;  
+  }  
+  
+  .nhiemVuAccordionBodyInner {  
+    padding: 0 12px 12px;  
+  }  
+  
+  .nhiemVuDetailItemHeader {  
+    flex-direction: column;  
+    align-items: flex-start;  
   }  
 }

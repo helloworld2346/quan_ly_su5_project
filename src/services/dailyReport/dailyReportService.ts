@@ -44,6 +44,21 @@ export interface NhiemVuNgaySingleResponse {
   Result: NhiemVuNgay;
 }
 
+export type NhiemVuNgayChildrenItem = {
+  donViResponse: {
+    maDonVi: string;
+    tenDonvi: string;
+    kyhieuDonvi?: string;
+    capDonVi?: string | null;
+  };
+  idNhiemvuNgay: string;
+  nhiemVuPhandoi: string;
+  noiDungDotXuat: string;
+  noiDungUuDiem: string;
+  noiDungKhuyetDiem: string;
+  noiDungCanGiaiQuyet: string;
+};  
+
 export const dailyReportService = {
   createReport: async (
     payload: CreateReportRequest,
@@ -174,6 +189,34 @@ export const dailyReportService = {
         noiDungKhuyetDiem: string;
         noiDungCanGiaiQuyet: string;
       } | null;
+    };
+  },
+
+  searchNhiemVuNgayChildrenByDonVi: async (
+    maDonVi: string,
+    ngayLoc: string,
+  ) => {
+    const response = await apiNoPrefix.get(
+      `/nhiemvungay/search/donvi/${maDonVi}/children`,
+      { params: { ngayLoc } },
+    );
+
+    return response.data as {
+      success: boolean;
+      code: number;
+      Result: Array<{
+        idNhiemvuNgay: string;
+        nhiemVuPhandoi: string;
+        noiDungDotXuat: string;
+        noiDungUuDiem: string;
+        noiDungKhuyetDiem: string;
+        noiDungCanGiaiQuyet: string;
+        donViResponse: {
+          maDonVi: string;
+          tenDonvi: string;
+          kyhieuDonvi?: string;
+        };
+      }>;
     };
   },
 
