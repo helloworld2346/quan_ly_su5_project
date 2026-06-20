@@ -65,6 +65,7 @@ export type ReportItemInput = {
   trucBanTacChien?: string;
   donVi: { maDonVi: string; tenDonvi: string; kyhieuDonvi?: string };
   caTruc: CaTrucInfo;
+  tinhHinhHoatDong?: string;
 };
 
 export interface CreateReportRequest {
@@ -102,6 +103,7 @@ export interface CreateReportResponse {
       kyhieuDonvi?: string;
     };
     caTruc: CaTrucInfo;
+    tinhHinhHoatDong?: string;
   };
 }
 
@@ -140,6 +142,7 @@ export interface UpdateReportResponse {
       kyhieuDonvi?: string;
     };
     caTruc: CaTrucInfo;
+    tinhHinhHoatDong?: string;
   };
 }
 

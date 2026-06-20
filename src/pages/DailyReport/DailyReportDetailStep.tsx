@@ -192,7 +192,6 @@ export default function DailyReportDetailStep({
             <h3 className={styles.cardTitle}>Ưu điểm và khuyết điểm</h3>
           </div>
           <div className={styles.cardBody}>
-            {/* Ưu điểm */}
             <div className={styles.section}>
               <label className={styles.label}>Ưu điểm</label>
               <div className={styles.radioGroup}>
@@ -244,7 +243,6 @@ export default function DailyReportDetailStep({
               ) : null}
             </div>
 
-            {/* Khuyết điểm */}
             <div className={styles.section}>
               <label className={styles.label}>Khuyết điểm</label>
               <div className={styles.radioGroup}>

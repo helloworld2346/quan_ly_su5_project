@@ -8,27 +8,26 @@ import RefuseDialog from "../../components/ui/RefuseDialog/RefuseDialog";
 import { dailyReportService } from "../../services/dailyReport/dailyReportService";
 import { useAuth } from "../../context/useAuth";
 import { useToast } from "../../context/useToast";
-import type {
-  CreateReportResponse,
-  CaTrucInfo,
-  ReportRow,
-  EditModalData,
-} from "../../types/dailyReport";
+import type { ReportRow, EditModalData } from "../../types/dailyReport";
 import { handleApiError } from "../../utils/errorHandler";
 import CaTrucInfoCard from "../../components/ui/CaTrucInfoCard/CaTrucInfoCard";
 import { useReportData } from "./hooks/useReportData";
 import { useReportActions } from "./hooks/useReportActions";
-import {
-  todayIsoDate,
-  normalizeRoleName,
-  EMPTY_VANG,
-} from "../../utils/reportUtils";
+import { todayIsoDate, normalizeRoleName } from "../../utils/reportUtils";
 import ReportTableHeader from "./components/ReportTableHeader";
 import ReportTableRow from "./components/ReportTableRow";
 import ReportTotalRow from "./components/ReportTotalRow";
 import { useReportPermissions } from "./hooks/useReportPermissions";
 import type { NhiemVuNgay } from "../../services/dailyReport/dailyReportService";
 import type { DetailStepData } from "./DailyReportDetailStep";
+import {
+  isPastDateForReport,
+  hasReportForDate,
+  buildDisplayRows,
+  buildDisplayTotals,
+  buildCaTrucInfo,
+  buildTrucInfoFromReport,
+} from "./utils/dailyTroopReportHelpers";
 
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
@@ -171,14 +170,14 @@ export default function DailyTroopReport() {
         }
         setEditNhiemVuId(nv.idNhiemvuNgay);
         setEditNhiemVuData({
-          securityStatus: nv.nhiemVuPhandoi ?? "",
-          incidentStatus: nv.noiDungDotXuat ? "yes" : "",
+          securityStatus: nv.nhiemVuPhandoi === "safe" ? "safe" : "unsafe",
+          incidentStatus: nv.noiDungDotXuat ? "yes" : "no",
           incidentDetail: nv.noiDungDotXuat ?? "",
-          advantageStatus: nv.noiDungUuDiem ? "yes" : "",
+          advantageStatus: nv.noiDungUuDiem ? "yes" : "no",
           advantageDetail: nv.noiDungUuDiem ?? "",
-          disadvantageStatus: nv.noiDungKhuyetDiem ? "yes" : "",
+          disadvantageStatus: nv.noiDungKhuyetDiem ? "yes" : "no",
           disadvantageDetail: nv.noiDungKhuyetDiem ?? "",
-          pendingTaskStatus: nv.noiDungCanGiaiQuyet ? "yes" : "",
+          pendingTaskStatus: nv.noiDungCanGiaiQuyet ? "yes" : "no",
           pendingDetail: nv.noiDungCanGiaiQuyet ?? "",
         });
       } catch {
@@ -188,28 +187,18 @@ export default function DailyTroopReport() {
     })();
   }, [editModalData]);
 
-  const isPastDate = useMemo(() => {
-    const selectedDate = new Date(reportDate + "T00:00:00");
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return selectedDate < today;
-  }, [reportDate]);
+  const isPastDate = isPastDateForReport(reportDate);
 
-  const checkIfDateHasReport = useMemo(() => {
-    if (!maDonViCurrent) return false;
-    const selectedDate = new Date(reportDate);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (selectedDate < today) return true;
-    if (isParentUnit) return parentReportData !== null;
-    return reportData.some((report) => report.donVi === maDonViCurrent);
-  }, [reportData, maDonViCurrent, reportDate, isParentUnit, parentReportData]);
+  const checkIfDateHasReport = hasReportForDate({
+    reportDate,
+    maDonViCurrent,
+    isParentUnit,
+    parentReportData,
+    reportData,
+  });
 
   const handleAddReport = () => {
-    const selectedDate = new Date(reportDate);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (selectedDate < today) {
+    if (isPastDate) {
       showError("Không thể tạo báo cáo cho ngày trong quá khứ!");
       return;
     }
@@ -238,38 +227,6 @@ export default function DailyTroopReport() {
   const handleConsolidate = () => {
     setShowConsolidateModal(true);
   };
-
-  const filteredRows = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return reportData;
-    return reportData.filter((row) => {
-      const rowText = [
-        row.tenDonVi,
-        row.donVi,
-        row.quanSoTong,
-        row.quanSoHienDien,
-        row.quanSoVang,
-        row.vang.hoiThaiNgoaiSuDoan,
-        row.vang.hoiThaiEF,
-        row.vang.xayDungNgoaiSuDoan,
-        row.vang.xayDungEF,
-        row.vang.choHuu,
-        row.vang.nghiTranhThu,
-        row.vang.phep,
-        row.vang.vienNgoaiSuDoan,
-        row.vang.vienEF,
-        row.vang.congTacNgoaiSuDoan,
-        row.vang.congTacSuDoan,
-        row.vang.hocSQ,
-        row.vang.hocCS,
-        row.vang.lyDoVangKhac,
-        row.ghiChu,
-      ]
-        .join(" ")
-        .toLowerCase();
-      return rowText.includes(q);
-    });
-  }, [query, reportData]);
 
   const ownReport = useMemo(() => {
     if (isParentUnit) return parentReportData;
@@ -325,40 +282,31 @@ export default function DailyTroopReport() {
     });
 
     const q = query.trim().toLowerCase();
-    const entries: NhiemVuEntry[] = [];
 
     if (isParentUnit) {
-      if (nhiemVuData) {
-        entries.push({
-          id: maDonViCurrent ?? "own",
-          title: ownNhiemVuUnitLabel,
-          subtitle: maDonViCurrent ?? "",
-          data: buildNhiemVuSummary(nhiemVuData),
-        });
-      }
+      return childUnits
+        .map((unit) => {
+          const matched = nhiemVuList.find((item) => {
+            const itemDonVi = item.donVi.toLowerCase();
+            return (
+              itemDonVi === (unit.kyhieuDonvi ?? "").toLowerCase() ||
+              itemDonVi === unit.tenDonvi.toLowerCase() ||
+              itemDonVi === unit.maDonVi.toLowerCase()
+            );
+          });
 
-      childUnits.forEach((unit) => {
-        const matched = nhiemVuList.find((item) => {
-          const itemDonVi = item.donVi.toLowerCase();
-          return (
-            itemDonVi === (unit.kyhieuDonvi ?? "").toLowerCase() ||
-            itemDonVi === unit.tenDonvi.toLowerCase() ||
-            itemDonVi === unit.maDonVi.toLowerCase()
-          );
-        });
-
-        entries.push({
-          id: unit.maDonVi,
-          title: unit.kyhieuDonvi || unit.maDonVi,
-          subtitle: "",
-          data: matched ? buildNhiemVuSummary(matched.data) : null,
-        });
-      });
-
-      return entries.filter(
-        (item) =>
-          !q || [item.title, item.subtitle].join(" ").toLowerCase().includes(q),
-      );
+          return {
+            id: unit.maDonVi,
+            title: unit.kyhieuDonvi || unit.maDonVi,
+            subtitle: "",
+            data: matched ? buildNhiemVuSummary(matched.data) : null,
+          };
+        })
+        .filter(
+          (item) =>
+            !q ||
+            [item.title, item.subtitle].join(" ").toLowerCase().includes(q),
+        );
     }
 
     if (!nhiemVuData) return [];
@@ -384,213 +332,62 @@ export default function DailyTroopReport() {
     query,
   ]);
 
-  const displayRows = useMemo((): ReportRow[] => {
-    if (!isParentUnit || childUnits.length === 0) {
-      if (isParentUnit && !isTrungDoan) {
-        const rows: ReportRow[] = parentReportData
-          ? [{ ...parentReportData, notSubmitted: false }]
-          : [];
-        if (isChiHuy && !isChiHuyLeaf)
-          return rows.filter((r) => r.notSubmitted || r.status !== "Nháp");
-        return rows;
-      }
-      if (isChiHuy && !isChiHuyLeaf)
-        return filteredRows.filter((r) => r.status !== "Nháp");
-      return filteredRows;
-    }
-
-    const parentRow = parentReportData;
-    const ownRow: ReportRow = parentRow
-      ? { ...parentRow, notSubmitted: false }
-      : {
-          idDonBaoCao: maDonViCurrent!,
-          donVi: maDonViCurrent!,
-          tenDonVi: account?.donVi?.tenDonvi ?? maDonViCurrent!,
-          kyhieuDonVi: account?.donVi?.kyhieuDonvi,
-          quanSoTong: 0,
-          quanSoHienDien: 0,
-          quanSoVang: 0,
-          vang: { ...EMPTY_VANG },
-          chiTietVangList: [],
-          status: "Chưa_Nộp",
-          ghiChu: "",
-          rawItem: {} as CreateReportResponse["Result"],
-          notSubmitted: true,
-        };
-
-    const q = query.trim().toLowerCase();
-    const childRows = childUnits
-      .filter((unit) => {
-        if (!q) return true;
-        const submitted = filteredRows.find((r) => r.donVi === unit.maDonVi);
-        if (submitted) return true;
-        return [unit.tenDonvi, unit.maDonVi, unit.kyhieuDonvi ?? ""]
-          .join(" ")
-          .toLowerCase()
-          .includes(q);
-      })
-      .map((unit) => {
-        const submitted = filteredRows.find((r) => r.donVi === unit.maDonVi);
-        if (submitted) return { ...submitted, notSubmitted: false };
-        return {
-          idDonBaoCao: unit.maDonVi,
-          donVi: unit.maDonVi,
-          tenDonVi: unit.tenDonvi,
-          kyhieuDonVi: unit.kyhieuDonvi,
-          quanSoTong: 0,
-          quanSoHienDien: 0,
-          quanSoVang: 0,
-          vang: { ...EMPTY_VANG },
-          chiTietVangList: [],
-          status: "Chưa_Nộp",
-          ghiChu: "",
-          rawItem: {} as CreateReportResponse["Result"],
-          notSubmitted: true,
-        };
-      });
-
-    const ownRowMatches =
-      !q ||
-      [ownRow.tenDonVi ?? "", ownRow.donVi ?? "", ownRow.kyhieuDonVi ?? ""]
-        .join(" ")
-        .toLowerCase()
-        .includes(q);
-
-    const allRows =
-      !isTrungDoan && !isTieuDoan
-        ? ownRowMatches
-          ? [ownRow, ...childRows]
-          : childRows
-        : childRows;
-
-    if (isChiHuy && !isChiHuyLeaf)
-      return allRows.filter((r) => r.notSubmitted || r.status !== "Nháp");
-    return allRows;
-  }, [
-    isParentUnit,
-    isTrungDoan,
-    isTieuDoan,
-    childUnits,
-    filteredRows,
-    maDonViCurrent,
-    account,
-    isChiHuy,
-    isChiHuyLeaf,
-    parentReportData,
-    query,
-  ]);
-
-  const displayTotals = useMemo(() => {
-    const submittedRows = displayRows.filter((r) => !r.notSubmitted);
-    return submittedRows.reduce(
-      (acc, row) => ({
-        quanSoTong: acc.quanSoTong + row.quanSoTong,
-        quanSoHienDien: acc.quanSoHienDien + row.quanSoHienDien,
-        quanSoVang: acc.quanSoVang + row.quanSoVang,
-        hoiThaiNgoaiSuDoan:
-          acc.hoiThaiNgoaiSuDoan + row.vang.hoiThaiNgoaiSuDoan,
-        hoiThaiEF: acc.hoiThaiEF + row.vang.hoiThaiEF,
-        xayDungNgoaiSuDoan:
-          acc.xayDungNgoaiSuDoan + row.vang.xayDungNgoaiSuDoan,
-        xayDungEF: acc.xayDungEF + row.vang.xayDungEF,
-        choHuu: acc.choHuu + row.vang.choHuu,
-        nghiTranhThu: acc.nghiTranhThu + row.vang.nghiTranhThu,
-        phep: acc.phep + row.vang.phep,
-        vienNgoaiSuDoan: acc.vienNgoaiSuDoan + row.vang.vienNgoaiSuDoan,
-        vienEF: acc.vienEF + row.vang.vienEF,
-        congTacNgoaiSuDoan:
-          acc.congTacNgoaiSuDoan + row.vang.congTacNgoaiSuDoan,
-        congTacSuDoan: acc.congTacSuDoan + row.vang.congTacSuDoan,
-        hocSQ: acc.hocSQ + row.vang.hocSQ,
-        hocCS: acc.hocCS + row.vang.hocCS,
-        lyDoVangKhac: acc.lyDoVangKhac + (row.vang.lyDoVangKhac ?? 0),
+  const displayRows = useMemo(
+    () =>
+      buildDisplayRows({
+        query,
+        reportData,
+        parentReportData,
+        childUnits,
+        isParentUnit,
+        isTrungDoan,
+        isTieuDoan,
+        isChiHuy,
+        isChiHuyLeaf,
+        maDonViCurrent,
+        accountDonVi: account?.donVi,
       }),
-      {
-        quanSoTong: 0,
-        quanSoHienDien: 0,
-        quanSoVang: 0,
-        hoiThaiNgoaiSuDoan: 0,
-        hoiThaiEF: 0,
-        xayDungNgoaiSuDoan: 0,
-        xayDungEF: 0,
-        choHuu: 0,
-        nghiTranhThu: 0,
-        phep: 0,
-        vienNgoaiSuDoan: 0,
-        vienEF: 0,
-        congTacNgoaiSuDoan: 0,
-        congTacSuDoan: 0,
-        hocSQ: 0,
-        hocCS: 0,
-        lyDoVangKhac: 0,
-      },
-    );
-  }, [displayRows]);
+    [
+      query,
+      reportData,
+      parentReportData,
+      childUnits,
+      isParentUnit,
+      isTrungDoan,
+      isTieuDoan,
+      isChiHuy,
+      isChiHuyLeaf,
+      maDonViCurrent,
+      account?.donVi,
+    ],
+  );
 
-  const caTrucInfo = useMemo((): CaTrucInfo | null => {
-    if (isParentUnit) {
-      if (parentReportData)
-        return parentReportData.rawItem.caTruc as CaTrucInfo;
-      if (isTacChien && caTrucFromApi) {
-        return {
-          idCatruc: caTrucFromApi.idCatruc,
-          matkhau: caTrucFromApi.matkhau,
-          ghichu: caTrucFromApi.ghichu ?? undefined,
-          ngaytruc: caTrucFromApi.ngaytruc,
-          trucChiHuy: {
-            tenNguoitruc: caTrucFromApi.trucChiHuy.tenNguoitruc,
-            capbacNguoitruc: caTrucFromApi.trucChiHuy.capbacNguoitruc,
-            chucvuNguoitruc: caTrucFromApi.trucChiHuy.chucvuNguoitruc,
-            sodienthoai: caTrucFromApi.trucChiHuy.sodienthoai,
-          },
-          trucBanTacChien: {
-            tenNguoitruc: caTrucFromApi.trucBanTacChien.tenNguoitruc,
-            capbacNguoitruc: caTrucFromApi.trucBanTacChien.capbacNguoitruc,
-            chucvuNguoitruc: caTrucFromApi.trucBanTacChien.chucvuNguoitruc,
-            sodienthoai: caTrucFromApi.trucBanTacChien.sodienthoai,
-          },
-        };
-      }
-      return null;
-    }
-    return reportData.length > 0
-      ? (reportData[0].rawItem.caTruc as CaTrucInfo)
-      : null;
-  }, [isParentUnit, isTacChien, parentReportData, reportData, caTrucFromApi]);
+  const displayTotals = useMemo(
+    () => buildDisplayTotals(displayRows),
+    [displayRows],
+  );
 
-  const trucInfoFromReport = useMemo(() => {
-    const currentReport = isParentUnit
-      ? parentReportData
-      : reportData.length > 0
-        ? reportData[0]
-        : null;
-    if (!currentReport) return null;
-    let trucChiHuy: {
-      tenNguoitruc?: string;
-      capbacNguoitruc?: string;
-      chucvuNguoitruc?: string;
-      sodienthoai?: string;
-    } | null = null;
-    let trucBanTacChien: {
-      tenNguoitruc?: string;
-      capbacNguoitruc?: string;
-      chucvuNguoitruc?: string;
-      sodienthoai?: string;
-    } | null = null;
-    try {
-      if (currentReport.rawItem.trucBanChiHuy)
-        trucChiHuy = JSON.parse(currentReport.rawItem.trucBanChiHuy);
-    } catch {
-      /* ignore */
-    }
-    try {
-      if (currentReport.rawItem.trucBanTacChien)
-        trucBanTacChien = JSON.parse(currentReport.rawItem.trucBanTacChien);
-    } catch {
-      /* ignore */
-    }
-    return { trucChiHuy, trucBanTacChien };
-  }, [isParentUnit, parentReportData, reportData]);
+  const caTrucInfo = useMemo(
+    () =>
+      buildCaTrucInfo({
+        isParentUnit,
+        isTacChien,
+        parentReportData,
+        reportData,
+        caTrucFromApi,
+      }),
+    [isParentUnit, isTacChien, parentReportData, reportData, caTrucFromApi],
+  );
+
+  const trucInfoFromReport = useMemo(
+    () =>
+      buildTrucInfoFromReport({
+        isParentUnit,
+        parentReportData,
+        reportData,
+      }),
+    [isParentUnit, parentReportData, reportData],
+  );
 
   const currentEditingReport = useMemo(() => {
     if (!editModalData) return null;
@@ -606,6 +403,21 @@ export default function DailyTroopReport() {
     }
     return null;
   }, [editModalData, reportData, parentReportData]);
+
+  const currentEditingDetail = useMemo<DetailStepData | null>(() => {
+    const raw = (currentEditingReport as { tinhHinhHoatDong?: string } | null)
+      ?.tinhHinhHoatDong;
+
+    if (raw) {
+      try {
+        return JSON.parse(raw) as DetailStepData;
+      } catch {
+        // fallback bên dưới
+      }
+    }
+
+    return editNhiemVuData;
+  }, [currentEditingReport, editNhiemVuData]);
 
   const totalRequiredCount = childUnits.length;
 
@@ -862,199 +674,181 @@ export default function DailyTroopReport() {
 
           <div className={styles.summaryList}>
             {nhiemVuEntries.length > 0 ? (
-              <>
-                {canConsolidateUnit && (
-                  <div className={styles.nhiemVuSectionNote}>
-                    Báo cáo các đơn vị
-                  </div>
-                )}
+              nhiemVuEntries.map((item) => {
+                const isOpen = openNhiemVuId === item.id;
 
-                {nhiemVuEntries.map((item) => {
-                  const isOpen = openNhiemVuId === item.id;
-
-                  return (
-                    <div key={item.id} className={styles.nhiemVuAccordionItem}>
-                      <button
-                        type="button"
-                        className={styles.nhiemVuAccordionHeader}
-                        onClick={() =>
-                          setOpenNhiemVuId((prev) =>
-                            prev === item.id ? null : item.id,
-                          )
-                        }
-                        aria-expanded={isOpen}
-                      >
-                        <div className={styles.nhiemVuAccordionHeaderLeft}>
-                          <div className={styles.nhiemVuAccordionTitle}>
-                            {item.title}
-                          </div>
-                        </div>
-
-                        <div className={styles.nhiemVuAccordionHeaderRight}>
-                          <span
-                            className={`${styles.nhiemVuAccordionStatus} ${
-                              item.data
-                                ? styles.nhiemVuAccordionStatusSuccess
-                                : styles.nhiemVuAccordionStatusEmpty
-                            }`}
-                          >
-                            {item.data
-                              ? "Đã nộp"
-                              : "Đơn vị này chưa nộp báo cáo"}
-                          </span>
-                          <span
-                            className={`${styles.nhiemVuAccordionArrow} ${
-                              isOpen ? styles.nhiemVuAccordionArrowOpen : ""
-                            }`}
-                          >
-                            ▾
-                          </span>
-                        </div>
-                      </button>
-
-                      <div
-                        className={`${styles.nhiemVuAccordionBody} ${
-                          isOpen ? styles.nhiemVuAccordionBodyOpen : ""
-                        }`}
-                      >
-                        <div className={styles.nhiemVuAccordionBodyInner}>
-                          {item.data ? (
-                            <div className={styles.nhiemVuDetailGrid}>
-                              <div className={styles.nhiemVuDetailItem}>
-                                <div className={styles.nhiemVuDetailItemHeader}>
-                                  <span className={styles.nhiemVuDetailLabel}>
-                                    Nhiệm vụ các phân đội đóng quân canh phòng
-                                    và các phân đội khác
-                                  </span>
-                                  <span
-                                    className={`${styles.nhiemVuDetailBadge} ${
-                                      item.data.securityStatus === "safe"
-                                        ? styles.nhiemVuDetailSuccess
-                                        : styles.nhiemVuDetailDanger
-                                    }`}
-                                  >
-                                    {item.data.securityStatus === "safe"
-                                      ? "✓ Đảm bảo an toàn"
-                                      : "✕ Không đảm bảo an toàn"}
-                                  </span>
-                                </div>
-                              </div>
-
-                              <div className={styles.nhiemVuDetailItem}>
-                                <div className={styles.nhiemVuDetailItemHeader}>
-                                  <span className={styles.nhiemVuDetailLabel}>
-                                    Những việc đột xuất xảy ra
-                                  </span>
-                                  <span
-                                    className={`${styles.nhiemVuDetailBadge} ${
-                                      item.data.incidentStatus === "yes"
-                                        ? styles.nhiemVuDetailWarning
-                                        : styles.nhiemVuDetailSuccess
-                                    }`}
-                                  >
-                                    {item.data.incidentStatus === "yes"
-                                      ? "⚠ Có phát sinh"
-                                      : "✓ Không phát sinh"}
-                                  </span>
-                                </div>
-                                {item.data.incidentDetail && (
-                                  <div className={styles.nhiemVuDetailText}>
-                                    {item.data.incidentDetail}
-                                  </div>
-                                )}
-                              </div>
-
-                              <div className={styles.nhiemVuDetailItem}>
-                                <div className={styles.nhiemVuDetailItemHeader}>
-                                  <span className={styles.nhiemVuDetailLabel}>
-                                    Ưu điểm
-                                  </span>
-                                  <span
-                                    className={`${styles.nhiemVuDetailBadge} ${
-                                      item.data.advantageStatus === "yes"
-                                        ? styles.nhiemVuDetailSuccess
-                                        : styles.nhiemVuDetailNeutral
-                                    }`}
-                                  >
-                                    {item.data.advantageStatus === "yes"
-                                      ? "✓ Có"
-                                      : "— Không có"}
-                                  </span>
-                                </div>
-                                {item.data.advantageDetail && (
-                                  <div className={styles.nhiemVuDetailText}>
-                                    {item.data.advantageDetail}
-                                  </div>
-                                )}
-                              </div>
-
-                              <div className={styles.nhiemVuDetailItem}>
-                                <div className={styles.nhiemVuDetailItemHeader}>
-                                  <span className={styles.nhiemVuDetailLabel}>
-                                    Khuyết điểm
-                                  </span>
-                                  <span
-                                    className={`${styles.nhiemVuDetailBadge} ${
-                                      item.data.disadvantageStatus === "yes"
-                                        ? styles.nhiemVuDetailDanger
-                                        : styles.nhiemVuDetailSuccess
-                                    }`}
-                                  >
-                                    {item.data.disadvantageStatus === "yes"
-                                      ? "✕ Có"
-                                      : "✓ Không có"}
-                                  </span>
-                                </div>
-                                {item.data.disadvantageDetail && (
-                                  <div className={styles.nhiemVuDetailText}>
-                                    {item.data.disadvantageDetail}
-                                  </div>
-                                )}
-                              </div>
-
-                              <div className={styles.nhiemVuDetailItem}>
-                                <div className={styles.nhiemVuDetailItemHeader}>
-                                  <span className={styles.nhiemVuDetailLabel}>
-                                    Những việc cần tiếp tục giải quyết
-                                  </span>
-                                  <span
-                                    className={`${styles.nhiemVuDetailBadge} ${
-                                      item.data.pendingStatus === "yes"
-                                        ? styles.nhiemVuDetailWarning
-                                        : styles.nhiemVuDetailSuccess
-                                    }`}
-                                  >
-                                    {item.data.pendingStatus === "yes"
-                                      ? "⚠ Cần xử lý"
-                                      : "✓ Không có"}
-                                  </span>
-                                </div>
-                                {item.data.pendingDetail && (
-                                  <div className={styles.nhiemVuDetailText}>
-                                    {item.data.pendingDetail}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          ) : (
-                            <div className={styles.emptyState}>
-                              <p>Đơn vị này chưa nộp báo cáo</p>
-                            </div>
-                          )}
+                return (
+                  <div key={item.id} className={styles.nhiemVuAccordionItem}>
+                    <button
+                      type="button"
+                      className={styles.nhiemVuAccordionHeader}
+                      onClick={() =>
+                        setOpenNhiemVuId((prev) =>
+                          prev === item.id ? null : item.id,
+                        )
+                      }
+                      aria-expanded={isOpen}
+                    >
+                      <div className={styles.nhiemVuAccordionHeaderLeft}>
+                        <div className={styles.nhiemVuAccordionTitle}>
+                          {item.title}
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
 
-                {canConsolidateUnit && (
-                  <div className={styles.nhiemVuSectionNote}>
-                    {parentReportData
-                      ? "Báo cáo tổng hợp"
-                      : "Chưa có báo cáo tổng hợp"}
+                      <div className={styles.nhiemVuAccordionHeaderRight}>
+                        <span
+                          className={`${styles.nhiemVuAccordionStatus} ${
+                            item.data
+                              ? styles.nhiemVuAccordionStatusSuccess
+                              : styles.nhiemVuAccordionStatusEmpty
+                          }`}
+                        >
+                          {item.data ? "Đã nộp" : "Đơn vị này chưa nộp báo cáo"}
+                        </span>
+                        <span
+                          className={`${styles.nhiemVuAccordionArrow} ${
+                            isOpen ? styles.nhiemVuAccordionArrowOpen : ""
+                          }`}
+                        >
+                          ▾
+                        </span>
+                      </div>
+                    </button>
+
+                    <div
+                      className={`${styles.nhiemVuAccordionBody} ${
+                        isOpen ? styles.nhiemVuAccordionBodyOpen : ""
+                      }`}
+                    >
+                      <div className={styles.nhiemVuAccordionBodyInner}>
+                        {item.data ? (
+                          <div className={styles.nhiemVuDetailGrid}>
+                            <div className={styles.nhiemVuDetailItem}>
+                              <div className={styles.nhiemVuDetailItemHeader}>
+                                <span className={styles.nhiemVuDetailLabel}>
+                                  Nhiệm vụ các phân đội đóng quân canh phòng và
+                                  các phân đội khác
+                                </span>
+                                <span
+                                  className={`${styles.nhiemVuDetailBadge} ${
+                                    item.data.securityStatus === "safe"
+                                      ? styles.nhiemVuDetailSuccess
+                                      : styles.nhiemVuDetailDanger
+                                  }`}
+                                >
+                                  {item.data.securityStatus === "safe"
+                                    ? "✓ Đảm bảo an toàn"
+                                    : "✕ Không đảm bảo an toàn"}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className={styles.nhiemVuDetailItem}>
+                              <div className={styles.nhiemVuDetailItemHeader}>
+                                <span className={styles.nhiemVuDetailLabel}>
+                                  Những việc đột xuất xảy ra
+                                </span>
+                                <span
+                                  className={`${styles.nhiemVuDetailBadge} ${
+                                    item.data.incidentStatus === "yes"
+                                      ? styles.nhiemVuDetailWarning
+                                      : styles.nhiemVuDetailSuccess
+                                  }`}
+                                >
+                                  {item.data.incidentStatus === "yes"
+                                    ? "⚠ Có phát sinh"
+                                    : "✓ Không phát sinh"}
+                                </span>
+                              </div>
+                              {item.data.incidentDetail && (
+                                <div className={styles.nhiemVuDetailText}>
+                                  {item.data.incidentDetail}
+                                </div>
+                              )}
+                            </div>
+
+                            <div className={styles.nhiemVuDetailItem}>
+                              <div className={styles.nhiemVuDetailItemHeader}>
+                                <span className={styles.nhiemVuDetailLabel}>
+                                  Ưu điểm
+                                </span>
+                                <span
+                                  className={`${styles.nhiemVuDetailBadge} ${
+                                    item.data.advantageStatus === "yes"
+                                      ? styles.nhiemVuDetailSuccess
+                                      : styles.nhiemVuDetailNeutral
+                                  }`}
+                                >
+                                  {item.data.advantageStatus === "yes"
+                                    ? "✓ Có"
+                                    : "— Không có"}
+                                </span>
+                              </div>
+                              {item.data.advantageDetail && (
+                                <div className={styles.nhiemVuDetailText}>
+                                  {item.data.advantageDetail}
+                                </div>
+                              )}
+                            </div>
+
+                            <div className={styles.nhiemVuDetailItem}>
+                              <div className={styles.nhiemVuDetailItemHeader}>
+                                <span className={styles.nhiemVuDetailLabel}>
+                                  Khuyết điểm
+                                </span>
+                                <span
+                                  className={`${styles.nhiemVuDetailBadge} ${
+                                    item.data.disadvantageStatus === "yes"
+                                      ? styles.nhiemVuDetailDanger
+                                      : styles.nhiemVuDetailSuccess
+                                  }`}
+                                >
+                                  {item.data.disadvantageStatus === "yes"
+                                    ? "✕ Có"
+                                    : "✓ Không có"}
+                                </span>
+                              </div>
+                              {item.data.disadvantageDetail && (
+                                <div className={styles.nhiemVuDetailText}>
+                                  {item.data.disadvantageDetail}
+                                </div>
+                              )}
+                            </div>
+
+                            <div className={styles.nhiemVuDetailItem}>
+                              <div className={styles.nhiemVuDetailItemHeader}>
+                                <span className={styles.nhiemVuDetailLabel}>
+                                  Những việc cần tiếp tục giải quyết
+                                </span>
+                                <span
+                                  className={`${styles.nhiemVuDetailBadge} ${
+                                    item.data.pendingStatus === "yes"
+                                      ? styles.nhiemVuDetailWarning
+                                      : styles.nhiemVuDetailSuccess
+                                  }`}
+                                >
+                                  {item.data.pendingStatus === "yes"
+                                    ? "⚠ Cần xử lý"
+                                    : "✓ Không có"}
+                                </span>
+                              </div>
+                              {item.data.pendingDetail && (
+                                <div className={styles.nhiemVuDetailText}>
+                                  {item.data.pendingDetail}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className={styles.emptyState}>
+                            <p>Đơn vị này chưa nộp báo cáo</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                )}
-              </>
+                );
+              })
             ) : (
               <div className={styles.emptyState}>
                 <p>Chưa có dữ liệu báo cáo</p>
@@ -1150,7 +944,7 @@ export default function DailyTroopReport() {
           isOpen={Boolean(editModalData)}
           onClose={() => setEditModalData(null)}
           initialData={currentEditingReport}
-          initialDetailData={editNhiemVuData}
+          initialDetailData={currentEditingDetail}
           onSubmit={async (payload, detailData) => {
             try {
               await dailyReportService.updateReport(editModalData.reportId, {

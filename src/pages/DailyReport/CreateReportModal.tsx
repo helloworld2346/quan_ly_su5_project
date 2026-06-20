@@ -77,19 +77,41 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       });
   }, [initialData?.idDonBaoCao]);
 
+  function parseDetailStepData(raw?: string | null): DetailStepData | null {
+    if (!raw) return null;
+
+    try {
+      const parsed = JSON.parse(raw) as Partial<DetailStepData>;
+
+      return {
+        securityStatus: parsed.securityStatus ?? "",
+        incidentStatus: parsed.incidentStatus ?? "",
+        incidentDetail: parsed.incidentDetail ?? "",
+        advantageStatus: parsed.advantageStatus ?? "",
+        advantageDetail: parsed.advantageDetail ?? "",
+        disadvantageStatus: parsed.disadvantageStatus ?? "",
+        disadvantageDetail: parsed.disadvantageDetail ?? "",
+        pendingTaskStatus: parsed.pendingTaskStatus ?? "",
+        pendingDetail: parsed.pendingDetail ?? "",
+      };
+    } catch {
+      return null;
+    }
+  }
+
   const detailFromInitialData = useMemo<DetailStepData | null>(() => {
     if (initialDetailData) return initialDetailData;
     if (!nhiemVuInitialData) return null;
 
     return {
-      securityStatus: nhiemVuInitialData.nhiemVuPhandoi ?? "",
-      incidentStatus: nhiemVuInitialData.noiDungDotXuat ? "yes" : "",
+      securityStatus: nhiemVuInitialData.nhiemVuPhandoi ?? "unsafe",
+      incidentStatus: nhiemVuInitialData.noiDungDotXuat ? "yes" : "no",
       incidentDetail: nhiemVuInitialData.noiDungDotXuat ?? "",
-      advantageStatus: nhiemVuInitialData.noiDungUuDiem ? "yes" : "",
+      advantageStatus: nhiemVuInitialData.noiDungUuDiem ? "yes" : "no",
       advantageDetail: nhiemVuInitialData.noiDungUuDiem ?? "",
-      disadvantageStatus: nhiemVuInitialData.noiDungKhuyetDiem ? "yes" : "",
+      disadvantageStatus: nhiemVuInitialData.noiDungKhuyetDiem ? "yes" : "no",
       disadvantageDetail: nhiemVuInitialData.noiDungKhuyetDiem ?? "",
-      pendingTaskStatus: nhiemVuInitialData.noiDungCanGiaiQuyet ? "yes" : "",
+      pendingTaskStatus: nhiemVuInitialData.noiDungCanGiaiQuyet ? "yes" : "no",
       pendingDetail: nhiemVuInitialData.noiDungCanGiaiQuyet ?? "",
     };
   }, [initialDetailData, nhiemVuInitialData]);
