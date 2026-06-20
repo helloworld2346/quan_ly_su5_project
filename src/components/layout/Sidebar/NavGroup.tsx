@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { IconProp } from "@fortawesome/fontawesome-svg-core";
 
 import styles from "./Sidebar.module.css";
-import type { NavItem } from "../../../types/navigation";
+import type { NavItem, NavItemId } from "../../../types/navigation";
 
 type Props = {
   label: string;
@@ -12,7 +12,7 @@ type Props = {
   isOpen: boolean;
   onToggle: () => void;
   activeId: string;
-  onNavigate: (id: string) => void;
+  onNavigate: (id: NavItemId) => void;
   collapsed: boolean;
   onExpand?: () => void;
   isActive: boolean;
@@ -114,10 +114,7 @@ export default function NavGroup({
 
       {isOpen && !collapsed && (
         <ul ref={listRef} className={styles.subList}>
-          <div
-            ref={connectorRef}
-            className={styles.activeConnector}
-          />
+          <div ref={connectorRef} className={styles.activeConnector} />
           {items.map((item) => (
             <li key={item.id} className={styles.subLi}>
               <button
