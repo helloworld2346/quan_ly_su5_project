@@ -1,4 +1,3 @@
-// src/pages/DailyReport/DailyTroopReport.tsx
 import { useMemo, useState, useEffect, useRef } from "react";
 import styles from "./DailyTroopReport.module.css";
 import ReportToolbar from "../../components/report/ReportToolbar";
@@ -28,6 +27,8 @@ import {
   buildCaTrucInfo,
   buildTrucInfoFromReport,
 } from "./utils/dailyTroopReportHelpers";
+import { normalizeReportStatus } from "../../utils/reportStatus";
+
 
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
@@ -261,11 +262,22 @@ export default function DailyTroopReport() {
     pendingDetail: string;
   };
 
+  function getNhiemVuReportStatusLabel(row: ReportRow | null | undefined) {
+    const normalized = normalizeReportStatus(
+      row?.notSubmitted ? "Nháp" : (row?.status ?? ""),
+    );
+
+    if (normalized === "Chờ_Duyệt") return "Chờ duyệt";
+    if (normalized === "Đã_Duyệt") return "Đã duyệt";
+    return "Chưa nộp";
+  }
+
   type NhiemVuEntry = {
     id: string;
     title: string;
     subtitle: string;
     data: NhiemVuSummary | null;
+    reportStatusLabel: string;
   };
 
   const nhiemVuEntries = useMemo<NhiemVuEntry[]>(() => {
@@ -282,32 +294,59 @@ export default function DailyTroopReport() {
     });
 
     const q = query.trim().toLowerCase();
+    const entries: NhiemVuEntry[] = [];
 
     if (isParentUnit) {
-      return childUnits
-        .map((unit) => {
-          const matched = nhiemVuList.find((item) => {
-            const itemDonVi = item.donVi.toLowerCase();
-            return (
-              itemDonVi === (unit.kyhieuDonvi ?? "").toLowerCase() ||
-              itemDonVi === unit.tenDonvi.toLowerCase() ||
-              itemDonVi === unit.maDonVi.toLowerCase()
-            );
-          });
+      const ownReportRow = parentReportData ?? null;
 
-          return {
-            id: unit.maDonVi,
-            title: unit.kyhieuDonvi || unit.maDonVi,
-            subtitle: "",
-            data: matched ? buildNhiemVuSummary(matched.data) : null,
-          };
-        })
-        .filter(
-          (item) =>
-            !q ||
-            [item.title, item.subtitle].join(" ").toLowerCase().includes(q),
-        );
+      if (nhiemVuData) {
+        entries.push({
+          id: maDonViCurrent ?? "own",
+          title: ownNhiemVuUnitLabel,
+          subtitle: maDonViCurrent ?? "",
+          data: buildNhiemVuSummary(nhiemVuData),
+          reportStatusLabel: getNhiemVuReportStatusLabel(ownReportRow),
+        });
+      } else {
+        entries.push({
+          id: maDonViCurrent ?? "own",
+          title: ownNhiemVuUnitLabel,
+          subtitle: maDonViCurrent ?? "",
+          data: null,
+          reportStatusLabel: getNhiemVuReportStatusLabel(ownReportRow),
+        });
+      }
+
+      childUnits.forEach((unit) => {
+        const matched = nhiemVuList.find((item) => {
+          const itemDonVi = item.donVi.toLowerCase();
+          return (
+            itemDonVi === (unit.kyhieuDonvi ?? "").toLowerCase() ||
+            itemDonVi === unit.tenDonvi.toLowerCase() ||
+            itemDonVi === unit.maDonVi.toLowerCase()
+          );
+        });
+
+        const childReportRow =
+          reportData.find((row) => row.donVi === unit.maDonVi) ?? null;
+
+        entries.push({
+          id: unit.maDonVi,
+          title: unit.kyhieuDonvi || unit.maDonVi,
+          subtitle: "",
+          data: matched ? buildNhiemVuSummary(matched.data) : null,
+          reportStatusLabel: getNhiemVuReportStatusLabel(childReportRow),
+        });
+      });
+
+      return entries.filter(
+        (item) =>
+          !q || [item.title, item.subtitle].join(" ").toLowerCase().includes(q),
+      );
     }
+
+    const ownReportRow =
+      reportData.find((row) => row.donVi === maDonViCurrent) ?? null;
 
     if (!nhiemVuData) return [];
 
@@ -317,6 +356,7 @@ export default function DailyTroopReport() {
         title: ownNhiemVuUnitLabel,
         subtitle: maDonViCurrent ?? "",
         data: buildNhiemVuSummary(nhiemVuData),
+        reportStatusLabel: getNhiemVuReportStatusLabel(ownReportRow),
       },
     ].filter(
       (item) =>
@@ -329,7 +369,9 @@ export default function DailyTroopReport() {
     nhiemVuData,
     nhiemVuList,
     ownNhiemVuUnitLabel,
+    parentReportData,
     query,
+    reportData,
   ]);
 
   const displayRows = useMemo(
@@ -698,12 +740,12 @@ export default function DailyTroopReport() {
                       <div className={styles.nhiemVuAccordionHeaderRight}>
                         <span
                           className={`${styles.nhiemVuAccordionStatus} ${
-                            item.data
+                            item.reportStatusLabel === "Đã duyệt"
                               ? styles.nhiemVuAccordionStatusSuccess
                               : styles.nhiemVuAccordionStatusEmpty
                           }`}
                         >
-                          {item.data ? "Đã nộp" : "Đơn vị này chưa nộp báo cáo"}
+                          {item.reportStatusLabel}
                         </span>
                         <span
                           className={`${styles.nhiemVuAccordionArrow} ${

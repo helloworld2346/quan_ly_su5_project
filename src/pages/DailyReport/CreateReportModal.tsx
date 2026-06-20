@@ -77,27 +77,6 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       });
   }, [initialData?.idDonBaoCao]);
 
-  function parseDetailStepData(raw?: string | null): DetailStepData | null {
-    if (!raw) return null;
-
-    try {
-      const parsed = JSON.parse(raw) as Partial<DetailStepData>;
-
-      return {
-        securityStatus: parsed.securityStatus ?? "",
-        incidentStatus: parsed.incidentStatus ?? "",
-        incidentDetail: parsed.incidentDetail ?? "",
-        advantageStatus: parsed.advantageStatus ?? "",
-        advantageDetail: parsed.advantageDetail ?? "",
-        disadvantageStatus: parsed.disadvantageStatus ?? "",
-        disadvantageDetail: parsed.disadvantageDetail ?? "",
-        pendingTaskStatus: parsed.pendingTaskStatus ?? "",
-        pendingDetail: parsed.pendingDetail ?? "",
-      };
-    } catch {
-      return null;
-    }
-  }
 
   const detailFromInitialData = useMemo<DetailStepData | null>(() => {
     if (initialDetailData) return initialDetailData;
