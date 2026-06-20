@@ -60,7 +60,7 @@ export default function DailyTroopReport() {
   >([]);
 
   const [openNhiemVuId, setOpenNhiemVuId] = useState<string | null>(null);
-  
+
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const { account } = useAuth();
@@ -291,12 +291,7 @@ export default function DailyTroopReport() {
       childUnits.length > 0,
     );
 
-  const ownNhiemVuUnitLabel =
-    account?.donVi?.kyhieuDonvi ||
-    account?.donVi?.tenDonvi ||
-    maDonViCurrent ||
-    "";
-
+  const ownNhiemVuUnitLabel = account?.donVi?.kyhieuDonvi || "";
   type NhiemVuSummary = {
     securityStatus: "safe" | "unsafe";
     incidentStatus: "yes" | "no";
@@ -345,10 +340,8 @@ export default function DailyTroopReport() {
 
           return {
             id: unit.maDonVi,
-            title: unit.tenDonvi,
-            subtitle: [unit.kyhieuDonvi, unit.maDonVi]
-              .filter(Boolean)
-              .join(" · "),
+            title: unit.kyhieuDonvi || unit.maDonVi,
+            subtitle: "",
             data: matched ? buildNhiemVuSummary(matched.data) : null,
           };
         })
@@ -381,7 +374,7 @@ export default function DailyTroopReport() {
     ownNhiemVuUnitLabel,
     query,
   ]);
-  
+
   const displayRows = useMemo((): ReportRow[] => {
     if (!isParentUnit || childUnits.length === 0) {
       if (isParentUnit && !isTrungDoan) {
@@ -653,7 +646,7 @@ export default function DailyTroopReport() {
 
         const list = (res.Result ?? []).map((item) => ({
           maDonVi: item.donViResponse.maDonVi,
-          donVi: item.donViResponse.kyhieuDonvi || item.donViResponse.tenDonvi,
+          donVi: item.donViResponse.kyhieuDonvi || "",
           data: {
             idNhiemvuNgay: item.idNhiemvuNgay,
             nhiemVuPhandoi: item.nhiemVuPhandoi,
@@ -879,11 +872,6 @@ export default function DailyTroopReport() {
                         <div className={styles.nhiemVuAccordionTitle}>
                           {item.title}
                         </div>
-                        {item.subtitle && (
-                          <div className={styles.nhiemVuAccordionSubTitle}>
-                            {item.subtitle}
-                          </div>
-                        )}
                       </div>
 
                       <div className={styles.nhiemVuAccordionHeaderRight}>
