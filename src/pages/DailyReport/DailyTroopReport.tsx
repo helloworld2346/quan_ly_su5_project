@@ -19,6 +19,7 @@ import ReportTotalRow from "./components/ReportTotalRow";
 import { useReportPermissions } from "./hooks/useReportPermissions";
 import type { NhiemVuNgay } from "../../services/dailyReport/dailyReportService";
 import type { DetailStepData } from "./DailyReportDetailStep";
+import { normalizeReportStatus } from "../../utils/reportStatus";
 import {
   isPastDateForReport,
   hasReportForDate,
@@ -27,8 +28,10 @@ import {
   buildCaTrucInfo,
   buildTrucInfoFromReport,
 } from "./utils/dailyTroopReportHelpers";
-import { normalizeReportStatus } from "../../utils/reportStatus";
-
+import {
+  filterVisibleNhiemVuEntries,
+  filterVisibleReportRows,
+} from "./utils/dailyTroopReportVisibility";
 
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
@@ -102,7 +105,29 @@ export default function DailyTroopReport() {
 
   const isChiHuyLeaf = isChiHuy && childUnits.length === 0;
 
-  const canAddReport = isChiHuyLeaf || (isTacChien && capDonVi === "SU_DOAN");
+const normalizedUnitName = (account?.donVi?.tenDonvi ?? "").toLowerCase();
+const normalizedUnitSymbol = (account?.donVi?.kyhieuDonvi ?? "").toLowerCase();
+
+const isDbOrEbUnit =
+  normalizedUnitName.includes("d bộ") ||
+  normalizedUnitName.includes("e bộ") ||
+  normalizedUnitName.includes("dbộ") ||
+  normalizedUnitName.includes("ebộ") ||
+  normalizedUnitName.includes("dbo") ||
+  normalizedUnitName.includes("ebo") ||
+  normalizedUnitSymbol.includes("d bộ") ||
+  normalizedUnitSymbol.includes("e bộ") ||
+  normalizedUnitSymbol.includes("dbộ") ||
+  normalizedUnitSymbol.includes("ebộ") ||
+  normalizedUnitSymbol.includes("dbo") ||
+  normalizedUnitSymbol.includes("ebo");
+
+const shouldHideDraftAndUnsubmitted =
+  isChiHuy && (isTrungDoan || isTieuDoan) && !isDbOrEbUnit;
+
+const canAddReport =
+  !shouldHideDraftAndUnsubmitted &&
+  (isChiHuyLeaf || (isTacChien && capDonVi === "SU_DOAN"));
 
   const {
     showRefuseDialog,
@@ -339,9 +364,13 @@ export default function DailyTroopReport() {
         });
       });
 
-      return entries.filter(
-        (item) =>
-          !q || [item.title, item.subtitle].join(" ").toLowerCase().includes(q),
+      return filterVisibleNhiemVuEntries(
+        entries.filter(
+          (item) =>
+            !q ||
+            [item.title, item.subtitle].join(" ").toLowerCase().includes(q),
+        ),
+        shouldHideDraftAndUnsubmitted,
       );
     }
 
@@ -350,17 +379,20 @@ export default function DailyTroopReport() {
 
     if (!nhiemVuData) return [];
 
-    return [
-      {
-        id: maDonViCurrent ?? "own",
-        title: ownNhiemVuUnitLabel,
-        subtitle: maDonViCurrent ?? "",
-        data: buildNhiemVuSummary(nhiemVuData),
-        reportStatusLabel: getNhiemVuReportStatusLabel(ownReportRow),
-      },
-    ].filter(
-      (item) =>
-        !q || [item.title, item.subtitle].join(" ").toLowerCase().includes(q),
+    return filterVisibleNhiemVuEntries(
+      [
+        {
+          id: maDonViCurrent ?? "own",
+          title: ownNhiemVuUnitLabel,
+          subtitle: maDonViCurrent ?? "",
+          data: buildNhiemVuSummary(nhiemVuData),
+          reportStatusLabel: getNhiemVuReportStatusLabel(ownReportRow),
+        },
+      ].filter(
+        (item) =>
+          !q || [item.title, item.subtitle].join(" ").toLowerCase().includes(q),
+      ),
+      shouldHideDraftAndUnsubmitted,
     );
   }, [
     childUnits,
@@ -372,23 +404,27 @@ export default function DailyTroopReport() {
     parentReportData,
     query,
     reportData,
+    shouldHideDraftAndUnsubmitted,
   ]);
 
   const displayRows = useMemo(
     () =>
-      buildDisplayRows({
-        query,
-        reportData,
-        parentReportData,
-        childUnits,
-        isParentUnit,
-        isTrungDoan,
-        isTieuDoan,
-        isChiHuy,
-        isChiHuyLeaf,
-        maDonViCurrent,
-        accountDonVi: account?.donVi,
-      }),
+      filterVisibleReportRows(
+        buildDisplayRows({
+          query,
+          reportData,
+          parentReportData,
+          childUnits,
+          isParentUnit,
+          isTrungDoan,
+          isTieuDoan,
+          isChiHuy,
+          isChiHuyLeaf,
+          maDonViCurrent,
+          accountDonVi: account?.donVi,
+        }),
+        shouldHideDraftAndUnsubmitted,
+      ),
     [
       query,
       reportData,
@@ -401,6 +437,7 @@ export default function DailyTroopReport() {
       isChiHuyLeaf,
       maDonViCurrent,
       account?.donVi,
+      shouldHideDraftAndUnsubmitted,
     ],
   );
 
@@ -561,9 +598,11 @@ export default function DailyTroopReport() {
                 : "Chưa có báo cáo con"
         }
         onApprove={
-          canApprove
-            ? () => handleApproveReport(commanderReport!.idDonBaoCao)
-            : undefined
+          shouldHideDraftAndUnsubmitted
+            ? undefined
+            : canApprove
+              ? () => handleApproveReport(commanderReport!.idDonBaoCao)
+              : undefined
         }
         onRefuse={
           canRefuse
@@ -571,9 +610,11 @@ export default function DailyTroopReport() {
             : undefined
         }
         onSubmit={
-          canSubmit
-            ? () => handleSubmitReport(ownReport!.idDonBaoCao)
-            : undefined
+          shouldHideDraftAndUnsubmitted
+            ? undefined
+            : canSubmit
+              ? () => handleSubmitReport(ownReport!.idDonBaoCao)
+              : undefined
         }
         onRecall={
           canRecall
