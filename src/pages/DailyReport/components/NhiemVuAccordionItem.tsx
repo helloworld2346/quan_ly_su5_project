@@ -1,16 +1,5 @@
 import styles from "../DailyTroopReport.module.css";
-
-export type NhiemVuSummary = {
-  securityStatus: "safe" | "unsafe";
-  incidentStatus: "yes" | "no";
-  incidentDetail: string;
-  advantageStatus: "yes" | "no";
-  advantageDetail: string;
-  disadvantageStatus: "yes" | "no";
-  disadvantageDetail: string;
-  pendingStatus: "yes" | "no";
-  pendingDetail: string;
-};
+import type { NhiemVuSummary } from "../dailyTroopReportTypes";
 
 type Props = {
   label: string;

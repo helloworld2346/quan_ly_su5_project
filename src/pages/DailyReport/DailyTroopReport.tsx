@@ -1,35 +1,26 @@
-import { useMemo, useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./DailyTroopReport.module.css";
+
 import ReportToolbar from "../../components/report/ReportToolbar";
 import TroopDetailModal from "./TroopDetailModal";
 import CreateReportModal from "./CreateReportModal";
 import RefuseDialog from "../../components/ui/RefuseDialog/RefuseDialog";
+import CaTrucInfoCard from "../../components/ui/CaTrucInfoCard/CaTrucInfoCard";
+
 import { dailyReportService } from "../../services/dailyReport/dailyReportService";
 import { useAuth } from "../../context/useAuth";
 import { useToast } from "../../context/useToast";
-import type { ReportRow, EditModalData } from "../../types/dailyReport";
-import { handleApiError } from "../../utils/errorHandler";
-import CaTrucInfoCard from "../../components/ui/CaTrucInfoCard/CaTrucInfoCard";
-import { useReportData } from "./hooks/useReportData";
-import { useReportActions } from "./hooks/useReportActions";
-import { todayIsoDate, normalizeRoleName } from "../../utils/reportUtils";
-import { useReportPermissions } from "./hooks/useReportPermissions";
+import type { EditModalData, ReportRow } from "../../types/dailyReport";
 import type { NhiemVuNgay } from "../../services/dailyReport/dailyReportService";
 import type { DetailStepData } from "./DailyReportDetailStep";
-import { normalizeReportStatus } from "../../utils/reportStatus";
-import {
-  isPastDateForReport,
-  hasReportForDate,
-  buildDisplayRows,
-  buildDisplayTotals,
-  buildCaTrucInfo,
-  buildTrucInfoFromReport,
-} from "./utils/dailyTroopReportHelpers";
-import {
-  filterVisibleNhiemVuEntries,
-  filterVisibleReportRows,
-  shouldHideDraftAndUnsubmittedForCommander,
-} from "./utils/dailyTroopReportVisibility";
+import { handleApiError } from "../../utils/errorHandler";
+import { todayIsoDate, normalizeRoleName } from "../../utils/reportUtils";
+
+import { useReportData } from "./hooks/useReportData";
+import { useReportActions } from "./hooks/useReportActions";
+import { useReportPermissions } from "./hooks/useReportPermissions";
+import { shouldHideDraftAndUnsubmittedForCommander } from "./utils/dailyTroopReportVisibility";
+import { useDailyTroopReportViewModel } from "./hooks/useDailyTroopReportViewModel";
 
 import DailyTroopStatisticsSection from "./components/DailyTroopStatisticsSection";
 import DailyTroopNhiemVuSection from "./components/DailyTroopNhiemVuSection";
@@ -61,7 +52,6 @@ export default function DailyTroopReport() {
       data: NhiemVuNgay;
     }>
   >([]);
-
   const [openNhiemVuId, setOpenNhiemVuId] = useState<string | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -77,14 +67,6 @@ export default function DailyTroopReport() {
   const isChiHuy = normalizedRole === "Trực chỉ huy";
   const isTacChien = normalizedRole === "Trực ban tác chiến";
   const isNoiVu = normalizedRole === "Trực ban nội vụ";
-  const isTrungDoan = capDonVi === "TRUNG_DOAN";
-  const isTieuDoan = capDonVi === "TIEU_DOAN";
-
-  const canConsolidateUnit =
-    (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
-    (isNoiVu && capDonVi === "TIEU_DOAN");
-
-  const isParentUnit = canConsolidateUnit;
 
   const {
     reportData,
@@ -97,24 +79,21 @@ export default function DailyTroopReport() {
     fetchReports,
   } = useReportData({
     maDonViCurrent,
-    isParentUnit,
+    isParentUnit:
+      (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
+      (isNoiVu && capDonVi === "TIEU_DOAN"),
     isTacChien,
     reportDate,
     showError,
   });
 
   const isChiHuyLeaf = isChiHuy && childUnits.length === 0;
-
   const shouldHideDraftAndUnsubmitted =
     shouldHideDraftAndUnsubmittedForCommander({
       isChiHuy,
       capDonVi,
       accountDonVi: account?.donVi,
     });
-
-  const canAddReport =
-    !shouldHideDraftAndUnsubmitted &&
-    (isChiHuyLeaf || (isTacChien && capDonVi === "SU_DOAN"));
 
   const {
     showRefuseDialog,
@@ -127,22 +106,71 @@ export default function DailyTroopReport() {
     handleRefuseCancel,
   } = useReportActions({ showSuccess, showError, fetchReports });
 
+  const {
+    isParentUnit,
+    ownReport,
+    commanderReport,
+    canAddReport,
+    isPastDate,
+    checkIfDateHasReport,
+    displayRows,
+    displayTotals,
+    caTrucInfo,
+    trucInfoFromReport,
+    currentEditingReport,
+    currentEditingDetail,
+    nhiemVuEntries,
+    shouldHideConsolidatedSections,
+    totalRequiredCount,
+  } = useDailyTroopReportViewModel({
+    query,
+    reportDate,
+    account,
+    isChiHuy,
+    isTacChien,
+    isNoiVu,
+    capDonVi,
+    maDonViCurrent,
+    reportData,
+    parentReportData,
+    childUnits,
+    caTrucFromApi,
+    consolidatedData,
+    editModalData,
+    editNhiemVuData,
+    shouldHideDraftAndUnsubmitted,
+    nhiemVuData,
+    nhiemVuList,
+  });
+
+  const { isReporter, canApprove, canRefuse, canSubmit, canRecall } =
+    useReportPermissions(
+      userRole,
+      capDonVi,
+      ownReport,
+      commanderReport,
+      childUnits.length > 0,
+    );
+
   const handleToggleMenu = (
     event: React.MouseEvent<HTMLButtonElement>,
     menuKey: string,
   ) => {
     event.stopPropagation();
+
     if (activeMenuUnit === menuKey) {
       setActiveMenuUnit(null);
-    } else {
-      const rect = event.currentTarget.getBoundingClientRect();
-      const menuHeight = 120;
-      const spaceBelow = window.innerHeight - rect.bottom;
-      const top =
-        spaceBelow < menuHeight ? rect.top - menuHeight - 4 : rect.bottom + 4;
-      setMenuPosition({ top, left: rect.right - 230 });
-      setActiveMenuUnit(menuKey);
+      return;
     }
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const menuHeight = 120;
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const top =
+      spaceBelow < menuHeight ? rect.top - menuHeight - 4 : rect.bottom + 4;
+
+    setMenuPosition({ top, left: rect.right - 230 });
+    setActiveMenuUnit(menuKey);
   };
 
   useEffect(() => {
@@ -154,10 +182,12 @@ export default function DailyTroopReport() {
         setActiveMenuUnit(null);
       }
     }
+
     if (activeMenuUnit) {
       document.addEventListener("mousedown", handleGlobalClose);
       window.addEventListener("scroll", handleGlobalClose, { passive: true });
     }
+
     return () => {
       document.removeEventListener("mousedown", handleGlobalClose);
       window.removeEventListener("scroll", handleGlobalClose);
@@ -171,16 +201,19 @@ export default function DailyTroopReport() {
         setEditNhiemVuId(null);
         return;
       }
+
       try {
         const res = await dailyReportService.getNhiemVuNgayByDonBaoCao(
           editModalData.reportId,
         );
         const nv = res.Result;
+
         if (!nv) {
           setEditNhiemVuData(null);
           setEditNhiemVuId(null);
           return;
         }
+
         setEditNhiemVuId(nv.idNhiemvuNgay);
         setEditNhiemVuData({
           securityStatus: nv.nhiemVuPhandoi === "safe" ? "safe" : "unsafe",
@@ -200,326 +233,22 @@ export default function DailyTroopReport() {
     })();
   }, [editModalData]);
 
-  const isPastDate = isPastDateForReport(reportDate);
-
-  const checkIfDateHasReport = hasReportForDate({
-    reportDate,
-    maDonViCurrent,
-    isParentUnit,
-    parentReportData,
-    reportData,
-  });
-
-  const handleAddReport = () => {
-    if (isPastDate) {
-      showError("Không thể tạo báo cáo cho ngày trong quá khứ!");
-      return;
-    }
-    if (checkIfDateHasReport) {
-      showError("Ngày này đã tồn tại báo cáo hoặc không hợp lệ!");
-      return;
-    }
-    setShowCreateModal(true);
-  };
-
-  const handleCreateSuccess = () => {
-    fetchReports();
-  };
-
-  const handleEditReport = (row: ReportRow) => {
-    setEditModalData({ reportId: row.idDonBaoCao, ngayBaoCao: reportDate });
-    setActiveMenuUnit(null);
-  };
-
-  const handleExportWord = () => {
-    console.log("Xuất file Word");
-  };
-
-  const handleExportExcel = () => {
-    console.log("Xuất file Excel");
-  };
-
-  const handleConsolidate = () => {
-    setShowConsolidateModal(true);
-  };
-
-  const isTacChienSuDoan = isTacChien && capDonVi === "SU_DOAN";
-  const shouldHideConsolidatedSections = isTacChienSuDoan;
-
-  const ownReport = useMemo(() => {
-    if (isParentUnit) return parentReportData;
-    return reportData.length > 0 ? reportData[0] : null;
-  }, [isParentUnit, parentReportData, reportData]);
-
-  const commanderReport = useMemo(() => {
-    if (!isChiHuy) return null;
-    if (isParentUnit) return parentReportData;
-    return reportData.length > 0 ? reportData[0] : null;
-  }, [isChiHuy, isParentUnit, parentReportData, reportData]);
-
-  const { isReporter, canApprove, canRefuse, canSubmit, canRecall } =
-    useReportPermissions(
-      userRole,
-      capDonVi,
-      ownReport,
-      commanderReport,
-      childUnits.length > 0,
-    );
-
-  const ownNhiemVuUnitLabel = account?.donVi?.kyhieuDonvi || "";
-
-  type NhiemVuSummary = {
-    securityStatus: "safe" | "unsafe";
-    incidentStatus: "yes" | "no";
-    incidentDetail: string;
-    advantageStatus: "yes" | "no";
-    advantageDetail: string;
-    disadvantageStatus: "yes" | "no";
-    disadvantageDetail: string;
-    pendingStatus: "yes" | "no";
-    pendingDetail: string;
-  };
-
-  function getNhiemVuReportStatusLabel(row: ReportRow | null | undefined) {
-    const normalized = normalizeReportStatus(
-      row?.notSubmitted ? "Nháp" : (row?.status ?? ""),
-    );
-
-    if (normalized === "Chờ_Duyệt") return "Chờ duyệt";
-    if (normalized === "Đã_Duyệt") return "Đã duyệt";
-    return "Chưa nộp";
-  }
-
-  type NhiemVuEntry = {
-    id: string;
-    title: string;
-    subtitle: string;
-    data: NhiemVuSummary | null;
-    reportStatusLabel: string;
-  };
-
-  const nhiemVuEntries = useMemo<NhiemVuEntry[]>(() => {
-    const buildNhiemVuSummary = (data: NhiemVuNgay): NhiemVuSummary => ({
-      securityStatus: data.nhiemVuPhandoi === "safe" ? "safe" : "unsafe",
-      incidentStatus: data.noiDungDotXuat ? "yes" : "no",
-      incidentDetail: data.noiDungDotXuat || "",
-      advantageStatus: data.noiDungUuDiem ? "yes" : "no",
-      advantageDetail: data.noiDungUuDiem || "",
-      disadvantageStatus: data.noiDungKhuyetDiem ? "yes" : "no",
-      disadvantageDetail: data.noiDungKhuyetDiem || "",
-      pendingStatus: data.noiDungCanGiaiQuyet ? "yes" : "no",
-      pendingDetail: data.noiDungCanGiaiQuyet || "",
-    });
-
-    const q = query.trim().toLowerCase();
-    const entries: NhiemVuEntry[] = [];
-
-    if (isParentUnit) {
-      const ownReportRow = parentReportData ?? null;
-
-      if (nhiemVuData) {
-        entries.push({
-          id: maDonViCurrent ?? "own",
-          title: ownNhiemVuUnitLabel,
-          subtitle: maDonViCurrent ?? "",
-          data: buildNhiemVuSummary(nhiemVuData),
-          reportStatusLabel: getNhiemVuReportStatusLabel(ownReportRow),
-        });
-      } else {
-        entries.push({
-          id: maDonViCurrent ?? "own",
-          title: ownNhiemVuUnitLabel,
-          subtitle: maDonViCurrent ?? "",
-          data: null,
-          reportStatusLabel: getNhiemVuReportStatusLabel(ownReportRow),
-        });
-      }
-
-      childUnits.forEach((unit) => {
-        const matched = nhiemVuList.find((item) => {
-          const itemDonVi = item.donVi.toLowerCase();
-          return (
-            itemDonVi === (unit.kyhieuDonvi ?? "").toLowerCase() ||
-            itemDonVi === unit.tenDonvi.toLowerCase() ||
-            itemDonVi === unit.maDonVi.toLowerCase()
-          );
-        });
-
-        const childReportRow =
-          reportData.find((row) => row.donVi === unit.maDonVi) ?? null;
-
-        entries.push({
-          id: unit.maDonVi,
-          title: unit.kyhieuDonvi || unit.maDonVi,
-          subtitle: "",
-          data: matched ? buildNhiemVuSummary(matched.data) : null,
-          reportStatusLabel: getNhiemVuReportStatusLabel(childReportRow),
-        });
-      });
-
-      return filterVisibleNhiemVuEntries(
-        entries.filter(
-          (item) =>
-            !q ||
-            [item.title, item.subtitle].join(" ").toLowerCase().includes(q),
-        ),
-        shouldHideDraftAndUnsubmitted,
-      );
-    }
-
-    const ownReportRow =
-      reportData.find((row) => row.donVi === maDonViCurrent) ?? null;
-
-    if (!nhiemVuData) return [];
-
-    return filterVisibleNhiemVuEntries(
-      [
-        {
-          id: maDonViCurrent ?? "own",
-          title: ownNhiemVuUnitLabel,
-          subtitle: maDonViCurrent ?? "",
-          data: buildNhiemVuSummary(nhiemVuData),
-          reportStatusLabel: getNhiemVuReportStatusLabel(ownReportRow),
-        },
-      ].filter(
-        (item) =>
-          !q || [item.title, item.subtitle].join(" ").toLowerCase().includes(q),
-      ),
-      shouldHideDraftAndUnsubmitted,
-    );
-  }, [
-    childUnits,
-    isParentUnit,
-    maDonViCurrent,
-    nhiemVuData,
-    nhiemVuList,
-    ownNhiemVuUnitLabel,
-    parentReportData,
-    query,
-    reportData,
-    shouldHideDraftAndUnsubmitted,
-  ]);
-
-  const displayRows = useMemo(
-    () =>
-      filterVisibleReportRows(
-        buildDisplayRows({
-          query,
-          reportData,
-          parentReportData,
-          childUnits,
-          isParentUnit,
-          isTrungDoan,
-          isTieuDoan,
-          isChiHuy,
-          isChiHuyLeaf,
-          maDonViCurrent,
-          accountDonVi: account?.donVi,
-        }),
-        shouldHideDraftAndUnsubmitted,
-      ),
-    [
-      query,
-      reportData,
-      parentReportData,
-      childUnits,
-      isParentUnit,
-      isTrungDoan,
-      isTieuDoan,
-      isChiHuy,
-      isChiHuyLeaf,
-      maDonViCurrent,
-      account?.donVi,
-      shouldHideDraftAndUnsubmitted,
-    ],
-  );
-
-  const displayTotals = useMemo(
-    () => buildDisplayTotals(displayRows),
-    [displayRows],
-  );
-
-  const caTrucInfo = useMemo(
-    () =>
-      buildCaTrucInfo({
-        isParentUnit,
-        isTacChien,
-        parentReportData,
-        reportData,
-        caTrucFromApi,
-      }),
-    [isParentUnit, isTacChien, parentReportData, reportData, caTrucFromApi],
-  );
-
-  const trucInfoFromReport = useMemo(
-    () =>
-      buildTrucInfoFromReport({
-        isParentUnit,
-        parentReportData,
-        reportData,
-      }),
-    [isParentUnit, parentReportData, reportData],
-  );
-
-  const currentEditingReport = useMemo(() => {
-    if (!editModalData) return null;
-    const childRow = reportData.find(
-      (r) => r.idDonBaoCao === editModalData.reportId,
-    );
-    if (childRow) return childRow.rawItem;
-    if (
-      parentReportData &&
-      parentReportData.idDonBaoCao === editModalData.reportId
-    ) {
-      return parentReportData.rawItem;
-    }
-    return null;
-  }, [editModalData, reportData, parentReportData]);
-
-  const currentEditingDetail = useMemo<DetailStepData | null>(() => {
-    const raw = (currentEditingReport as { tinhHinhHoatDong?: string } | null)
-      ?.tinhHinhHoatDong;
-
-    if (raw) {
-      try {
-        return JSON.parse(raw) as DetailStepData;
-      } catch {
-        // fallback bên dưới
-      }
-    }
-
-    return editNhiemVuData;
-  }, [currentEditingReport, editNhiemVuData]);
-
-  const totalRequiredCount = childUnits.length;
-
-  const sharedRowProps = {
-    isParentUnit,
-    isReporter,
-    isTacChien,
-    isChiHuyLeaf,
-    maDonViCurrent,
-    activeMenuUnit,
-    menuPosition,
-    dropdownRef,
-    onToggleMenu: handleToggleMenu,
-    onViewDetail: (r: ReportRow) => {
-      setSelectedReportRow(r);
-      setActiveMenuUnit(null);
-    },
-    onEditReport: handleEditReport,
-  };
-
   useEffect(() => {
-    if (!ownReport?.idDonBaoCao) return;
-    dailyReportService
-      .getNhiemVuNgayByDonBaoCao(ownReport.idDonBaoCao)
-      .then((res) => {
-        setNhiemVuData(res.Result ?? null);
-      })
-      .catch(() => {
+    void (async () => {
+      if (!ownReport?.idDonBaoCao) {
         setNhiemVuData(null);
-      });
+        return;
+      }
+
+      try {
+        const res = await dailyReportService.getNhiemVuNgayByDonBaoCao(
+          ownReport.idDonBaoCao,
+        );
+        setNhiemVuData(res.Result ?? null);
+      } catch {
+        setNhiemVuData(null);
+      }
+    })();
   }, [ownReport]);
 
   useEffect(() => {
@@ -563,6 +292,58 @@ export default function DailyTroopReport() {
     };
   }, [isParentUnit, maDonViCurrent, reportDate]);
 
+  const handleAddReport = () => {
+    if (isPastDate) {
+      showError("Không thể tạo báo cáo cho ngày trong quá khứ!");
+      return;
+    }
+
+    if (checkIfDateHasReport) {
+      showError("Ngày này đã tồn tại báo cáo hoặc không hợp lệ!");
+      return;
+    }
+
+    setShowCreateModal(true);
+  };
+
+  const handleCreateSuccess = async () => {
+    await fetchReports();
+  };
+
+  const handleEditReport = (row: ReportRow) => {
+    setEditModalData({ reportId: row.idDonBaoCao, ngayBaoCao: reportDate });
+    setActiveMenuUnit(null);
+  };
+
+  const handleExportWord = () => {
+    console.log("Xuất file Word");
+  };
+
+  const handleExportExcel = () => {
+    console.log("Xuất file Excel");
+  };
+
+  const handleConsolidate = () => {
+    setShowConsolidateModal(true);
+  };
+
+  const sharedRowProps = {
+    isParentUnit,
+    isReporter,
+    isTacChien,
+    isChiHuyLeaf,
+    maDonViCurrent,
+    activeMenuUnit,
+    menuPosition,
+    dropdownRef,
+    onToggleMenu: handleToggleMenu,
+    onViewDetail: (row: ReportRow) => {
+      setSelectedReportRow(row);
+      setActiveMenuUnit(null);
+    },
+    onEditReport: handleEditReport,
+  };
+
   return (
     <section className={styles.report} aria-labelledby="dashboard-page-heading">
       <ReportToolbar
@@ -571,7 +352,7 @@ export default function DailyTroopReport() {
         reportDate={reportDate}
         onReportDateChange={setReportDate}
         onAddReport={canAddReport ? handleAddReport : undefined}
-        onConsolidate={canConsolidateUnit ? handleConsolidate : undefined}
+        onConsolidate={isParentUnit ? handleConsolidate : undefined}
         consolidateDisabled={
           !consolidatedData ||
           consolidatedData.submittedCount === 0 ||
@@ -625,7 +406,7 @@ export default function DailyTroopReport() {
         displayTotals={displayTotals}
         parentReportData={parentReportData}
         consolidatedData={consolidatedData}
-        canConsolidateUnit={canConsolidateUnit}
+        canConsolidateUnit={isParentUnit}
         shouldHideConsolidatedSections={shouldHideConsolidatedSections}
         sharedRowProps={sharedRowProps}
         activeMenuUnit={activeMenuUnit}
@@ -692,6 +473,7 @@ export default function DailyTroopReport() {
           onSubmit={async (payload, detailData) => {
             try {
               const res = await dailyReportService.createReport(payload);
+
               if (detailData && res.Result?.idDonBaoCao) {
                 try {
                   await dailyReportService.createNhiemVuNgay({
@@ -706,6 +488,7 @@ export default function DailyTroopReport() {
                   // Không block nếu nhiemvungay fail
                 }
               }
+
               showSuccess("Tạo báo cáo quân số thành công");
               await handleCreateSuccess();
               setShowCreateModal(false);
@@ -755,6 +538,7 @@ export default function DailyTroopReport() {
                   noiDungCanGiaiQuyet: detailData.pendingDetail,
                   donBaoCao: editModalData.reportId,
                 };
+
                 try {
                   if (editNhiemVuId) {
                     await dailyReportService.updateNhiemVuNgay(

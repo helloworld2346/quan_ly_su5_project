@@ -1,3 +1,4 @@
+// src/pages/DailyReport/hooks/useDailyTroopReportViewModel.ts
 import { useMemo } from "react";
 import type { Account, DonVi } from "../../../types/account";
 import type {
@@ -22,7 +23,7 @@ import {
 } from "../utils/dailyTroopReportVisibility";
 import { normalizeReportStatus } from "../../../utils/reportStatus";
 
-type NhiemVuSummary = {
+export type NhiemVuSummary = {
   securityStatus: "safe" | "unsafe";
   incidentStatus: "yes" | "no";
   incidentDetail: string;
@@ -34,7 +35,7 @@ type NhiemVuSummary = {
   pendingDetail: string;
 };
 
-type NhiemVuEntry = {
+export type NhiemVuEntry = {
   id: string;
   title: string;
   subtitle: string;
@@ -42,7 +43,7 @@ type NhiemVuEntry = {
   reportStatusLabel: string;
 };
 
-type ConsolidatedData = {
+export type ConsolidatedData = {
   quanSoTong: number;
   quanSoVang: number;
   quanSoHienDien: number;
@@ -59,7 +60,13 @@ type ConsolidatedData = {
   totalCount: number;
 };
 
-type Props = {
+export type NhiemVuListItem = {
+  maDonVi: string;
+  donVi: string;
+  data: NhiemVuNgay;
+};
+
+export type UseDailyTroopReportViewModelArgs = {
   query: string;
   reportDate: string;
   account: Account | null | undefined;
@@ -77,11 +84,7 @@ type Props = {
   editNhiemVuData: DetailStepData | null;
   shouldHideDraftAndUnsubmitted: boolean;
   nhiemVuData: NhiemVuNgay | null;
-  nhiemVuList: Array<{
-    maDonVi: string;
-    donVi: string;
-    data: NhiemVuNgay;
-  }>;
+  nhiemVuList: NhiemVuListItem[];
 };
 
 function buildNhiemVuSummary(data: NhiemVuNgay): NhiemVuSummary {
@@ -108,7 +111,9 @@ function getNhiemVuReportStatusLabel(row: ReportRow | null | undefined) {
   return "Chưa nộp";
 }
 
-export function useDailyTroopReportViewModel(args: Props) {
+export function useDailyTroopReportViewModel(
+  args: UseDailyTroopReportViewModelArgs,
+) {
   const {
     query,
     reportDate,
@@ -223,13 +228,16 @@ export function useDailyTroopReportViewModel(args: Props) {
 
   const currentEditingReport = useMemo(() => {
     if (!editModalData) return null;
+
     const childRow = reportData.find(
       (r) => r.idDonBaoCao === editModalData.reportId,
     );
     if (childRow) return childRow.rawItem;
+
     if (parentReportData?.idDonBaoCao === editModalData.reportId) {
       return parentReportData.rawItem;
     }
+
     return null;
   }, [editModalData, reportData, parentReportData]);
 

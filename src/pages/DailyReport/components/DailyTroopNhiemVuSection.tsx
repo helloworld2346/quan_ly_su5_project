@@ -1,16 +1,7 @@
 import type { Dispatch, SetStateAction } from "react";
 import styles from "../DailyTroopReport.module.css";
-import NhiemVuAccordionItem, {
-  type NhiemVuSummary,
-} from "./NhiemVuAccordionItem";
-
-type NhiemVuEntry = {
-  id: string;
-  title: string;
-  subtitle: string;
-  data: NhiemVuSummary | null;
-  reportStatusLabel: string;
-};
+import NhiemVuAccordionItem from "./NhiemVuAccordionItem";
+import type { NhiemVuEntry } from "../dailyTroopReportTypes";
 
 type Props = {
   nhiemVuEntries: NhiemVuEntry[];
