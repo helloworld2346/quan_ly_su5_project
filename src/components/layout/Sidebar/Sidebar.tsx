@@ -160,7 +160,8 @@ export default function Sidebar({
             <>
               <p className={styles.unitName}>{unitName}</p>
               <p className={styles.appName}>
-                Thống kê quân số. Công tác Đảng. Công tác chính trị
+                Thống kê quân số <br></br>
+                Hoạt động CTĐ, CTCT
               </p>
             </>
           )}

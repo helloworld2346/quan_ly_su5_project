@@ -254,6 +254,9 @@ const canAddReport =
     setShowConsolidateModal(true);
   };
 
+  const isTacChienSuDoan = isTacChien && capDonVi === "SU_DOAN";
+  const shouldHideConsolidatedSections = isTacChienSuDoan;
+
   const ownReport = useMemo(() => {
     if (isParentUnit) return parentReportData;
     return reportData.length > 0 ? reportData[0] : null;
@@ -598,11 +601,9 @@ const canAddReport =
                 : "Chưa có báo cáo con"
         }
         onApprove={
-          shouldHideDraftAndUnsubmitted
-            ? undefined
-            : canApprove
-              ? () => handleApproveReport(commanderReport!.idDonBaoCao)
-              : undefined
+          canApprove
+            ? () => handleApproveReport(commanderReport!.idDonBaoCao)
+            : undefined
         }
         onRefuse={
           canRefuse
@@ -678,11 +679,13 @@ const canAddReport =
                     </tr>
                   ) : (
                     <>
-                      {canConsolidateUnit && displayRows.length > 0 && (
-                        <tr className={styles.separatorRow}>
-                          <td colSpan={22}>Báo cáo các đơn vị</td>
-                        </tr>
-                      )}
+                      {!shouldHideConsolidatedSections &&
+                        canConsolidateUnit &&
+                        displayRows.length > 0 && (
+                          <tr className={styles.separatorRow}>
+                            <td colSpan={22}>Báo cáo các đơn vị</td>
+                          </tr>
+                        )}
 
                       {displayRows.map((row) => (
                         <ReportTableRow
@@ -693,29 +696,33 @@ const canAddReport =
                         />
                       ))}
 
-                      {displayRows.some((r) => !r.notSubmitted) && (
-                        <ReportTotalRow
-                          displayTotals={displayTotals}
-                          isParentUnit={isParentUnit}
-                          hasConsolidatedData={Boolean(consolidatedData)}
-                          activeMenuUnit={activeMenuUnit}
-                          menuPosition={menuPosition}
-                          dropdownRef={dropdownRef}
-                          onToggleMenu={handleToggleMenu}
-                          onViewConsolidatedDetail={() => {
-                            setShowConsolidatedDetail(true);
-                            setActiveMenuUnit(null);
-                          }}
-                        />
-                      )}
+                      {!shouldHideConsolidatedSections &&
+                        displayRows.some((r) => !r.notSubmitted) && (
+                          <ReportTotalRow
+                            displayTotals={displayTotals}
+                            isParentUnit={isParentUnit}
+                            hasConsolidatedData={Boolean(consolidatedData)}
+                            activeMenuUnit={activeMenuUnit}
+                            menuPosition={menuPosition}
+                            dropdownRef={dropdownRef}
+                            onToggleMenu={handleToggleMenu}
+                            onViewConsolidatedDetail={() => {
+                              setShowConsolidatedDetail(true);
+                              setActiveMenuUnit(null);
+                            }}
+                          />
+                        )}
 
-                      {canConsolidateUnit && (
-                        <tr className={styles.separatorRow}>
-                          <td colSpan={22}>Báo cáo tổng hợp</td>
-                        </tr>
-                      )}
+                      {!shouldHideConsolidatedSections &&
+                        canConsolidateUnit && (
+                          <tr className={styles.separatorRow}>
+                            <td colSpan={22}>Báo cáo tổng hợp</td>
+                          </tr>
+                        )}
 
-                      {canConsolidateUnit && parentReportData ? (
+                      {!shouldHideConsolidatedSections &&
+                      canConsolidateUnit &&
+                      parentReportData ? (
                         <ReportTableRow
                           key={`parent-${parentReportData.idDonBaoCao}`}
                           row={parentReportData}
@@ -723,6 +730,7 @@ const canAddReport =
                           {...sharedRowProps}
                         />
                       ) : (
+                        !shouldHideConsolidatedSections &&
                         canConsolidateUnit && (
                           <tr className={styles.noConsolidatedRow}>
                             <td colSpan={22}>Chưa có báo cáo tổng hợp</td>
