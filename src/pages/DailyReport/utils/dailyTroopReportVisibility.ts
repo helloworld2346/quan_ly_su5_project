@@ -1,12 +1,41 @@
 import type { ReportRow } from "../../../types/dailyReport";
 
+type AccountDonVi = {
+  tenDonvi?: string;
+  kyhieuDonvi?: string;
+};
+
+function isDbOrEbUnit(accountDonVi?: AccountDonVi): boolean {
+  const normalizedUnitName = (accountDonVi?.tenDonvi ?? "").toLowerCase();
+  const normalizedUnitSymbol = (accountDonVi?.kyhieuDonvi ?? "").toLowerCase();
+
+  return (
+    normalizedUnitName.includes("d bộ") ||
+    normalizedUnitName.includes("e bộ") ||
+    normalizedUnitName.includes("dbộ") ||
+    normalizedUnitName.includes("ebộ") ||
+    normalizedUnitName.includes("dbo") ||
+    normalizedUnitName.includes("ebo") ||
+    normalizedUnitSymbol.includes("d bộ") ||
+    normalizedUnitSymbol.includes("e bộ") ||
+    normalizedUnitSymbol.includes("dbộ") ||
+    normalizedUnitSymbol.includes("ebộ") ||
+    normalizedUnitSymbol.includes("dbo") ||
+    normalizedUnitSymbol.includes("ebo")
+  );
+}
+
 export function shouldHideDraftAndUnsubmittedForCommander(args: {
   isChiHuy: boolean;
   capDonVi?: string | null;
+  accountDonVi?: AccountDonVi;
 }): boolean {
-  const { isChiHuy, capDonVi } = args;
+  const { isChiHuy, capDonVi, accountDonVi } = args;
 
-  return isChiHuy && (capDonVi === "TRUNG_DOAN" || capDonVi === "TIEU_DOAN");
+  if (!isChiHuy) return false;
+  if (capDonVi !== "TRUNG_DOAN" && capDonVi !== "TIEU_DOAN") return false;
+
+  return !isDbOrEbUnit(accountDonVi);
 }
 
 export function filterVisibleReportRows(

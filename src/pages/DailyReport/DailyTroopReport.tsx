@@ -31,6 +31,7 @@ import {
 import {
   filterVisibleNhiemVuEntries,
   filterVisibleReportRows,
+  shouldHideDraftAndUnsubmittedForCommander,
 } from "./utils/dailyTroopReportVisibility";
 
 export default function DailyTroopReport() {
@@ -103,27 +104,15 @@ export default function DailyTroopReport() {
     showError,
   });
 
-  const isChiHuyLeaf = isChiHuy && childUnits.length === 0;
+const isChiHuyLeaf = isChiHuy && childUnits.length === 0;
 
-const normalizedUnitName = (account?.donVi?.tenDonvi ?? "").toLowerCase();
-const normalizedUnitSymbol = (account?.donVi?.kyhieuDonvi ?? "").toLowerCase();
-
-const isDbOrEbUnit =
-  normalizedUnitName.includes("d bộ") ||
-  normalizedUnitName.includes("e bộ") ||
-  normalizedUnitName.includes("dbộ") ||
-  normalizedUnitName.includes("ebộ") ||
-  normalizedUnitName.includes("dbo") ||
-  normalizedUnitName.includes("ebo") ||
-  normalizedUnitSymbol.includes("d bộ") ||
-  normalizedUnitSymbol.includes("e bộ") ||
-  normalizedUnitSymbol.includes("dbộ") ||
-  normalizedUnitSymbol.includes("ebộ") ||
-  normalizedUnitSymbol.includes("dbo") ||
-  normalizedUnitSymbol.includes("ebo");
-
-const shouldHideDraftAndUnsubmitted =
-  isChiHuy && (isTrungDoan || isTieuDoan) && !isDbOrEbUnit;
+const shouldHideDraftAndUnsubmitted = shouldHideDraftAndUnsubmittedForCommander(
+  {
+    isChiHuy,
+    capDonVi,
+    accountDonVi: account?.donVi,
+  },
+);
 
 const canAddReport =
   !shouldHideDraftAndUnsubmitted &&
