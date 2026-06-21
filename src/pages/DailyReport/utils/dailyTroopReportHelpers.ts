@@ -156,80 +156,90 @@ function filterDraftIfNeeded(rows: ReportRow[]): ReportRow[] {
   return rows;
 }
 
-export function buildDisplayRows(args: {
-  query: string;
-  reportData: ReportRow[];
-  parentReportData: ReportRow | null;
-  childUnits: ChildUnit[];
-  isParentUnit: boolean;
-  isTrungDoan: boolean;
-  isTieuDoan: boolean;
-  isChiHuy: boolean;
-  isChiHuyLeaf: boolean;
-  maDonViCurrent?: string;
-  accountDonVi?: {
-    maDonVi?: string;
-    tenDonvi?: string;
-    kyhieuDonvi?: string;
-  };
-}): ReportRow[] {
-  const {
-    query,
-    reportData,
-    parentReportData,
-    childUnits,
-    isParentUnit,
-    isTrungDoan,
-    maDonViCurrent,
-    accountDonVi,
-  } = args;
-
-  const filtered = buildFilteredRows(query, reportData);
-
-  if (!isParentUnit || childUnits.length === 0) {
-    if (isParentUnit && !isTrungDoan) {
-      const rows: ReportRow[] = parentReportData
-        ? [{ ...parentReportData, notSubmitted: false }]
-        : [
-            createEmptyReportRow({
-              idDonBaoCao: maDonViCurrent ?? "",
-              tenDonVi: accountDonVi?.tenDonvi ?? "",
-              kyhieuDonVi: accountDonVi?.kyhieuDonvi,
-            }),
-          ];
-      return filterDraftIfNeeded(rows);
-    }
-
-    const rows: ReportRow[] =
-      filtered.length > 0
-        ? filtered.map((row) => ({ ...row, notSubmitted: false }))
-        : [
-            createEmptyReportRow({
-              idDonBaoCao: maDonViCurrent ?? "",
-              tenDonVi: accountDonVi?.tenDonvi ?? "",
-              kyhieuDonVi: accountDonVi?.kyhieuDonvi,
-            }),
-          ];
-
-    return filterDraftIfNeeded(rows);
-  }
-
-  const childRows = childUnits.map((unit) => {
-    const matched = filtered.find((row) => row.donVi === unit.maDonVi);
-    if (matched) return { ...matched, notSubmitted: false };
-
-    return createEmptyReportRow({
-      idDonBaoCao: unit.maDonVi,
-      tenDonVi: unit.tenDonvi,
-      kyhieuDonVi: unit.kyhieuDonvi,
-    });
-  });
-
-  const allRows = parentReportData
-    ? [{ ...parentReportData, notSubmitted: false }, ...childRows]
-    : childRows;
-
-  return filterDraftIfNeeded(allRows);
+// src/pages/DailyReport/utils/dailyTroopReportHelpers.ts  
+export function buildDisplayRows(args: {  
+  query: string;  
+  reportData: ReportRow[];  
+  parentReportData: ReportRow | null;  
+  childUnits: ChildUnit[];  
+  isParentUnit: boolean;  
+  isTrungDoan: boolean;  
+  isTieuDoan: boolean;  
+  isChiHuy: boolean;  
+  isChiHuyLeaf: boolean;  
+  maDonViCurrent?: string;  
+  accountDonVi?: {  
+    maDonVi?: string;  
+    tenDonvi?: string;  
+    kyhieuDonvi?: string;  
+  };  
+}): ReportRow[] {  
+  const {  
+    query,  
+    reportData,  
+    parentReportData,  
+    childUnits,  
+    isParentUnit,  
+    isTrungDoan,  
+    maDonViCurrent,  
+    accountDonVi,  
+  } = args;  
+  
+  const filtered = buildFilteredRows(query, reportData);  
+  
+  if (!isParentUnit || childUnits.length === 0) {  
+    if (isParentUnit && !isTrungDoan) {  
+      const rows: ReportRow[] = parentReportData  
+        ? [{ ...parentReportData, notSubmitted: false }]  
+        : [  
+            createEmptyReportRow({  
+              idDonBaoCao: maDonViCurrent ?? "",  
+              tenDonVi: accountDonVi?.tenDonvi ?? "",  
+              kyhieuDonVi: accountDonVi?.kyhieuDonvi,  
+            }),  
+          ];  
+      return filterDraftIfNeeded(rows);  
+    }  
+  
+    const rows: ReportRow[] =  
+      filtered.length > 0  
+        ? filtered.map((row) => ({ ...row, notSubmitted: false }))  
+        : [  
+            createEmptyReportRow({  
+              idDonBaoCao: maDonViCurrent ?? "",  
+              tenDonVi: accountDonVi?.tenDonvi ?? "",  
+              kyhieuDonVi: accountDonVi?.kyhieuDonvi,  
+            }),  
+          ];  
+  
+    return filterDraftIfNeeded(rows);  
+  }  
+  
+  const ownUnitRow =  
+    isParentUnit && !isTrungDoan  
+      ? [  
+          parentReportData  
+            ? { ...parentReportData, notSubmitted: false }  
+            : createEmptyReportRow({  
+                idDonBaoCao: maDonViCurrent ?? "",  
+                tenDonVi: accountDonVi?.tenDonvi ?? "",  
+                kyhieuDonVi: accountDonVi?.kyhieuDonvi,  
+              }),  
+        ]  
+      : [];  
+  
+  const childRows = childUnits.map((unit) => {  
+    const matched = filtered.find((row) => row.donVi === unit.maDonVi);  
+    if (matched) return { ...matched, notSubmitted: false };  
+  
+    return createEmptyReportRow({  
+      idDonBaoCao: unit.maDonVi,  
+      tenDonVi: unit.tenDonvi,  
+      kyhieuDonVi: unit.kyhieuDonvi,  
+    });  
+  });  
+  
+  return filterDraftIfNeeded([...ownUnitRow, ...childRows]);  
 }
 
 export function buildDisplayTotals(displayRows: ReportRow[]): DisplayTotals {

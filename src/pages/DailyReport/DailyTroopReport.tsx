@@ -13,9 +13,6 @@ import CaTrucInfoCard from "../../components/ui/CaTrucInfoCard/CaTrucInfoCard";
 import { useReportData } from "./hooks/useReportData";
 import { useReportActions } from "./hooks/useReportActions";
 import { todayIsoDate, normalizeRoleName } from "../../utils/reportUtils";
-import ReportTableHeader from "./components/ReportTableHeader";
-import ReportTableRow from "./components/ReportTableRow";
-import ReportTotalRow from "./components/ReportTotalRow";
 import { useReportPermissions } from "./hooks/useReportPermissions";
 import type { NhiemVuNgay } from "../../services/dailyReport/dailyReportService";
 import type { DetailStepData } from "./DailyReportDetailStep";
@@ -33,6 +30,9 @@ import {
   filterVisibleReportRows,
   shouldHideDraftAndUnsubmittedForCommander,
 } from "./utils/dailyTroopReportVisibility";
+
+import DailyTroopStatisticsSection from "./components/DailyTroopStatisticsSection";
+import DailyTroopNhiemVuSection from "./components/DailyTroopNhiemVuSection";
 
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
@@ -54,7 +54,6 @@ export default function DailyTroopReport() {
   const [editNhiemVuId, setEditNhiemVuId] = useState<string | null>(null);
 
   const [nhiemVuData, setNhiemVuData] = useState<NhiemVuNgay | null>(null);
-
   const [nhiemVuList, setNhiemVuList] = useState<
     Array<{
       maDonVi: string;
@@ -104,19 +103,18 @@ export default function DailyTroopReport() {
     showError,
   });
 
-const isChiHuyLeaf = isChiHuy && childUnits.length === 0;
+  const isChiHuyLeaf = isChiHuy && childUnits.length === 0;
 
-const shouldHideDraftAndUnsubmitted = shouldHideDraftAndUnsubmittedForCommander(
-  {
-    isChiHuy,
-    capDonVi,
-    accountDonVi: account?.donVi,
-  },
-);
+  const shouldHideDraftAndUnsubmitted =
+    shouldHideDraftAndUnsubmittedForCommander({
+      isChiHuy,
+      capDonVi,
+      accountDonVi: account?.donVi,
+    });
 
-const canAddReport =
-  !shouldHideDraftAndUnsubmitted &&
-  (isChiHuyLeaf || (isTacChien && capDonVi === "SU_DOAN"));
+  const canAddReport =
+    !shouldHideDraftAndUnsubmitted &&
+    (isChiHuyLeaf || (isTacChien && capDonVi === "SU_DOAN"));
 
   const {
     showRefuseDialog,
@@ -236,9 +234,11 @@ const canAddReport =
   const handleExportWord = () => {
     console.log("Xuất file Word");
   };
+
   const handleExportExcel = () => {
     console.log("Xuất file Excel");
   };
+
   const handleConsolidate = () => {
     setShowConsolidateModal(true);
   };
@@ -267,6 +267,7 @@ const canAddReport =
     );
 
   const ownNhiemVuUnitLabel = account?.donVi?.kyhieuDonvi || "";
+
   type NhiemVuSummary = {
     securityStatus: "safe" | "unsafe";
     incidentStatus: "yes" | "no";
@@ -617,326 +618,30 @@ const canAddReport =
         hasReport={checkIfDateHasReport}
         showExport={false}
       />
-      <section className={styles.sectionBlock}>
-        <div className={styles.sectionCard}>
-          <div className={styles.sectionHeading}>
-            <div className={styles.sectionTitleGroup}>
-              <span className={styles.sectionKicker}>I</span>
-              <div>
-                <h2 className={styles.sectionTitle}>THỐNG KÊ QUÂN SỐ</h2>
-                <div className={styles.sectionSubTitle}>
-                  Tổng hợp biên chế, quân số và trạng thái báo cáo trong ngày
-                </div>
-              </div>
-            </div>
-          </div>
 
-          <div className={styles.tableShell}>
-            {loading ? (
-              <div className={styles.loadingState}>Đang tải dữ liệu...</div>
-            ) : (
-              <table className={styles.reportTable}>
-                <colgroup>
-                  <col style={{ width: "9%" }} />
-                  <col style={{ width: "4%" }} />
-                  <col style={{ width: "5%" }} />
-                  <col style={{ width: "5%" }} />
-                  <col style={{ width: "6%" }} />
-                  <col style={{ width: "6%" }} />
-                  <col style={{ width: "6%" }} />
-                  <col style={{ width: "6%" }} />
-                  <col style={{ width: "6%" }} />
-                  <col style={{ width: "6%" }} />
-                  <col style={{ width: "6%" }} />
-                  <col style={{ width: "6%" }} />
-                  <col style={{ width: "6%" }} />
-                  <col style={{ width: "6%" }} />
-                  <col style={{ width: "6%" }} />
-                  <col style={{ width: "6%" }} />
-                  <col style={{ width: "6%" }} />
-                  <col style={{ width: "6%" }} />
-                  <col style={{ width: "8%" }} />
-                  <col style={{ width: "10%" }} />
-                  <col style={{ width: "5%" }} />
-                </colgroup>
-                <ReportTableHeader />
+      <DailyTroopStatisticsSection
+        loading={loading}
+        displayRows={displayRows}
+        displayTotals={displayTotals}
+        parentReportData={parentReportData}
+        consolidatedData={consolidatedData}
+        canConsolidateUnit={canConsolidateUnit}
+        shouldHideConsolidatedSections={shouldHideConsolidatedSections}
+        sharedRowProps={sharedRowProps}
+        activeMenuUnit={activeMenuUnit}
+        menuPosition={menuPosition}
+        dropdownRef={dropdownRef}
+        onViewConsolidatedDetail={() => {
+          setShowConsolidatedDetail(true);
+          setActiveMenuUnit(null);
+        }}
+      />
 
-                <tbody>
-                  {displayRows.length === 0 && !parentReportData ? (
-                    <tr className={styles.noReportRow}>
-                      <td colSpan={22}>Chưa có dữ liệu báo cáo</td>
-                    </tr>
-                  ) : (
-                    <>
-                      {!shouldHideConsolidatedSections &&
-                        canConsolidateUnit &&
-                        displayRows.length > 0 && (
-                          <tr className={styles.separatorRow}>
-                            <td colSpan={22}>Báo cáo các đơn vị</td>
-                          </tr>
-                        )}
-
-                      {displayRows.map((row) => (
-                        <ReportTableRow
-                          key={row.idDonBaoCao}
-                          row={row}
-                          isConsolidatedRow={false}
-                          {...sharedRowProps}
-                        />
-                      ))}
-
-                      {!shouldHideConsolidatedSections &&
-                        displayRows.some((r) => !r.notSubmitted) && (
-                          <ReportTotalRow
-                            displayTotals={displayTotals}
-                            isParentUnit={isParentUnit}
-                            hasConsolidatedData={Boolean(consolidatedData)}
-                            activeMenuUnit={activeMenuUnit}
-                            menuPosition={menuPosition}
-                            dropdownRef={dropdownRef}
-                            onToggleMenu={handleToggleMenu}
-                            onViewConsolidatedDetail={() => {
-                              setShowConsolidatedDetail(true);
-                              setActiveMenuUnit(null);
-                            }}
-                          />
-                        )}
-
-                      {!shouldHideConsolidatedSections &&
-                        canConsolidateUnit && (
-                          <tr className={styles.separatorRow}>
-                            <td colSpan={22}>Báo cáo tổng hợp</td>
-                          </tr>
-                        )}
-
-                      {!shouldHideConsolidatedSections &&
-                      canConsolidateUnit &&
-                      parentReportData ? (
-                        <ReportTableRow
-                          key={`parent-${parentReportData.idDonBaoCao}`}
-                          row={parentReportData}
-                          isConsolidatedRow={true}
-                          {...sharedRowProps}
-                        />
-                      ) : (
-                        !shouldHideConsolidatedSections &&
-                        canConsolidateUnit && (
-                          <tr className={styles.noConsolidatedRow}>
-                            <td colSpan={22}>Chưa có báo cáo tổng hợp</td>
-                          </tr>
-                        )
-                      )}
-                    </>
-                  )}
-                </tbody>
-              </table>
-            )}
-          </div>
-        </div>
-      </section>
-
-      <section className={styles.sectionBlock}>
-        <div className={`${styles.sectionCard} ${styles.sectionCardSoft}`}>
-          <div className={styles.sectionHeading}>
-            <div className={styles.sectionTitleGroup}>
-              <span className={styles.sectionKicker}>II</span>
-              <div>
-                <h2 className={styles.sectionTitle}>
-                  TÌNH HÌNH HOẠT ĐỘNG NHIỆM VỤ NGÀY
-                </h2>
-                <div className={styles.sectionSubTitle}>
-                  Nội dung nhiệm vụ, đột xuất, ưu điểm, khuyết điểm và việc cần
-                  giải quyết
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.summaryList}>
-            {nhiemVuEntries.length > 0 ? (
-              nhiemVuEntries.map((item) => {
-                const isOpen = openNhiemVuId === item.id;
-
-                return (
-                  <div key={item.id} className={styles.nhiemVuAccordionItem}>
-                    <button
-                      type="button"
-                      className={styles.nhiemVuAccordionHeader}
-                      onClick={() =>
-                        setOpenNhiemVuId((prev) =>
-                          prev === item.id ? null : item.id,
-                        )
-                      }
-                      aria-expanded={isOpen}
-                    >
-                      <div className={styles.nhiemVuAccordionHeaderLeft}>
-                        <div className={styles.nhiemVuAccordionTitle}>
-                          {item.title}
-                        </div>
-                      </div>
-
-                      <div className={styles.nhiemVuAccordionHeaderRight}>
-                        <span
-                          className={`${styles.nhiemVuAccordionStatus} ${
-                            item.reportStatusLabel === "Đã duyệt"
-                              ? styles.nhiemVuAccordionStatusSuccess
-                              : styles.nhiemVuAccordionStatusEmpty
-                          }`}
-                        >
-                          {item.reportStatusLabel}
-                        </span>
-                        <span
-                          className={`${styles.nhiemVuAccordionArrow} ${
-                            isOpen ? styles.nhiemVuAccordionArrowOpen : ""
-                          }`}
-                        >
-                          ▾
-                        </span>
-                      </div>
-                    </button>
-
-                    <div
-                      className={`${styles.nhiemVuAccordionBody} ${
-                        isOpen ? styles.nhiemVuAccordionBodyOpen : ""
-                      }`}
-                    >
-                      <div className={styles.nhiemVuAccordionBodyInner}>
-                        {item.data ? (
-                          <div className={styles.nhiemVuDetailGrid}>
-                            <div className={styles.nhiemVuDetailItem}>
-                              <div className={styles.nhiemVuDetailItemHeader}>
-                                <span className={styles.nhiemVuDetailLabel}>
-                                  Nhiệm vụ các phân đội đóng quân canh phòng và
-                                  các phân đội khác
-                                </span>
-                                <span
-                                  className={`${styles.nhiemVuDetailBadge} ${
-                                    item.data.securityStatus === "safe"
-                                      ? styles.nhiemVuDetailSuccess
-                                      : styles.nhiemVuDetailDanger
-                                  }`}
-                                >
-                                  {item.data.securityStatus === "safe"
-                                    ? "✓ Đảm bảo an toàn"
-                                    : "✕ Không đảm bảo an toàn"}
-                                </span>
-                              </div>
-                            </div>
-
-                            <div className={styles.nhiemVuDetailItem}>
-                              <div className={styles.nhiemVuDetailItemHeader}>
-                                <span className={styles.nhiemVuDetailLabel}>
-                                  Những việc đột xuất xảy ra
-                                </span>
-                                <span
-                                  className={`${styles.nhiemVuDetailBadge} ${
-                                    item.data.incidentStatus === "yes"
-                                      ? styles.nhiemVuDetailWarning
-                                      : styles.nhiemVuDetailSuccess
-                                  }`}
-                                >
-                                  {item.data.incidentStatus === "yes"
-                                    ? "⚠ Có phát sinh"
-                                    : "✓ Không phát sinh"}
-                                </span>
-                              </div>
-                              {item.data.incidentDetail && (
-                                <div className={styles.nhiemVuDetailText}>
-                                  {item.data.incidentDetail}
-                                </div>
-                              )}
-                            </div>
-
-                            <div className={styles.nhiemVuDetailItem}>
-                              <div className={styles.nhiemVuDetailItemHeader}>
-                                <span className={styles.nhiemVuDetailLabel}>
-                                  Ưu điểm
-                                </span>
-                                <span
-                                  className={`${styles.nhiemVuDetailBadge} ${
-                                    item.data.advantageStatus === "yes"
-                                      ? styles.nhiemVuDetailSuccess
-                                      : styles.nhiemVuDetailNeutral
-                                  }`}
-                                >
-                                  {item.data.advantageStatus === "yes"
-                                    ? "✓ Có"
-                                    : "— Không có"}
-                                </span>
-                              </div>
-                              {item.data.advantageDetail && (
-                                <div className={styles.nhiemVuDetailText}>
-                                  {item.data.advantageDetail}
-                                </div>
-                              )}
-                            </div>
-
-                            <div className={styles.nhiemVuDetailItem}>
-                              <div className={styles.nhiemVuDetailItemHeader}>
-                                <span className={styles.nhiemVuDetailLabel}>
-                                  Khuyết điểm
-                                </span>
-                                <span
-                                  className={`${styles.nhiemVuDetailBadge} ${
-                                    item.data.disadvantageStatus === "yes"
-                                      ? styles.nhiemVuDetailDanger
-                                      : styles.nhiemVuDetailSuccess
-                                  }`}
-                                >
-                                  {item.data.disadvantageStatus === "yes"
-                                    ? "✕ Có"
-                                    : "✓ Không có"}
-                                </span>
-                              </div>
-                              {item.data.disadvantageDetail && (
-                                <div className={styles.nhiemVuDetailText}>
-                                  {item.data.disadvantageDetail}
-                                </div>
-                              )}
-                            </div>
-
-                            <div className={styles.nhiemVuDetailItem}>
-                              <div className={styles.nhiemVuDetailItemHeader}>
-                                <span className={styles.nhiemVuDetailLabel}>
-                                  Những việc cần tiếp tục giải quyết
-                                </span>
-                                <span
-                                  className={`${styles.nhiemVuDetailBadge} ${
-                                    item.data.pendingStatus === "yes"
-                                      ? styles.nhiemVuDetailWarning
-                                      : styles.nhiemVuDetailSuccess
-                                  }`}
-                                >
-                                  {item.data.pendingStatus === "yes"
-                                    ? "⚠ Cần xử lý"
-                                    : "✓ Không có"}
-                                </span>
-                              </div>
-                              {item.data.pendingDetail && (
-                                <div className={styles.nhiemVuDetailText}>
-                                  {item.data.pendingDetail}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        ) : (
-                          <div className={styles.emptyState}>
-                            <p>Đơn vị này chưa nộp báo cáo</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })
-            ) : (
-              <div className={styles.emptyState}>
-                <p>Chưa có dữ liệu báo cáo</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
+      <DailyTroopNhiemVuSection
+        nhiemVuEntries={nhiemVuEntries}
+        openNhiemVuId={openNhiemVuId}
+        setOpenNhiemVuId={setOpenNhiemVuId}
+      />
 
       {caTrucInfo && (
         <CaTrucInfoCard
