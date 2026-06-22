@@ -31,35 +31,35 @@
   overflow: hidden;  
 }  
   
-.header {  
-  display: flex;  
-  align-items: center;  
-  justify-content: space-between;  
-  padding: 16px 24px;  
-  border-bottom: 1px solid var(--modal-border);  
-  background-color: var(--modal-section-bg);  
-  flex-shrink: 0;  
-}  
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--modal-border);
+  background-color: var(--sidebar-bg-top);
+  flex-shrink: 0;
+} 
   
-.title {  
-  font-size: 16px;  
-  font-weight: 700;  
-  color: var(--modal-title-text);  
-  letter-spacing: 0.5px;  
-}  
-  
-.closeBtn {  
-  border: none;  
-  background: transparent;  
-  font-size: 22px;  
-  cursor: pointer;  
-  color: var(--modal-label-text);  
-  transition: color 0.2s;  
-}  
-  
-.closeBtn:hover {  
-  color: var(--modal-title-text);  
-}  
+.title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-white);
+  letter-spacing: 0.5px;
+}
+
+.closeBtn {
+  border: none;
+  background: transparent;
+  font-size: 22px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.8);
+  transition: color 0.2s;
+}
+
+.closeBtn:hover {
+  color: var(--text-white);
+}
   
 .body {  
   flex: 1;  

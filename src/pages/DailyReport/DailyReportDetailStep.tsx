@@ -14,12 +14,10 @@ export default function DailyReportDetailStep() {
   return (
     <div className={styles.container}>
       <div className={styles.grid}>
-        {/* Nhiệm vụ canh phòng */}
         <div className={styles.card}>
           <h3 className={styles.cardTitle}>
-            Nhiệm vụ các phân đội đóng quân canh phòng và các phân đội khác
+            I. Nhiệm vụ các phân đội đóng quân canh phòng và các phân đội khác
           </h3>
-
           <div className={styles.radioGroup}>
             <label className={styles.radioLabel}>
               <input
@@ -57,10 +55,9 @@ export default function DailyReportDetailStep() {
           )}
         </div>
 
-        {/* Việc đột xuất */}
         <div className={styles.card}>
           <h3 className={styles.cardTitle}>
-            Những việc đột xuất xảy ra
+            II. Những việc đột xuất xảy ra
           </h3>
 
           <div className={styles.radioGroup}>
@@ -100,10 +97,10 @@ export default function DailyReportDetailStep() {
           )}
         </div>
 
-        {/* Nhận xét */}
+      
         <div className={styles.card}>
           <h3 className={styles.cardTitle}>
-            Nhận xét ưu, khuyết điểm nội vụ, vệ sinh
+            III. Nhận xét ưu, khuyết điểm nội vụ, vệ sinh
           </h3>
 
           <div className={styles.section}>
@@ -183,10 +180,9 @@ export default function DailyReportDetailStep() {
           </div>
         </div>
 
-        {/* Việc cần giải quyết */}
         <div className={styles.card}>
           <h3 className={styles.cardTitle}>
-            Những việc cần tiếp tục giải quyết
+            IV. Những việc cần tiếp tục giải quyết
           </h3>
 
           <div className={styles.radioGroup}>
