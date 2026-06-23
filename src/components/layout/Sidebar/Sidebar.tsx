@@ -62,7 +62,9 @@ export default function Sidebar({
     "statistics", // Thống kê báo cáo
   ];
 
-  const allowedNavItems = getNavItemsByRole(userRole).filter(
+  const capDonVi = donVi?.capDonVi ?? account?.donVi?.capDonVi ?? null;
+
+  const allowedNavItems = getNavItemsByRole(userRole, capDonVi).filter(
     (item) => !hiddenSidebarIds.includes(item.id),
   );
 

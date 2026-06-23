@@ -1,6 +1,8 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { normalizeRoleName } from "../utils/reportUtils";
+import { canAccessDutyGroup } from "../types/navigation";  
+
 
 type Props = {
   children: React.ReactNode;
@@ -39,6 +41,21 @@ export default function RequireRole({ children, allowedRoles }: Props) {
     }
     return <Navigate to="/settings" replace />;
   }
+
+  const capDonVi = donVi?.capDonVi ?? account?.donVi?.capDonVi ?? null;
+  const isDutyRoute = location.pathname.startsWith("/duty/");
+
+  if (isDutyRoute && !canAccessDutyGroup(userRole, capDonVi)) {
+    return (
+      <Navigate
+        to={
+          normalizedRole === "Trực ban tác chiến" ? "/dashboard" : "/settings"
+        }
+        replace
+      />
+    );
+  }
+
 
   return <>{children}</>;
 }

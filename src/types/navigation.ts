@@ -332,40 +332,61 @@ export function getNavItemById(id: NavItemId): NavItem | undefined {
   return ALL_NAV_ITEMS.find((item) => item.id === id);
 }
 
-export function getNavItemsByRole(userRole: string | null): NavItem[] {
-  if (!userRole) return [];
-  const normalizedRole = normalizeRoleName(userRole);
-
-  if (normalizedRole === "Quản Trị Viên") return ALL_NAV_ITEMS;
-
-  if (normalizedRole === "Trực ban tác chiến") {
-    return ALL_NAV_ITEMS.filter(
-      (item) =>
-        item.id === "executive" ||
-        item.id === "executive-training" ||
-        item.id.startsWith("report-") ||
-        item.id === "statistics" ||
-        item.id.startsWith("duty-") ||
-        item.id === "settings",
-    );
-  }
-
-  if (
-    normalizedRole === "Trực chỉ huy" ||
-    normalizedRole === "Trực ban nội vụ"
-  ) {
-    return ALL_NAV_ITEMS.filter(
-      (item) =>
-        item.id.startsWith("report-") ||
-        item.id === "statistics" ||
-        item.id === "settings",
-    );
-  }
-
-  return ALL_NAV_ITEMS.filter((item) => {
-    if (!item.allowedRoles) return true;
-    return item.allowedRoles.includes(normalizedRole);
-  });
+// thêm helper này trước getNavItemsByRole()  
+export function canAccessDutyGroup(  
+  userRole: string | null | undefined,  
+  capDonVi: string | null | undefined,  
+): boolean {  
+  const normalizedRole = normalizeRoleName(userRole ?? undefined);  
+  
+  if (normalizedRole === "Quản Trị Viên") return true;  
+  if (normalizedRole !== "Trực ban tác chiến") return false;  
+  
+  return capDonVi === "SU_DOAN";  
+}  
+  
+export function getNavItemsByRole(  
+  userRole: string | null,  
+  capDonVi: string | null = null,  
+): NavItem[] {  
+  if (!userRole) return [];  
+  
+  const normalizedRole = normalizeRoleName(userRole);  
+  const canAccessDuty = canAccessDutyGroup(userRole, capDonVi);  
+  
+  const isCoreNav = (item: NavItem) =>  
+    item.id === "executive" ||  
+    item.id === "executive-training" ||  
+    item.id.startsWith("report-") ||  
+    item.id === "statistics" ||  
+    item.id === "settings";  
+  
+  if (normalizedRole === "Quản Trị Viên") {  
+    return ALL_NAV_ITEMS;  
+  }  
+  
+  if (normalizedRole === "Trực ban tác chiến") {  
+    return ALL_NAV_ITEMS.filter(  
+      (item) => isCoreNav(item) || (item.id.startsWith("duty-") && canAccessDuty),  
+    );  
+  }  
+  
+  if (  
+    normalizedRole === "Trực chỉ huy" ||  
+    normalizedRole === "Trực ban nội vụ"  
+  ) {  
+    return ALL_NAV_ITEMS.filter(  
+      (item) =>  
+        item.id.startsWith("report-") ||  
+        item.id === "statistics" ||  
+        item.id === "settings",  
+    );  
+  }  
+  
+  return ALL_NAV_ITEMS.filter((item) => {  
+    if (!item.allowedRoles) return true;  
+    return item.allowedRoles.includes(normalizedRole);  
+  });  
 }
 
 export function getLoadingText(id: NavItemId): {
