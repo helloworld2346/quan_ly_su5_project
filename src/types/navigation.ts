@@ -88,85 +88,85 @@ export const EXECUTIVE_NAV_GROUP = {
   label: "Tổng hợp điều hành",
   items: [EXECUTIVE_NAV, EXECUTIVE_TRAINING_NAV],
 };
-  
-export const REPORT_NAV_GROUP = {  
-  label: "Thống kê",  
-  labelByRole: {  
-    "Trực ban tác chiến": "Báo ban",  
-    "Trực ban nội vụ": "Báo ban",  
-  },  
-  items: [  
-    {  
-      id: "report-troop" as const,  
-      label: "Thống kê quân số hoạt động trong ngày ",  
-      path: "/daily-report",  
-      loadingTitle: "Đang tải báo cáo ngày",  
-      loadingSubtitle: "Đang tải dữ liệu…",  
-      component: DailyTroopReport,  
-      allowedRoles: [  
-        "Quản Trị Viên",  
-        "Trực ban tác chiến",  
-        "Trực chỉ huy",  
-        "Trực ban nội vụ",  
-      ],  
-    },  
-    {  
-      id: "report-political-work" as const,  
-      label: "Hoạt động Công tác Đảng, công tác chính trị",  
-      path: "/political-work-report",  
-      loadingTitle: "Đang tải công tác Đảng, công tác chính trị",  
-      loadingSubtitle: "Đang tải dữ liệu…",  
-      component: PoliticalWorkReport,  
-      allowedRoles: [  
-        "Quản Trị Viên",  
-        "Trực ban tác chiến",  
-        "Trực chỉ huy",  
-        "Trực ban nội vụ",  
-      ],  
-    },  
-    {  
-      id: "report-training" as const,  
-      label: "Thống kê quân số huấn luyện",  
-      path: "/training-report",  
-      loadingTitle: "Đang tải báo cáo huấn luyện",  
-      loadingSubtitle: "Đang tải dữ liệu…",  
-      component: TrainingReport,  
-      allowedRoles: [  
-        "Quản Trị Viên",  
-        "Trực ban tác chiến",  
-        "Trực chỉ huy",  
-        "Trực ban nội vụ",  
-      ],  
-    },  
-    {  
-      id: "report-family" as const,  
-      label: "Báo ban thân nhân thăm nuôi",  
-      path: "/family-report",  
-      loadingTitle: "Đang tải báo cáo thân nhân thăm nuôi",  
-      loadingSubtitle: "Đang tải dữ liệu…",  
-      component: FamilyReport,  
-      allowedRoles: [  
-        "Quản Trị Viên",  
-        "Trực ban tác chiến",  
-        "Trực chỉ huy",  
-        "Trực ban nội vụ",  
-      ],  
-    },  
-    {  
-      id: "report-communication" as const,  
-      label: "Báo ban thông tin liên lạc",  
-      path: "/communication-report",  
-      loadingTitle: "Đang tải báo cáo thông tin liên lạc",  
-      loadingSubtitle: "Đang tải dữ liệu…",  
-      component: CommunicationReport,  
-      allowedRoles: [  
-        "Quản Trị Viên",  
-        "Trực ban tác chiến",  
-        "Trực chỉ huy",  
-        "Trực ban nội vụ",  
-      ],  
-    },  
-  ],  
+
+export const REPORT_NAV_GROUP = {
+  label: "Thống kê",
+  labelByRole: {
+    "Trực ban tác chiến": "Báo ban",
+    "Trực ban nội vụ": "Báo ban",
+  },
+  items: [
+    {
+      id: "report-troop" as const,
+      label: "Thống kê quân số hoạt động trong ngày ",
+      path: "/daily-report",
+      loadingTitle: "Đang tải báo cáo ngày",
+      loadingSubtitle: "Đang tải dữ liệu…",
+      component: DailyTroopReport,
+      allowedRoles: [
+        "Quản Trị Viên",
+        "Trực ban tác chiến",
+        "Trực chỉ huy",
+        "Trực ban nội vụ",
+      ],
+    },
+    {
+      id: "report-political-work" as const,
+      label: "Hoạt động Công tác Đảng, công tác chính trị",
+      path: "/political-work-report",
+      loadingTitle: "Đang tải công tác Đảng, công tác chính trị",
+      loadingSubtitle: "Đang tải dữ liệu…",
+      component: PoliticalWorkReport,
+      allowedRoles: [
+        "Quản Trị Viên",
+        "Trực ban tác chiến",
+        "Trực chỉ huy",
+        "Trực ban nội vụ",
+      ],
+    },
+    {
+      id: "report-training" as const,
+      label: "Thống kê quân số huấn luyện",
+      path: "/training-report",
+      loadingTitle: "Đang tải báo cáo huấn luyện",
+      loadingSubtitle: "Đang tải dữ liệu…",
+      component: TrainingReport,
+      allowedRoles: [
+        "Quản Trị Viên",
+        "Trực ban tác chiến",
+        "Trực chỉ huy",
+        "Trực ban nội vụ",
+      ],
+    },
+    {
+      id: "report-family" as const,
+      label: "Báo ban thân nhân thăm nuôi",
+      path: "/family-report",
+      loadingTitle: "Đang tải báo cáo thân nhân thăm nuôi",
+      loadingSubtitle: "Đang tải dữ liệu…",
+      component: FamilyReport,
+      allowedRoles: [
+        "Quản Trị Viên",
+        "Trực ban tác chiến",
+        "Trực chỉ huy",
+        "Trực ban nội vụ",
+      ],
+    },
+    {
+      id: "report-communication" as const,
+      label: "Báo ban thông tin liên lạc",
+      path: "/communication-report",
+      loadingTitle: "Đang tải báo cáo thông tin liên lạc",
+      loadingSubtitle: "Đang tải dữ liệu…",
+      component: CommunicationReport,
+      allowedRoles: [
+        "Quản Trị Viên",
+        "Trực ban tác chiến",
+        "Trực chỉ huy",
+        "Trực ban nội vụ",
+      ],
+    },
+  ],
 };
 
 export const STATISTICS_NAV: NavItem = {
@@ -332,61 +332,64 @@ export function getNavItemById(id: NavItemId): NavItem | undefined {
   return ALL_NAV_ITEMS.find((item) => item.id === id);
 }
 
-// thêm helper này trước getNavItemsByRole()  
-export function canAccessDutyGroup(  
-  userRole: string | null | undefined,  
-  capDonVi: string | null | undefined,  
-): boolean {  
-  const normalizedRole = normalizeRoleName(userRole ?? undefined);  
-  
-  if (normalizedRole === "Quản Trị Viên") return true;  
-  if (normalizedRole !== "Trực ban tác chiến") return false;  
-  
-  return capDonVi === "SU_DOAN";  
-}  
-  
-export function getNavItemsByRole(  
-  userRole: string | null,  
-  capDonVi: string | null = null,  
-): NavItem[] {  
-  if (!userRole) return [];  
-  
-  const normalizedRole = normalizeRoleName(userRole);  
-  const canAccessDuty = canAccessDutyGroup(userRole, capDonVi);  
-  
-  const isCoreNav = (item: NavItem) =>  
-    item.id === "executive" ||  
-    item.id === "executive-training" ||  
-    item.id.startsWith("report-") ||  
-    item.id === "statistics" ||  
-    item.id === "settings";  
-  
-  if (normalizedRole === "Quản Trị Viên") {  
-    return ALL_NAV_ITEMS;  
-  }  
-  
-  if (normalizedRole === "Trực ban tác chiến") {  
-    return ALL_NAV_ITEMS.filter(  
-      (item) => isCoreNav(item) || (item.id.startsWith("duty-") && canAccessDuty),  
-    );  
-  }  
-  
-  if (  
-    normalizedRole === "Trực chỉ huy" ||  
-    normalizedRole === "Trực ban nội vụ"  
-  ) {  
-    return ALL_NAV_ITEMS.filter(  
-      (item) =>  
-        item.id.startsWith("report-") ||  
-        item.id === "statistics" ||  
-        item.id === "settings",  
-    );  
-  }  
-  
-  return ALL_NAV_ITEMS.filter((item) => {  
-    if (!item.allowedRoles) return true;  
-    return item.allowedRoles.includes(normalizedRole);  
-  });  
+export function canAccessDutyGroup(
+  userRole: string | null | undefined,
+  capDonVi: string | null | undefined,
+): boolean {
+  const normalizedRole = normalizeRoleName(userRole ?? undefined);
+
+  if (normalizedRole === "Quản Trị Viên") return true;
+  if (normalizedRole !== "Trực ban tác chiến") return false;
+
+  return capDonVi === "SU_DOAN";
+}
+
+export function getNavItemsByRole(
+  userRole: string | null,
+  capDonVi: string | null = null,
+): NavItem[] {
+  if (!userRole) return [];
+
+  const normalizedRole = normalizeRoleName(userRole);
+  const canAccessDuty = canAccessDutyGroup(userRole, capDonVi);
+
+  const isCoreNav = (item: NavItem) =>
+    item.id === "executive" ||
+    item.id === "executive-training" ||
+    item.id.startsWith("report-") ||
+    item.id === "statistics" ||
+    item.id === "settings";
+
+  const isExecutiveItem = (item: NavItem) =>
+    item.id === "executive" || item.id === "executive-training";
+
+  if (normalizedRole === "Quản Trị Viên") {
+    return ALL_NAV_ITEMS;
+  }
+
+  if (normalizedRole === "Trực ban tác chiến") {
+    return ALL_NAV_ITEMS.filter((item) => {
+      if (isExecutiveItem(item)) return capDonVi === "SU_DOAN";
+      return isCoreNav(item) || (item.id.startsWith("duty-") && canAccessDuty);
+    });
+  }
+
+  if (
+    normalizedRole === "Trực chỉ huy" ||
+    normalizedRole === "Trực ban nội vụ"
+  ) {
+    return ALL_NAV_ITEMS.filter(
+      (item) =>
+        item.id.startsWith("report-") ||
+        item.id === "statistics" ||
+        item.id === "settings",
+    );
+  }
+
+  return ALL_NAV_ITEMS.filter((item) => {
+    if (!item.allowedRoles) return true;
+    return item.allowedRoles.includes(normalizedRole);
+  });
 }
 
 export function getLoadingText(id: NavItemId): {

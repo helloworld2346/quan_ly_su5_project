@@ -397,7 +397,7 @@ export default function DailyTroopReport() {
         onExportExcel={handleExportExcel}
         isPastDate={isPastDate}
         hasReport={checkIfDateHasReport}
-        showExport={false}
+        showExport={isTacChien && capDonVi === "SU_DOAN"}
       />
 
       <DailyTroopStatisticsSection
