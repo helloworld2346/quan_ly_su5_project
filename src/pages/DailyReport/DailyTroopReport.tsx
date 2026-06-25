@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "./DailyTroopReport.module.css";
+import type { AxiosError } from "axios";
 
 import ReportToolbar from "../../components/report/ReportToolbar";
 import TroopDetailModal from "./TroopDetailModal";
@@ -24,7 +25,6 @@ import { useDailyTroopReportViewModel } from "./hooks/useDailyTroopReportViewMod
 
 import DailyTroopStatisticsSection from "./components/DailyTroopStatisticsSection";
 import DailyTroopNhiemVuSection from "./components/DailyTroopNhiemVuSection";
-
 
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
@@ -304,6 +304,13 @@ export default function DailyTroopReport() {
       return;
     }
 
+    if (isTacChien && !caTrucFromApi) {
+      showError(
+        "Chưa có ca trực cho ngày này. Vui lòng tạo ca trực trước khi tạo báo cáo!",
+      );
+      return;
+    }
+
     setShowCreateModal(true);
   };
 
@@ -495,8 +502,18 @@ export default function DailyTroopReport() {
                     noiDungCanGiaiQuyet: detailData.pendingDetail,
                     donBaoCao: res.Result.idDonBaoCao,
                   });
-                } catch {
-                  // Không block nếu nhiemvungay fail
+                } catch (error) {
+                  const status = (error as AxiosError)?.response?.status;
+                  if (status === 404) {
+                    showError(
+                      "Chưa có ca trực cho ngày này. Vui lòng tạo ca trực trước!",
+                    );
+                    return;
+                  }
+                  handleApiError(error, {
+                    showError,
+                    errorMessage: "Không thể tạo báo cáo",
+                  });
                 }
               }
 
