@@ -22,6 +22,16 @@ type ExportArgs = {
 const COLUMN_COUNT = 18;
 const FONT = "Times New Roman";
 
+const PROTECT_PASSWORD = "su5@2026";
+
+const COLOR = {
+  WHITE: "FFFFFFFF",
+  TITLE_FILL: "FF1F4E78",
+  HEADER_FILL: "FF2E75B6",
+  ZEBRA_FILL: "FFEAF1FB",
+  TOTAL_FILL: "FFFFF2CC",
+} as const;
+
 export async function exportTroopReportToExcel({
   displayRows,
   displayTotals,
@@ -121,13 +131,13 @@ export async function exportTroopReportToExcel({
     name: FONT,
     bold: true,
     size: 16,
-    color: { argb: "FFFFFFFF" },
+    color: { argb: COLOR.WHITE },
   };
   ws.getCell(7, 1).alignment = { horizontal: "center", vertical: "middle" };
   ws.getCell(7, 1).fill = {
     type: "pattern",
     pattern: "solid",
-    fgColor: { argb: "FF1F4E78" },
+    fgColor: { argb: COLOR.TITLE_FILL },
   };
   ws.getRow(7).height = 26;
 
@@ -166,7 +176,7 @@ export async function exportTroopReportToExcel({
 
   let rowIdx = r3 + 1;
   displayRows.forEach((row, i) => {
-    const zebra = i % 2 === 0 ? "FFFFFFFF" : "FFEAF1FB";
+    const zebra = i % 2 === 0 ? COLOR.WHITE : COLOR.ZEBRA_FILL;
     writeDataRow(
       ws,
       rowIdx,
@@ -221,7 +231,7 @@ export async function exportTroopReportToExcel({
       t.lyDoVangKhac,
     ],
     true,
-    "FFFFF2CC",
+    COLOR.TOTAL_FILL,
   );
   rowIdx++;
 
@@ -247,7 +257,7 @@ export async function exportTroopReportToExcel({
   ws.getColumn(1).width = 12;
   for (let c = 2; c <= COLUMN_COUNT; c++) ws.getColumn(c).width = 12;
 
-  await ws.protect("su5@2026", {
+  await ws.protect(PROTECT_PASSWORD, {
     selectLockedCells: true,
     selectUnlockedCells: true,
     formatCells: false,
@@ -285,7 +295,7 @@ function styleHeaderRange(ws: ExcelJS.Worksheet, from: number, to: number) {
         name: FONT,
         bold: true,
         size: 14,
-        color: { argb: "FFFFFFFF" },
+        color: { argb: COLOR.WHITE },
       };
       cell.alignment = {
         horizontal: "center",
@@ -296,7 +306,7 @@ function styleHeaderRange(ws: ExcelJS.Worksheet, from: number, to: number) {
       cell.fill = {
         type: "pattern",
         pattern: "solid",
-        fgColor: { argb: "FF2E75B6" },
+        fgColor: { argb: COLOR.HEADER_FILL },
       };
     }
   }
