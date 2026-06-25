@@ -65,6 +65,7 @@ export type ReportItemInput = {
   trucBanTacChien?: string;
   donVi: { maDonVi: string; tenDonvi: string; kyhieuDonvi?: string };
   caTruc: CaTrucInfo;
+  tinhHinhHoatDong?: string;
 };
 
 export interface CreateReportRequest {
@@ -77,6 +78,7 @@ export interface CreateReportRequest {
   donVi: string;
   trucBanChiHuy?: string;
   trucBanTacChien?: string;
+  tinhHinhHoatDong?: string;
 }
 
 export interface CreateReportResponse {
@@ -101,6 +103,7 @@ export interface CreateReportResponse {
       kyhieuDonvi?: string;
     };
     caTruc: CaTrucInfo;
+    tinhHinhHoatDong?: string;
   };
 }
 
@@ -115,6 +118,7 @@ export interface UpdateReportRequest {
   donVi: string;
   trucBanChiHuy?: string;
   trucBanTacChien?: string;
+  tinhHinhHoatDong?: string;
 }
 
 export interface UpdateReportResponse {
@@ -138,6 +142,7 @@ export interface UpdateReportResponse {
       kyhieuDonvi?: string;
     };
     caTruc: CaTrucInfo;
+    tinhHinhHoatDong?: string;
   };
 }
 
@@ -321,4 +326,5 @@ export interface ReportRow {
 export type EditModalData = {
   reportId: string;
   ngayBaoCao: string;
+  idNhiemvuNgay?: string;
 };

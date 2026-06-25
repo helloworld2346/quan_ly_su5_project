@@ -117,7 +117,12 @@ export const REPORT_NAV_GROUP = {
       loadingTitle: "Đang tải công tác Đảng, công tác chính trị",
       loadingSubtitle: "Đang tải dữ liệu…",
       component: PoliticalWorkReport,
-      allowedRoles: ["Quản Trị Viên", "Sư đoàn", "Chỉ huy", "Báo cáo"],
+      allowedRoles: [
+        "Quản Trị Viên",
+        "Trực ban tác chiến",
+        "Trực chỉ huy",
+        "Trực ban nội vụ",
+      ],
     },
     {
       id: "report-training" as const,
@@ -126,7 +131,12 @@ export const REPORT_NAV_GROUP = {
       loadingTitle: "Đang tải báo cáo huấn luyện",
       loadingSubtitle: "Đang tải dữ liệu…",
       component: TrainingReport,
-      allowedRoles: ["Quản Trị Viên", "Sư đoàn", "Chỉ huy", "Báo cáo"],
+      allowedRoles: [
+        "Quản Trị Viên",
+        "Trực ban tác chiến",
+        "Trực chỉ huy",
+        "Trực ban nội vụ",
+      ],
     },
     {
       id: "report-family" as const,
@@ -135,7 +145,12 @@ export const REPORT_NAV_GROUP = {
       loadingTitle: "Đang tải báo cáo thân nhân thăm nuôi",
       loadingSubtitle: "Đang tải dữ liệu…",
       component: FamilyReport,
-      allowedRoles: ["Quản Trị Viên", "Sư đoàn", "Chỉ huy", "Báo cáo"],
+      allowedRoles: [
+        "Quản Trị Viên",
+        "Trực ban tác chiến",
+        "Trực chỉ huy",
+        "Trực ban nội vụ",
+      ],
     },
     {
       id: "report-communication" as const,
@@ -144,7 +159,12 @@ export const REPORT_NAV_GROUP = {
       loadingTitle: "Đang tải báo cáo thông tin liên lạc",
       loadingSubtitle: "Đang tải dữ liệu…",
       component: CommunicationReport,
-      allowedRoles: ["Quản Trị Viên", "Sư đoàn", "Chỉ huy", "Báo cáo"],
+      allowedRoles: [
+        "Quản Trị Viên",
+        "Trực ban tác chiến",
+        "Trực chỉ huy",
+        "Trực ban nội vụ",
+      ],
     },
   ],
 };
@@ -156,7 +176,12 @@ export const STATISTICS_NAV: NavItem = {
   loadingTitle: "Đang tải thống kê",
   loadingSubtitle: "Đang tải dữ liệu…",
   component: ReportStatistics,
-  allowedRoles: ["Quản Trị Viên", "Trực ban tác chiến", "Trực chỉ huy", "Trực ban nội vụ"],
+  allowedRoles: [
+    "Quản Trị Viên",
+    "Trực ban tác chiến",
+    "Trực chỉ huy",
+    "Trực ban nội vụ",
+  ],
 };
 
 export const DUTY_NAV_GROUP = {
@@ -199,7 +224,12 @@ export const SETTINGS_NAV: NavItem = {
   loadingTitle: "Đang tải cài đặt",
   loadingSubtitle: "Đang tải dữ liệu…",
   component: Settings,
-  allowedRoles: ["Quản Trị Viên", "Trực ban tác chiến", "Trực chỉ huy", "Trực ban nội vụ"],
+  allowedRoles: [
+    "Quản Trị Viên",
+    "Trực ban tác chiến",
+    "Trực chỉ huy",
+    "Trực ban nội vụ",
+  ],
 };
 
 export const NAV_PAGE_TITLES: Record<NavItemId, string> = {
@@ -254,16 +284,45 @@ export function getNavGroupLabel(activeId: NavItemId): string | null {
 export function getNavGroupLabelByRole(
   groupLabel: string,
   userRole: string | null,
-  isParentUnit: boolean = false,
+  capDonVi: string | null = null,
+  unitName: string | null = null,
+  unitSymbol: string | null = null,
 ): string {
   const normalized = userRole ? normalizeRoleName(userRole) : null;
+  const normalizedCap = capDonVi ? capDonVi.toUpperCase() : null;
+  const normalizedUnitName = unitName?.toLowerCase() ?? "";
+  const normalizedUnitSymbol = unitSymbol?.toLowerCase() ?? "";
+
+  const isDbOrEbUnit =
+    normalizedUnitSymbol.includes("ebộ") ||
+    normalizedUnitSymbol.includes("ebo") ||
+    normalizedUnitSymbol.includes("dbộ") ||
+    normalizedUnitSymbol.includes("dbo") ||
+    normalizedUnitName.includes("dbộ") ||
+    normalizedUnitName.includes("ebộ") ||
+    normalizedUnitName.includes("dbo") ||
+    normalizedUnitName.includes("ebo") ||
+    normalizedUnitName.includes("d bộ") ||
+    normalizedUnitName.includes("e bộ");
 
   if (groupLabel === "Thống kê") {
-    if (normalized === "Trực ban tác chiến") {
-      return isParentUnit ? "Tổng Hợp - Báo Ban" : "Báo Ban";
+    if (normalized === "Trực chỉ huy") {
+      if (isDbOrEbUnit) return "Thống kê";
+
+      return normalizedCap === "TRUNG_DOAN" || normalizedCap === "TIEU_DOAN"
+        ? "Phê duyệt thống kê"
+        : "Thống kê";
     }
-    if (normalized === "Trực ban nội vụ") return "Báo Ban";
-    if (normalized === "Trực chỉ huy") return "Phê duyệt báo ban";
+
+    if (normalized === "Trực ban nội vụ") {
+      return normalizedCap === "TIEU_DOAN" ? "Tổng hợp, thống kê" : "Thống kê";
+    }
+
+    if (normalized === "Trực ban tác chiến") {
+      return normalizedCap === "SU_DOAN" || normalizedCap === "TRUNG_DOAN"
+        ? "Tổng hợp, thống kê"
+        : "Thống kê";
+    }
   }
 
   return groupLabel;
@@ -273,22 +332,46 @@ export function getNavItemById(id: NavItemId): NavItem | undefined {
   return ALL_NAV_ITEMS.find((item) => item.id === id);
 }
 
-export function getNavItemsByRole(userRole: string | null): NavItem[] {
-  if (!userRole) return [];
-  const normalizedRole = normalizeRoleName(userRole);
+export function canAccessDutyGroup(
+  userRole: string | null | undefined,
+  capDonVi: string | null | undefined,
+): boolean {
+  const normalizedRole = normalizeRoleName(userRole ?? undefined);
 
-  if (normalizedRole === "Quản Trị Viên") return ALL_NAV_ITEMS;
+  if (normalizedRole === "Quản Trị Viên") return true;
+  if (normalizedRole !== "Trực ban tác chiến") return false;
+
+  return capDonVi === "SU_DOAN";
+}
+
+export function getNavItemsByRole(
+  userRole: string | null,
+  capDonVi: string | null = null,
+): NavItem[] {
+  if (!userRole) return [];
+
+  const normalizedRole = normalizeRoleName(userRole);
+  const canAccessDuty = canAccessDutyGroup(userRole, capDonVi);
+
+  const isCoreNav = (item: NavItem) =>
+    item.id === "executive" ||
+    item.id === "executive-training" ||
+    item.id.startsWith("report-") ||
+    item.id === "statistics" ||
+    item.id === "settings";
+
+  const isExecutiveItem = (item: NavItem) =>
+    item.id === "executive" || item.id === "executive-training";
+
+  if (normalizedRole === "Quản Trị Viên") {
+    return ALL_NAV_ITEMS;
+  }
 
   if (normalizedRole === "Trực ban tác chiến") {
-    return ALL_NAV_ITEMS.filter(
-      (item) =>
-        item.id === "executive" ||
-        item.id === "executive-training" ||
-        item.id.startsWith("report-") ||
-        item.id === "statistics" ||
-        item.id.startsWith("duty-") ||
-        item.id === "settings",
-    );
+    return ALL_NAV_ITEMS.filter((item) => {
+      if (isExecutiveItem(item)) return capDonVi === "SU_DOAN";
+      return isCoreNav(item) || (item.id.startsWith("duty-") && canAccessDuty);
+    });
   }
 
   if (

@@ -7,16 +7,18 @@ export function useReportPermissions(
   capDonVi: string | null | undefined,
   ownReport: ReportRow | null,
   commanderReport: ReportRow | null,
+  hasChildren: boolean,
 ) {
   const normalizedRole = normalizeRoleName(userRole ?? undefined);
-  const isChiHuy = normalizedRole === "Trực chỉ huy"; // replaces isCommander
-  const isTacChien = normalizedRole === "Trực ban tác chiến"; // replaces isSuDoan
-  const isNoiVu = normalizedRole === "Trực ban nội vụ"; // replaces isReporter
-  const isReporter = isTacChien || isNoiVu; // can submit/recall
+  const isChiHuy = normalizedRole === "Trực chỉ huy";
+  const isTacChien = normalizedRole === "Trực ban tác chiến";
+  const isNoiVu = normalizedRole === "Trực ban nội vụ";
+  const isReporter = isTacChien || isNoiVu;
   const isTrungDoan = capDonVi === "TRUNG_DOAN";
   const isTieuDoan = capDonVi === "TIEU_DOAN";
   const needsApproval = isTrungDoan || isTieuDoan;
   const selfApprove = !needsApproval;
+  const isChiHuyLeaf = isChiHuy && !hasChildren;
 
   const canApprove = useMemo(() => {
     if (!commanderReport || commanderReport.notSubmitted) return false;
@@ -29,14 +31,20 @@ export function useReportPermissions(
   }, [commanderReport, isChiHuy]);
 
   const canSubmit = useMemo(() => {
-    if ((!isReporter && !selfApprove) || !ownReport || ownReport.notSubmitted)
+    if (
+      (!isReporter && !selfApprove && !isChiHuyLeaf) ||
+      !ownReport ||
+      ownReport.notSubmitted
+    ) {
       return false;
+    }
     return ownReport.status === "Nháp";
-  }, [isReporter, selfApprove, ownReport]);
+  }, [isReporter, selfApprove, isChiHuyLeaf, ownReport]);
 
   const canRecall = useMemo(() => {
-    if ((!isReporter && !selfApprove) || !ownReport || ownReport.notSubmitted)
+    if ((!isReporter && !selfApprove) || !ownReport || ownReport.notSubmitted) {
       return false;
+    }
     return ownReport.status === "Chờ_Duyệt";
   }, [isReporter, selfApprove, ownReport]);
 
@@ -49,6 +57,7 @@ export function useReportPermissions(
     isTieuDoan,
     needsApproval,
     selfApprove,
+    isChiHuyLeaf,
     canApprove,
     canRefuse,
     canSubmit,

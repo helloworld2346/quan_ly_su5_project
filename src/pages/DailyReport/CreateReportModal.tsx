@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import styles from "./CreateReportModal.module.css";
 import DailyReportDetailStep from "./DailyReportDetailStep";
+import type { DetailStepData } from "./DailyReportDetailStep";
 import type {
   AbsentRow,
   VangChiTiet,
@@ -26,7 +27,7 @@ import AbsentRowsTable from "./components/AbsentRowsTable";
 interface CreateReportModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (payload: CreateReportRequest) => void;
+  onSubmit: (payload: CreateReportRequest, detailData?: DetailStepData) => void;
   initialData?: CreateReportResponse["Result"] | null;
   maDonViCurrent?: string;
   tongQuanSoBienChe?: number;
@@ -34,6 +35,7 @@ interface CreateReportModalProps {
   caTrucInfo?: CaTrucInfo | null;
   isTacChien?: boolean;
   reportDate?: string;
+  initialDetailData?: DetailStepData | null;
 }
 
 export const CreateReportModal: React.FC<CreateReportModalProps> = ({
@@ -47,9 +49,52 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   caTrucInfo,
   isTacChien,
   reportDate,
+  initialDetailData,
 }) => {
   const { showWarning } = useToast();
   const [step, setStep] = useState(1);
+  const [detailData, setDetailData] = useState<DetailStepData | null>(null);
+  const [validationError, setValidationError] = useState("");
+
+  const [nhiemVuInitialData, setNhiemVuInitialData] = useState<{
+    idNhiemvuNgay: string;
+    nhiemVuPhandoi: string;
+    noiDungDotXuat: string;
+    noiDungUuDiem: string;
+    noiDungKhuyetDiem: string;
+    noiDungCanGiaiQuyet: string;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!initialData?.idDonBaoCao) return;
+    void dailyReportService
+      .getNhiemVuNgayByDonBaoCao(initialData.idDonBaoCao)
+      .then((res) => {
+        if (res.Result) setNhiemVuInitialData(res.Result);
+      })
+      .catch(() => {
+        // Không block nếu chưa có nhiemvungay
+      });
+  }, [initialData?.idDonBaoCao]);
+
+
+  const detailFromInitialData = useMemo<DetailStepData | null>(() => {
+    if (initialDetailData) return initialDetailData;
+    if (!nhiemVuInitialData) return null;
+
+    return {
+      securityStatus: nhiemVuInitialData.nhiemVuPhandoi ?? "unsafe",
+      incidentStatus: nhiemVuInitialData.noiDungDotXuat ? "yes" : "no",
+      incidentDetail: nhiemVuInitialData.noiDungDotXuat ?? "",
+      advantageStatus: nhiemVuInitialData.noiDungUuDiem ? "yes" : "no",
+      advantageDetail: nhiemVuInitialData.noiDungUuDiem ?? "",
+      disadvantageStatus: nhiemVuInitialData.noiDungKhuyetDiem ? "yes" : "no",
+      disadvantageDetail: nhiemVuInitialData.noiDungKhuyetDiem ?? "",
+      pendingTaskStatus: nhiemVuInitialData.noiDungCanGiaiQuyet ? "yes" : "no",
+      pendingDetail: nhiemVuInitialData.noiDungCanGiaiQuyet ?? "",
+    };
+  }, [initialDetailData, nhiemVuInitialData]);
+
   const [ngayBaoCao] = useState<string>(() => {
     if (initialData?.thoiGianBaoCao) {
       return initialData.thoiGianBaoCao.split("T")[0];
@@ -121,6 +166,70 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
     return result >= 0 ? result : 0;
   }, [tongQuanSo, quanSoVang]);
 
+  const effectiveDetailData = detailData ?? detailFromInitialData;
+
+  const validateStep1 = () => {
+    if (
+      !trucChiHuy.tenNguoitruc.trim() ||
+      !trucChiHuy.capbacNguoitruc.trim() ||
+      !trucChiHuy.chucvuNguoitruc.trim()
+    ) {
+      return "Điền đầy đủ Trực chỉ huy trước khi tiếp tục.";
+    }
+
+    if (
+      !trucBanTacChien.tenNguoitruc.trim() ||
+      !trucBanTacChien.capbacNguoitruc.trim() ||
+      !trucBanTacChien.chucvuNguoitruc.trim()
+    ) {
+      return `Điền đầy đủ ${
+        isTacChien ? "Trực ban tác chiến" : "Trực ban nội vụ"
+      } trước khi tiếp tục.`;
+    }
+
+    const invalidIndex = absentRows.findIndex(
+      (row) => !row.hoTen.trim() || !row.capBac.trim() || !row.lyDoVang,
+    );
+
+    if (invalidIndex !== -1) {
+      return `Dòng ${
+        invalidIndex + 1
+      } của danh sách quân nhân vắng chưa điền đủ họ tên, cấp bậc hoặc lý do vắng.`;
+    }
+
+    return "";
+  };
+
+  const validateDetailStep = (data: DetailStepData | null) => {
+    if (!data) {
+      return "Bạn phải điền xong TÌNH HÌNH HOẠT ĐỘNG NHIỆM VỤ NGÀY trước khi lưu báo cáo.";
+    }
+
+    if (!data.securityStatus) return "Mục I chưa được chọn.";
+    if (!data.incidentStatus) return "Mục II chưa được chọn.";
+    if (data.incidentStatus === "yes" && !data.incidentDetail.trim()) {
+      return "Mục II cần nhập chi tiết khi chọn Có.";
+    }
+
+    if (!data.advantageStatus) return "Mục III - Ưu điểm chưa được chọn.";
+    if (!data.advantageDetail.trim()) {
+      return "Mục III - Ưu điểm cần nhập chi tiết.";
+    }
+
+    if (!data.disadvantageStatus)
+      return "Mục III - Khuyết điểm chưa được chọn.";
+    if (!data.disadvantageDetail.trim()) {
+      return "Mục III - Khuyết điểm cần nhập chi tiết.";
+    }
+
+    if (!data.pendingTaskStatus) return "Mục IV chưa được chọn.";
+    if (data.pendingTaskStatus === "yes" && !data.pendingDetail.trim()) {
+      return "Mục IV cần nhập chi tiết khi chọn Có.";
+    }
+
+    return "";
+  };
+
   const handleAddRow = () => {
     const newRow: AbsentRow = {
       id: crypto.randomUUID(),
@@ -177,22 +286,48 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
 
   const handleLoadYesterday = async () => {
     if (!maDonViCurrent) return;
-
     const d = new Date(ngayBaoCao);
     d.setDate(d.getDate() - 1);
     const yesterday = d.toISOString().split("T")[0];
-
     if (absentRows.length > 0) {
       setPendingYesterday(yesterday);
       setConfirmOpen(true);
       return;
     }
-
     await doLoadYesterday(yesterday);
   };
 
-  const handleLocalSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleGoToDetailStep = () => {
+    const step1Error = validateStep1();
+    if (step1Error) {
+      setValidationError(step1Error);
+      showWarning(step1Error);
+      return;
+    }
+
+    setValidationError("");
+    setStep(2);
+  };
+
+  const handleFinalSubmit = () => {
+    console.log("Dữ liệu nhiệm vụ trước khi lưu:", detailData);
+    const step1Error = validateStep1();
+    if (step1Error) {
+      setValidationError(step1Error);
+      showWarning(step1Error);
+      setStep(1);
+      return;
+    }
+
+    const detailError = validateDetailStep(effectiveDetailData);
+    if (detailError) {
+      setValidationError(detailError);
+      showWarning(detailError);
+      setStep(2);
+      return;
+    }
+
+    const currentDetailData = effectiveDetailData!;
 
     const thongTinVangObj: VangChiTiet = {
       hoiThaiNgoaiSuDoan: 0,
@@ -227,22 +362,27 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       donVi: initialData?.donVi?.maDonVi || maDonViCurrent || "",
       trucBanChiHuy: JSON.stringify(trucChiHuy),
       trucBanTacChien: JSON.stringify(trucBanTacChien),
+      tinhHinhHoatDong: JSON.stringify(currentDetailData),
     };
 
-
-    onSubmit(payload);
+    onSubmit(payload, currentDetailData);
   };
+
   const handleCloseModal = () => {
     setStep(1);
+    setDetailData(null);
+    setValidationError("");
+    setConfirmOpen(false);
+    setPendingYesterday(null);
     onClose();
   };
-  if (!isOpen) return null;
 
+  if (!isOpen) return null;
   const isConsolidation = !!consolidatedAbsentRows;
 
   return (
     <div className={styles.overlay}>
-      <form className={styles.modal} onSubmit={handleLocalSubmit}>
+      <div className={styles.modal}>
         <div className={styles.header}>
           <h2 className={styles.title}>
             {step === 2
@@ -263,8 +403,10 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
         </div>
 
         <div className={styles.body}>
-          {step === 1 && (
-            <>
+          <div
+            className={`${styles.stepsTrack} ${step === 2 ? styles.stepsTrackStep2 : ""}`}
+          >
+            <div className={styles.stepPanel}>
               {caTrucInfo?.matkhau && (
                 <div className={styles.caTrucBanner}>
                   <span className={styles.caTrucBannerLabel}>
@@ -275,7 +417,6 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                   </span>
                 </div>
               )}
-
 
               <div className={styles.coreGrid}>
                 <div className={styles.field}>
@@ -289,6 +430,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                     required
                   />
                 </div>
+
                 <div className={styles.field}>
                   <label className={styles.label}>Tổng quân số biên chế</label>
                   <input
@@ -301,6 +443,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                     min={0}
                   />
                 </div>
+
                 <div className={styles.field}>
                   <label className={styles.label}>Quân số hiện diện</label>
                   <input
@@ -310,6 +453,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                     disabled
                   />
                 </div>
+
                 <div className={styles.field}>
                   <label className={styles.label}>Tổng vắng</label>
                   <input
@@ -331,13 +475,17 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                   isTacChien ? CAP_BAC_CHI_HUY_SU_DOAN : CAP_BAC_CHI_HUY_DEFAULT
                 }
               />
+
               <hr className={styles.divider} />
+
               <TrucNguoiFormSection
                 title={isTacChien ? "Trực ban tác chiến" : "Trực ban nội vụ"}
                 value={trucBanTacChien}
                 onChange={setTrucBanTacChien}
                 capBacOptions={
-                  isTacChien ? CAP_BAC_TAC_CHIEN_SU_DOAN : CAP_BAC_TAC_CHIEN_DEFAULT
+                  isTacChien
+                    ? CAP_BAC_TAC_CHIEN_SU_DOAN
+                    : CAP_BAC_TAC_CHIEN_DEFAULT
                 }
               />
 
@@ -346,7 +494,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
               <div className={styles.sectionHeader}>
                 <h3 className={styles.sectionTitle}>
                   {isConsolidation
-                    ? "Danh sách tổng hợp quân nhân vắng mặt (từ các đơn vị con)"
+                    ? "Danh sách tổng hợp quân nhân vắng mặt"
                     : "Danh sách quân nhân vắng mặt"}
                 </h3>
                 <div className={styles.sectionActions}>
@@ -357,7 +505,9 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                       onClick={handleLoadYesterday}
                       disabled={isLoadingYesterday}
                     >
-                      {isLoadingYesterday ? "Đang tải..." : "Sao chép từ hôm qua"}
+                      {isLoadingYesterday
+                        ? "Đang tải..."
+                        : "Sao chép từ hôm qua"}
                     </button>
                   )}
                   <button
@@ -377,23 +527,61 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                   onRemove={handleRemoveRow}
                 />
               </div>
+            </div>
 
-            </>
-          )}
-
-          {step === 2 && (
-            <DailyReportDetailStep />
-          )}
+            <div className={styles.stepPanel}>
+              <DailyReportDetailStep
+                key={
+                  initialDetailData
+                    ? JSON.stringify(initialDetailData)
+                    : (nhiemVuInitialData?.idNhiemvuNgay ?? "new")
+                }
+                initialData={
+                  initialDetailData ??
+                  (nhiemVuInitialData
+                    ? {
+                        securityStatus: nhiemVuInitialData.nhiemVuPhandoi ?? "",
+                        incidentStatus: nhiemVuInitialData.noiDungDotXuat
+                          ? "yes"
+                          : "",
+                        incidentDetail: nhiemVuInitialData.noiDungDotXuat ?? "",
+                        advantageStatus: nhiemVuInitialData.noiDungUuDiem
+                          ? "yes"
+                          : "",
+                        advantageDetail: nhiemVuInitialData.noiDungUuDiem ?? "",
+                        disadvantageStatus: nhiemVuInitialData.noiDungKhuyetDiem
+                          ? "yes"
+                          : "",
+                        disadvantageDetail:
+                          nhiemVuInitialData.noiDungKhuyetDiem ?? "",
+                        pendingTaskStatus:
+                          nhiemVuInitialData.noiDungCanGiaiQuyet ? "yes" : "",
+                        pendingDetail:
+                          nhiemVuInitialData.noiDungCanGiaiQuyet ?? "",
+                      }
+                    : null)
+                }
+                onChange={setDetailData}
+              />
+            </div>
+          </div>
         </div>
+
+        {validationError && (
+          <div
+            className={styles.validationError}
+            role="alert"
+            aria-live="polite"
+          >
+            {validationError}
+          </div>
+        )}
+
         <div className={styles.footer}>
           <button
             type="button"
             className={`${styles.btn} ${styles.btnCancel}`}
-            onClick={
-              step === 1
-                ? handleCloseModal
-                : () => setStep(1)
-            }
+            onClick={step === 1 ? handleCloseModal : () => setStep(1)}
           >
             {step === 1 ? "Hủy bỏ" : "Quay lại"}
           </button>
@@ -402,14 +590,15 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
             <button
               type="button"
               className={`${styles.btn} ${styles.btnSubmit}`}
-              onClick={() => setStep(2)}
+              onClick={handleGoToDetailStep}
             >
               Tiếp tục
             </button>
           ) : (
             <button
-              type="submit"
+              type="button"
               className={`${styles.btn} ${styles.btnSubmit}`}
+              onClick={handleFinalSubmit}
             >
               {isConsolidation
                 ? "Lưu báo cáo tổng hợp"
@@ -419,12 +608,14 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
             </button>
           )}
         </div>
-      </form>
+      </div>
 
       <ConfirmDialog
         isOpen={confirmOpen}
         title="Xác nhận sao chép"
-        message={`Danh sách hiện tại sẽ bị thay thế bằng dữ liệu ngày ${pendingYesterday ?? ""}. Tiếp tục?`}
+        message={`Danh sách hiện tại sẽ bị thay thế bằng dữ liệu ngày ${
+          pendingYesterday ?? ""
+        }. Tiếp tục?`}
         confirmText="Tiếp tục"
         cancelText="Hủy"
         type="warning"

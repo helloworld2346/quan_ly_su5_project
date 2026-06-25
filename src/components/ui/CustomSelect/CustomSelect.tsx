@@ -56,7 +56,6 @@ export default function CustomSelect({
         variant === "table" ? 180 : rect.width,
       );
 
-      // Ưu tiên mở xuống nếu đủ chỗ (hoặc không gian dưới >= không gian trên)
       if (spaceBelow >= MIN_DROPDOWN_HEIGHT || spaceBelow >= spaceAbove) {
         return {
           top: rect.bottom + window.scrollY + DROPDOWN_OFFSET,
@@ -69,7 +68,6 @@ export default function CustomSelect({
         };
       }
 
-      // Không đủ chỗ dưới -> mở lên trên
       return {
         bottom: viewportHeight - rect.top + window.scrollY + DROPDOWN_OFFSET,
         left: rect.left + window.scrollX,

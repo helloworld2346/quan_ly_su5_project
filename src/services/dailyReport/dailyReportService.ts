@@ -10,10 +10,7 @@ import type {
   SearchReportResponse,
   SearchChildrenResponse,
   SearchByRangeResponse,
-  
 } from "../../types/dailyReport";
-
-
 
 export interface NhiemVuNgay {
   idNhiemvuNgay: string;
@@ -31,6 +28,37 @@ export interface NhiemVuNgayResponse {
   result: NhiemVuNgay[];
 }
 
+export interface CreateNhiemVuNgayRequest {
+  nhiemVuPhandoi: string;
+  noiDungDotXuat: string;
+  noiDungUuDiem: string;
+  noiDungKhuyetDiem: string;
+  noiDungCanGiaiQuyet: string;
+  donBaoCao: string;
+}
+
+export interface NhiemVuNgaySingleResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  Result: NhiemVuNgay;
+}
+
+export type NhiemVuNgayChildrenItem = {
+  donViResponse: {
+    maDonVi: string;
+    tenDonvi: string;
+    kyhieuDonvi?: string;
+    capDonVi?: string | null;
+  };
+  idNhiemvuNgay: string;
+  nhiemVuPhandoi: string;
+  noiDungDotXuat: string;
+  noiDungUuDiem: string;
+  noiDungKhuyetDiem: string;
+  noiDungCanGiaiQuyet: string;
+};  
+
 export const dailyReportService = {
   createReport: async (
     payload: CreateReportRequest,
@@ -43,9 +71,9 @@ export const dailyReportService = {
   },
 
   getNhiemVuNgay: async (): Promise<NhiemVuNgayResponse> => {
-  const response = await apiNoPrefix.get<NhiemVuNgayResponse>("/nhiemvungay");
-  return response.data;
-},
+    const response = await apiNoPrefix.get<NhiemVuNgayResponse>("/nhiemvungay");
+    return response.data;
+  },
 
   updateReport: async (
     id: string,
@@ -128,5 +156,72 @@ export const dailyReportService = {
     return response.data;
   },
 
-  
+  createNhiemVuNgay: async (
+    payload: CreateNhiemVuNgayRequest,
+  ): Promise<NhiemVuNgayResponse> => {
+    const response = await apiNoPrefix.post<NhiemVuNgayResponse>(
+      "/nhiemvungay",
+      payload,
+    );
+    return response.data;
+  },
+
+  getNhiemVuNgayById: async (
+    id: string,
+  ): Promise<NhiemVuNgaySingleResponse> => {
+    const response = await apiNoPrefix.get<NhiemVuNgaySingleResponse>(
+      `/nhiemvungay/${id}`,
+    );
+    return response.data;
+  },
+
+  getNhiemVuNgayByDonBaoCao: async (idDonBaoCao: string) => {
+    const response = await apiNoPrefix.get(
+      `/nhiemvungay/donbaocao/${idDonBaoCao}`,
+    );
+    return response.data as {
+      success: boolean;
+      Result: {
+        idNhiemvuNgay: string;
+        nhiemVuPhandoi: string;
+        noiDungDotXuat: string;
+        noiDungUuDiem: string;
+        noiDungKhuyetDiem: string;
+        noiDungCanGiaiQuyet: string;
+      } | null;
+    };
+  },
+
+  searchNhiemVuNgayChildrenByDonVi: async (
+    maDonVi: string,
+    ngayLoc: string,
+  ) => {
+    const response = await apiNoPrefix.get(
+      `/nhiemvungay/search/donvi/${maDonVi}/children`,
+      { params: { ngayLoc } },
+    );
+
+    return response.data as {
+      success: boolean;
+      code: number;
+      Result: Array<{
+        idNhiemvuNgay: string;
+        nhiemVuPhandoi: string;
+        noiDungDotXuat: string;
+        noiDungUuDiem: string;
+        noiDungKhuyetDiem: string;
+        noiDungCanGiaiQuyet: string;
+        donViResponse: {
+          maDonVi: string;
+          tenDonvi: string;
+          kyhieuDonvi?: string;
+        };
+      }>;
+    };
+  },
+
+  updateNhiemVuNgay: async (id: string, payload: CreateNhiemVuNgayRequest) => {
+    const response = await apiNoPrefix.put(`/nhiemvungay/${id}`, payload);
+    return response.data;
+  },
 };

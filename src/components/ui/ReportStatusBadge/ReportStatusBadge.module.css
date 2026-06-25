@@ -1,27 +1,44 @@
-.badge {  
-  display: inline-block;  
-  padding: 4px 12px;  
-  border-radius: 12px;  
-  font-size: 12px;  
-  font-weight: 600;  
-}  
-  
-.pending {  
-  background: var(--btn-recall-bg);  
-  color: var(--btn-recall-fg);  
-}  
-  
-.approved {  
-  background: var(--btn-approve-bg);  
-  color: var(--btn-approve-fg);  
-}  
-  
-.rejected {  
-  background: var(--btn-refuse-bg);  
-  color: var(--btn-refuse-fg);  
-}  
-  
-.draft {  
-  background: var(--modal-btn-draft-bg);  
-  color: var(--modal-btn-draft-text);  
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  min-width: 0;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.pending {
+  background: var(--btn-recall-bg);
+  color: var(--btn-recall-fg);
+}
+
+.approved {
+  background: var(--btn-approve-bg);
+  color: var(--btn-approve-fg);
+}
+
+.rejected {
+  background: var(--btn-refuse-bg);
+  color: var(--btn-refuse-fg);
+}
+
+.draft {
+  background: var(--modal-btn-draft-bg);
+  color: var(--modal-btn-draft-text);
+}
+
+@media (max-width: 768px) {
+  .badge {
+    padding: 3px 8px;
+    font-size: 10px;
+    border-radius: 10px;
+  }
 }

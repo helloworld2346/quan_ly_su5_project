@@ -1,3 +1,4 @@
+// src/components/layout/Sidebar/Sidebar.tsx
 import { useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -23,6 +24,7 @@ import {
 import NavGroup from "./NavGroup";
 import { useNavGroupState } from "./useNavGroupState";
 import SidebarTooltip from "./SidebarTooltip";
+import ConfirmDialog from "../../ui/ConfirmDialog/ConfirmDialog";
 import { useAuth } from "../../../context/useAuth";
 
 type Props = {
@@ -45,20 +47,26 @@ export default function Sidebar({
   collapsed = false,
   onExpand,
 }: Props) {
- const { account, donVi, isParentUnit } = useAuth();
-const unitName = donVi?.tenDonvi || account?.donVi?.tenDonvi || "Chưa phân đơn vị";
+  const { account, donVi } = useAuth();
+  const unitName =
+    donVi?.tenDonvi || account?.donVi?.tenDonvi || "Chưa phân đơn vị";
   const userRole = account?.vaiTro?.tenVaiTro || null;
-  const hiddenSidebarIds: NavItemId[] = [
-  "executive-training", // Tổng hợp huấn luyện
-  "report-training", // Thống kê quân số huấn luyện
-  "report-family", // Báo ban thân nhân thăm nuôi
-  "report-communication", // Báo ban thông tin liên lạc
-  "statistics", // Thống kê báo cáo
-];
+  const unitQuota = donVi?.quanSoTong ?? account?.donVi?.quanSoTong ?? 0;
+  const hasQuota = unitQuota > 0;
 
-const allowedNavItems = getNavItemsByRole(userRole).filter(
-  (item) => !hiddenSidebarIds.includes(item.id),
-);
+  const hiddenSidebarIds: NavItemId[] = [
+    "executive-training", // Tổng hợp huấn luyện
+    "report-training", // Thống kê quân số huấn luyện
+    "report-family", // Báo ban thân nhân thăm nuôi
+    "report-communication", // Báo ban thông tin liên lạc
+    "statistics", // Thống kê báo cáo
+  ];
+
+  const capDonVi = donVi?.capDonVi ?? account?.donVi?.capDonVi ?? null;
+
+  const allowedNavItems = getNavItemsByRole(userRole, capDonVi).filter(
+    (item) => !hiddenSidebarIds.includes(item.id),
+  );
 
   const executiveActive = EXECUTIVE_NAV_GROUP.items.some(
     (item) =>
@@ -74,6 +82,7 @@ const allowedNavItems = getNavItemsByRole(userRole).filter(
   const [prevCollapsed, setPrevCollapsed] = useState(collapsed);
 
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
+  const [showQuotaDialog, setShowQuotaDialog] = useState(false);
 
   const settingsRef = useRef<HTMLButtonElement>(null);
   const statisticsRef = useRef<HTMLButtonElement>(null);
@@ -98,6 +107,19 @@ const allowedNavItems = getNavItemsByRole(userRole).filter(
 
   const handleTooltipLeave = () => {
     setTooltip(null);
+  };
+
+  const handleNavigate = (id: NavItemId) => {
+    if (id !== SETTINGS_NAV.id && !hasQuota) {
+      setShowQuotaDialog(true);
+      return;
+    }
+    onNavigate(id);
+  };
+
+  const handleQuotaConfirm = () => {
+    setShowQuotaDialog(false);
+    onNavigate(SETTINGS_NAV.id);
   };
 
   if (collapsed !== prevCollapsed) {
@@ -125,7 +147,6 @@ const allowedNavItems = getNavItemsByRole(userRole).filter(
   const reportLabel = getNavGroupLabelByRole(
     REPORT_NAV_GROUP.label,
     userRole,
-    isParentUnit(),
   );
 
   return (
@@ -139,9 +160,10 @@ const allowedNavItems = getNavItemsByRole(userRole).filter(
           <img src={logo} alt="Logo Sư đoàn 5" className={styles.logo} />
           {!collapsed && (
             <>
-             <p className={styles.unitName}>{unitName}</p>
+              <p className={styles.unitName}>{unitName}</p>
               <p className={styles.appName}>
-              Thống kê quân số. Công tác Đảng. Công tác chính trị 
+                Thống kê quân số <br></br>
+                Hoạt động CTĐ, CTCT
               </p>
             </>
           )}
@@ -158,7 +180,7 @@ const allowedNavItems = getNavItemsByRole(userRole).filter(
               isOpen={executiveOpen}
               onToggle={() => setExecutiveOpen(!executiveOpen)}
               activeId={activeId}
-              onNavigate={(id) => onNavigate(id as NavItemId)}
+              onNavigate={handleNavigate}
               collapsed={collapsed}
               onExpand={onExpand}
               isActive={executiveActive}
@@ -177,7 +199,7 @@ const allowedNavItems = getNavItemsByRole(userRole).filter(
               isOpen={reportsOpen}
               onToggle={() => setReportsOpen(!reportsOpen)}
               activeId={activeId}
-              onNavigate={(id) => onNavigate(id as NavItemId)}
+              onNavigate={handleNavigate}
               collapsed={collapsed}
               onExpand={onExpand}
               isActive={reportActive}
@@ -195,7 +217,7 @@ const allowedNavItems = getNavItemsByRole(userRole).filter(
                   ? `${styles.navItem} ${styles.active}`
                   : styles.navItem
               }
-              onClick={() => onNavigate(STATISTICS_NAV.id)}
+              onClick={() => handleNavigate(STATISTICS_NAV.id)}
               aria-label={collapsed ? STATISTICS_NAV.label : undefined}
               onMouseEnter={() =>
                 handleTooltipEnter(STATISTICS_NAV.label, statisticsRef)
@@ -217,7 +239,7 @@ const allowedNavItems = getNavItemsByRole(userRole).filter(
               isOpen={dutyOpen}
               onToggle={() => setDutyOpen(!dutyOpen)}
               activeId={activeId}
-              onNavigate={(id) => onNavigate(id as NavItemId)}
+              onNavigate={handleNavigate}
               collapsed={collapsed}
               onExpand={onExpand}
               isActive={dutyActive}
@@ -235,7 +257,7 @@ const allowedNavItems = getNavItemsByRole(userRole).filter(
                   ? `${styles.navItem} ${styles.active}`
                   : styles.navItem
               }
-              onClick={() => onNavigate(SETTINGS_NAV.id)}
+              onClick={() => handleNavigate(SETTINGS_NAV.id)}
               aria-label={collapsed ? SETTINGS_NAV.label : undefined}
               onMouseEnter={() =>
                 handleTooltipEnter(SETTINGS_NAV.label, settingsRef)
@@ -267,6 +289,17 @@ const allowedNavItems = getNavItemsByRole(userRole).filter(
           </button>
         )}
       </aside>
+
+      <ConfirmDialog
+        isOpen={showQuotaDialog}
+        title="Chưa nhập quân số biên chế"
+        message="Vui lòng nhập quân số bên dưới để có thể sử dụng các tính năng báo cáo."
+        confirmText="Vào Cài đặt"
+        cancelText="Đóng"
+        type="warning"
+        onConfirm={handleQuotaConfirm}
+        onCancel={() => setShowQuotaDialog(false)}
+      />
 
       {tooltip && (
         <SidebarTooltip

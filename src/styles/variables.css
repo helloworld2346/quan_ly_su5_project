@@ -374,7 +374,7 @@
 --info-field-border: #5c8a70;  
 
 --table-header-bg: #1a6b5a;  
---row-danger-bg: rgba(239, 68, 68, 0.15);  
---row-danger-text: #fca5a5;  
+--row-danger-bg: #ffe9e9;  
+--row-danger-text: #8f1010;  
 --row-danger-text-strong: #ffffff;
 }

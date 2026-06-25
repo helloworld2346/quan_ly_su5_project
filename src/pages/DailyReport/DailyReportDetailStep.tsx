@@ -1,179 +1,185 @@
+// src/pages/DailyReport/DailyReportDetailStep.tsx
 import styles from "./DailyReportDetailStep.module.css";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
-export default function DailyReportDetailStep() {
-  const [securityStatus, setSecurityStatus] = useState("");
+export interface DetailStepData {
+  securityStatus: string;
+  incidentStatus: string;
+  incidentDetail: string;
+  advantageStatus: string;
+  advantageDetail: string;
+  disadvantageStatus: string;
+  disadvantageDetail: string;
+  pendingTaskStatus: string;
+  pendingDetail: string;
+}
 
-  const [incidentStatus, setIncidentStatus] = useState("");
+interface Props {
+  onChange?: (data: DetailStepData) => void;
+  initialData?: DetailStepData | null;
+}
 
-  const [advantageStatus, setAdvantageStatus] = useState("");
-  const [disadvantageStatus, setDisadvantageStatus] = useState("");
+export default function DailyReportDetailStep({
+  onChange,
+  initialData,
+}: Props) {
+  const [securityStatus, setSecurityStatus] = useState(
+    () => initialData?.securityStatus ?? "",
+  );
+  const [incidentStatus, setIncidentStatus] = useState(
+    () => initialData?.incidentStatus ?? "",
+  );
+  const [incidentDetail, setIncidentDetail] = useState(
+    () => initialData?.incidentDetail ?? "",
+  );
+  const [advantageStatus, setAdvantageStatus] = useState(
+    () => initialData?.advantageStatus ?? "",
+  );
+  const [advantageDetail, setAdvantageDetail] = useState(
+    () => initialData?.advantageDetail ?? "",
+  );
+  const [disadvantageStatus, setDisadvantageStatus] = useState(
+    () => initialData?.disadvantageStatus ?? "",
+  );
+  const [disadvantageDetail, setDisadvantageDetail] = useState(
+    () => initialData?.disadvantageDetail ?? "",
+  );
+  const [pendingTaskStatus, setPendingTaskStatus] = useState(
+    () => initialData?.pendingTaskStatus ?? "",
+  );
+  const [pendingDetail, setPendingDetail] = useState(
+    () => initialData?.pendingDetail ?? "",
+  );
 
-  const [pendingTaskStatus, setPendingTaskStatus] = useState("");
+  const notify = useCallback(
+    (patch: Partial<DetailStepData>) => {
+      onChange?.({
+        securityStatus,
+        incidentStatus,
+        incidentDetail,
+        advantageStatus,
+        advantageDetail,
+        disadvantageStatus,
+        disadvantageDetail,
+        pendingTaskStatus,
+        pendingDetail,
+        ...patch,
+      });
+    },
+    [
+      onChange,
+      securityStatus,
+      incidentStatus,
+      incidentDetail,
+      advantageStatus,
+      advantageDetail,
+      disadvantageStatus,
+      disadvantageDetail,
+      pendingTaskStatus,
+      pendingDetail,
+    ],
+  );
 
   return (
     <div className={styles.container}>
       <div className={styles.grid}>
         <div className={styles.card}>
-          <h3 className={styles.cardTitle}>
-            I. Nhiệm vụ các phân đội đóng quân canh phòng và các phân đội khác
-          </h3>
-          <div className={styles.radioGroup}>
-            <label className={styles.radioLabel}>
-              <input
-                type="radio"
-                name="security"
-                value="safe"
-                checked={securityStatus === "safe"}
-                onChange={(e) => setSecurityStatus(e.target.value)}
-              />
-              Đảm bảo an toàn
-            </label>
-
-            <label className={styles.radioLabel}>
-              <input
-                type="radio"
-                name="security"
-                value="unsafe"
-                checked={securityStatus === "unsafe"}
-                onChange={(e) => setSecurityStatus(e.target.value)}
-              />
-              Không đảm bảo an toàn
-            </label>
+          <div className={styles.cardHeader}>
+            <span className={styles.cardBadge}>I</span>
+            <h3 className={styles.cardTitle}>
+              Nhiệm vụ các phân đội đóng quân canh phòng và các phân đội khác
+            </h3>
           </div>
-
-          {securityStatus === "unsafe" && (
-            <div className={styles.expandContent}>
-              <label className={styles.label}>Lý do</label>
-
-              <textarea
-                rows={4}
-                className={styles.textarea}
-                placeholder="Nhập lý do..."
-              />
-            </div>
-          )}
-        </div>
-
-        <div className={styles.card}>
-          <h3 className={styles.cardTitle}>
-            II. Những việc đột xuất xảy ra
-          </h3>
-
-          <div className={styles.radioGroup}>
-            <label className={styles.radioLabel}>
-              <input
-                type="radio"
-                name="incident"
-                value="yes"
-                checked={incidentStatus === "yes"}
-                onChange={(e) => setIncidentStatus(e.target.value)}
-              />
-              Có
-            </label>
-
-            <label className={styles.radioLabel}>
-              <input
-                type="radio"
-                name="incident"
-                value="no"
-                checked={incidentStatus === "no"}
-                onChange={(e) => setIncidentStatus(e.target.value)}
-              />
-              Không
-            </label>
-          </div>
-
-          {incidentStatus === "yes" && (
-            <div className={styles.expandContent}>
-              <label className={styles.label}>Chi tiết</label>
-
-              <textarea
-                rows={4}
-                className={styles.textarea}
-                placeholder="Nhập nội dung..."
-              />
-            </div>
-          )}
-        </div>
-
-      
-        <div className={styles.card}>
-          <h3 className={styles.cardTitle}>
-            III. Nhận xét ưu, khuyết điểm nội vụ, vệ sinh
-          </h3>
-
-          <div className={styles.section}>
-            <label className={styles.label}>Ưu điểm</label>
-
+          <div className={styles.cardBody}>
             <div className={styles.radioGroup}>
-              <label className={styles.radioLabel}>
+              <label
+                className={`${styles.radioLabel} ${styles.radioLabelSuccess}`}
+              >
                 <input
                   type="radio"
-                  name="advantage"
+                  name="security"
+                  value="safe"
+                  checked={securityStatus === "safe"}
+                  onChange={(e) => {
+                    setSecurityStatus(e.target.value);
+                    notify({ securityStatus: e.target.value });
+                  }}
+                />
+                Đảm bảo an toàn
+              </label>
+              <label
+                className={`${styles.radioLabel} ${styles.radioLabelDanger}`}
+              >
+                <input
+                  type="radio"
+                  name="security"
+                  value="unsafe"
+                  checked={securityStatus === "unsafe"}
+                  onChange={(e) => {
+                    setSecurityStatus(e.target.value);
+                    notify({ securityStatus: e.target.value });
+                  }}
+                />
+                Không đảm bảo an toàn
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <span className={styles.cardBadge}>II</span>
+            <h3 className={styles.cardTitle}>Những việc đột xuất xảy ra</h3>
+          </div>
+          <div className={styles.cardBody}>
+            <div className={styles.radioGroup}>
+              <label
+                className={`${styles.radioLabel} ${styles.radioLabelDanger}`}
+              >
+                <input
+                  type="radio"
+                  name="incident"
                   value="yes"
-                  checked={advantageStatus === "yes"}
-                  onChange={(e) => setAdvantageStatus(e.target.value)}
+                  checked={incidentStatus === "yes"}
+                  onChange={(e) => {
+                    setIncidentStatus(e.target.value);
+                    notify({ incidentStatus: e.target.value });
+                  }}
                 />
                 Có
               </label>
-
-              <label className={styles.radioLabel}>
+              <label
+                className={`${styles.radioLabel} ${styles.radioLabelSuccess}`}
+              >
                 <input
                   type="radio"
-                  name="advantage"
+                  name="incident"
                   value="no"
-                  checked={advantageStatus === "no"}
-                  onChange={(e) => setAdvantageStatus(e.target.value)}
+                  checked={incidentStatus === "no"}
+                  onChange={(e) => {
+                    setIncidentStatus(e.target.value);
+                    setIncidentDetail("");
+                    notify({
+                      incidentStatus: e.target.value,
+                      incidentDetail: "",
+                    });
+                  }}
                 />
                 Không
               </label>
             </div>
-
-            {advantageStatus === "yes" && (
+            {incidentStatus === "yes" && (
               <div className={styles.expandContent}>
+                <label className={styles.label}>Chi tiết</label>
                 <textarea
                   rows={3}
                   className={styles.textarea}
-                  placeholder="Nhập ưu điểm..."
-                />
-              </div>
-            )}
-          </div>
-
-          <div className={styles.section}>
-            <label className={styles.label}>Khuyết điểm</label>
-
-            <div className={styles.radioGroup}>
-              <label className={styles.radioLabel}>
-                <input
-                  type="radio"
-                  name="disadvantage"
-                  value="yes"
-                  checked={disadvantageStatus === "yes"}
-                  onChange={(e) => setDisadvantageStatus(e.target.value)}
-                />
-                Có
-              </label>
-
-              <label className={styles.radioLabel}>
-                <input
-                  type="radio"
-                  name="disadvantage"
-                  value="no"
-                  checked={disadvantageStatus === "no"}
-                  onChange={(e) => setDisadvantageStatus(e.target.value)}
-                />
-                Không
-              </label>
-            </div>
-
-            {disadvantageStatus === "yes" && (
-              <div className={styles.expandContent}>
-                <textarea
-                  rows={3}
-                  className={styles.textarea}
-                  placeholder="Nhập khuyết điểm..."
+                  placeholder="Nhập nội dung đột xuất..."
+                  value={incidentDetail}
+                  onChange={(e) => {
+                    setIncidentDetail(e.target.value);
+                    notify({ incidentDetail: e.target.value });
+                  }}
                 />
               </div>
             )}
@@ -181,45 +187,175 @@ export default function DailyReportDetailStep() {
         </div>
 
         <div className={styles.card}>
-          <h3 className={styles.cardTitle}>
-            IV. Những việc cần tiếp tục giải quyết
-          </h3>
-
-          <div className={styles.radioGroup}>
-            <label className={styles.radioLabel}>
-              <input
-                type="radio"
-                name="pending"
-                value="yes"
-                checked={pendingTaskStatus === "yes"}
-                onChange={(e) => setPendingTaskStatus(e.target.value)}
-              />
-              Có
-            </label>
-
-            <label className={styles.radioLabel}>
-              <input
-                type="radio"
-                name="pending"
-                value="no"
-                checked={pendingTaskStatus === "no"}
-                onChange={(e) => setPendingTaskStatus(e.target.value)}
-              />
-              Không
-            </label>
+          <div className={styles.cardHeader}>
+            <span className={styles.cardBadge}>III</span>
+            <h3 className={styles.cardTitle}>Ưu điểm và khuyết điểm</h3>
           </div>
+          <div className={styles.cardBody}>
+            <div className={styles.section}>
+              <label className={styles.label}>Ưu điểm</label>
+              <div className={styles.radioGroup}>
+                <label
+                  className={`${styles.radioLabel} ${styles.radioLabelSuccess}`}
+                >
+                  <input
+                    type="radio"
+                    name="advantage"
+                    value="yes"
+                    checked={advantageStatus === "yes"}
+                    onChange={(e) => {
+                      setAdvantageStatus(e.target.value);
+                      notify({ advantageStatus: e.target.value });
+                    }}
+                  />
+                  Có
+                </label>
+                <label
+                  className={`${styles.radioLabel} ${styles.radioLabelDanger}`}
+                >
+                  <input
+                    type="radio"
+                    name="advantage"
+                    value="no"
+                    checked={advantageStatus === "no"}
+                    onChange={(e) => {
+                      setAdvantageStatus(e.target.value);
+                      notify({ advantageStatus: e.target.value });
+                    }}
+                  />
+                  Không
+                </label>
+              </div>
 
-          {pendingTaskStatus === "yes" && (
-            <div className={styles.expandContent}>
-              <label className={styles.label}>Chi tiết</label>
-
-              <textarea
-                rows={4}
-                className={styles.textarea}
-                placeholder="Nhập nội dung..."
-              />
+              {advantageStatus === "yes" || advantageStatus === "no" ? (
+                <div className={styles.expandContent}>
+                  <textarea
+                    rows={3}
+                    className={styles.textarea}
+                    placeholder="Nhập ưu điểm..."
+                    value={advantageDetail}
+                    onChange={(e) => {
+                      setAdvantageDetail(e.target.value);
+                      notify({ advantageDetail: e.target.value });
+                    }}
+                  />
+                </div>
+              ) : null}
             </div>
-          )}
+
+            <div className={styles.section}>
+              <label className={styles.label}>Khuyết điểm</label>
+              <div className={styles.radioGroup}>
+                <label
+                  className={`${styles.radioLabel} ${styles.radioLabelDanger}`}
+                >
+                  <input
+                    type="radio"
+                    name="disadvantage"
+                    value="yes"
+                    checked={disadvantageStatus === "yes"}
+                    onChange={(e) => {
+                      setDisadvantageStatus(e.target.value);
+                      notify({ disadvantageStatus: e.target.value });
+                    }}
+                  />
+                  Có
+                </label>
+                <label
+                  className={`${styles.radioLabel} ${styles.radioLabelSuccess}`}
+                >
+                  <input
+                    type="radio"
+                    name="disadvantage"
+                    value="no"
+                    checked={disadvantageStatus === "no"}
+                    onChange={(e) => {
+                      setDisadvantageStatus(e.target.value);
+                      notify({ disadvantageStatus: e.target.value });
+                    }}
+                  />
+                  Không
+                </label>
+              </div>
+
+              {disadvantageStatus === "yes" || disadvantageStatus === "no" ? (
+                <div className={styles.expandContent}>
+                  <textarea
+                    rows={3}
+                    className={styles.textarea}
+                    placeholder="Nhập khuyết điểm..."
+                    value={disadvantageDetail}
+                    onChange={(e) => {
+                      setDisadvantageDetail(e.target.value);
+                      notify({ disadvantageDetail: e.target.value });
+                    }}
+                  />
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <span className={styles.cardBadge}>IV</span>
+            <h3 className={styles.cardTitle}>
+              Những việc cần tiếp tục giải quyết
+            </h3>
+          </div>
+          <div className={styles.cardBody}>
+            <div className={styles.radioGroup}>
+              <label
+                className={`${styles.radioLabel} ${styles.radioLabelDanger}`}
+              >
+                <input
+                  type="radio"
+                  name="pending"
+                  value="yes"
+                  checked={pendingTaskStatus === "yes"}
+                  onChange={(e) => {
+                    setPendingTaskStatus(e.target.value);
+                    notify({ pendingTaskStatus: e.target.value });
+                  }}
+                />
+                Có
+              </label>
+              <label
+                className={`${styles.radioLabel} ${styles.radioLabelSuccess}`}
+              >
+                <input
+                  type="radio"
+                  name="pending"
+                  value="no"
+                  checked={pendingTaskStatus === "no"}
+                  onChange={(e) => {
+                    setPendingTaskStatus(e.target.value);
+                    setPendingDetail("");
+                    notify({
+                      pendingTaskStatus: e.target.value,
+                      pendingDetail: "",
+                    });
+                  }}
+                />
+                Không
+              </label>
+            </div>
+            {pendingTaskStatus === "yes" && (
+              <div className={styles.expandContent}>
+                <label className={styles.label}>Chi tiết</label>
+                <textarea
+                  rows={4}
+                  className={styles.textarea}
+                  placeholder="Nhập nội dung..."
+                  value={pendingDetail}
+                  onChange={(e) => {
+                    setPendingDetail(e.target.value);
+                    notify({ pendingDetail: e.target.value });
+                  }}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
