@@ -3,7 +3,11 @@ import type {
   CreateReportResponse,
   ReportRow,
 } from "../../../types/dailyReport";
-import { EMPTY_VANG, parseTrucNguoi } from "../../../utils/reportUtils";
+import {
+  EMPTY_VANG,
+  sumVang,
+  parseTrucNguoi,
+} from "../../../utils/reportUtils";
 
 type ChildUnit = {
   maDonVi: string;
@@ -287,46 +291,12 @@ export function buildDisplayRows(args: {
 export function buildDisplayTotals(displayRows: ReportRow[]): DisplayTotals {
   const submittedRows = displayRows.filter((r) => !r.notSubmitted);
 
-  return submittedRows.reduce<DisplayTotals>(
-    (acc, row) => ({
-      quanSoTong: acc.quanSoTong + row.quanSoTong,
-      quanSoHienDien: acc.quanSoHienDien + row.quanSoHienDien,
-      quanSoVang: acc.quanSoVang + row.quanSoVang,
-      hoiThaiNgoaiSuDoan: acc.hoiThaiNgoaiSuDoan + row.vang.hoiThaiNgoaiSuDoan,
-      hoiThaiEF: acc.hoiThaiEF + row.vang.hoiThaiEF,
-      xayDungNgoaiSuDoan: acc.xayDungNgoaiSuDoan + row.vang.xayDungNgoaiSuDoan,
-      xayDungEF: acc.xayDungEF + row.vang.xayDungEF,
-      choHuu: acc.choHuu + row.vang.choHuu,
-      nghiTranhThu: acc.nghiTranhThu + row.vang.nghiTranhThu,
-      phep: acc.phep + row.vang.phep,
-      vienNgoaiSuDoan: acc.vienNgoaiSuDoan + row.vang.vienNgoaiSuDoan,
-      vienEF: acc.vienEF + row.vang.vienEF,
-      congTacNgoaiSuDoan: acc.congTacNgoaiSuDoan + row.vang.congTacNgoaiSuDoan,
-      congTacSuDoan: acc.congTacSuDoan + row.vang.congTacSuDoan,
-      hocSQ: acc.hocSQ + row.vang.hocSQ,
-      hocCS: acc.hocCS + row.vang.hocCS,
-      lyDoVangKhac: acc.lyDoVangKhac + (row.vang.lyDoVangKhac ?? 0),
-    }),
-    {
-      quanSoTong: 0,
-      quanSoHienDien: 0,
-      quanSoVang: 0,
-      hoiThaiNgoaiSuDoan: 0,
-      hoiThaiEF: 0,
-      xayDungNgoaiSuDoan: 0,
-      xayDungEF: 0,
-      choHuu: 0,
-      nghiTranhThu: 0,
-      phep: 0,
-      vienNgoaiSuDoan: 0,
-      vienEF: 0,
-      congTacNgoaiSuDoan: 0,
-      congTacSuDoan: 0,
-      hocSQ: 0,
-      hocCS: 0,
-      lyDoVangKhac: 0,
-    },
-  );
+  return {
+    quanSoTong: submittedRows.reduce((s, r) => s + r.quanSoTong, 0),
+    quanSoHienDien: submittedRows.reduce((s, r) => s + r.quanSoHienDien, 0),
+    quanSoVang: submittedRows.reduce((s, r) => s + r.quanSoVang, 0),
+    ...sumVang(submittedRows),
+  };
 }
 
 export function buildCaTrucInfo(args: {

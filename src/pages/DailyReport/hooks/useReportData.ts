@@ -3,7 +3,7 @@ import { dailyReportService } from "../../../services/dailyReport/dailyReportSer
 import { donviService } from "../../../services/unit/unitService";
 import { dutyService } from "../../../services/duty/dutyService";
 import { handleApiError } from "../../../utils/errorHandler";
-import { EMPTY_VANG, mapItemToRow } from "../../../utils/reportUtils";
+import { sumVang, mapItemToRow } from "../../../utils/reportUtils";
 import type {
   AbsentRow,
   VangChiTiet,
@@ -158,25 +158,7 @@ export function useReportData({
       0,
     );
     const quanSoHienDien = quanSoTong - quanSoVang;
-    const thongTinVang: VangChiTiet = submittedReports.reduce(
-      (acc, r) => ({
-        hoiThaiNgoaiSuDoan: acc.hoiThaiNgoaiSuDoan + r.vang.hoiThaiNgoaiSuDoan,
-        hoiThaiEF: acc.hoiThaiEF + r.vang.hoiThaiEF,
-        xayDungNgoaiSuDoan: acc.xayDungNgoaiSuDoan + r.vang.xayDungNgoaiSuDoan,
-        xayDungEF: acc.xayDungEF + r.vang.xayDungEF,
-        choHuu: acc.choHuu + r.vang.choHuu,
-        nghiTranhThu: acc.nghiTranhThu + r.vang.nghiTranhThu,
-        phep: acc.phep + r.vang.phep,
-        vienNgoaiSuDoan: acc.vienNgoaiSuDoan + r.vang.vienNgoaiSuDoan,
-        vienEF: acc.vienEF + r.vang.vienEF,
-        congTacNgoaiSuDoan: acc.congTacNgoaiSuDoan + r.vang.congTacNgoaiSuDoan,
-        congTacSuDoan: acc.congTacSuDoan + r.vang.congTacSuDoan,
-        hocSQ: acc.hocSQ + r.vang.hocSQ,
-        hocCS: acc.hocCS + r.vang.hocCS,
-        lyDoVangKhac: acc.lyDoVangKhac + (r.vang.lyDoVangKhac ?? 0),
-      }),
-      { ...EMPTY_VANG },
-    );
+    const thongTinVang: VangChiTiet = sumVang(submittedReports);
     const absentRows: AbsentRow[] = submittedReports.flatMap((r) =>
       r.chiTietVangList.map((m) => ({
         id: crypto.randomUUID(),

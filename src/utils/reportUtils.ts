@@ -24,6 +24,18 @@ export const EMPTY_VANG: VangChiTiet = {
   lyDoVangKhac: 0,
 };
 
+export function sumVang(rows: { vang: VangChiTiet }[]): VangChiTiet {
+  return rows.reduce<VangChiTiet>(
+    (acc, r) => {
+      (Object.keys(acc) as (keyof VangChiTiet)[]).forEach((k) => {
+        acc[k] += r.vang[k] ?? 0;
+      });
+      return acc;
+    },
+    { ...EMPTY_VANG },
+  );
+}
+
 export function todayIsoDate(): string {
   const d = new Date();
   return [
