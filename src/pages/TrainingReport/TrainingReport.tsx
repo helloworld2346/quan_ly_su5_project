@@ -142,10 +142,10 @@ export default function TrainingReport() {
                         row.status === "Tốt"
                           ? styles.good
                           : row.status === "Khá"
-                          ? styles.fair
-                          : row.status === "Trung bình"
-                          ? styles.average
-                          : styles.bad
+                            ? styles.fair
+                            : row.status === "Trung bình"
+                              ? styles.average
+                              : styles.bad
                       }`}
                     >
                       {row.status}
@@ -170,7 +170,7 @@ export default function TrainingReport() {
                             setOpenMenuId(null);
                           }}
                         >
-                           Xem chi tiết
+                          Xem chi tiết
                         </button>
                         <button
                           onClick={() => {
@@ -178,7 +178,7 @@ export default function TrainingReport() {
                             setOpenMenuId(null);
                           }}
                         >
-                           Sửa
+                          Sửa
                         </button>
                       </div>
                     )}
@@ -228,9 +228,7 @@ export default function TrainingReport() {
         <DetailModal row={detailRow} onClose={() => setDetailRow(null)} />
       )}
 
-      {editRow && (
-        <EditModal row={editRow} onClose={() => setEditRow(null)} />
-      )}
+      {editRow && <EditModal row={editRow} onClose={() => setEditRow(null)} />}
     </section>
   );
 }
