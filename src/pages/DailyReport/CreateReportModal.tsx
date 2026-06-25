@@ -20,6 +20,7 @@ import {
   CAP_BAC_TAC_CHIEN_SU_DOAN,
   EMPTY_TRUC,
   parseTrucNguoi,
+  trucFromCaTrucInfo,
 } from "../../utils/reportUtils";
 import TrucNguoiFormSection from "./components/NguoiTrucFormSection";
 import AbsentRowsTable from "./components/AbsentRowsTable";
@@ -132,12 +133,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
     if (initialData?.trucBanChiHuy)
       return parseTrucNguoi(initialData.trucBanChiHuy);
     if (isTacChien && caTrucInfo?.trucChiHuy) {
-      return {
-        tenNguoitruc: caTrucInfo.trucChiHuy.tenNguoitruc ?? "",
-        capbacNguoitruc: caTrucInfo.trucChiHuy.capbacNguoitruc ?? "",
-        chucvuNguoitruc: caTrucInfo.trucChiHuy.chucvuNguoitruc ?? "",
-        sodienthoai: caTrucInfo.trucChiHuy.sodienthoai ?? "",
-      };
+      return trucFromCaTrucInfo(caTrucInfo.trucChiHuy);
     }
     return { ...EMPTY_TRUC };
   });
@@ -146,12 +142,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
     if (initialData?.trucBanTacChien)
       return parseTrucNguoi(initialData.trucBanTacChien);
     if (isTacChien && caTrucInfo?.trucBanTacChien) {
-      return {
-        tenNguoitruc: caTrucInfo.trucBanTacChien.tenNguoitruc ?? "",
-        capbacNguoitruc: caTrucInfo.trucBanTacChien.capbacNguoitruc ?? "",
-        chucvuNguoitruc: caTrucInfo.trucBanTacChien.chucvuNguoitruc ?? "",
-        sodienthoai: caTrucInfo.trucBanTacChien.sodienthoai ?? "",
-      };
+      return trucFromCaTrucInfo(caTrucInfo.trucBanTacChien);
     }
     return { ...EMPTY_TRUC };
   });
