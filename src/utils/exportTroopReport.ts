@@ -1,6 +1,10 @@
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import type { ReportRow } from "../types/dailyReport";
+import {
+  reportRowToExportCells,
+  totalsToExportCells,
+} from "../pages/DailyReport/utils/dailyTroopReportHelpers";
 import type { DisplayTotals } from "../pages/DailyReport/utils/dailyTroopReportHelpers";
 
 type TrucNguoi = {
@@ -177,59 +181,14 @@ export async function exportTroopReportToExcel({
   let rowIdx = r3 + 1;
   displayRows.forEach((row, i) => {
     const zebra = i % 2 === 0 ? COLOR.WHITE : COLOR.ZEBRA_FILL;
-    writeDataRow(
-      ws,
-      rowIdx,
-      [
-        row.kyhieuDonVi || row.tenDonVi,
-        row.quanSoTong,
-        row.quanSoHienDien,
-        row.quanSoVang,
-        row.vang.hoiThaiNgoaiSuDoan,
-        row.vang.hoiThaiEF,
-        row.vang.xayDungNgoaiSuDoan,
-        row.vang.xayDungEF,
-        row.vang.choHuu,
-        row.vang.nghiTranhThu,
-        row.vang.phep,
-        row.vang.vienNgoaiSuDoan,
-        row.vang.vienEF,
-        row.vang.congTacNgoaiSuDoan,
-        row.vang.congTacSuDoan,
-        row.vang.hocSQ,
-        row.vang.hocCS,
-        row.vang.lyDoVangKhac ?? 0,
-      ],
-      false,
-      zebra,
-    );
+    writeDataRow(ws, rowIdx, reportRowToExportCells(row), false, zebra);
     rowIdx++;
   });
 
-  const t = displayTotals;
   writeDataRow(
     ws,
     rowIdx,
-    [
-      "Tổng",
-      t.quanSoTong,
-      t.quanSoHienDien,
-      t.quanSoVang,
-      t.hoiThaiNgoaiSuDoan,
-      t.hoiThaiEF,
-      t.xayDungNgoaiSuDoan,
-      t.xayDungEF,
-      t.choHuu,
-      t.nghiTranhThu,
-      t.phep,
-      t.vienNgoaiSuDoan,
-      t.vienEF,
-      t.congTacNgoaiSuDoan,
-      t.congTacSuDoan,
-      t.hocSQ,
-      t.hocCS,
-      t.lyDoVangKhac,
-    ],
+    totalsToExportCells(displayTotals),
     true,
     COLOR.TOTAL_FILL,
   );
