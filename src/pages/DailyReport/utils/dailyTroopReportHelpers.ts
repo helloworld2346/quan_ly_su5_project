@@ -152,11 +152,6 @@ export function buildFilteredRows(
   );
 }
 
-function filterDraftIfNeeded(rows: ReportRow[]): ReportRow[] {
-  return rows;
-}
-
-// src/pages/DailyReport/utils/dailyTroopReportHelpers.ts  
 export function buildDisplayRows(args: {  
   query: string;  
   reportData: ReportRow[];  
@@ -198,7 +193,7 @@ export function buildDisplayRows(args: {
               kyhieuDonVi: accountDonVi?.kyhieuDonvi,  
             }),  
           ];  
-      return filterDraftIfNeeded(rows);  
+      return rows;  
     }  
   
     const rows: ReportRow[] =  
@@ -212,7 +207,8 @@ export function buildDisplayRows(args: {
             }),  
           ];  
   
-    return filterDraftIfNeeded(rows);  
+    return rows;
+ 
   }  
   
   const ownUnitRow =  
@@ -239,7 +235,7 @@ export function buildDisplayRows(args: {
     });  
   });  
   
-  return filterDraftIfNeeded([...ownUnitRow, ...childRows]);  
+  return [...ownUnitRow, ...childRows];
 }
 
 export function buildDisplayTotals(displayRows: ReportRow[]): DisplayTotals {
