@@ -25,6 +25,7 @@ import { useDailyTroopReportViewModel } from "./hooks/useDailyTroopReportViewMod
 import DailyTroopStatisticsSection from "./components/DailyTroopStatisticsSection";
 import DailyTroopNhiemVuSection from "./components/DailyTroopNhiemVuSection";
 
+
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
   const [reportDate, setReportDate] = useState(todayIsoDate());
@@ -319,8 +320,18 @@ export default function DailyTroopReport() {
     console.log("Xuất file Word");
   };
 
-  const handleExportExcel = () => {
-    console.log("Xuất file Excel");
+  const handleExportExcel = async () => {
+    const { exportTroopReportToExcel } =
+      await import("../../utils/exportTroopReport");
+    await exportTroopReportToExcel({
+      displayRows,
+      displayTotals,
+      reportDate,
+      matkhau: caTrucInfo?.matkhau,
+      trucChiHuy: trucInfoFromReport?.trucChiHuy ?? caTrucInfo?.trucChiHuy,
+      trucBanTacChien:
+        trucInfoFromReport?.trucBanTacChien ?? caTrucInfo?.trucBanTacChien,
+    });
   };
 
   const handleConsolidate = () => {
