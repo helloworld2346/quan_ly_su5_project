@@ -66,7 +66,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         const notifId = accountResponse.Result.donVi?.maDonVi;
-        console.log("[Auth] notifId for notifications:", notifId);
 
         if (notifId) {
           try {
@@ -83,8 +82,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const connectWebSocket = () => {
         WebSocketLink.setOnOpen(() => {
-          console.log("🚀 WebSocket opened");
-
           WebSocketLink.send({
             type: "REGISTER",
             role: accountResponse.Result.vaiTro?.idVaiTro ?? "",
