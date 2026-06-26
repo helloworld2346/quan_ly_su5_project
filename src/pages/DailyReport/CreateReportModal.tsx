@@ -24,6 +24,7 @@ import {
 } from "../../utils/reportUtils";
 import TrucNguoiFormSection from "./components/NguoiTrucFormSection";
 import AbsentRowsTable from "./components/AbsentRowsTable";
+import { generateId } from "../../utils/uuid";
 
 interface CreateReportModalProps {
   isOpen: boolean;
@@ -77,7 +78,6 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
         // Không block nếu chưa có nhiemvungay
       });
   }, [initialData?.idDonBaoCao]);
-
 
   const detailFromInitialData = useMemo<DetailStepData | null>(() => {
     if (initialDetailData) return initialDetailData;
@@ -223,7 +223,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
 
   const handleAddRow = () => {
     const newRow: AbsentRow = {
-      id: crypto.randomUUID(),
+      id: generateId(),
       hoTen: "",
       capBac: "",
       chucVu: "",
@@ -258,7 +258,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
         if (res.Result.chiTietVang) {
           const rows = JSON.parse(res.Result.chiTietVang) as AbsentRow[];
           if (rows.length > 0) {
-            setAbsentRows(rows.map((r) => ({ ...r, id: crypto.randomUUID() })));
+            setAbsentRows(rows.map((r) => ({ ...r, id: generateId() })));
           } else {
             showWarning("Hôm qua không có quân nhân vắng.");
           }

@@ -1,6 +1,14 @@
 import { WebSocketManager } from "./WebSocketManager";
 
+function resolveWsUrl(): string {
+  const envUrl = import.meta.env.VITE_WS_URL;
+  if (envUrl) return envUrl;
+  
+  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+  return `${protocol}//${window.location.host}/ws`;
+}
+
 export const WebSocketLink = new WebSocketManager({
-  url: import.meta.env.VITE_WS_URL ?? "ws://localhost:8080/ws",
+  url: resolveWsUrl(),
   reconnectInterval: 3000,
 });

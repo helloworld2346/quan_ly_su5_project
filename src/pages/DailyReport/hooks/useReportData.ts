@@ -11,6 +11,7 @@ import type {
 } from "../../../types/dailyReport";
 import type { DonVi } from "../../../types/account";
 import type { CaTrucDetail } from "../../../types/duty";
+import { generateId } from "../../../utils/uuid";  
 
 export type { ReportRow };
 
@@ -161,7 +162,7 @@ export function useReportData({
     const thongTinVang: VangChiTiet = sumVang(submittedReports);
     const absentRows: AbsentRow[] = submittedReports.flatMap((r) =>
       r.chiTietVangList.map((m) => ({
-        id: crypto.randomUUID(),
+        id: generateId(),
         hoTen: m.hoTen,
         capBac: m.capBac,
         chucVu: m.chucVu,

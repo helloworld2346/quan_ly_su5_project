@@ -6,6 +6,9 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
+    build: {
+      target: "es2015",
+    },
     server: {
       proxy: {
         "/api": {
