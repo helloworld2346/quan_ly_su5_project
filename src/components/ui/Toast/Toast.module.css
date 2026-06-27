@@ -5,13 +5,15 @@
   z-index: 9999;  
   display: flex;  
   flex-direction: column-reverse;  
-  gap: 12px;  
+}  
+  
+.container > * + * {  
+  margin-top: 12px;  
 }  
   
 .toast {  
   display: flex;  
   align-items: center;  
-  gap: 12px;  
   min-width: 300px;  
   max-width: 400px;  
   padding: 16px;  
@@ -21,6 +23,10 @@
   backdrop-filter: blur(10px);  
   animation: slideIn 0.3s ease-out;  
 }  
+  
+.toast > * + * {  
+  margin-left: 12px;  
+}
   
 .toast.removing {  
   animation: slideOut 0.3s ease-in forwards;  

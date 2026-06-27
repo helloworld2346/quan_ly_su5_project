@@ -70,9 +70,12 @@
   
 .actions {  
   display: flex;  
-  gap: 12px;  
   justify-content: center;  
 }  
+  
+.actions > * + * {  
+  margin-left: 12px;  
+}
   
 .cancelButton,  
 .confirmButton {  
