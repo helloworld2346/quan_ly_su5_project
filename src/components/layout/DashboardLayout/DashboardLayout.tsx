@@ -86,6 +86,7 @@ export default function DashboardLayout({
   const isExecutive =
     activeId === "executive" || activeId === "executive-training";
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const { isDark, toggleTheme } = useTheme();
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -101,6 +102,34 @@ export default function DashboardLayout({
       sidebarCollapsed ? "0px" : "120px",
     );
   }, [sidebarCollapsed]);
+
+  // Khi chuyển sang mobile (≤640px): luôn hiện sidebar đầy đủ (không collapsed)
+  // và đóng drawer mỗi khi đổi breakpoint.
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 640px)");
+    const handler = (e: MediaQueryListEvent | MediaQueryList) => {
+      if (e.matches) setSidebarCollapsed(false);
+      setMobileOpen(false);
+    };
+    handler(mq);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  const isMobile = () => window.matchMedia("(max-width: 640px)").matches;
+
+  const handleHamburger = () => {
+    if (isMobile()) {
+      setMobileOpen((v) => !v);
+    } else {
+      setSidebarCollapsed((v) => !v);
+    }
+  };
+
+  const handleNavigate = (id: NavItemId) => {
+    onNavigate(id);
+    setMobileOpen(false);
+  };
 
   const groupLabel = getNavGroupLabel(activeId);
   const showBreadcrumb = Boolean(groupLabel);
@@ -122,11 +151,20 @@ export default function DashboardLayout({
     <div className={layoutClass}>
       <Sidebar
         activeId={activeId}
-        onNavigate={onNavigate}
+        onNavigate={handleNavigate}
         onLogout={onLogout}
         collapsed={sidebarCollapsed}
         onExpand={() => setSidebarCollapsed(false)}
+        mobileOpen={mobileOpen}
       />
+
+      {mobileOpen && (
+        <div
+          className={styles.backdrop}
+          onClick={() => setMobileOpen(false)}
+          aria-hidden
+        />
+      )}
 
       <div className={mainClass}>
         <header className={styles.topBar}>
@@ -138,7 +176,7 @@ export default function DashboardLayout({
                 sidebarCollapsed ? "Mở rộng sidebar" : "Thu gọn sidebar"
               }
               aria-expanded={!sidebarCollapsed}
-              onClick={() => setSidebarCollapsed((v) => !v)}
+              onClick={handleHamburger}
             >
               <FontAwesomeIcon icon={faBars} />
             </button>

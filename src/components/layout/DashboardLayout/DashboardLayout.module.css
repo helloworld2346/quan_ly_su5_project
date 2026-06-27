@@ -241,12 +241,15 @@
 }  
   
 @media (max-width: 640px) {  
-  .main,  
-  .mainCollapsed {  
-    margin-left: 0;  
+  .backdrop {  
+    display: block;  
+    position: fixed;  
+    inset: 0;  
+    z-index: 999;  
+    background: rgba(0, 0, 0, 0.45);  
   }  
-}  
-  
+}
+
 @media (prefers-reduced-motion: reduce) {  
   .layout,  
   .layout::before,  
@@ -256,3 +259,7 @@
     transition: none !important;  
   }  
 }
+
+.backdrop {  
+  display: none;  
+}  

@@ -24,13 +24,15 @@ import SidebarTooltip from "./SidebarTooltip";
 import ConfirmDialog from "../../ui/ConfirmDialog/ConfirmDialog";
 import { useAuth } from "../../../context/useAuth";
 
-type Props = {
-  activeId: NavItemId;
-  onNavigate: (id: NavItemId) => void;
-  onLogout?: () => void;
-  collapsed?: boolean;
-  onExpand?: () => void;
-};
+type Props = {  
+  activeId: NavItemId;  
+  onNavigate: (id: NavItemId) => void;  
+  onLogout?: () => void;  
+  collapsed?: boolean;  
+  onExpand?: () => void;  
+  mobileOpen?: boolean;  
+};  
+
 
 type TooltipState = {
   text: string;
@@ -43,6 +45,7 @@ export default function Sidebar({
   onLogout,
   collapsed = false,
   onExpand,
+  mobileOpen = false,
 }: Props) {
   const { account, donVi } = useAuth();
   const unitName =
@@ -138,12 +141,24 @@ export default function Sidebar({
   return (
     <>
       <aside
-        className={
-          collapsed ? `${styles.sidebar} ${styles.collapsed}` : styles.sidebar
-        }
+        className={[
+          styles.sidebar,
+          collapsed ? styles.collapsed : "",
+          mobileOpen ? styles.mobileOpen : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
       >
         <div className={styles.brand}>
-          <img src={logo} alt="Logo Sư đoàn 5" className={styles.logo} />
+          <div className={styles.logoWrap}>
+            <img src={logo} alt="Logo Sư đoàn 5" className={styles.logoFull} />
+            <img
+              src={logo}
+              alt=""
+              aria-hidden="true"
+              className={styles.logoMini}
+            />
+          </div>
           {!collapsed && (
             <>
               <p className={styles.unitName}>{unitName}</p>
