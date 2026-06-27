@@ -44,8 +44,9 @@
   min-height: 100vh;  
   position: relative;  
   z-index: 1;  
-}  
-  
+  transition: margin-left 0.25s ease;  
+}
+
 .mainCollapsed {  
   margin-left: var(--sidebar-collapsed-width);  
 }  

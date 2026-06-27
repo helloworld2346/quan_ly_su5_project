@@ -135,7 +135,6 @@
   flex-direction: column;  
 }  
   
-/* Khoảng cách dọc trong group (thay cho gap: 4px) */  
 .group > * + * {  
   margin-top: 4px;  
 }  
@@ -157,7 +156,6 @@
   align-items: center;  
 }  
   
-/* Khoảng cách icon -> chữ trong nav/group/logout (thay cho gap: 10px) */  
 .navItem .navIcon,  
 .groupLabel .navIcon,  
 .logout .navIcon {  

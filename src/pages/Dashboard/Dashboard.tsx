@@ -12,7 +12,7 @@ import {
   type NavItemId,
 } from "../../types/navigation";
 
-const APP_NAME = "Quản lý Sư đoàn 5";
+const APP_NAME = "Phần mềm thống kê Sư đoàn 5";
 
 type Props = {
   onLogout?: () => void;
