@@ -194,24 +194,37 @@ export async function exportTroopReportToExcel({
   );
   rowIdx++;
 
-  const dotsLine = ".".repeat(300);
-  const dotsBlock = Array(4).fill(dotsLine).join("\n");
+const EXPLAIN_LINES = 4;
+const explainStartRow = rowIdx;
 
-  ws.getCell(rowIdx, 1).value = "Giải trình quân số thay đổi trong ngày";
-  ws.getCell(rowIdx, 1).font = { name: FONT, bold: true, size: 14 };
-  ws.getCell(rowIdx, 1).alignment = {
-    horizontal: "center",
-    vertical: "middle",
-    wrapText: true,
-  };
+ws.getCell(rowIdx, 1).value = "Giải trình\nquân số\nthay đổi\ntrong ngày";
+ws.getCell(explainStartRow, 1).font = { name: FONT, bold: true, size: 12 };
+ws.getCell(explainStartRow, 1).alignment = {
+  horizontal: "center",
+  vertical: "middle",
+  wrapText: true,
+};
+setMerged(
+  ws,
+  explainStartRow,
+  1,
+  explainStartRow + EXPLAIN_LINES - 1,
+  1,
+  "Giải trình quân số thay đổi trong ngày",
+);
 
-  setMerged(ws, rowIdx, 2, rowIdx, COLUMN_COUNT, dotsBlock);
-  const dotsCell = ws.getCell(rowIdx, 2);
-  dotsCell.font = { name: FONT, size: 14 };
-  dotsCell.alignment = { horizontal: "left", vertical: "middle", wrapText: true };
+for (let line = 0; line < EXPLAIN_LINES; line++) {
+  const lineRow = explainStartRow + line;
+  setMerged(ws, lineRow, 2, lineRow, COLUMN_COUNT, "");
+  for (let c = 2; c <= COLUMN_COUNT; c++) {
+    ws.getCell(lineRow, c).border = {
+      bottom: { style: "dotted" },
+    };
+  }
+  ws.getRow(lineRow).height = 18;
+}
 
-  ws.getRow(rowIdx).height = 18 * 4;
-  rowIdx++;
+rowIdx = explainStartRow + EXPLAIN_LINES;
 
   ws.getColumn(1).width = 12;
   for (let c = 2; c <= COLUMN_COUNT; c++) ws.getColumn(c).width = 12;
