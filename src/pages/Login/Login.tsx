@@ -33,6 +33,7 @@ export default function Login({ onSuccess }: Props) {
   const { showError, showSuccess } = useToast();
 
   useEffect(() => {
+    document.title = "Đăng nhập | Phần mềm thống kê Sư đoàn 5";
     themeSession.applyOnAppStart(!!storage.getToken());
   }, []);
 
