@@ -140,73 +140,70 @@
   --toast-info-color: #3b82f6;
 
   /* --- CHART COLORS (Training Dashboard) --- */
---chart-green: #22c55e;
---chart-red: #ef4444;
---chart-blue: #3b82f6;
---chart-purple: #a855f7;
---chart-orange: #f97316;
---chart-yellow: #eab308;
---chart-cyan: #06b6d4;
---chart-pink: #ec4899;
+  --chart-green: #22c55e;
+  --chart-red: #ef4444;
+  --chart-blue: #3b82f6;
+  --chart-purple: #a855f7;
+  --chart-orange: #f97316;
+  --chart-yellow: #eab308;
+  --chart-cyan: #06b6d4;
+  --chart-pink: #ec4899;
 
---chart-sq: #3b82f6;      
---chart-qncn: #a855f7;     
---chart-hsn1: #22c55e;    
---chart-hsn2: #f97316;     
+  --chart-sq: #3b82f6;
+  --chart-qncn: #a855f7;
+  --chart-hsn1: #22c55e;
+  --chart-hsn2: #f97316;
 
+  --chart-present: #22c55e;
+  --chart-absent: #ef4444;
 
---chart-present: #22c55e;
---chart-absent: #ef4444;
+  --bar-bg: rgba(59, 130, 246, 0.12);
+  --bar-hover: rgba(59, 130, 246, 0.2);
 
+  --btn-approve-fg: #065f46;
+  --btn-approve-bg: #d1fae5;
+  --btn-approve-border: #6ee7b7;
+  --btn-approve-hover-bg: #a7f3d0;
+  --btn-approve-hover-border: #34d399;
 
---bar-bg: rgba(59, 130, 246, 0.12);
---bar-hover: rgba(59, 130, 246, 0.2);
+  --btn-refuse-fg: #991b1b;
+  --btn-refuse-bg: #fee2e2;
+  --btn-refuse-border: #fca5a5;
+  --btn-refuse-hover-bg: #fecaca;
+  --btn-refuse-hover-border: #f87171;
 
---btn-approve-fg: #065f46;  
---btn-approve-bg: #d1fae5;  
---btn-approve-border: #6ee7b7;  
---btn-approve-hover-bg: #a7f3d0;  
---btn-approve-hover-border: #34d399;  
+  --btn-recall-fg: #92400e;
+  --btn-recall-bg: #fef3c7;
+  --btn-recall-border: #fde68a;
+  --btn-recall-hover-bg: #fde68a;
+  --btn-recall-hover-border: #f59e0b;
+
+  --info-field-bg: #cfe9da;
+  --info-field-border: #7fb095;
+
+  /* --- DANGER ROW (báo cáo chưa nộp / nháp) --- */
+  --table-header-bg: #218673;
+  --row-danger-bg: #ffe9e9;
+  --row-danger-text: #b42318;
+  --row-danger-text-strong: #8f1010;
+
+  --sidebar-text: rgba(255, 255, 255, 0.9);
+  --sidebar-text-muted: rgba(255, 255, 255, 0.75);
+  --sidebar-text-sub: rgba(255, 255, 255, 0.7);
+  --sidebar-border-bottom: rgba(255, 255, 255, 0.12);
+  --sidebar-border-right: rgba(255, 255, 255, 0.08);
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.08);
+  --sidebar-hover-bg-sub: rgba(255, 255, 255, 0.05);
+  --sidebar-scrollbar: rgba(255, 255, 255, 0.3);
+  --sidebar-scrollbar-hover: rgba(255, 255, 255, 0.5);
+  --sidebar-connector: rgba(255, 255, 255, 0.35);
+  --sidebar-logout-border: rgba(255, 255, 255, 0.25);
+  --sidebar-logout-border-hover: rgba(255, 255, 255, 0.4);
+
+  --focus-ring-color: rgba(31, 92, 63, 0.45);
+  --focus-ring-offset: 2px;
+  --focus-ring-width: 3px;
   
- 
---btn-refuse-fg: #991b1b;  
---btn-refuse-bg: #fee2e2;  
---btn-refuse-border: #fca5a5;  
---btn-refuse-hover-bg: #fecaca;  
---btn-refuse-hover-border: #f87171;  
-  
-
---btn-recall-fg: #92400e;  
---btn-recall-bg: #fef3c7;  
---btn-recall-border: #fde68a;  
---btn-recall-hover-bg: #fde68a;  
---btn-recall-hover-border: #f59e0b;
-
---info-field-bg: #cfe9da;      
---info-field-border: #7fb095; 
-
-/* --- DANGER ROW (báo cáo chưa nộp / nháp) --- */  
---table-header-bg: #218673;  
---row-danger-bg: #ffe9e9;  
---row-danger-text: #b42318;  
---row-danger-text-strong: #8f1010;
-
---sidebar-text: rgba(255, 255, 255, 0.9);  
---sidebar-text-muted: rgba(255, 255, 255, 0.75);  
---sidebar-text-sub: rgba(255, 255, 255, 0.7);  
---sidebar-border-bottom: rgba(255, 255, 255, 0.12);  
---sidebar-border-right: rgba(255, 255, 255, 0.08);  
---sidebar-hover-bg: rgba(255, 255, 255, 0.08);  
---sidebar-hover-bg-sub: rgba(255, 255, 255, 0.05);  
---sidebar-scrollbar: rgba(255, 255, 255, 0.3);  
---sidebar-scrollbar-hover: rgba(255, 255, 255, 0.5);  
---sidebar-connector: rgba(255, 255, 255, 0.35);  
---sidebar-logout-border: rgba(255, 255, 255, 0.25);  
---sidebar-logout-border-hover: rgba(255, 255, 255, 0.4);
-
---focus-ring-color: rgba(31, 92, 63, 0.45);  
---focus-ring-offset: 2px;  
---focus-ring-width: 3px;
 }
 
 /* ==========================================================================  
@@ -325,62 +322,62 @@
   --modal-input-disabled-bg: #1c2822;
   --modal-input-disabled-text: #6b7d75;
 
-/* --- TOAST NOTIFICATIONS (Dark Mode) --- */  
---toast-bg: #1c2822;  
---toast-message-text: #d8e4de;  
---toast-close-text: #9fb0a8;  
---toast-close-hover-text: #d8e4de;  
---toast-info-color: #6bb892;
+  /* --- TOAST NOTIFICATIONS (Dark Mode) --- */
+  --toast-bg: #1c2822;
+  --toast-message-text: #d8e4de;
+  --toast-close-text: #9fb0a8;
+  --toast-close-hover-text: #d8e4de;
+  --toast-info-color: #6bb892;
 
   /* --- CHART COLORS (Dark Mode) --- */
---chart-green: #4ade80;
---chart-red: #f87171;
---chart-blue: #60a5fa;
---chart-purple: #c084fc;
---chart-orange: #fb923c;
---chart-yellow: #facc15;
---chart-cyan: #22d3ee;
---chart-pink: #f472b6;
+  --chart-green: #4ade80;
+  --chart-red: #f87171;
+  --chart-blue: #60a5fa;
+  --chart-purple: #c084fc;
+  --chart-orange: #fb923c;
+  --chart-yellow: #facc15;
+  --chart-cyan: #22d3ee;
+  --chart-pink: #f472b6;
 
---chart-sq: #60a5fa;
---chart-qncn: #c084fc;
---chart-hsn1: #4ade80;
---chart-hsn2: #fb923c;
+  --chart-sq: #60a5fa;
+  --chart-qncn: #c084fc;
+  --chart-hsn1: #4ade80;
+  --chart-hsn2: #fb923c;
 
---chart-present: #4ade80;
---chart-absent: #f87171;
+  --chart-present: #4ade80;
+  --chart-absent: #f87171;
 
---bar-bg: rgba(96, 165, 250, 0.15);
---bar-hover: rgba(96, 165, 250, 0.25);
+  --bar-bg: rgba(96, 165, 250, 0.15);
+  --bar-hover: rgba(96, 165, 250, 0.25);
 
-/* Nút Phê duyệt (Màu Xanh lá - Approve) */  
---btn-approve-fg: #4ade80;  
---btn-approve-bg: rgba(74, 222, 128, 0.15);  
---btn-approve-border: rgba(74, 222, 128, 0.35);  
---btn-approve-hover-bg: rgba(74, 222, 128, 0.25);  
---btn-approve-hover-border: #4ade80;  
-  
-/* Nút Từ chối (Màu Đỏ - Refuse) */  
---btn-refuse-fg: #f87171;  
---btn-refuse-bg: rgba(248, 113, 113, 0.15);  
---btn-refuse-border: rgba(248, 113, 113, 0.35);  
---btn-refuse-hover-bg: rgba(248, 113, 113, 0.25);  
---btn-refuse-hover-border: #f87171;  
-  
-/* Nút Thu hồi (Màu Vàng hổ phách - Recall) */  
---btn-recall-fg: #fbbf24;  
---btn-recall-bg: rgba(245, 158, 11, 0.15);  
---btn-recall-border: rgba(245, 158, 11, 0.35);  
---btn-recall-hover-bg: rgba(245, 158, 11, 0.25);  
---btn-recall-hover-border: #fbbf24;
+  /* Nút Phê duyệt (Màu Xanh lá - Approve) */
+  --btn-approve-fg: #4ade80;
+  --btn-approve-bg: rgba(74, 222, 128, 0.15);
+  --btn-approve-border: rgba(74, 222, 128, 0.35);
+  --btn-approve-hover-bg: rgba(74, 222, 128, 0.25);
+  --btn-approve-hover-border: #4ade80;
 
---info-field-bg: #2a3d35; 
---info-field-border: #5c8a70;  
+  /* Nút Từ chối (Màu Đỏ - Refuse) */
+  --btn-refuse-fg: #f87171;
+  --btn-refuse-bg: rgba(248, 113, 113, 0.15);
+  --btn-refuse-border: rgba(248, 113, 113, 0.35);
+  --btn-refuse-hover-bg: rgba(248, 113, 113, 0.25);
+  --btn-refuse-hover-border: #f87171;
 
---table-header-bg: #1a6b5a;  
---row-danger-bg: #ffe9e9;  
---row-danger-text: #8f1010;  
---row-danger-text-strong: #ffffff;
+  /* Nút Thu hồi (Màu Vàng hổ phách - Recall) */
+  --btn-recall-fg: #fbbf24;
+  --btn-recall-bg: rgba(245, 158, 11, 0.15);
+  --btn-recall-border: rgba(245, 158, 11, 0.35);
+  --btn-recall-hover-bg: rgba(245, 158, 11, 0.25);
+  --btn-recall-hover-border: #fbbf24;
 
---focus-ring-color: rgba(107, 184, 146, 0.55);
+  --info-field-bg: #2a3d35;
+  --info-field-border: #5c8a70;
+
+  --table-header-bg: #1a6b5a;
+  --row-danger-bg: #ffe9e9;
+  --row-danger-text: #8f1010;
+  --row-danger-text-strong: #ffffff;
+
+  --focus-ring-color: rgba(107, 184, 146, 0.55);
 }

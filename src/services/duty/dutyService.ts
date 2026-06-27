@@ -1,5 +1,4 @@
-import { apiNoPrefix } from "../api";
-import api from "../api"
+import api from "../api";
 
 import type {
   TrucNguoiPayload,
@@ -22,7 +21,7 @@ export const dutyService = {
   createTrucChiHuy: async (
     payload: TrucNguoiPayload,
   ): Promise<TrucNguoiResponse> => {
-    const res = await apiNoPrefix.post<TrucNguoiResponse>(
+    const res = await api.post<TrucNguoiResponse>(
       "/truc-chi-huy",
       payload,
     );
@@ -32,7 +31,7 @@ export const dutyService = {
   createTrucBanTacChien: async (
     payload: TrucNguoiPayload,
   ): Promise<TrucNguoiResponse> => {
-    const res = await apiNoPrefix.post<TrucNguoiResponse>(
+    const res = await api.post<TrucNguoiResponse>(
       "/truc-ban-tac-chien",
       payload,
     );
@@ -42,7 +41,7 @@ export const dutyService = {
   createKhungGioChiHuy: async (
     payload: KhungGioPayload,
   ): Promise<KhungGioResponse> => {
-    const res = await apiNoPrefix.post<KhungGioResponse>(
+    const res = await api.post<KhungGioResponse>(
       "/khung-gio-bao-cao/banChiHuy",
       payload,
     );
@@ -52,7 +51,7 @@ export const dutyService = {
   createKhungGioTacChien: async (
     payload: KhungGioPayload,
   ): Promise<KhungGioResponse> => {
-    const res = await apiNoPrefix.post<KhungGioResponse>(
+    const res = await api.post<KhungGioResponse>(
       "/khung-gio-bao-cao/banTacChien",
       payload,
     );
@@ -62,7 +61,7 @@ export const dutyService = {
   createCaTruc: async (
     payload: CaTrucPayload,
   ): Promise<CaTrucCreateResponse> => {
-    const res = await apiNoPrefix.post<CaTrucCreateResponse>(
+    const res = await api.post<CaTrucCreateResponse>(
       "/ca-truc",
       payload,
     );
@@ -70,7 +69,7 @@ export const dutyService = {
   },
 
   getCaTruc: async (idCatruc: string): Promise<CaTrucDetailResponse> => {
-    const res = await apiNoPrefix.get<CaTrucDetailResponse>(
+    const res = await api.get<CaTrucDetailResponse>(
       `/ca-truc/${idCatruc}`,
     );
     return res.data;
@@ -79,7 +78,7 @@ export const dutyService = {
   getCaTrucByDate: async (
     ngayTruc: string,
   ): Promise<GetCaTrucByDateResponse> => {
-    const response = await apiNoPrefix.get<GetCaTrucByDateResponse>(
+    const response = await api.get<GetCaTrucByDateResponse>(
       `/ca-truc/ngaytruc?ngayTruc=${ngayTruc}`,
     );
     return response.data;
@@ -96,19 +95,19 @@ export const dutyService = {
   },
 
   getAllTrucChiHuy: async (): Promise<NguoiTrucListResponse> => {
-    const res = await apiNoPrefix.get<NguoiTrucListResponse>("/truc-chi-huy");
+    const res = await api.get<NguoiTrucListResponse>("/truc-chi-huy");
     return res.data;
   },
 
   getAllTrucBanTacChien: async (): Promise<NguoiTrucListResponse> => {
-    const res = await apiNoPrefix.get<NguoiTrucListResponse>(
+    const res = await api.get<NguoiTrucListResponse>(
       "/truc-ban-tac-chien",
     );
     return res.data;
   },
 
   getAllCaTruc: async (): Promise<CaTrucListResponse> => {
-    const res = await apiNoPrefix.get<CaTrucListResponse>("/ca-truc");
+    const res = await api.get<CaTrucListResponse>("/ca-truc");
     return res.data;
   },
 
@@ -116,7 +115,7 @@ export const dutyService = {
     idCatruc: string,
     payload: UpdateCaTrucPayload,
   ): Promise<UpdateCaTrucResponse> => {
-    const res = await apiNoPrefix.put<UpdateCaTrucResponse>(
+    const res = await api.put<UpdateCaTrucResponse>(
       `/ca-truc/${idCatruc}`,
       payload,
     );
@@ -127,7 +126,7 @@ export const dutyService = {
     id: string,
     payload: TrucNguoiPayload,
   ): Promise<TrucNguoiResponse> => {
-    const res = await apiNoPrefix.put<TrucNguoiResponse>(
+    const res = await api.put<TrucNguoiResponse>(
       `/truc-chi-huy/${id}`,
       payload,
     );
@@ -135,7 +134,7 @@ export const dutyService = {
   },
 
   deleteTrucChiHuy: async (id: string): Promise<TrucNguoiResponse> => {
-    const res = await apiNoPrefix.delete<TrucNguoiResponse>(
+    const res = await api.delete<TrucNguoiResponse>(
       `/truc-chi-huy/${id}`,
     );
     return res.data;
@@ -145,7 +144,7 @@ export const dutyService = {
     id: string,
     payload: TrucNguoiPayload,
   ): Promise<TrucNguoiResponse> => {
-    const res = await apiNoPrefix.put<TrucNguoiResponse>(
+    const res = await api.put<TrucNguoiResponse>(
       `/truc-ban-tac-chien/${id}`,
       payload,
     );
@@ -153,10 +152,9 @@ export const dutyService = {
   },
 
   deleteTrucBanTacChien: async (id: string): Promise<TrucNguoiResponse> => {
-    const res = await apiNoPrefix.delete<TrucNguoiResponse>(
+    const res = await api.delete<TrucNguoiResponse>(
       `/truc-ban-tac-chien/${id}`,
     );
     return res.data;
   },
 };
-

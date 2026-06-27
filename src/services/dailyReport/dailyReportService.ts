@@ -1,4 +1,4 @@
-import { apiNoPrefix } from "../api";
+import api from "../api";
 import type {
   CreateReportRequest,
   CreateReportResponse,
@@ -57,13 +57,13 @@ export type NhiemVuNgayChildrenItem = {
   noiDungUuDiem: string;
   noiDungKhuyetDiem: string;
   noiDungCanGiaiQuyet: string;
-};  
+};
 
 export const dailyReportService = {
   createReport: async (
     payload: CreateReportRequest,
   ): Promise<CreateReportResponse> => {
-    const response = await apiNoPrefix.post<CreateReportResponse>(
+    const response = await api.post<CreateReportResponse>(
       "/donbaocao",
       payload,
     );
@@ -71,7 +71,7 @@ export const dailyReportService = {
   },
 
   getNhiemVuNgay: async (): Promise<NhiemVuNgayResponse> => {
-    const response = await apiNoPrefix.get<NhiemVuNgayResponse>("/nhiemvungay");
+    const response = await api.get<NhiemVuNgayResponse>("/nhiemvungay");
     return response.data;
   },
 
@@ -79,7 +79,7 @@ export const dailyReportService = {
     id: string,
     payload: UpdateReportRequest,
   ): Promise<UpdateReportResponse> => {
-    const response = await apiNoPrefix.put<UpdateReportResponse>(
+    const response = await api.put<UpdateReportResponse>(
       `/donbaocao/${id}`,
       payload,
     );
@@ -87,7 +87,7 @@ export const dailyReportService = {
   },
 
   approveReport: async (id: string): Promise<ApproveResponse> => {
-    const response = await apiNoPrefix.put<ApproveResponse>(
+    const response = await api.put<ApproveResponse>(
       `/donbaocao/approve/${id}`,
     );
     return response.data;
@@ -97,7 +97,7 @@ export const dailyReportService = {
     id: string,
     payload: RefuseRequest,
   ): Promise<RefuseResponse> => {
-    const response = await apiNoPrefix.put<RefuseResponse>(
+    const response = await api.put<RefuseResponse>(
       `/donbaocao/refuse/${id}`,
       payload,
     );
@@ -108,7 +108,7 @@ export const dailyReportService = {
     maDonVi: string,
     ngayLoc: string,
   ): Promise<SearchReportResponse> => {
-    const response = await apiNoPrefix.get<SearchReportResponse>(
+    const response = await api.get<SearchReportResponse>(
       `/donbaocao/search/DonVi/${maDonVi}`,
       { params: { ngayLoc } },
     );
@@ -119,7 +119,7 @@ export const dailyReportService = {
     maDonVi: string,
     ngayLoc: string,
   ): Promise<SearchChildrenResponse> => {
-    const response = await apiNoPrefix.get<SearchChildrenResponse>(
+    const response = await api.get<SearchChildrenResponse>(
       `/donbaocao/search/DonVi/${maDonVi}/children`,
       { params: { ngayLoc } },
     );
@@ -131,7 +131,7 @@ export const dailyReportService = {
     start: string,
     end: string,
   ): Promise<SearchByRangeResponse> => {
-    const response = await apiNoPrefix.get<SearchByRangeResponse>(
+    const response = await api.get<SearchByRangeResponse>(
       `/donbaocao/don-bao-cao/search`,
       { params: { idDonVi, start, end } },
     );
@@ -139,7 +139,7 @@ export const dailyReportService = {
   },
 
   submitReport: async (id: string): Promise<ApproveResponse> => {
-    const response = await apiNoPrefix.put<ApproveResponse>(
+    const response = await api.put<ApproveResponse>(
       `/donbaocao/submit/${id}`,
       null,
       { params: { id } },
@@ -148,7 +148,7 @@ export const dailyReportService = {
   },
 
   recallReport: async (id: string): Promise<ApproveResponse> => {
-    const response = await apiNoPrefix.put<ApproveResponse>(
+    const response = await api.put<ApproveResponse>(
       `/donbaocao/recall/${id}`,
       null,
       { params: { id } },
@@ -159,7 +159,7 @@ export const dailyReportService = {
   createNhiemVuNgay: async (
     payload: CreateNhiemVuNgayRequest,
   ): Promise<NhiemVuNgayResponse> => {
-    const response = await apiNoPrefix.post<NhiemVuNgayResponse>(
+    const response = await api.post<NhiemVuNgayResponse>(
       "/nhiemvungay",
       payload,
     );
@@ -169,14 +169,14 @@ export const dailyReportService = {
   getNhiemVuNgayById: async (
     id: string,
   ): Promise<NhiemVuNgaySingleResponse> => {
-    const response = await apiNoPrefix.get<NhiemVuNgaySingleResponse>(
+    const response = await api.get<NhiemVuNgaySingleResponse>(
       `/nhiemvungay/${id}`,
     );
     return response.data;
   },
 
   getNhiemVuNgayByDonBaoCao: async (idDonBaoCao: string) => {
-    const response = await apiNoPrefix.get(
+    const response = await api.get(
       `/nhiemvungay/donbaocao/${idDonBaoCao}`,
     );
     return response.data as {
@@ -196,7 +196,7 @@ export const dailyReportService = {
     maDonVi: string,
     ngayLoc: string,
   ) => {
-    const response = await apiNoPrefix.get(
+    const response = await api.get(
       `/nhiemvungay/search/donvi/${maDonVi}/children`,
       { params: { ngayLoc } },
     );
@@ -221,7 +221,7 @@ export const dailyReportService = {
   },
 
   updateNhiemVuNgay: async (id: string, payload: CreateNhiemVuNgayRequest) => {
-    const response = await apiNoPrefix.put(`/nhiemvungay/${id}`, payload);
+    const response = await api.put(`/nhiemvungay/${id}`, payload);
     return response.data;
   },
 };

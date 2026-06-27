@@ -10,13 +10,6 @@ const api = axios.create({
   },
 });
 
-const apiNoPrefix = axios.create({
-  baseURL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
 type ToastErrorHandler = (message: string) => void;
 let toastErrorHandler: ToastErrorHandler | null = null;
 
@@ -34,9 +27,7 @@ function setupInterceptors(instance: typeof api) {
   });
 
   instance.interceptors.response.use(
-    (response) => {
-      return response;
-    },
+    (response) => response,
     (error) => {
       if (error.response?.status === 401 && storage.getToken()) {
         storage.removeToken();
@@ -60,7 +51,5 @@ function setupInterceptors(instance: typeof api) {
 }
 
 setupInterceptors(api);
-setupInterceptors(apiNoPrefix);
 
 export default api;
-export { apiNoPrefix };
