@@ -177,7 +177,7 @@
 .nameCell {  
   font-weight: 600;  
 }  
-
+  
 .trucSection {  
   margin-bottom: 16px;  
 }  
@@ -200,7 +200,6 @@
 .trucCard {  
   display: flex;  
   flex-direction: column;  
-  gap: 10px;  
   padding: 14px 16px;  
   border-radius: 12px;  
   background: var(--dialog-bg);  
@@ -208,10 +207,17 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);  
 }  
   
+.trucCard > * + * {  
+  margin-top: 10px;  
+}  
+  
 .trucCardHeader {  
   display: flex;  
   align-items: center;  
-  gap: 10px;  
+}  
+  
+.trucCardHeader > * + * {  
+  margin-left: 10px;  
 }  
   
 .trucRole {  
@@ -225,7 +231,10 @@
 .trucCardBody {  
   display: flex;  
   flex-direction: column;  
-  gap: 3px;  
+}  
+  
+.trucCardBody > * + * {  
+  margin-top: 3px;  
 }  
   
 .trucName {  
@@ -252,7 +261,7 @@
   color: var(--dialog-message-text);  
   font-style: italic;  
 }  
-    
+  
 .recalledNotice {  
   padding: 48px 24px;  
   text-align: center;  
@@ -264,7 +273,7 @@
 .recalledNotice p {  
   margin: 0;  
 }  
-    
+  
 @media (max-width: 768px) {  
   .overlay {  
     left: 0;  
@@ -285,10 +294,10 @@
   }  
   
   .table {  
-    font-size: 13px;
+    font-size: 13px;  
   }  
   
   .trucGrid {  
-    grid-template-columns: 1fr; 
+    grid-template-columns: 1fr;  
   }  
 }

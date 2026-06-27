@@ -4,7 +4,10 @@
   margin: 0 auto;  
   display: flex;  
   flex-direction: column;  
-  gap: 32px;  
+}  
+  
+.page > * + * {  
+  margin-top: 32px;  
 }  
   
 .formCard {  
@@ -14,7 +17,10 @@
   padding: 40px;  
   display: flex;  
   flex-direction: column;  
-  gap: 32px;  
+}  
+  
+.formCard > * + * {  
+  margin-top: 32px;  
 }  
   
 .cardTitle {  
@@ -23,7 +29,7 @@
   color: var(--login-text);  
   margin: 0;  
 }  
-    
+  
 .formGrid {  
   display: grid;  
   grid-template-columns: 1fr 1fr;  
@@ -33,7 +39,10 @@
 .formGroup {  
   display: flex;  
   flex-direction: column;  
-  gap: 10px;  
+}  
+  
+.formGroup > * + * {  
+  margin-top: 10px;  
 }  
   
 .fullWidth {  
@@ -74,7 +83,7 @@
   min-height: 80px;  
   resize: vertical;  
 }  
-    
+  
 .trucGrid {  
   display: grid;  
   grid-template-columns: 1fr 1fr;  
@@ -84,13 +93,19 @@
 .trucColumn {  
   display: flex;  
   flex-direction: column;  
-  gap: 14px;  
+}  
+  
+.trucColumn > * + * {  
+  margin-top: 14px;  
 }  
   
 .trucColumnHeader {  
   display: flex;  
   align-items: center;  
-  gap: 8px;  
+}  
+  
+.trucColumnHeader > * + * {  
+  margin-left: 8px;  
 }  
   
 .trucColumnLabel {  
@@ -100,15 +115,18 @@
   text-transform: uppercase;  
   letter-spacing: 0.5px;  
 }  
-    
+  
 .personCard {  
   display: flex;  
   flex-direction: column;  
-  gap: 5px;  
   padding: 20px 24px;  
   border: 1px solid var(--login-border);  
   border-radius: 12px;  
   background: var(--surface-muted);  
+}  
+  
+.personCard > * + * {  
+  margin-top: 5px;  
 }  
   
 .personRole {  
@@ -134,12 +152,15 @@
 .personPhone {  
   display: flex;  
   align-items: center;  
-  gap: 6px;  
   font-size: 15px;  
   font-weight: 600;  
   color: var(--primary-color);  
   text-decoration: none;  
   margin-top: 4px;  
+}  
+  
+.personPhone > * + * {  
+  margin-left: 6px;  
 }  
   
 .personEmpty {  
@@ -148,17 +169,19 @@
   font-style: italic;  
   padding: 14px 0;  
 }  
-    
+  
 .actions {  
   display: flex;  
   justify-content: flex-end;  
-  gap: 12px;  
+}  
+  
+.actions > * + * {  
+  margin-left: 12px;  
 }  
   
 .btnSubmit {  
   display: flex;  
   align-items: center;  
-  gap: 8px;  
   padding: 14px 40px;  
   border: none;  
   border-radius: 8px;  
@@ -170,6 +193,10 @@
   transition: opacity 0.15s;  
 }  
   
+.btnSubmit > * + * {  
+  margin-left: 8px;  
+}  
+  
 .btnSubmit:hover:not(:disabled) {  
   opacity: 0.88;  
 }  
@@ -179,11 +206,9 @@
   cursor: not-allowed;  
 }  
   
-  
 .successBanner {  
   display: flex;  
   align-items: center;  
-  gap: 12px;  
   padding: 20px 28px;  
   background: color-mix(in srgb, var(--primary-color) 12%, transparent);  
   border: 1.5px solid var(--primary-color);  
@@ -193,6 +218,10 @@
   color: var(--primary-color);  
 }  
   
+.successBanner > * + * {  
+  margin-left: 12px;  
+}  
+  
 .successIcon {  
   font-size: 22px;  
 }  
@@ -200,12 +229,18 @@
 @media (max-width: 1024px) {  
   .page {  
     padding: 24px;  
-    gap: 24px;  
+  }  
+  
+  .page > * + * {  
+    margin-top: 24px;  
   }  
   
   .formCard {  
     padding: 28px 24px;  
-    gap: 24px;  
+  }  
+  
+  .formCard > * + * {  
+    margin-top: 24px;  
   }  
   
   .formGrid {  
@@ -215,17 +250,23 @@
   .trucGrid {  
     gap: 20px;  
   }  
-}
+}  
   
 @media (max-width: 768px) {  
   .page {  
     padding: 16px;  
-    gap: 20px;  
+  }  
+  
+  .page > * + * {  
+    margin-top: 20px;  
   }  
   
   .formCard {  
     padding: 24px 20px;  
-    gap: 24px;  
+  }  
+  
+  .formCard > * + * {  
+    margin-top: 24px;  
   }  
   
   .formGrid {  

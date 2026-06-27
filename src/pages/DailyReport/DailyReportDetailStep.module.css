@@ -19,12 +19,15 @@
 .cardHeader {  
   display: flex;  
   align-items: flex-start;  
-  gap: 12px;  
   padding: 14px 18px;  
   background: color-mix(in srgb, var(--primary-color) 7%, var(--modal-bg));  
   border-bottom: 1px solid var(--modal-border);  
   min-height: 80px;  
-  align-items: center;
+  align-items: center;  
+}  
+  
+.cardHeader > * + * {  
+  margin-left: 12px;  
 }  
   
 .cardBadge {  
@@ -40,8 +43,8 @@
   align-items: center;  
   justify-content: center;  
   margin-top: 1px;  
-}
-
+}  
+  
 .radioLabel.radioLabelSuccess.radioLabelChecked {  
   border-color: var(--btn-approve-fg);  
   background: var(--btn-approve-fg);  
@@ -52,7 +55,7 @@
   border-color: var(--btn-refuse-fg);  
   background: var(--btn-refuse-fg);  
   color: #fff;  
-} 
+}  
   
 .cardTitle {  
   font-size: 14px;  
@@ -84,8 +87,11 @@
   
 .radioGroup {  
   display: flex;  
-  gap: 8px;  
   flex-wrap: wrap;  
+}  
+  
+.radioGroup > * + * {  
+  margin-left: 8px;  
 }  
   
 .radioLabel {  
@@ -124,7 +130,7 @@
   background: var(--primary-color);  
   color: #fff;  
   font-weight: 700;  
-}
+}  
   
 .textarea {  
   width: 100%;  

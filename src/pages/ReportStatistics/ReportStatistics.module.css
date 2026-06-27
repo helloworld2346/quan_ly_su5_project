@@ -2,14 +2,16 @@
   width: 100%;  
   display: flex;  
   flex-direction: column;  
-  gap: 20px;  
   padding: 0 0 32px;  
+}  
+  
+.page > * + * {  
+  margin-top: 20px;  
 }  
   
 .toolbar {  
   display: flex;  
   align-items: center;  
-  gap: 16px;  
   flex-wrap: wrap;  
   background: var(--dialog-bg);  
   border: 1px solid var(--login-border);  
@@ -17,12 +19,19 @@
   padding: 14px 20px;  
 }  
   
+.toolbar > * + * {  
+  margin-left: 16px;  
+}  
+  
 .dateRange {  
   display: flex;  
   align-items: center;  
-  gap: 10px;  
   flex-wrap: wrap;  
   flex: 1;  
+}  
+  
+.dateRange > * + * {  
+  margin-left: 10px;  
 }  
   
 .dateLabel {  
@@ -45,7 +54,7 @@
 .dateInput:focus {  
   outline: none;  
   border-color: var(--modal-input-focus-border);  
-  box-shadow: 0 0 0 2px var(--modal-input-focus-shadow, rgba(33,134,115,0.15));  
+  box-shadow: 0 0 0 2px var(--modal-input-focus-shadow, rgba(33, 134, 115, 0.15));  
 }  
   
 .dateSep {  
@@ -90,12 +99,15 @@
   display: flex;  
   flex-direction: column;  
   align-items: center;  
-  gap: 6px;  
   padding: 20px 16px;  
   background: var(--dialog-bg);  
   border: 1px solid var(--login-border);  
   border-radius: 12px;  
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);  
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);  
+}  
+  
+.summaryCard > * + * {  
+  margin-top: 6px;  
 }  
   
 .summaryValue {  
@@ -135,7 +147,10 @@
 .breakdownList {  
   display: flex;  
   flex-direction: column;  
-  gap: 10px;  
+}  
+  
+.breakdownList > * + * {  
+  margin-top: 10px;  
 }  
   
 .breakdownRow {  
@@ -177,7 +192,10 @@
 .timelineList {  
   display: flex;  
   flex-direction: column;  
-  gap: 12px;  
+}  
+  
+.timelineList > * + * {  
+  margin-top: 12px;  
 }  
   
 .timelineCard {  
@@ -218,18 +236,27 @@
   padding: 14px 16px;  
   display: flex;  
   flex-direction: column;  
-  gap: 14px;  
+}  
+  
+.cardBody > * + * {  
+  margin-top: 14px;  
 }  
   
 .qsRow {  
   display: flex;  
-  gap: 24px;  
+}  
+  
+.qsRow > * + * {  
+  margin-left: 24px;  
 }  
   
 .qsItem {  
   display: flex;  
   flex-direction: column;  
-  gap: 2px;  
+}  
+  
+.qsItem > * + * {  
+  margin-top: 2px;  
 }  
   
 .qsLabel {  
@@ -257,7 +284,8 @@
   padding-top: 10px;  
   border-top: 1px solid var(--login-border);  
 }  
-  .trucGrid {  
+  
+.trucGrid {  
   display: grid;  
   grid-template-columns: 1fr 1fr;  
   gap: 10px;  
@@ -267,11 +295,14 @@
 .trucCard {  
   display: flex;  
   flex-direction: column;  
-  gap: 6px;  
   padding: 10px 14px;  
   border: 1px solid var(--login-border);  
   border-radius: 10px;  
   background: var(--dialog-bg, #fff);  
+}  
+  
+.trucCard > * + * {  
+  margin-top: 6px;  
 }  
   
 .trucRole {  
@@ -285,7 +316,10 @@
 .trucCardBody {  
   display: flex;  
   flex-direction: column;  
-  gap: 2px;  
+}  
+  
+.trucCardBody > * + * {  
+  margin-top: 2px;  
 }  
   
 .trucPersonName {  
@@ -315,14 +349,13 @@
   font-size: 13px;  
   color: var(--login-text-muted);  
   font-style: italic;  
-} 
-
+}  
   
 @media (max-width: 600px) {  
   .trucGrid {  
     grid-template-columns: 1fr;  
   }  
-}
+}  
   
 @media (max-width: 768px) {  
   .summaryGrid { grid-template-columns: repeat(2, 1fr); }  
