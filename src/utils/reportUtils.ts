@@ -24,6 +24,18 @@ export const EMPTY_VANG: VangChiTiet = {
   lyDoVangKhac: 0,
 };
 
+export function sumVang(rows: { vang: VangChiTiet }[]): VangChiTiet {
+  return rows.reduce<VangChiTiet>(
+    (acc, r) => {
+      (Object.keys(acc) as (keyof VangChiTiet)[]).forEach((k) => {
+        acc[k] += r.vang[k] ?? 0;
+      });
+      return acc;
+    },
+    { ...EMPTY_VANG },
+  );
+}
+
 export function todayIsoDate(): string {
   const d = new Date();
   return [
@@ -146,6 +158,23 @@ export const EMPTY_TRUC: TrucNguoiInfo = {
   chucvuNguoitruc: "",
   sodienthoai: "",
 };
+
+type CaTrucNguoi = {
+  tenNguoitruc?: string;
+  capbacNguoitruc?: string;
+  chucvuNguoitruc?: string;
+  sodienthoai?: string;
+};
+
+export function trucFromCaTrucInfo(t?: CaTrucNguoi | null): TrucNguoiInfo {
+  if (!t) return { ...EMPTY_TRUC };
+  return {
+    tenNguoitruc: t.tenNguoitruc ?? "",
+    capbacNguoitruc: t.capbacNguoitruc ?? "",
+    chucvuNguoitruc: t.chucvuNguoitruc ?? "",
+    sodienthoai: t.sodienthoai ?? "",
+  };
+}
 
 export function parseTrucNguoi(raw?: string): TrucNguoiInfo {
   if (!raw) return { ...EMPTY_TRUC };

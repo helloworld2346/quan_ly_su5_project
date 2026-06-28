@@ -9,6 +9,8 @@ import type {
   VangChiTiet,
 } from "../../types/dailyReport";
 
+import { EMPTY_VANG } from "../../utils/reportUtils";
+
 type ReportItem = SearchByRangeResponse["Result"][number];
 
 function getDefaultDates() {
@@ -44,22 +46,7 @@ function parseVang(thongTinVang: string): VangChiTiet {
   try {
     return JSON.parse(thongTinVang);
   } catch {
-    return {
-      hoiThaiNgoaiSuDoan: 0,
-      hoiThaiEF: 0,
-      xayDungNgoaiSuDoan: 0,
-      xayDungEF: 0,
-      choHuu: 0,
-      nghiTranhThu: 0,
-      phep: 0,
-      vienNgoaiSuDoan: 0,
-      vienEF: 0,
-      congTacNgoaiSuDoan: 0,
-      congTacSuDoan: 0,
-      hocSQ: 0,
-      hocCS: 0,
-      lyDoVangKhac: 0,
-    };
+    return { ...EMPTY_VANG };
   }
 }
 
@@ -94,23 +81,6 @@ const VANG_LABELS: { key: keyof VangChiTiet; label: string }[] = [
   { key: "choHuu", label: "Chờ hưu" },
   { key: "lyDoVangKhac", label: "Lý do khác" },
 ];
-
-const EMPTY_VANG: VangChiTiet = {
-  hoiThaiNgoaiSuDoan: 0,
-  hoiThaiEF: 0,
-  xayDungNgoaiSuDoan: 0,
-  xayDungEF: 0,
-  choHuu: 0,
-  nghiTranhThu: 0,
-  phep: 0,
-  vienNgoaiSuDoan: 0,
-  vienEF: 0,
-  congTacNgoaiSuDoan: 0,
-  congTacSuDoan: 0,
-  hocSQ: 0,
-  hocCS: 0,
-  lyDoVangKhac: 0,
-};
 
 export default function ReportStatistics() {
   const { account } = useAuth();

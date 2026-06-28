@@ -1,11 +1,6 @@
-// src/pages/DailyReport/hooks/useDailyTroopReportViewModel.ts
 import { useMemo } from "react";
 import type { Account, DonVi } from "../../../types/account";
-import type {
-  ReportRow,
-  EditModalData,
-  VangChiTiet,
-} from "../../../types/dailyReport";
+import type { ReportRow, EditModalData } from "../../../types/dailyReport";
 import type { CaTrucDetail } from "../../../types/duty";
 import type { DetailStepData } from "../DailyReportDetailStep";
 import type { NhiemVuNgay } from "../../../services/dailyReport/dailyReportService";
@@ -22,43 +17,13 @@ import {
   filterVisibleReportRows,
 } from "../utils/dailyTroopReportVisibility";
 import { normalizeReportStatus } from "../../../utils/reportStatus";
+import type {
+  NhiemVuSummary,
+  NhiemVuEntry,
+  ConsolidatedData,
+} from "../dailyTroopReportTypes";
 
-export type NhiemVuSummary = {
-  securityStatus: "safe" | "unsafe";
-  incidentStatus: "yes" | "no";
-  incidentDetail: string;
-  advantageStatus: "yes" | "no";
-  advantageDetail: string;
-  disadvantageStatus: "yes" | "no";
-  disadvantageDetail: string;
-  pendingStatus: "yes" | "no";
-  pendingDetail: string;
-};
-
-export type NhiemVuEntry = {
-  id: string;
-  title: string;
-  subtitle: string;
-  data: NhiemVuSummary | null;
-  reportStatusLabel: string;
-};
-
-export type ConsolidatedData = {
-  quanSoTong: number;
-  quanSoVang: number;
-  quanSoHienDien: number;
-  thongTinVang: VangChiTiet;
-  absentRows: Array<{
-    id: string;
-    hoTen: string;
-    capBac: string;
-    chucVu: string;
-    lyDoVang: keyof VangChiTiet;
-    ghiChu: string;
-  }>;
-  submittedCount: number;
-  totalCount: number;
-};
+export type { NhiemVuSummary, NhiemVuEntry, ConsolidatedData };
 
 export type NhiemVuListItem = {
   maDonVi: string;

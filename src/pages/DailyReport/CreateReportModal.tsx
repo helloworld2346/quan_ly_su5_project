@@ -20,9 +20,11 @@ import {
   CAP_BAC_TAC_CHIEN_SU_DOAN,
   EMPTY_TRUC,
   parseTrucNguoi,
+  trucFromCaTrucInfo,
 } from "../../utils/reportUtils";
 import TrucNguoiFormSection from "./components/NguoiTrucFormSection";
 import AbsentRowsTable from "./components/AbsentRowsTable";
+import { generateId } from "../../utils/uuid";
 
 interface CreateReportModalProps {
   isOpen: boolean;
@@ -76,7 +78,6 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
         // Không block nếu chưa có nhiemvungay
       });
   }, [initialData?.idDonBaoCao]);
-
 
   const detailFromInitialData = useMemo<DetailStepData | null>(() => {
     if (initialDetailData) return initialDetailData;
@@ -132,12 +133,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
     if (initialData?.trucBanChiHuy)
       return parseTrucNguoi(initialData.trucBanChiHuy);
     if (isTacChien && caTrucInfo?.trucChiHuy) {
-      return {
-        tenNguoitruc: caTrucInfo.trucChiHuy.tenNguoitruc ?? "",
-        capbacNguoitruc: caTrucInfo.trucChiHuy.capbacNguoitruc ?? "",
-        chucvuNguoitruc: caTrucInfo.trucChiHuy.chucvuNguoitruc ?? "",
-        sodienthoai: caTrucInfo.trucChiHuy.sodienthoai ?? "",
-      };
+      return trucFromCaTrucInfo(caTrucInfo.trucChiHuy);
     }
     return { ...EMPTY_TRUC };
   });
@@ -146,12 +142,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
     if (initialData?.trucBanTacChien)
       return parseTrucNguoi(initialData.trucBanTacChien);
     if (isTacChien && caTrucInfo?.trucBanTacChien) {
-      return {
-        tenNguoitruc: caTrucInfo.trucBanTacChien.tenNguoitruc ?? "",
-        capbacNguoitruc: caTrucInfo.trucBanTacChien.capbacNguoitruc ?? "",
-        chucvuNguoitruc: caTrucInfo.trucBanTacChien.chucvuNguoitruc ?? "",
-        sodienthoai: caTrucInfo.trucBanTacChien.sodienthoai ?? "",
-      };
+      return trucFromCaTrucInfo(caTrucInfo.trucBanTacChien);
     }
     return { ...EMPTY_TRUC };
   });
@@ -232,7 +223,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
 
   const handleAddRow = () => {
     const newRow: AbsentRow = {
-      id: crypto.randomUUID(),
+      id: generateId(),
       hoTen: "",
       capBac: "",
       chucVu: "",
@@ -267,7 +258,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
         if (res.Result.chiTietVang) {
           const rows = JSON.parse(res.Result.chiTietVang) as AbsentRow[];
           if (rows.length > 0) {
-            setAbsentRows(rows.map((r) => ({ ...r, id: crypto.randomUUID() })));
+            setAbsentRows(rows.map((r) => ({ ...r, id: generateId() })));
           } else {
             showWarning("Hôm qua không có quân nhân vắng.");
           }
@@ -310,7 +301,6 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   };
 
   const handleFinalSubmit = () => {
-    console.log("Dữ liệu nhiệm vụ trước khi lưu:", detailData);
     const step1Error = validateStep1();
     if (step1Error) {
       setValidationError(step1Error);

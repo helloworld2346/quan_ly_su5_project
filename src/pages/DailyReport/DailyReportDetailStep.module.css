@@ -42,17 +42,17 @@
   margin-top: 1px;  
 }
 
-.radioLabel.radioLabelSuccess:has(input[type="radio"]:checked) {  
+.radioLabel.radioLabelSuccess.radioLabelChecked {  
   border-color: var(--btn-approve-fg);  
   background: var(--btn-approve-fg);  
   color: #fff;  
 }  
   
-.radioLabel.radioLabelDanger:has(input[type="radio"]:checked) {  
+.radioLabel.radioLabelDanger.radioLabelChecked {  
   border-color: var(--btn-refuse-fg);  
   background: var(--btn-refuse-fg);  
   color: #fff;  
-}
+} 
   
 .cardTitle {  
   font-size: 14px;  
@@ -119,12 +119,12 @@
   pointer-events: none;  
 }  
   
-.radioLabel:has(input[type="radio"]:checked) {  
+.radioLabel.radioLabelChecked {  
   border-color: var(--primary-color);  
   background: var(--primary-color);  
   color: #fff;  
   font-weight: 700;  
-}  
+}
   
 .textarea {  
   width: 100%;  

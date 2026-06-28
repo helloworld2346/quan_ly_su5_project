@@ -30,8 +30,9 @@ export class WebSocketManager {
     this.socket = new WebSocket(this.options.url);
 
     this.socket.onopen = () => {
-      console.log("🟢 Connected");
-
+      if (import.meta.env.DEV) {
+        console.log("🟢 Connected");
+      }
       this.options.onOpen?.();
     };
 
@@ -46,8 +47,9 @@ export class WebSocketManager {
     };
 
     this.socket.onclose = () => {
-      console.log("🔴 Disconnected");
-
+      if (import.meta.env.DEV) {
+        console.log("🔴 Disconnected");
+      }
       this.options.onClose?.();
 
       if (this.manuallyClosed) {

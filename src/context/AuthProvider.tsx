@@ -11,6 +11,8 @@ import { notificationStorage } from "../utils/notificationStorage";
 import type { Notification } from "../components/ui/NotificationBell/NotificationBell";
 import type { ApiNotification } from "../types/notification";
 import { useToast } from "./useToast";
+import { generateId } from "../utils/uuid";  
+
 
 function mapApiNotification(n: ApiNotification): Notification {
   return {
@@ -66,7 +68,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         const notifId = accountResponse.Result.donVi?.maDonVi;
-        console.log("[Auth] notifId for notifications:", notifId);
 
         if (notifId) {
           try {
@@ -83,8 +84,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const connectWebSocket = () => {
         WebSocketLink.setOnOpen(() => {
-          console.log("🚀 WebSocket opened");
-
           WebSocketLink.send({
             type: "REGISTER",
             role: accountResponse.Result.vaiTro?.idVaiTro ?? "",
@@ -113,7 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
           if (msg.title || msg.message) {
             const newNotif: Notification = {
-              id: msg.id ?? crypto.randomUUID(),
+              id: msg.id ?? generateId(),
               title: msg.title ?? "",
               message: msg.message ?? "",
               time: new Date().toISOString(),

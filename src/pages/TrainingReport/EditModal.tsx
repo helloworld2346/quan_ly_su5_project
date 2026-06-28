@@ -51,7 +51,9 @@ export default function EditModal({ row, onClose }: Props) {
         </div>
         <div className={styles.modalActions}>
           <button className={styles.saveBtn}>Lưu</button>
-          <button className={styles.closeBtn} onClick={onClose}>Hủy</button>
+          <button className={styles.closeBtn} onClick={onClose}>
+            Hủy
+          </button>
         </div>
       </div>
     </div>

@@ -93,7 +93,9 @@ export default function DailyReportDetailStep({
           <div className={styles.cardBody}>
             <div className={styles.radioGroup}>
               <label
-                className={`${styles.radioLabel} ${styles.radioLabelSuccess}`}
+                className={`${styles.radioLabel} ${styles.radioLabelSuccess} ${
+                  securityStatus === "safe" ? styles.radioLabelChecked : ""
+                }`}
               >
                 <input
                   type="radio"
@@ -107,8 +109,11 @@ export default function DailyReportDetailStep({
                 />
                 Đảm bảo an toàn
               </label>
+
               <label
-                className={`${styles.radioLabel} ${styles.radioLabelDanger}`}
+                className={`${styles.radioLabel} ${styles.radioLabelDanger} ${
+                  securityStatus === "unsafe" ? styles.radioLabelChecked : ""
+                }`}
               >
                 <input
                   type="radio"
@@ -134,7 +139,9 @@ export default function DailyReportDetailStep({
           <div className={styles.cardBody}>
             <div className={styles.radioGroup}>
               <label
-                className={`${styles.radioLabel} ${styles.radioLabelDanger}`}
+                className={`${styles.radioLabel} ${styles.radioLabelDanger} ${
+                  incidentStatus === "yes" ? styles.radioLabelChecked : ""
+                }`}
               >
                 <input
                   type="radio"
@@ -149,7 +156,9 @@ export default function DailyReportDetailStep({
                 Có
               </label>
               <label
-                className={`${styles.radioLabel} ${styles.radioLabelSuccess}`}
+                className={`${styles.radioLabel} ${styles.radioLabelSuccess} ${
+                  incidentStatus === "no" ? styles.radioLabelChecked : ""
+                }`}
               >
                 <input
                   type="radio"
@@ -196,7 +205,9 @@ export default function DailyReportDetailStep({
               <label className={styles.label}>Ưu điểm</label>
               <div className={styles.radioGroup}>
                 <label
-                  className={`${styles.radioLabel} ${styles.radioLabelSuccess}`}
+                  className={`${styles.radioLabel} ${styles.radioLabelSuccess} ${
+                    advantageStatus === "yes" ? styles.radioLabelChecked : ""
+                  }`}
                 >
                   <input
                     type="radio"
@@ -211,7 +222,9 @@ export default function DailyReportDetailStep({
                   Có
                 </label>
                 <label
-                  className={`${styles.radioLabel} ${styles.radioLabelDanger}`}
+                  className={`${styles.radioLabel} ${styles.radioLabelDanger} ${
+                    advantageStatus === "no" ? styles.radioLabelChecked : ""
+                  }`}
                 >
                   <input
                     type="radio"
@@ -247,7 +260,9 @@ export default function DailyReportDetailStep({
               <label className={styles.label}>Khuyết điểm</label>
               <div className={styles.radioGroup}>
                 <label
-                  className={`${styles.radioLabel} ${styles.radioLabelDanger}`}
+                  className={`${styles.radioLabel} ${styles.radioLabelDanger} ${
+                    disadvantageStatus === "yes" ? styles.radioLabelChecked : ""
+                  }`}
                 >
                   <input
                     type="radio"
@@ -262,7 +277,9 @@ export default function DailyReportDetailStep({
                   Có
                 </label>
                 <label
-                  className={`${styles.radioLabel} ${styles.radioLabelSuccess}`}
+                  className={`${styles.radioLabel} ${styles.radioLabelSuccess} ${
+                    disadvantageStatus === "no" ? styles.radioLabelChecked : ""
+                  }`}
                 >
                   <input
                     type="radio"
@@ -306,7 +323,9 @@ export default function DailyReportDetailStep({
           <div className={styles.cardBody}>
             <div className={styles.radioGroup}>
               <label
-                className={`${styles.radioLabel} ${styles.radioLabelDanger}`}
+                className={`${styles.radioLabel} ${styles.radioLabelDanger} ${
+                  pendingTaskStatus === "yes" ? styles.radioLabelChecked : ""
+                }`}
               >
                 <input
                   type="radio"
@@ -321,7 +340,9 @@ export default function DailyReportDetailStep({
                 Có
               </label>
               <label
-                className={`${styles.radioLabel} ${styles.radioLabelSuccess}`}
+                className={`${styles.radioLabel} ${styles.radioLabelSuccess} ${
+                  pendingTaskStatus === "no" ? styles.radioLabelChecked : ""
+                }`}
               >
                 <input
                   type="radio"
