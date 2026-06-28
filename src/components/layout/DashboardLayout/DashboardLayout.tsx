@@ -13,6 +13,8 @@ import { accountService } from "../../../services/account/accountService";
 import type { Account } from "../../../types/account";
 import { useTheme, ThemeToggle } from "../../../theme";
 
+import {getAvatarInitials} from "../../../utils/avatar"
+
 type Props = {
   activeId: NavItemId;
   pageTitle: string;
@@ -45,9 +47,7 @@ function TopBarActions({ isDark, onToggleTheme }: TopBarActionsProps) {
   }, []);
 
 const getAvatarText = () => {
-  if (!account) return "QT";
-  const name = account.tenDangNhap || account.tenTaiKhoan || "";
-  return name.split("_")[0].toUpperCase();
+  return getAvatarInitials(account);
 };
 
   const getDisplayName = () => {
