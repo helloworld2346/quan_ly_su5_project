@@ -8,7 +8,11 @@ import {
   faLock,
   faEye,
   faEyeSlash,
+  faSun,
+  faMoon,
 } from "@fortawesome/free-solid-svg-icons";
+
+import { useTheme } from "../../theme";
 
 import { accountService } from "../../services/account/accountService";
 import { donviService } from "../../services/unit/unitService";
@@ -16,6 +20,9 @@ import { useToast } from "../../context/useToast";
 import { useAuth } from "../../context/useAuth";
 import type { Account, DonVi } from "../../types/account";
 import { authService } from "../../services/auth/authService";
+
+import ConfirmDialog from "../../components/ui/ConfirmDialog/ConfirmDialog";
+import { useConfirmDialog } from "../../components/ui/ConfirmDialog/useConfirmDialog";
 
 import styles from "./Settings.module.css";
 
@@ -34,6 +41,8 @@ export default function Settings() {
   const [saving, setSaving] = useState(false);
 
   const { showError, showSuccess } = useToast();
+  const { confirm, isOpen, options, onConfirm, onCancel } = useConfirmDialog();
+  const { isDark, toggleTheme } = useTheme();
   const { refreshAccount } = useAuth();
 
   const MIN_PASSWORD_LENGTH = 6;
@@ -64,6 +73,15 @@ export default function Settings() {
     () => quanSoSiQuan + quanSoHsqBs + quanSoQncn,
     [quanSoSiQuan, quanSoHsqBs, quanSoQncn],
   );
+
+  const hasUnsavedChanges = useMemo(() => {
+    if (!donVi) return false;
+    return (
+      quanSoSiQuan !== donVi.quanSoSiQuan ||
+      quanSoQncn !== donVi.quanSoQncn ||
+      quanSoHsqBs !== donVi.quanSoHsqBs
+    );
+  }, [donVi, quanSoSiQuan, quanSoQncn, quanSoHsqBs]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -140,6 +158,15 @@ export default function Settings() {
     e.preventDefault();
     if (!donVi) return;
 
+    const confirmed = await confirm({
+      title: "Xác nhận cập nhật quân số",
+      message: `Lưu quân số biên chế mới? Tổng quân số: ${quanSoTong} (Sĩ quan ${quanSoSiQuan} · QNCN ${quanSoQncn} · HSQ-BS ${quanSoHsqBs}).`,
+      confirmText: "Lưu thay đổi",
+      cancelText: "Hủy",
+      type: "warning",
+    });
+    if (!confirmed) return;
+
     setSaving(true);
     try {
       const response = await donviService.updateDonVi(donVi.maDonVi, {
@@ -203,9 +230,9 @@ export default function Settings() {
     );
   }
 
-const initials = (account.tenDangNhap || account.tenTaiKhoan || "QT")
-  .split("_")[0]
-  .toUpperCase();
+  const initials = (account.tenDangNhap || account.tenTaiKhoan || "QT")
+    .split("_")[0]
+    .toUpperCase();
 
   return (
     <div className={styles.container}>
@@ -222,6 +249,16 @@ const initials = (account.tenDangNhap || account.tenTaiKhoan || "QT")
       </div>
 
       <div className={styles.layout}>
+        <ConfirmDialog
+          isOpen={isOpen}
+          title={options.title}
+          message={options.message}
+          confirmText={options.confirmText}
+          cancelText={options.cancelText}
+          type={options.type}
+          onConfirm={onConfirm}
+          onCancel={onCancel}
+        />
         <aside className={styles.profileCol}>
           <div className={styles.profileCard}>
             <div className={styles.avatar}>{initials}</div>
@@ -422,10 +459,27 @@ const initials = (account.tenDangNhap || account.tenTaiKhoan || "QT")
                 </div>
 
                 <div className={styles.formActions}>
+                  {hasUnsavedChanges && (
+                    <button
+                      type="button"
+                      className={styles.resetBtn}
+                      onClick={() => {
+                        setQuanSoSiQuan(donVi.quanSoSiQuan);
+                        setSiQuanStr(String(donVi.quanSoSiQuan));
+                        setQuanSoQncn(donVi.quanSoQncn);
+                        setQncnStr(String(donVi.quanSoQncn));
+                        setQuanSoHsqBs(donVi.quanSoHsqBs);
+                        setHsqBsStr(String(donVi.quanSoHsqBs));
+                      }}
+                      disabled={saving}
+                    >
+                      Hoàn tác
+                    </button>
+                  )}
                   <button
                     type="submit"
                     className={styles.saveBtn}
-                    disabled={saving}
+                    disabled={saving || !hasUnsavedChanges}
                   >
                     {saving ? "Đang lưu..." : "Lưu thay đổi"}
                   </button>
@@ -445,7 +499,6 @@ const initials = (account.tenDangNhap || account.tenTaiKhoan || "QT")
 
             <form className={styles.form} onSubmit={handleChangePassword}>
               <div className={styles.infoGrid}>
-                {/* Mật khẩu mới */}
                 <div className={styles.formGroup}>
                   <label>Mật khẩu mới</label>
                   <div className={styles.passwordField}>
@@ -497,7 +550,6 @@ const initials = (account.tenDangNhap || account.tenTaiKhoan || "QT")
                   )}
                 </div>
 
-                {/* Xác nhận mật khẩu */}
                 <div className={styles.formGroup}>
                   <label>Xác nhận mật khẩu</label>
                   <div className={styles.passwordField}>
@@ -549,6 +601,51 @@ const initials = (account.tenDangNhap || account.tenTaiKhoan || "QT")
                 </button>
               </div>
             </form>
+          </div>
+          <div className={styles.cardSection}>
+            <div className={styles.cardHeader}>
+              <FontAwesomeIcon
+                icon={isDark ? faMoon : faSun}
+                className={styles.cardHeaderIcon}
+              />
+              <h2 className={styles.cardTitle}>Giao diện</h2>
+            </div>
+
+            <div className={styles.themeRow}>
+              <div className={styles.themeInfo}>
+                <span className={styles.themeName}>
+                  {isDark ? "Giao diện tối" : "Giao diện sáng"}
+                </span>
+                <span className={styles.themeDesc}>
+                  Tùy chỉnh màu nền sáng/tối cho toàn bộ ứng dụng
+                </span>
+              </div>
+
+              <div className={styles.themeOptions}>
+                <button
+                  type="button"
+                  className={`${styles.themeOption} ${!isDark ? styles.themeOptionActive : ""}`}
+                  onClick={() => {
+                    if (isDark) toggleTheme();
+                  }}
+                  aria-pressed={!isDark}
+                >
+                  <FontAwesomeIcon icon={faSun} />
+                  <span>Sáng</span>
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.themeOption} ${isDark ? styles.themeOptionActive : ""}`}
+                  onClick={() => {
+                    if (!isDark) toggleTheme();
+                  }}
+                  aria-pressed={isDark}
+                >
+                  <FontAwesomeIcon icon={faMoon} />
+                  <span>Tối</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -208,9 +208,9 @@
 .content {  
   flex: 1;  
   padding: 24px 28px 32px;  
-  overflow: auto;  
+  overflow: visible;
   min-height: 0;  
-}  
+}
   
 @media (max-width: 1100px) {  
   .topBar {  
