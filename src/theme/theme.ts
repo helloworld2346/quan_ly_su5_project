@@ -1,4 +1,3 @@
-// src/theme/theme.ts
 export const THEME_KEY = "su5-theme";
 
 export type ThemeMode = "light" | "dark";
@@ -8,14 +7,20 @@ export function getStoredTheme(): ThemeMode {
 }
 
 export function applyTheme(mode: ThemeMode): void {
-  document.documentElement.setAttribute("data-theme", mode);
+  const root = document.documentElement;
+  root.classList.add("theme-switching");
+  root.setAttribute("data-theme", mode);
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      root.classList.remove("theme-switching");
+    });
+  });
 }
 
 export function persistTheme(mode: ThemeMode): void {
   localStorage.setItem(THEME_KEY, mode);
 }
 
-/** Chỉ hiển thị login sáng — không ghi đè preference user */
 export function applyLoginSurfaceTheme(): void {
   applyTheme("light");
 }

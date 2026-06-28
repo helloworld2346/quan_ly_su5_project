@@ -61,7 +61,6 @@
   min-height: 56px;  
   padding: 0 28px;  
   background: var(--topbar-bg);  
-  backdrop-filter: blur(10px);  
   border-bottom: 1px solid var(--login-border);  
   transition:  
     background 0.25s ease,  

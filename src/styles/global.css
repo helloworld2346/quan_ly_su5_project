@@ -93,3 +93,8 @@ select:focus-visible {
   outline: none;  
   box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);  
 }
+
+html.theme-switching,  
+html.theme-switching * {  
+  transition: none !important;  
+}

@@ -38,7 +38,7 @@
   --sidebar-bg-bottom: #0d3b28;
   --dashboard-bg: #f0f4f2;
 
-  --topbar-bg: rgba(255, 255, 255, 0.92);
+  --topbar-bg: rgba(255, 255, 255, 0.98);
   --topbar-btn-bg: #ffffff;
   --topbar-btn-hover: #f0f5f2;
 
@@ -231,7 +231,7 @@
   --sidebar-bg-bottom: #101c17;
   --dashboard-bg: #121a16;
 
-  --topbar-bg: rgba(22, 32, 28, 0.88);
+  --topbar-bg: rgba(22, 32, 28, 0.98);
   --topbar-btn-bg: #243029;
   --topbar-btn-hover: #2d3b34;
 
