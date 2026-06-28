@@ -8,7 +8,7 @@
   padding: 24px;  
   isolation: isolate;  
 }  
-  
+
 .page::before,  
 .page::after {  
   content: "";  

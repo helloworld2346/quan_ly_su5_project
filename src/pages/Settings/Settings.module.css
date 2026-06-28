@@ -497,3 +497,96 @@
     font-size: 14px;  
   }  
 }
+
+.passwordField {  
+  position: relative;  
+  width: 100%;  
+}  
+  
+.passwordField input {  
+  width: 100%;  
+  padding-right: 48px;  
+}  
+  
+.eyeBtn {  
+  position: absolute;  
+  top: 0;  
+  right: 0;  
+  width: 44px;  
+  height: 48px;  
+  display: flex;  
+  align-items: center;  
+  justify-content: center;  
+  background: transparent;  
+  border: none;  
+  cursor: pointer;  
+  color: var(--login-text-muted);  
+  font-size: 15px;  
+  transition: color 0.15s;  
+}  
+  
+.eyeBtn:hover {  
+  color: var(--primary-color);  
+}  
+  
+.strengthWrap {  
+  display: flex;  
+  align-items: center;  
+  gap: 10px;  
+  margin-top: 8px;  
+}  
+  
+.strengthBar {  
+  flex: 1;  
+  height: 6px;  
+  background: var(--login-border);  
+  border-radius: 999px;  
+  overflow: hidden;  
+}  
+  
+.strengthFill {  
+  display: block;  
+  height: 100%;  
+  width: 0;  
+  border-radius: 999px;  
+  transition:  
+    width 0.2s,  
+    background 0.2s;  
+}  
+  
+.strengthWeak {  
+  width: 33%;  
+  background: var(--dialog-danger-bg);  
+}  
+  
+.strengthMedium {  
+  width: 66%;  
+  background: var(--dialog-warning-bg);  
+}  
+  
+.strengthStrong {  
+  width: 100%;  
+  background: var(--primary-color);  
+}  
+  
+.strengthLabel {  
+  font-size: 12px;  
+  font-weight: 700;  
+  color: var(--login-text-muted);  
+  white-space: nowrap;  
+}  
+  
+.matchHint,  
+.matchOk {  
+  font-size: 13px;  
+  font-weight: 600;  
+  margin-top: 6px;  
+}  
+  
+.matchHint {  
+  color: var(--dialog-danger-icon);  
+}  
+  
+.matchOk {  
+  color: var(--primary-color);  
+}

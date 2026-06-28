@@ -6,6 +6,8 @@ import {
   faTriangleExclamation,
   faUsers,
   faLock,
+  faEye,
+  faEyeSlash,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { accountService } from "../../services/account/accountService";
@@ -34,9 +36,29 @@ export default function Settings() {
   const { showError, showSuccess } = useToast();
   const { refreshAccount } = useAuth();
 
+  const MIN_PASSWORD_LENGTH = 6;
+
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const passwordStrength = useMemo(() => {
+    const v = newPassword;
+    if (!v) return 0;
+    let score = 0;
+    if (v.length >= MIN_PASSWORD_LENGTH) score++;
+    if (/[A-Za-z]/.test(v) && /[0-9]/.test(v)) score++;
+    if (/[^A-Za-z0-9]/.test(v) || v.length >= 10) score++;
+    return Math.max(1, score);
+  }, [newPassword]);
+
+  const passwordsMatch =
+    confirmPassword.length > 0 && newPassword === confirmPassword;
+
+  const isPasswordValid =
+    newPassword.trim().length >= MIN_PASSWORD_LENGTH && passwordsMatch;
 
   const quanSoTong = useMemo(
     () => quanSoSiQuan + quanSoHsqBs + quanSoQncn,
@@ -87,6 +109,10 @@ export default function Settings() {
       showError("Vui lòng nhập mật khẩu mới");
       return;
     }
+    if (newPassword.trim().length < MIN_PASSWORD_LENGTH) {
+      showError(`Mật khẩu phải có ít nhất ${MIN_PASSWORD_LENGTH} ký tự`);
+      return;
+    }
     if (newPassword !== confirmPassword) {
       showError("Mật khẩu xác nhận không khớp");
       return;
@@ -98,6 +124,8 @@ export default function Settings() {
         showSuccess("Đổi mật khẩu thành công");
         setNewPassword("");
         setConfirmPassword("");
+        setShowNewPassword(false);
+        setShowConfirmPassword(false);
       } else {
         showError(res.message || "Đổi mật khẩu thất bại");
       }
@@ -417,24 +445,97 @@ const initials = (account.tenDangNhap || account.tenTaiKhoan || "QT")
 
             <form className={styles.form} onSubmit={handleChangePassword}>
               <div className={styles.infoGrid}>
+                {/* Mật khẩu mới */}
                 <div className={styles.formGroup}>
                   <label>Mật khẩu mới</label>
-                  <input
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Nhập mật khẩu mới"
-                  />
+                  <div className={styles.passwordField}>
+                    <input
+                      type={showNewPassword ? "text" : "password"}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="Nhập mật khẩu mới"
+                    />
+                    <button
+                      type="button"
+                      className={styles.eyeBtn}
+                      onClick={() => setShowNewPassword((p) => !p)}
+                      aria-label={
+                        showNewPassword ? "Ẩn mật khẩu" : "Hiển thị mật khẩu"
+                      }
+                      title={
+                        showNewPassword ? "Ẩn mật khẩu" : "Hiển thị mật khẩu"
+                      }
+                    >
+                      <FontAwesomeIcon
+                        icon={showNewPassword ? faEyeSlash : faEye}
+                      />
+                    </button>
+                  </div>
+
+                  {newPassword.length > 0 && (
+                    <div className={styles.strengthWrap}>
+                      <div className={styles.strengthBar}>
+                        <span
+                          className={[
+                            styles.strengthFill,
+                            passwordStrength === 1 && styles.strengthWeak,
+                            passwordStrength === 2 && styles.strengthMedium,
+                            passwordStrength === 3 && styles.strengthStrong,
+                          ]
+                            .filter(Boolean)
+                            .join(" ")}
+                        />
+                      </div>
+                      <span className={styles.strengthLabel}>
+                        {passwordStrength === 1
+                          ? "Yếu"
+                          : passwordStrength === 2
+                            ? "Trung bình"
+                            : "Mạnh"}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
+                {/* Xác nhận mật khẩu */}
                 <div className={styles.formGroup}>
                   <label>Xác nhận mật khẩu</label>
-                  <input
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Nhập lại mật khẩu mới"
-                  />
+                  <div className={styles.passwordField}>
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Nhập lại mật khẩu mới"
+                    />
+                    <button
+                      type="button"
+                      className={styles.eyeBtn}
+                      onClick={() => setShowConfirmPassword((p) => !p)}
+                      aria-label={
+                        showConfirmPassword
+                          ? "Ẩn mật khẩu"
+                          : "Hiển thị mật khẩu"
+                      }
+                      title={
+                        showConfirmPassword
+                          ? "Ẩn mật khẩu"
+                          : "Hiển thị mật khẩu"
+                      }
+                    >
+                      <FontAwesomeIcon
+                        icon={showConfirmPassword ? faEyeSlash : faEye}
+                      />
+                    </button>
+                  </div>
+
+                  {confirmPassword.length > 0 &&
+                    (passwordsMatch ? (
+                      <span className={styles.matchOk}>Mật khẩu khớp</span>
+                    ) : (
+                      <span className={styles.matchHint}>
+                        Mật khẩu xác nhận không khớp
+                      </span>
+                    ))}
                 </div>
               </div>
 
@@ -442,7 +543,7 @@ const initials = (account.tenDangNhap || account.tenTaiKhoan || "QT")
                 <button
                   type="submit"
                   className={styles.saveBtn}
-                  disabled={changingPassword}
+                  disabled={changingPassword || !isPasswordValid}
                 >
                   {changingPassword ? "Đang lưu..." : "Đổi mật khẩu"}
                 </button>
