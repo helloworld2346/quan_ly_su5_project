@@ -24,6 +24,8 @@ import { authService } from "../../services/auth/authService";
 import ConfirmDialog from "../../components/ui/ConfirmDialog/ConfirmDialog";
 import { useConfirmDialog } from "../../components/ui/ConfirmDialog/useConfirmDialog";
 
+import NumberStepper from "../../components/ui/NumberStepper/NumberStepper";
+
 import styles from "./Settings.module.css";
 
 export default function Settings() {
@@ -35,9 +37,6 @@ export default function Settings() {
   const [quanSoHsqBs, setQuanSoHsqBs] = useState(0);
   const [quanSoSiQuan, setQuanSoSiQuan] = useState(0);
   const [quanSoQncn, setQuanSoQncn] = useState(0);
-  const [siQuanStr, setSiQuanStr] = useState("0");
-  const [hsqBsStr, setHsqBsStr] = useState("0");
-  const [qncnStr, setQncnStr] = useState("0");
   const [saving, setSaving] = useState(false);
 
   const { showError, showSuccess } = useToast();
@@ -103,11 +102,8 @@ export default function Settings() {
           if (unit) {
             setDonVi(unit);
             setQuanSoHsqBs(unit.quanSoHsqBs);
-            setHsqBsStr(String(unit.quanSoHsqBs));
             setQuanSoSiQuan(unit.quanSoSiQuan);
-            setSiQuanStr(String(unit.quanSoSiQuan));
             setQuanSoQncn(unit.quanSoQncn);
-            setQncnStr(String(unit.quanSoQncn));
           }
         }
       } catch (err) {
@@ -183,11 +179,8 @@ export default function Settings() {
       if (response.success) {
         setDonVi(response.Result);
         setQuanSoHsqBs(response.Result.quanSoHsqBs);
-        setHsqBsStr(String(response.Result.quanSoHsqBs));
         setQuanSoSiQuan(response.Result.quanSoSiQuan);
-        setSiQuanStr(String(response.Result.quanSoSiQuan));
         setQuanSoQncn(response.Result.quanSoQncn);
-        setQncnStr(String(response.Result.quanSoQncn));
 
         await refreshAccount();
 
@@ -323,134 +316,24 @@ export default function Settings() {
 
               <form className={styles.form} onSubmit={handleUpdateDonVi}>
                 <div className={styles.statGrid}>
-                  <div className={styles.statCard}>
-                    <span className={styles.statLabel}>Sĩ quan</span>
-                    <div className={styles.numberInput}>
-                      <button
-                        type="button"
-                        className={`${styles.numberInputBtn} ${styles.numberInputBtnLeft}`}
-                        onClick={() => {
-                          const v = Math.max(0, quanSoSiQuan - 1);
-                          setQuanSoSiQuan(v);
-                          setSiQuanStr(String(v));
-                        }}
-                      >
-                        −
-                      </button>
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        pattern="[0-9]*"
-                        value={siQuanStr}
-                        onChange={(e) => {
-                          const raw = e.target.value.replace(/[^0-9]/g, "");
-                          setSiQuanStr(raw);
-                          setQuanSoSiQuan(raw === "" ? 0 : parseInt(raw, 10));
-                        }}
-                        onBlur={() => {
-                          if (siQuanStr === "") setSiQuanStr("0");
-                        }}
-                        required
-                      />
-                      <button
-                        type="button"
-                        className={`${styles.numberInputBtn} ${styles.numberInputBtnRight}`}
-                        onClick={() => {
-                          const v = quanSoSiQuan + 1;
-                          setQuanSoSiQuan(v);
-                          setSiQuanStr(String(v));
-                        }}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className={styles.statCard}>
-                    <span className={styles.statLabel}>QNCN</span>
-                    <div className={styles.numberInput}>
-                      <button
-                        type="button"
-                        className={`${styles.numberInputBtn} ${styles.numberInputBtnLeft}`}
-                        onClick={() => {
-                          const v = Math.max(0, quanSoQncn - 1);
-                          setQuanSoQncn(v);
-                          setQncnStr(String(v));
-                        }}
-                      >
-                        −
-                      </button>
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        pattern="[0-9]*"
-                        value={qncnStr}
-                        onChange={(e) => {
-                          const raw = e.target.value.replace(/[^0-9]/g, "");
-                          setQncnStr(raw);
-                          setQuanSoQncn(raw === "" ? 0 : parseInt(raw, 10));
-                        }}
-                        onBlur={() => {
-                          if (qncnStr === "") setQncnStr("0");
-                        }}
-                        required
-                      />
-                      <button
-                        type="button"
-                        className={`${styles.numberInputBtn} ${styles.numberInputBtnRight}`}
-                        onClick={() => {
-                          const v = quanSoQncn + 1;
-                          setQuanSoQncn(v);
-                          setQncnStr(String(v));
-                        }}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className={styles.statCard}>
-                    <span className={styles.statLabel}>HSQ-BS</span>
-                    <div className={styles.numberInput}>
-                      <button
-                        type="button"
-                        className={`${styles.numberInputBtn} ${styles.numberInputBtnLeft}`}
-                        onClick={() => {
-                          const v = Math.max(0, quanSoHsqBs - 1);
-                          setQuanSoHsqBs(v);
-                          setHsqBsStr(String(v));
-                        }}
-                      >
-                        −
-                      </button>
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        pattern="[0-9]*"
-                        value={hsqBsStr}
-                        onChange={(e) => {
-                          const raw = e.target.value.replace(/[^0-9]/g, "");
-                          setHsqBsStr(raw);
-                          setQuanSoHsqBs(raw === "" ? 0 : parseInt(raw, 10));
-                        }}
-                        onBlur={() => {
-                          if (hsqBsStr === "") setHsqBsStr("0");
-                        }}
-                        required
-                      />
-                      <button
-                        type="button"
-                        className={`${styles.numberInputBtn} ${styles.numberInputBtnRight}`}
-                        onClick={() => {
-                          const v = quanSoHsqBs + 1;
-                          setQuanSoHsqBs(v);
-                          setHsqBsStr(String(v));
-                        }}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
+                  <NumberStepper
+                    label="Sĩ quan"
+                    value={quanSoSiQuan}
+                    onChange={setQuanSoSiQuan}
+                    required
+                  />
+                  <NumberStepper
+                    label="QNCN"
+                    value={quanSoQncn}
+                    onChange={setQuanSoQncn}
+                    required
+                  />
+                  <NumberStepper
+                    label="HSQ-BS"
+                    value={quanSoHsqBs}
+                    onChange={setQuanSoHsqBs}
+                    required
+                  />
 
                   <div className={styles.totalCard}>
                     <span className={styles.totalLabel}>Tổng quân số</span>
@@ -465,11 +348,8 @@ export default function Settings() {
                       className={styles.resetBtn}
                       onClick={() => {
                         setQuanSoSiQuan(donVi.quanSoSiQuan);
-                        setSiQuanStr(String(donVi.quanSoSiQuan));
                         setQuanSoQncn(donVi.quanSoQncn);
-                        setQncnStr(String(donVi.quanSoQncn));
                         setQuanSoHsqBs(donVi.quanSoHsqBs);
-                        setHsqBsStr(String(donVi.quanSoHsqBs));
                       }}
                       disabled={saving}
                     >
@@ -602,6 +482,7 @@ export default function Settings() {
               </div>
             </form>
           </div>
+
           <div className={styles.cardSection}>
             <div className={styles.cardHeader}>
               <FontAwesomeIcon

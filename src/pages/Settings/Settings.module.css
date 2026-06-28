@@ -45,26 +45,31 @@
   color: var(--login-text-muted);  
 }  
   
+/* ===== LAYOUT 2 CỘT (grid gap OK cho Chrome 66+) ===== */  
 .layout {  
   display: grid;  
   grid-template-columns: minmax(280px, 320px) 1fr;  
   gap: 24px;  
-  align-items: start;
+  align-items: start;  
 }  
   
 .profileCol {  
   position: sticky;  
-  top: 80px;
+  top: 80px;  
   align-self: start;  
-}
+}  
   
 .mainCol {  
   display: flex;  
   flex-direction: column;  
-  gap: 24px;  
   min-width: 0;  
 }  
   
+.mainCol > * + * {  
+  margin-top: 24px;  
+}  
+  
+/* ===== PROFILE CARD (cột trái) ===== */  
 .profileCard {  
   display: flex;  
   flex-direction: column;  
@@ -123,20 +128,26 @@
   padding-top: 16px;  
   display: flex;  
   flex-direction: column;  
-  gap: 12px;  
+}  
+  
+.infoList > * + * {  
+  margin-top: 12px;  
 }  
   
 .infoRow {  
   display: flex;  
   flex-direction: column;  
   align-items: flex-start;  
-  gap: 4px;  
   padding: 10px 14px;  
   background: var(--info-field-bg);  
   border: 1px solid var(--info-field-border);  
   border-left: 4px solid var(--primary-color);  
   border-radius: 8px;  
   text-align: left;  
+}  
+  
+.infoRow > * + * {  
+  margin-top: 4px;  
 }  
   
 .infoLabel {  
@@ -154,6 +165,7 @@
   word-break: break-word;  
 }  
   
+/* ===== CARD SECTION (cột phải) ===== */  
 .cardSection {  
   background: var(--surface-card);  
   border: 1px solid var(--login-border);  
@@ -178,7 +190,7 @@
 .cardHeaderIcon {  
   color: var(--primary-color);  
   font-size: 18px;  
-  margin-right: 8px;
+  margin-right: 8px;  
 }  
   
 .cardTitle {  
@@ -188,6 +200,7 @@
   color: var(--primary-color);  
 }  
   
+/* ===== FORM ===== */  
 .form {  
   display: flex;  
   flex-direction: column;  
@@ -242,28 +255,11 @@
   gap: 20px;  
 }  
   
+/* ===== QUÂN SỐ (grid gap OK) ===== */  
 .statGrid {  
   display: grid;  
   grid-template-columns: repeat(2, 1fr);  
   gap: 16px;  
-}  
-  
-.statCard {  
-  display: flex;  
-  flex-direction: column;  
-  gap: 10px;  
-  padding: 16px;  
-  background: var(--surface-muted);  
-  border: 1px solid var(--login-border);  
-  border-radius: 12px;  
-}  
-  
-.statLabel {  
-  font-size: 13px;  
-  font-weight: 700;  
-  text-transform: uppercase;  
-  letter-spacing: 0.6px;  
-  color: color-mix(in srgb, var(--primary-color) 65%, var(--login-text-muted));  
 }  
   
 .totalCard {  
@@ -271,12 +267,15 @@
   flex-direction: column;  
   align-items: center;  
   justify-content: center;  
-  gap: 6px;  
   padding: 16px;  
   background: var(--primary-color);  
   border: 1px solid var(--primary-color);  
   border-radius: 12px;  
   color: var(--text-white);  
+}  
+  
+.totalCard > * + * {  
+  margin-top: 6px;  
 }  
   
 .totalLabel {  
@@ -293,11 +292,15 @@
   line-height: 1;  
 }  
   
+/* ===== ACTIONS ===== */  
 .formActions {  
   display: flex;  
   justify-content: flex-end;  
-  gap: 12px;  
   padding-top: 4px;  
+}  
+  
+.formActions > * + * {  
+  margin-left: 12px;  
 }  
   
 .resetBtn {  
@@ -322,7 +325,7 @@
 .resetBtn:disabled {  
   opacity: 0.45;  
   cursor: not-allowed;  
-}
+}  
   
 .saveBtn {  
   padding: 10px 28px;  
@@ -347,6 +350,7 @@
   cursor: not-allowed;  
 }  
   
+/* ===== LOADING / ERROR ===== */  
 .loading {  
   display: flex;  
   flex-direction: column;  
@@ -389,6 +393,7 @@
   text-align: center;  
 }  
   
+/* ===== WARNING BANNER ===== */  
 .warningBanner {  
   display: flex;  
   align-items: flex-start;  
@@ -406,73 +411,7 @@
   margin-left: 12px;  
 }  
   
-.numberInput {  
-  display: flex;  
-  align-items: center;  
-  border: 1px solid var(--login-border);  
-  border-radius: 10px;  
-  overflow: hidden;  
-  background: var(--input-bg);  
-  transition:  
-    border-color 0.15s,  
-    box-shadow 0.15s;  
-}  
-  
-.numberInput:focus-within {  
-  border-color: var(--primary-color);  
-  box-shadow: 0 0 0 3px var(--modal-input-focus-shadow);  
-}  
-  
-.numberInput input {  
-  flex: 1;  
-  height: 48px;  
-  padding: 0 8px;  
-  border: none !important;  
-  border-radius: 0 !important;  
-  font-size: 16px;  
-  font-weight: 600;  
-  text-align: center;  
-  background: transparent;  
-  color: var(--login-text);  
-  outline: none;  
-  box-shadow: none !important;  
-  width: 100%;  
-  min-width: 0;  
-}  
-  
-.numberInputBtn {  
-  width: 44px;  
-  height: 48px;  
-  display: flex;  
-  align-items: center;  
-  justify-content: center;  
-  background: var(--table-row-even);  
-  border: none;  
-  font-size: 22px;  
-  font-weight: 700;  
-  color: var(--primary-color);  
-  cursor: pointer;  
-  transition: background 0.15s;  
-  flex-shrink: 0;  
-  user-select: none;  
-}  
-  
-.numberInputBtn:hover {  
-  background: color-mix(in srgb, var(--primary-color) 12%, transparent);  
-}  
-  
-.numberInputBtn:active {  
-  background: color-mix(in srgb, var(--primary-color) 22%, transparent);  
-}  
-  
-.numberInputBtnLeft {  
-  border-right: 1px solid var(--login-border);  
-}  
-  
-.numberInputBtnRight {  
-  border-left: 1px solid var(--login-border);  
-}  
-  
+/* ===== RESPONSIVE ===== */  
 @media (max-width: 1024px) {  
   .layout {  
     grid-template-columns: 1fr;  
@@ -522,8 +461,9 @@
     height: 44px;  
     font-size: 14px;  
   }  
-}
-
+}  
+  
+/* ===== PASSWORD FIELD ===== */  
 .passwordField {  
   position: relative;  
   width: 100%;  
@@ -555,11 +495,15 @@
   color: var(--primary-color);  
 }  
   
+/* ===== STRENGTH METER ===== */  
 .strengthWrap {  
   display: flex;  
   align-items: center;  
-  gap: 10px;  
   margin-top: 8px;  
+}  
+  
+.strengthWrap > * + * {  
+  margin-left: 10px;  
 }  
   
 .strengthBar {  
@@ -602,6 +546,7 @@
   white-space: nowrap;  
 }  
   
+/* ===== MATCH HINT ===== */  
 .matchHint,  
 .matchOk {  
   font-size: 13px;  
@@ -615,20 +560,27 @@
   
 .matchOk {  
   color: var(--primary-color);  
-}
-
+}  
+  
+/* ===== THEME ===== */  
 .themeRow {  
   display: flex;  
   align-items: center;  
   justify-content: space-between;  
-  gap: 16px;  
   flex-wrap: wrap;  
+}  
+  
+.themeRow > * + * {  
+  margin-left: 16px;  
 }  
   
 .themeInfo {  
   display: flex;  
   flex-direction: column;  
-  gap: 4px;  
+}  
+  
+.themeInfo > * + * {  
+  margin-top: 4px;  
 }  
   
 .themeName {  
@@ -644,17 +596,19 @@
   
 .themeOptions {  
   display: flex;  
-  gap: 8px;  
   background: var(--surface-muted);  
   border: 1px solid var(--login-border);  
   border-radius: 999px;  
   padding: 4px;  
 }  
   
+.themeOptions > * + * {  
+  margin-left: 8px;  
+}  
+  
 .themeOption {  
   display: flex;  
   align-items: center;  
-  gap: 8px;  
   padding: 8px 18px;  
   border: none;  
   border-radius: 999px;  
@@ -666,6 +620,10 @@
   transition:  
     background 0.2s,  
     color 0.2s;  
+}  
+  
+.themeOption > * + * {  
+  margin-left: 8px;  
 }  
   
 .themeOption:hover {  
