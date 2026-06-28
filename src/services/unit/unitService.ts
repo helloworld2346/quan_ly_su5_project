@@ -1,4 +1,4 @@
-import { apiNoPrefix } from "../api";
+import api from "../api";
 import type {
   DonViResponse,
   DonVi,
@@ -8,7 +8,7 @@ import type {
 
 export const donviService = {
   getDonVi: async (): Promise<DonVi[]> => {
-    const response = await apiNoPrefix.get<DonViResponse>("/donvi");
+    const response = await api.get<DonViResponse>("/donvi");
     return response.data.Result;
   },
 
@@ -16,7 +16,7 @@ export const donviService = {
     maDonVi: string,
     data: UpdateDonViRequest,
   ): Promise<UpdateDonViResponse> => {
-    const response = await apiNoPrefix.put<UpdateDonViResponse>(
+    const response = await api.put<UpdateDonViResponse>(
       `/donvi/update/${maDonVi}`,
       data,
     );

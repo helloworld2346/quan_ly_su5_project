@@ -44,8 +44,9 @@
   min-height: 100vh;  
   position: relative;  
   z-index: 1;  
-}  
-  
+  transition: margin-left 0.25s ease;  
+}
+
 .mainCollapsed {  
   margin-left: var(--sidebar-collapsed-width);  
 }  
@@ -57,7 +58,6 @@
   display: flex;  
   align-items: center;  
   justify-content: space-between;  
-  gap: 20px;  
   min-height: 56px;  
   padding: 0 28px;  
   background: var(--topbar-bg);  
@@ -68,21 +68,31 @@
     border-color 0.25s ease;  
 }  
   
+.topBar > * + * {  
+  margin-left: 20px;  
+}  
+  
 .topBarLeft {  
   min-width: 0;  
   display: flex;  
   align-items: center;  
-  gap: 12px;  
+}  
+  
+.topBarLeft > * + * {  
+  margin-left: 12px;  
 }  
   
 .breadcrumb {  
   display: flex;  
   align-items: center;  
   flex-wrap: wrap;  
-  gap: 6px;  
   font-size: 14px;  
   font-weight: 600;  
   color: var(--login-text-muted);  
+}  
+  
+.breadcrumb > * + * {  
+  margin-left: 6px;  
 }  
   
 .hamburgerBtn {  
@@ -132,7 +142,10 @@
   display: flex;  
   align-items: center;  
   flex-shrink: 0;  
-  gap: 12px;  
+}  
+  
+.topBarRight > * + * {  
+  margin-left: 12px;  
 }  
   
 .iconButton {  
@@ -166,7 +179,10 @@
 .userBlock {  
   display: flex;  
   align-items: center;  
-  gap: 8px;  
+}  
+  
+.userBlock > * + * {  
+  margin-left: 8px;  
 }  
   
 .userAvatar {  
@@ -195,13 +211,16 @@
   overflow: auto;  
   min-height: 0;  
 }  
-    
+  
 @media (max-width: 1100px) {  
   .topBar {  
     flex-wrap: wrap;  
     min-height: auto;  
     padding: 12px 20px;  
-    gap: 12px;  
+  }  
+  
+  .topBar > * + * {  
+    margin-left: 12px;  
   }  
   
   .topBarRight {  
@@ -222,12 +241,15 @@
 }  
   
 @media (max-width: 640px) {  
-  .main,  
-  .mainCollapsed {  
-    margin-left: 0;  
+  .backdrop {  
+    display: block;  
+    position: fixed;  
+    inset: 0;  
+    z-index: 999;  
+    background: rgba(0, 0, 0, 0.45);  
   }  
-}  
-  
+}
+
 @media (prefers-reduced-motion: reduce) {  
   .layout,  
   .layout::before,  
@@ -237,3 +259,7 @@
     transition: none !important;  
   }  
 }
+
+.backdrop {  
+  display: none;  
+}  

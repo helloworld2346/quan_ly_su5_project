@@ -1,5 +1,4 @@
-import { apiNoPrefix } from "../api";
-
+import api from "../api";
 export interface DonViItem {
   tenDonVi: string;
   quanSoTong: number;
@@ -36,7 +35,7 @@ export interface ThongKeQuanSoResponse {
 
 export const troopStatsService = {
   getThongKe: async (ngayBaoCao: string): Promise<ThongKeQuanSoResult> => {
-    const response = await apiNoPrefix.get<ThongKeQuanSoResponse>("/thong-ke", {
+    const response = await api.get<ThongKeQuanSoResponse>("/thong-ke", {
       params: { ngayBaoCao },
     });
     return response.data.Result;

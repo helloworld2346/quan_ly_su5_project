@@ -39,6 +39,17 @@ export default function NavGroup({
   const connectorRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
+    const ul = listRef.current;
+    if (!ul) return;
+
+    if (isOpen && !collapsed) {
+      ul.style.maxHeight = `${ul.scrollHeight}px`;
+    } else {
+      ul.style.maxHeight = "0px";
+    }
+  }, [isOpen, collapsed, items]);
+
+  useLayoutEffect(() => {
     const connector = connectorRef.current;
     if (!connector) return;
 
@@ -112,8 +123,12 @@ export default function NavGroup({
         )}
       </button>
 
-      {isOpen && !collapsed && (
-        <ul ref={listRef} className={styles.subList}>
+      {!collapsed && (
+        <ul
+          ref={listRef}
+          className={`${styles.subList} ${isOpen ? styles.subListOpen : ""}`}
+          aria-hidden={!isOpen}
+        >
           <div ref={connectorRef} className={styles.activeConnector} />
           {items.map((item) => (
             <li key={item.id} className={styles.subLi}>

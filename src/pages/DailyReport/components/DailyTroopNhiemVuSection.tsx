@@ -1,4 +1,4 @@
-import type { Dispatch, SetStateAction } from "react";
+import { useEffect, type Dispatch, type SetStateAction } from "react";
 import styles from "../DailyTroopReport.module.css";
 import NhiemVuAccordionItem from "./NhiemVuAccordionItem";
 import type { NhiemVuEntry } from "../dailyTroopReportTypes";
@@ -14,6 +14,19 @@ export default function DailyTroopNhiemVuSection({
   openNhiemVuId,
   setOpenNhiemVuId,
 }: Props) {
+  const isSingle = nhiemVuEntries.length === 1;
+  const openItem =
+    nhiemVuEntries.find((item) => item.id === openNhiemVuId) ?? null;
+
+  useEffect(() => {
+    if (!openItem) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpenNhiemVuId(null);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [openItem, setOpenNhiemVuId]);
+
   return (
     <section className={styles.sectionBlock}>
       <div className={`${styles.sectionCard} ${styles.sectionCardSoft}`}>
@@ -32,71 +45,88 @@ export default function DailyTroopNhiemVuSection({
           </div>
         </div>
 
-        <div className={styles.summaryList}>
-          {nhiemVuEntries.length > 0 ? (
-            nhiemVuEntries.map((item) => {
-              const isOpen = openNhiemVuId === item.id;
+        {nhiemVuEntries.length === 0 && (
+          <div className={styles.emptyState}>
+            <p>Chưa có dữ liệu báo cáo</p>
+          </div>
+        )}
 
-              return (
-                <div key={item.id} className={styles.nhiemVuAccordionItem}>
-                  <button
-                    type="button"
-                    className={styles.nhiemVuAccordionHeader}
-                    onClick={() =>
-                      setOpenNhiemVuId((prev) =>
-                        prev === item.id ? null : item.id,
-                      )
-                    }
-                    aria-expanded={isOpen}
-                  >
-                    <div className={styles.nhiemVuAccordionHeaderLeft}>
-                      <div className={styles.nhiemVuAccordionTitle}>
-                        {item.title}
-                      </div>
-                    </div>
-
-                    <div className={styles.nhiemVuAccordionHeaderRight}>
-                      <span
-                        className={`${styles.nhiemVuAccordionStatus} ${
-                          item.reportStatusLabel === "Đã duyệt"
-                            ? styles.nhiemVuAccordionStatusSuccess
-                            : styles.nhiemVuAccordionStatusEmpty
-                        }`}
-                      >
-                        {item.reportStatusLabel}
-                      </span>
-                      <span
-                        className={`${styles.nhiemVuAccordionArrow} ${
-                          isOpen ? styles.nhiemVuAccordionArrowOpen : ""
-                        }`}
-                      >
-                        ▾
-                      </span>
-                    </div>
-                  </button>
-
-                  <div
-                    className={`${styles.nhiemVuAccordionBody} ${
-                      isOpen ? styles.nhiemVuAccordionBodyOpen : ""
-                    }`}
-                  >
-                    <div className={styles.nhiemVuAccordionBodyInner}>
-                      <NhiemVuAccordionItem
-                        label={item.title}
-                        data={item.data}
-                      />
-                    </div>
-                  </div>
-                </div>
-              );
-            })
-          ) : (
-            <div className={styles.emptyState}>
-              <p>Chưa có dữ liệu báo cáo</p>
+        {isSingle && (
+          <div className={styles.nhiemVuSingle}>
+            <div className={styles.nhiemVuSingleHeader}>
+              <span className={styles.nhiemVuSingleTitle}>
+                {nhiemVuEntries[0].title}
+              </span>
+              <span
+                className={`${styles.nhiemVuCardStatus} ${
+                  nhiemVuEntries[0].reportStatusLabel === "Đã duyệt"
+                    ? styles.nhiemVuCardStatusApproved
+                    : styles.nhiemVuCardStatusPending
+                }`}
+              >
+                {nhiemVuEntries[0].reportStatusLabel}
+              </span>
             </div>
-          )}
-        </div>
+            <NhiemVuAccordionItem
+              label={nhiemVuEntries[0].title}
+              data={nhiemVuEntries[0].data}
+            />
+          </div>
+        )}
+
+        {nhiemVuEntries.length > 1 && (
+          <div className={styles.nhiemVuGrid}>
+            {nhiemVuEntries.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                className={styles.nhiemVuCard}
+                onClick={() => setOpenNhiemVuId(item.id)}
+              >
+                <span className={styles.nhiemVuCardTitle}>{item.title}</span>
+                <span
+                  className={`${styles.nhiemVuCardStatus} ${
+                    item.reportStatusLabel === "Đã duyệt"
+                      ? styles.nhiemVuCardStatusApproved
+                      : styles.nhiemVuCardStatusPending
+                  }`}
+                >
+                  {item.reportStatusLabel}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
+
+      {!isSingle && openItem && (
+        <div
+          className={styles.nhiemVuModalOverlay}
+          onClick={() => setOpenNhiemVuId(null)}
+        >
+          <div
+            className={styles.nhiemVuModal}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.nhiemVuModalHeader}>
+              <h3 className={styles.nhiemVuModalTitle}>{openItem.title}</h3>
+              <button
+                type="button"
+                className={styles.nhiemVuModalClose}
+                onClick={() => setOpenNhiemVuId(null)}
+              >
+                &times;
+              </button>
+            </div>
+            <div className={styles.nhiemVuModalBody}>
+              <NhiemVuAccordionItem
+                label={openItem.title}
+                data={openItem.data}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

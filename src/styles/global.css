@@ -74,3 +74,22 @@ label {
 *::-webkit-scrollbar-corner {  
   background: transparent;  
 }
+
+/* ── Focus ring ── */  
+  
+:focus {  
+  outline: none;  
+}  
+  
+:focus-visible {  
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);  
+  outline-offset: var(--focus-ring-offset);  
+  border-radius: 6px;  
+}  
+
+input:focus-visible,  
+textarea:focus-visible,  
+select:focus-visible {  
+  outline: none;  
+  box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);  
+}

@@ -6,10 +6,6 @@ export type NavItemId =
   | "executive-training"
   | "report-troop"
   | "report-political-work"
-  | "report-training"
-  | "report-family"
-  | "report-communication"
-  | "statistics"
   | "duty-personnel"
   | "duty-shifts"
   | "duty-create"
@@ -36,21 +32,6 @@ const DailyTroopReport = lazy(
 const PoliticalWorkReport = lazy(
   () => import("../pages/PoliticalWorkReport/PoliticalWorkReport"),
 );
-
-const TrainingReport = lazy(
-  () => import("../pages/TrainingReport/TrainingReport"),
-);
-
-const FamilyReport = lazy(() => import("../pages/FamilyReport/FamilyReport"));
-
-const CommunicationReport = lazy(
-  () => import("../pages/CommunicationReport/CommunicationReport"),
-);
-
-const ReportStatistics = lazy(
-  () => import("../pages/ReportStatistics/ReportStatistics"),
-);
-
 const DutyPersonnel = lazy(() => import("../pages/CommandDuty/DutyPersonnel"));
 const DutyShifts = lazy(() => import("../pages/CommandDuty/DutyShifts"));
 
@@ -59,10 +40,6 @@ const CreateDutyShift = lazy(
 );
 
 const Settings = lazy(() => import("../pages/Settings/Settings"));
-
-const Trainningstatistical = lazy(
-  () => import("../pages/TrainingReport/Trainningstatistical"),
-);
 
 export const EXECUTIVE_NAV: NavItem = {
   id: "executive",
@@ -74,19 +51,9 @@ export const EXECUTIVE_NAV: NavItem = {
   allowedRoles: ["Quản Trị Viên", "Trực ban tác chiến"],
 };
 
-export const EXECUTIVE_TRAINING_NAV: NavItem = {
-  id: "executive-training",
-  label: "Tổng hợp huấn luyện",
-  path: "/dashboard/training",
-  loadingTitle: "Đang tải tổng hợp huấn luyện",
-  loadingSubtitle: "Đang tải dữ liệu huấn luyện...",
-  component: Trainningstatistical,
-  allowedRoles: ["Quản Trị Viên", "Trực ban tác chiến"],
-};
-
 export const EXECUTIVE_NAV_GROUP = {
   label: "Tổng hợp điều hành",
-  items: [EXECUTIVE_NAV, EXECUTIVE_TRAINING_NAV],
+  items: [EXECUTIVE_NAV],
 };
 
 export const REPORT_NAV_GROUP = {
@@ -124,63 +91,6 @@ export const REPORT_NAV_GROUP = {
         "Trực ban nội vụ",
       ],
     },
-    {
-      id: "report-training" as const,
-      label: "Thống kê quân số huấn luyện",
-      path: "/training-report",
-      loadingTitle: "Đang tải báo cáo huấn luyện",
-      loadingSubtitle: "Đang tải dữ liệu…",
-      component: TrainingReport,
-      allowedRoles: [
-        "Quản Trị Viên",
-        "Trực ban tác chiến",
-        "Trực chỉ huy",
-        "Trực ban nội vụ",
-      ],
-    },
-    {
-      id: "report-family" as const,
-      label: "Báo ban thân nhân thăm nuôi",
-      path: "/family-report",
-      loadingTitle: "Đang tải báo cáo thân nhân thăm nuôi",
-      loadingSubtitle: "Đang tải dữ liệu…",
-      component: FamilyReport,
-      allowedRoles: [
-        "Quản Trị Viên",
-        "Trực ban tác chiến",
-        "Trực chỉ huy",
-        "Trực ban nội vụ",
-      ],
-    },
-    {
-      id: "report-communication" as const,
-      label: "Báo ban thông tin liên lạc",
-      path: "/communication-report",
-      loadingTitle: "Đang tải báo cáo thông tin liên lạc",
-      loadingSubtitle: "Đang tải dữ liệu…",
-      component: CommunicationReport,
-      allowedRoles: [
-        "Quản Trị Viên",
-        "Trực ban tác chiến",
-        "Trực chỉ huy",
-        "Trực ban nội vụ",
-      ],
-    },
-  ],
-};
-
-export const STATISTICS_NAV: NavItem = {
-  id: "statistics",
-  label: "Thống kê báo cáo",
-  path: "/statistics",
-  loadingTitle: "Đang tải thống kê",
-  loadingSubtitle: "Đang tải dữ liệu…",
-  component: ReportStatistics,
-  allowedRoles: [
-    "Quản Trị Viên",
-    "Trực ban tác chiến",
-    "Trực chỉ huy",
-    "Trực ban nội vụ",
   ],
 };
 
@@ -237,10 +147,6 @@ export const NAV_PAGE_TITLES: Record<NavItemId, string> = {
   "executive-training": "Tổng hợp huấn luyện",
   "report-troop": "Thống kê quân số hoạt động trong ngày",
   "report-political-work": "Hoạt động công tác Đảng, công tác chính trị",
-  "report-training": "Thống kê quân số huấn luyện",
-  "report-family": "Báo ban thân nhân thăm nuôi",
-  "report-communication": "Báo ban thông tin liên lạc",
-  statistics: "Thống kê báo ban",
   "duty-personnel": "Quản lý trực ban",
   "duty-shifts": "Quản lý ca trực",
   "duty-create": "Tạo ca trực",
@@ -249,9 +155,7 @@ export const NAV_PAGE_TITLES: Record<NavItemId, string> = {
 
 export const ALL_NAV_ITEMS: NavItem[] = [
   EXECUTIVE_NAV,
-  EXECUTIVE_TRAINING_NAV,
   ...REPORT_NAV_GROUP.items,
-  STATISTICS_NAV,
   ...DUTY_NAV_GROUP.items,
   SETTINGS_NAV,
 ];
@@ -267,7 +171,7 @@ export function getIdByPath(path: string): NavItemId {
 }
 
 export function getNavGroupLabel(activeId: NavItemId): string | null {
-  if (activeId === "settings" || activeId === "statistics") return null;
+  if (activeId === "settings") return null;
 
   if (EXECUTIVE_NAV_GROUP.items.some((i) => i.id === activeId))
     return EXECUTIVE_NAV_GROUP.label;
@@ -355,13 +259,10 @@ export function getNavItemsByRole(
 
   const isCoreNav = (item: NavItem) =>
     item.id === "executive" ||
-    item.id === "executive-training" ||
     item.id.startsWith("report-") ||
-    item.id === "statistics" ||
     item.id === "settings";
 
-  const isExecutiveItem = (item: NavItem) =>
-    item.id === "executive" || item.id === "executive-training";
+  const isExecutiveItem = (item: NavItem) => item.id === "executive";
 
   if (normalizedRole === "Quản Trị Viên") {
     return ALL_NAV_ITEMS;
@@ -379,10 +280,7 @@ export function getNavItemsByRole(
     normalizedRole === "Trực ban nội vụ"
   ) {
     return ALL_NAV_ITEMS.filter(
-      (item) =>
-        item.id.startsWith("report-") ||
-        item.id === "statistics" ||
-        item.id === "settings",
+      (item) => item.id.startsWith("report-") || item.id === "settings",
     );
   }
 

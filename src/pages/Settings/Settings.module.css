@@ -7,10 +7,13 @@
 .header {  
   display: flex;  
   align-items: center;  
-  gap: 16px;  
   padding-bottom: 20px;  
   border-bottom: 1px solid var(--login-border);  
   margin-bottom: 24px;  
+}  
+  
+.header > * + * {  
+  margin-left: 16px;  
 }  
   
 .headerIcon {  
@@ -41,7 +44,7 @@
   font-size: 14px;  
   color: var(--login-text-muted);  
 }  
-    
+  
 .card,  
 .cardSection {  
   background: var(--surface-card);  
@@ -59,10 +62,13 @@
 .cardHeader {  
   display: flex;  
   align-items: center;  
-  gap: 12px;  
   margin-bottom: 24px;  
   padding-bottom: 16px;  
   border-bottom: 1px solid var(--login-border);  
+}  
+  
+.cardHeader > * + * {  
+  margin-left: 12px;  
 }  
   
 .cardTitle {  
@@ -71,17 +77,23 @@
   font-weight: 700;  
   color: var(--primary-color);  
 }  
-    
+  
 .form {  
   display: flex;  
   flex-direction: column;  
-  gap: 20px;  
+}  
+  
+.form > * + * {  
+  margin-top: 20px;  
 }  
   
 .formGroup {  
   display: flex;  
   flex-direction: column;  
-  gap: 8px;  
+}  
+  
+.formGroup > * + * {  
+  margin-top: 8px;  
 }  
   
 .formGroup label {  
@@ -141,7 +153,7 @@
 .fullWidth {  
   grid-column: 1 / -1;  
 }  
-    
+  
 .quanSoCheckError,  
 .quanSoCheckOk {  
   padding: 10px 16px;  
@@ -161,7 +173,7 @@
   border: 1px solid var(--btn-approve-border);  
   color: var(--btn-approve-fg);  
 }  
-    
+  
 .formActions {  
   display: flex;  
   justify-content: flex-end;  
@@ -190,14 +202,17 @@
   opacity: 0.45;  
   cursor: not-allowed;  
 }  
-    
+  
 .loading {  
   display: flex;  
   flex-direction: column;  
   align-items: center;  
   justify-content: center;  
   padding: 80px 20px;  
-  gap: 16px;  
+}  
+  
+.loading > * + * {  
+  margin-top: 16px;  
 }  
   
 .loadingSpinner {  
@@ -217,7 +232,7 @@
   font-size: 15px;  
   color: var(--login-text-muted);  
 }  
-    
+  
 .error {  
   padding: 16px 20px;  
   background: var(--dialog-danger-bg);  
@@ -233,11 +248,10 @@
   font-size: 32px;  
   margin-bottom: 12px;  
 }  
-    
+  
 .warningBanner {  
   display: flex;  
   align-items: flex-start;  
-  gap: 12px;  
   padding: 14px 18px;  
   margin-top: 10px;  
   margin-bottom: 20px;  
@@ -249,6 +263,9 @@
   font-weight: 500;  
 }  
   
+.warningBanner > * + * {  
+  margin-left: 12px;  
+}  
   
 .numberInput {  
   display: flex;  
@@ -328,7 +345,7 @@
   .infoGrid {  
     gap: 14px;  
   }  
-}
+}  
   
 @media (max-width: 768px) {  
   .container { padding: 0; }  
@@ -336,7 +353,11 @@
   .header {  
     flex-direction: column;  
     text-align: center;  
-    gap: 12px;  
+  }  
+  
+  .header > * + * {  
+    margin-left: 0;  
+    margin-top: 12px;  
   }  
   
   .title { font-size: 20px; }  

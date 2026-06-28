@@ -1,4 +1,4 @@
-import { Suspense, useTransition } from "react";
+import { Suspense, useEffect, useTransition } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import DashboardLayout from "../../components/layout/DashboardLayout/DashboardLayout";
 import LoadingScreen from "../../components/ui/LoadingScreen/LoadingScreen";
@@ -11,6 +11,8 @@ import {
   getLoadingText,
   type NavItemId,
 } from "../../types/navigation";
+
+const APP_NAME = "Phần mềm thống kê Sư đoàn 5";
 
 type Props = {
   onLogout?: () => void;
@@ -25,6 +27,11 @@ export default function Dashboard({ onLogout }: Props) {
   const navItem = getNavItemById(activeId);
   const ActiveComponent = navItem?.component;
   const loadingText = getLoadingText(activeId);
+
+  useEffect(() => {
+    const pageTitle = NAV_PAGE_TITLES[activeId];
+    document.title = pageTitle ? `${pageTitle} | ${APP_NAME}` : APP_NAME;
+  }, [activeId]);
 
   function handleNavigate(id: NavItemId) {
     startTransition(() => {

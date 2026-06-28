@@ -1,4 +1,3 @@
-// src/components/layout/Sidebar/Sidebar.tsx
 import { useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -7,7 +6,6 @@ import {
   faClipboardList,
   faGear,
   faChartPie,
-  faChartBar,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./Sidebar.module.css";
 import logo from "../../../assets/images/logo-su5.png";
@@ -15,7 +13,6 @@ import {
   REPORT_NAV_GROUP,
   DUTY_NAV_GROUP,
   SETTINGS_NAV,
-  STATISTICS_NAV,
   type NavItemId,
   getNavItemsByRole,
   getNavGroupLabelByRole,
@@ -27,13 +24,15 @@ import SidebarTooltip from "./SidebarTooltip";
 import ConfirmDialog from "../../ui/ConfirmDialog/ConfirmDialog";
 import { useAuth } from "../../../context/useAuth";
 
-type Props = {
-  activeId: NavItemId;
-  onNavigate: (id: NavItemId) => void;
-  onLogout?: () => void;
-  collapsed?: boolean;
-  onExpand?: () => void;
-};
+type Props = {  
+  activeId: NavItemId;  
+  onNavigate: (id: NavItemId) => void;  
+  onLogout?: () => void;  
+  collapsed?: boolean;  
+  onExpand?: () => void;  
+  mobileOpen?: boolean;  
+};  
+
 
 type TooltipState = {
   text: string;
@@ -46,6 +45,7 @@ export default function Sidebar({
   onLogout,
   collapsed = false,
   onExpand,
+  mobileOpen = false,
 }: Props) {
   const { account, donVi } = useAuth();
   const unitName =
@@ -56,10 +56,6 @@ export default function Sidebar({
 
   const hiddenSidebarIds: NavItemId[] = [
     "executive-training", // Tổng hợp huấn luyện
-    "report-training", // Thống kê quân số huấn luyện
-    "report-family", // Báo ban thân nhân thăm nuôi
-    "report-communication", // Báo ban thông tin liên lạc
-    "statistics", // Thống kê báo cáo
   ];
 
   const capDonVi = donVi?.capDonVi ?? account?.donVi?.capDonVi ?? null;
@@ -85,7 +81,6 @@ export default function Sidebar({
   const [showQuotaDialog, setShowQuotaDialog] = useState(false);
 
   const settingsRef = useRef<HTMLButtonElement>(null);
-  const statisticsRef = useRef<HTMLButtonElement>(null);
   const logoutRef = useRef<HTMLButtonElement>(null);
   const [dutyOpen, setDutyOpen] = useNavGroupState("dutyOpen");
   const dutyActive = DUTY_NAV_GROUP.items.some(
@@ -139,25 +134,31 @@ export default function Sidebar({
   const showReportGroup = REPORT_NAV_GROUP.items.some((item) =>
     allowedNavItems.some((nav) => nav.id === item.id),
   );
-  const showStatistics = allowedNavItems.some(
-    (nav) => nav.id === STATISTICS_NAV.id,
-  );
   const showSettings = allowedNavItems.some((nav) => nav.id === "settings");
 
-  const reportLabel = getNavGroupLabelByRole(
-    REPORT_NAV_GROUP.label,
-    userRole,
-  );
+  const reportLabel = getNavGroupLabelByRole(REPORT_NAV_GROUP.label, userRole);
 
   return (
     <>
       <aside
-        className={
-          collapsed ? `${styles.sidebar} ${styles.collapsed}` : styles.sidebar
-        }
+        className={[
+          styles.sidebar,
+          collapsed ? styles.collapsed : "",
+          mobileOpen ? styles.mobileOpen : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
       >
         <div className={styles.brand}>
-          <img src={logo} alt="Logo Sư đoàn 5" className={styles.logo} />
+          <div className={styles.logoWrap}>
+            <img src={logo} alt="Logo Sư đoàn 5" className={styles.logoFull} />
+            <img
+              src={logo}
+              alt=""
+              aria-hidden="true"
+              className={styles.logoMini}
+            />
+          </div>
           {!collapsed && (
             <>
               <p className={styles.unitName}>{unitName}</p>
@@ -206,27 +207,6 @@ export default function Sidebar({
               onTooltipEnter={handleTooltipEnter}
               onTooltipLeave={handleTooltipLeave}
             />
-          )}
-
-          {showStatistics && (
-            <button
-              ref={statisticsRef}
-              type="button"
-              className={
-                activeId === STATISTICS_NAV.id
-                  ? `${styles.navItem} ${styles.active}`
-                  : styles.navItem
-              }
-              onClick={() => handleNavigate(STATISTICS_NAV.id)}
-              aria-label={collapsed ? STATISTICS_NAV.label : undefined}
-              onMouseEnter={() =>
-                handleTooltipEnter(STATISTICS_NAV.label, statisticsRef)
-              }
-              onMouseLeave={handleTooltipLeave}
-            >
-              <FontAwesomeIcon icon={faChartBar} className={styles.navIcon} />
-              {!collapsed && STATISTICS_NAV.label}
-            </button>
           )}
 
           {showDutyGroup && (
