@@ -86,25 +86,6 @@
   letter-spacing: 0.5px;  
 }  
   
-.filterInput {  
-  height: 37px;  
-  padding: 0 14px;  
-  border: 1px solid var(--login-border);  
-  border-radius: 6px;  
-  font-size: 14px;  
-  font-family: inherit;  
-  color: var(--login-text);  
-  background: var(--input-bg);  
-  outline: none;  
-  transition: border-color 0.15s, box-shadow 0.15s;  
-  min-width: 260px;  
-}  
-  
-.filterInput:focus {  
-  border-color: var(--primary-color);  
-  box-shadow: 0 0 0 3px var(--modal-input-focus-shadow);  
-}  
-  
 .filterSelect {  
   height: 40px;  
   padding: 0 12px;  
@@ -133,25 +114,6 @@
   
 .monthPicker > * + * {  
   margin-left: 8px;  
-}  
-  
-.btnClearFilter {  
-  height: 42px;  
-  padding: 0 18px;  
-  border: 1.5px solid var(--login-border);  
-  border-radius: 10px;  
-  background: transparent;  
-  color: var(--login-text-muted);  
-  font-size: 14px;  
-  font-weight: 600;  
-  cursor: pointer;  
-  transition: border-color 0.15s, color 0.15s;  
-  align-self: flex-end;  
-}  
-  
-.btnClearFilter:hover {  
-  border-color: var(--primary-color);  
-  color: var(--primary-color);  
 }  
   
 .tableWrapper {  
@@ -476,10 +438,6 @@
 }  
   
 @media (max-width: 1024px) {  
-  .filterInput {  
-    min-width: 200px;  
-  }  
-  
   .editGrid {  
     grid-template-columns: 1fr 1fr;  
     gap: 12px 20px;  
@@ -521,11 +479,6 @@
   .filterBar > * + * {  
     margin-left: 0;  
     margin-top: 16px;  
-  }  
-  
-  .filterInput {  
-    min-width: unset;  
-    width: 100%;  
   }  
   
   .tableWrapper {  

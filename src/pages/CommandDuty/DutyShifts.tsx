@@ -12,6 +12,8 @@ import { useToast } from "../../context/useToast";
 import type { CaTrucDetail, NguoiTrucWithCaTruc } from "../../types/duty";
 import CustomSelect from "../../components/ui/CustomSelect/CustomSelect";
 
+import SearchBar from "../../components/ui/SearchBar/SearchBar";
+
 function formatDate(dateStr: string): string {
   return new Date(dateStr + "T00:00:00").toLocaleDateString("vi-VN", {
     weekday: "long",
@@ -207,27 +209,12 @@ export default function DutyShifts() {
           </div>
         </div>
 
-        <div className={styles.filterGroup}>
-          <label className={styles.filterLabel}>Tìm người trực</label>
-          <input
-            type="text"
-            className={styles.filterInput}
-            value={filterSearch}
-            onChange={(e) => setFilterSearch(e.target.value)}
-            placeholder="Nhập tên người trực..."
-          />
+        <SearchBar  
+          value={filterSearch}  
+          onChange={setFilterSearch}  
+          placeholder="Tìm theo tên người trực..."  
+        />
         </div>
-
-        {filterSearch && (
-          <button
-            type="button"
-            className={styles.btnClearFilter}
-            onClick={() => setFilterSearch("")}
-          >
-            <FontAwesomeIcon icon={faXmark} /> Xóa bộ lọc
-          </button>
-        )}
-      </div>
 
       <div className={styles.tableWrapper}>
         {loading ? (

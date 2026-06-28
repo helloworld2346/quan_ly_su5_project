@@ -6,10 +6,59 @@
   max-width: 1200px;  
   margin: 0 auto;  
   width: 100%;  
-}  
+  padding: 24px 0 0;  
+}
   
 .page > * + * {  
   margin-top: 20px;  
+}  
+  
+.pageHeader {  
+  display: flex;  
+  align-items: center;  
+  justify-content: space-between;  
+  padding: 0 0 20px;  
+  flex-shrink: 0;  
+  border-bottom: 1.5px solid var(--login-border);  
+}
+  
+.pageHeaderLeft {  
+  display: flex;  
+  align-items: center;  
+  padding-left: 16px;  
+  border-left: 4px solid var(--primary-color);  
+}  
+  
+.pageHeaderLeft > * + * {  
+  margin-left: 16px;  
+}  
+  
+.pageTitle {  
+  font-size: 24px;  
+  font-weight: 800;  
+  color: var(--login-text);  
+  margin: 0;  
+  letter-spacing: -0.4px;  
+  line-height: 1.2;  
+}  
+  
+.pageBadge {  
+  display: inline-flex;  
+  align-items: center;  
+  padding: 5px 14px;  
+  background: var(--primary-color);  
+  color: var(--text-white);  
+  border-radius: 20px;  
+  font-size: 14px;  
+  font-weight: 700;  
+  white-space: nowrap;  
+  flex-shrink: 0;  
+  letter-spacing: 0.2px;  
+}  
+  
+.searchBar {  
+  display: flex;  
+  flex-shrink: 0;  
 }  
   
 .formCard {  
@@ -24,13 +73,6 @@
   
 .formCard > * + * {  
   margin-top: 18px;  
-}  
-  
-.formTitle {  
-  font-size: 20px;  
-  font-weight: 700;  
-  color: var(--login-text);  
-  margin: 0;  
 }  
   
 .typeToggle {  
@@ -307,16 +349,10 @@
 .personActions {  
   display: flex;  
   flex-shrink: 0;  
-  opacity: 0;  
-  transition: opacity 0.15s;  
 }  
   
 .personActions > * + * {  
   margin-left: 6px;  
-}  
-  
-.personCard:hover .personActions {  
-  opacity: 1;  
 }  
   
 .btnEdit,  
@@ -469,6 +505,10 @@
     height: auto;  
     overflow: visible;  
     padding: 16px;  
+  }  
+  
+  .searchBar {  
+    width: 100%;  
   }  
   
   .formGrid {  

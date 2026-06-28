@@ -19,7 +19,7 @@
   
 .page::before {  
   z-index: -2;  
-  background: var(--login-bg) center center / contain no-repeat;  
+  background: var(--login-bg) center center / 60% auto no-repeat;  
   opacity: 0.5;  
 }  
   

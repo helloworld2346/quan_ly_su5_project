@@ -19,6 +19,7 @@ import type {
   ChucVu,
 } from "../../types/duty";
 import CustomSelect from "../../components/ui/CustomSelect/CustomSelect";
+import SearchBar from "../../components/ui/SearchBar/SearchBar";
 
 const CHI_HUY_CAP_BAC = ["Đại tá", "Thượng tá", "Trung tá"];
 const CHI_HUY_CHUC_VU = [
@@ -68,6 +69,9 @@ export default function DutyPersonnel() {
   const [dutyType, setDutyType] = useState<DutyType>("chiHuy");
   const [form, setForm] = useState<TrucNguoiPayload>({ ...EMPTY_FORM });
   const [submitting, setSubmitting] = useState(false);
+
+  // Search state
+  const [search, setSearch] = useState("");
 
   // Edit state
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -256,6 +260,18 @@ export default function DutyPersonnel() {
       .map((name) => ({ value: name, label: name }));
   }, [chucVuList, editType]);
 
+  const filteredChiHuy = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return chiHuyList;
+    return chiHuyList.filter((p) => p.tenNguoitruc.toLowerCase().includes(q));
+  }, [chiHuyList, search]);
+
+  const filteredTacChien = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return tacChienList;
+    return tacChienList.filter((p) => p.tenNguoitruc.toLowerCase().includes(q));
+  }, [tacChienList, search]);
+
   const renderPersonCard = (person: NguoiTrucWithCaTruc, type: DutyType) => {
     const isEditing = editingId === person.idNguoitruc;
     const isDeleting = deletingId === person.idNguoitruc;
@@ -389,9 +405,16 @@ export default function DutyPersonnel() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.formCard}>
-        <h2 className={styles.formTitle}>Thêm người trực</h2>
+      <div className={styles.pageHeader}>
+        <div className={styles.pageHeaderLeft}>
+          <h1 className={styles.pageTitle}>Quản lý trực ban</h1>
+          <span className={styles.pageBadge}>
+            {filteredChiHuy.length + filteredTacChien.length} người trực
+          </span>
+        </div>
+      </div>
 
+      <div className={styles.formCard}>
         <div className={styles.typeToggle}>
           <button
             type="button"
@@ -476,6 +499,14 @@ export default function DutyPersonnel() {
         </div>
       </div>
 
+      <div className={styles.searchBar}>
+        <SearchBar
+          value={search}
+          onChange={setSearch}
+          placeholder="Tìm theo tên người trực..."
+        />
+      </div>
+
       {loadingList ? (
         <div className={styles.loading}>Đang tải danh sách...</div>
       ) : (
@@ -487,13 +518,15 @@ export default function DutyPersonnel() {
                 className={styles.listHeaderIcon}
               />
               <span>Trực chỉ huy</span>
-              <span className={styles.listCount}>{chiHuyList.length}</span>
+              <span className={styles.listCount}>{filteredChiHuy.length}</span>
             </div>
             <div className={styles.listBody}>
-              {chiHuyList.length === 0 ? (
-                <div className={styles.emptyList}>Chưa có người trực</div>
+              {filteredChiHuy.length === 0 ? (
+                <div className={styles.emptyList}>
+                  {search ? "Không tìm thấy người trực" : "Chưa có người trực"}
+                </div>
               ) : (
-                chiHuyList.map((p) => renderPersonCard(p, "chiHuy"))
+                filteredChiHuy.map((p) => renderPersonCard(p, "chiHuy"))
               )}
             </div>
           </div>
@@ -505,13 +538,17 @@ export default function DutyPersonnel() {
                 className={styles.listHeaderIcon}
               />
               <span>Trực ban tác chiến</span>
-              <span className={styles.listCount}>{tacChienList.length}</span>
+              <span className={styles.listCount}>
+                {filteredTacChien.length}
+              </span>
             </div>
             <div className={styles.listBody}>
-              {tacChienList.length === 0 ? (
-                <div className={styles.emptyList}>Chưa có người trực</div>
+              {filteredTacChien.length === 0 ? (
+                <div className={styles.emptyList}>
+                  {search ? "Không tìm thấy người trực" : "Chưa có người trực"}
+                </div>
               ) : (
-                tacChienList.map((p) => renderPersonCard(p, "tacChien"))
+                filteredTacChien.map((p) => renderPersonCard(p, "tacChien"))
               )}
             </div>
           </div>
