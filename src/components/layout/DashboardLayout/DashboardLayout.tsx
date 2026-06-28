@@ -44,11 +44,11 @@ function TopBarActions({ isDark, onToggleTheme }: TopBarActionsProps) {
     fetchAccount();
   }, []);
 
-  const getAvatarText = () => {
-    if (!account) return "QT";
-    const name = account.tenDangNhap || account.tenTaiKhoan || "";
-    return name.slice(0, 2).toUpperCase();
-  };
+const getAvatarText = () => {
+  if (!account) return "QT";
+  const name = account.tenDangNhap || account.tenTaiKhoan || "";
+  return name.split("_")[0].toUpperCase();
+};
 
   const getDisplayName = () => {
     if (!account) return "Quản trị viên";

@@ -4,6 +4,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUserCog,
   faTriangleExclamation,
+  faUsers,
+  faLock,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { accountService } from "../../services/account/accountService";
@@ -173,6 +175,10 @@ export default function Settings() {
     );
   }
 
+const initials = (account.tenDangNhap || account.tenTaiKhoan || "QT")
+  .split("_")[0]
+  .toUpperCase();
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -187,258 +193,263 @@ export default function Settings() {
         </div>
       </div>
 
-      <div className={styles.card}>
-        <div className={styles.cardHeader}>
-          <h2 className={styles.cardTitle}>
-            Thông tin đơn vị — {donVi?.tenDonvi ?? ""}
-          </h2>
-        </div>
+      <div className={styles.layout}>
+        <aside className={styles.profileCol}>
+          <div className={styles.profileCard}>
+            <div className={styles.avatar}>{initials}</div>
+            <h2 className={styles.profileName}>{account.tenTaiKhoan}</h2>
+            <span className={styles.roleBadge}>
+              {account.vaiTro?.tenVaiTro || "Chưa phân vai trò"}
+            </span>
+            <span className={styles.profileUnit}>
+              {account.donVi?.tenDonvi || "Chưa phân đơn vị"}
+            </span>
 
-        <div className={styles.form}>
-          <div className={styles.infoGrid}>
-            <div className={styles.formGroup}>
-              <label>Tên đăng nhập</label>
-              <input type="text" value={account.tenDangNhap} disabled />
-            </div>
-
-            <div className={styles.formGroup}>
-              <label>Tên tài khoản</label>
-              <input type="text" value={account.tenTaiKhoan} disabled />
-            </div>
-
-            <div className={styles.formGroup}>
-              <label>Vai trò</label>
-              <input
-                type="text"
-                value={account.vaiTro?.tenVaiTro || "Chưa phân vai trò"}
-                disabled
-              />
-            </div>
-
-            <div className={styles.formGroup}>
-              <label>Đơn vị</label>
-              <input
-                type="text"
-                value={account.donVi?.tenDonvi || "Chưa phân đơn vị"}
-                disabled
-              />
+            <div className={styles.infoList}>
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}>Tên đăng nhập</span>
+                <span className={styles.infoValue}>{account.tenDangNhap}</span>
+              </div>
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}>Tên tài khoản</span>
+                <span className={styles.infoValue}>{account.tenTaiKhoan}</span>
+              </div>
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}>Vai trò</span>
+                <span className={styles.infoValue}>
+                  {account.vaiTro?.tenVaiTro || "Chưa phân vai trò"}
+                </span>
+              </div>
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}>Đơn vị</span>
+                <span className={styles.infoValue}>
+                  {account.donVi?.tenDonvi || "Chưa phân đơn vị"}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        </aside>
 
-      {donVi && donVi.quanSoTong === 0 && (
-        <div className={styles.warningBanner}>
-          <FontAwesomeIcon
-            icon={faTriangleExclamation}
-            className={styles.warningIcon}
-          />
-          <div>
-            <strong>Chưa nhập quân số biên chế.</strong> Vui lòng nhập quân số
-            bên dưới để có thể sử dụng các tính năng báo cáo.
-          </div>
-        </div>
-      )}
-
-      {donVi && (
-        <div className={styles.cardSection}>
-          <div className={styles.cardHeader}>
-            <h2 className={styles.cardTitle}>Cập nhật thông tin đơn vị</h2>
-          </div>
-
-          <form className={styles.form} onSubmit={handleUpdateDonVi}>
-            <div className={styles.infoGrid}>
-              <div className={styles.formGroup}>
-                <label>Tổng quân số biên chế</label>
-                <input
-                  type="number"
-                  value={quanSoTong}
-                  readOnly
-                  disabled
-                  className={styles.inputDisabled}
+        <div className={styles.mainCol}>
+          {donVi && (
+            <div className={styles.cardSection}>
+              <div className={styles.cardHeader}>
+                <FontAwesomeIcon
+                  icon={faUsers}
+                  className={styles.cardHeaderIcon}
                 />
+                <h2 className={styles.cardTitle}>
+                  Cập nhật quân số biên chế — {donVi.tenDonvi}
+                </h2>
               </div>
 
-              <div className={styles.formGroup}>
-                <label>Quân số Sĩ quan</label>
-                <div className={styles.numberInput}>
-                  <button
-                    type="button"
-                    className={`${styles.numberInputBtn} ${styles.numberInputBtnLeft}`}
-                    onClick={() => {
-                      const v = Math.max(0, quanSoSiQuan - 1);
-                      setQuanSoSiQuan(v);
-                      setSiQuanStr(String(v));
-                    }}
-                  >
-                    −
-                  </button>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    value={siQuanStr}
-                    onChange={(e) => {
-                      const raw = e.target.value.replace(/[^0-9]/g, "");
-                      setSiQuanStr(raw);
-                      setQuanSoSiQuan(raw === "" ? 0 : parseInt(raw, 10));
-                    }}
-                    onBlur={() => {
-                      if (siQuanStr === "") setSiQuanStr("0");
-                    }}
-                    required
+              {donVi.quanSoTong === 0 && (
+                <div className={styles.warningBanner}>
+                  <FontAwesomeIcon
+                    icon={faTriangleExclamation}
+                    className={styles.warningIcon}
                   />
-                  <button
-                    type="button"
-                    className={`${styles.numberInputBtn} ${styles.numberInputBtnRight}`}
-                    onClick={() => {
-                      const v = quanSoSiQuan + 1;
-                      setQuanSoSiQuan(v);
-                      setSiQuanStr(String(v));
-                    }}
-                  >
-                    +
-                  </button>
+                  <div>
+                    <strong>Chưa nhập quân số biên chế.</strong> Vui lòng nhập
+                    quân số bên dưới để có thể sử dụng các tính năng báo cáo.
+                  </div>
                 </div>
-              </div>
-              <div className={styles.formGroup}>
-                <label>Quân số QNCN</label>
-                <div className={styles.numberInput}>
-                  <button
-                    type="button"
-                    className={`${styles.numberInputBtn} ${styles.numberInputBtnLeft}`}
-                    onClick={() => {
-                      const v = Math.max(0, quanSoQncn - 1);
-                      setQuanSoQncn(v);
-                      setQncnStr(String(v));
-                    }}
-                  >
-                    −
-                  </button>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    value={qncnStr}
-                    onChange={(e) => {
-                      const raw = e.target.value.replace(/[^0-9]/g, "");
-                      setQncnStr(raw);
-                      setQuanSoQncn(raw === "" ? 0 : parseInt(raw, 10));
-                    }}
-                    onBlur={() => {
-                      if (qncnStr === "") setQncnStr("0");
-                    }}
-                    required
-                  />
-                  <button
-                    type="button"
-                    className={`${styles.numberInputBtn} ${styles.numberInputBtnRight}`}
-                    onClick={() => {
-                      const v = quanSoQncn + 1;
-                      setQuanSoQncn(v);
-                      setQncnStr(String(v));
-                    }}
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
+              )}
 
-              <div className={styles.formGroup}>
-                <label>Quân số HSQ-BS</label>
-                <div className={styles.numberInput}>
+              <form className={styles.form} onSubmit={handleUpdateDonVi}>
+                <div className={styles.statGrid}>
+                  <div className={styles.statCard}>
+                    <span className={styles.statLabel}>Sĩ quan</span>
+                    <div className={styles.numberInput}>
+                      <button
+                        type="button"
+                        className={`${styles.numberInputBtn} ${styles.numberInputBtnLeft}`}
+                        onClick={() => {
+                          const v = Math.max(0, quanSoSiQuan - 1);
+                          setQuanSoSiQuan(v);
+                          setSiQuanStr(String(v));
+                        }}
+                      >
+                        −
+                      </button>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        value={siQuanStr}
+                        onChange={(e) => {
+                          const raw = e.target.value.replace(/[^0-9]/g, "");
+                          setSiQuanStr(raw);
+                          setQuanSoSiQuan(raw === "" ? 0 : parseInt(raw, 10));
+                        }}
+                        onBlur={() => {
+                          if (siQuanStr === "") setSiQuanStr("0");
+                        }}
+                        required
+                      />
+                      <button
+                        type="button"
+                        className={`${styles.numberInputBtn} ${styles.numberInputBtnRight}`}
+                        onClick={() => {
+                          const v = quanSoSiQuan + 1;
+                          setQuanSoSiQuan(v);
+                          setSiQuanStr(String(v));
+                        }}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className={styles.statCard}>
+                    <span className={styles.statLabel}>QNCN</span>
+                    <div className={styles.numberInput}>
+                      <button
+                        type="button"
+                        className={`${styles.numberInputBtn} ${styles.numberInputBtnLeft}`}
+                        onClick={() => {
+                          const v = Math.max(0, quanSoQncn - 1);
+                          setQuanSoQncn(v);
+                          setQncnStr(String(v));
+                        }}
+                      >
+                        −
+                      </button>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        value={qncnStr}
+                        onChange={(e) => {
+                          const raw = e.target.value.replace(/[^0-9]/g, "");
+                          setQncnStr(raw);
+                          setQuanSoQncn(raw === "" ? 0 : parseInt(raw, 10));
+                        }}
+                        onBlur={() => {
+                          if (qncnStr === "") setQncnStr("0");
+                        }}
+                        required
+                      />
+                      <button
+                        type="button"
+                        className={`${styles.numberInputBtn} ${styles.numberInputBtnRight}`}
+                        onClick={() => {
+                          const v = quanSoQncn + 1;
+                          setQuanSoQncn(v);
+                          setQncnStr(String(v));
+                        }}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className={styles.statCard}>
+                    <span className={styles.statLabel}>HSQ-BS</span>
+                    <div className={styles.numberInput}>
+                      <button
+                        type="button"
+                        className={`${styles.numberInputBtn} ${styles.numberInputBtnLeft}`}
+                        onClick={() => {
+                          const v = Math.max(0, quanSoHsqBs - 1);
+                          setQuanSoHsqBs(v);
+                          setHsqBsStr(String(v));
+                        }}
+                      >
+                        −
+                      </button>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        value={hsqBsStr}
+                        onChange={(e) => {
+                          const raw = e.target.value.replace(/[^0-9]/g, "");
+                          setHsqBsStr(raw);
+                          setQuanSoHsqBs(raw === "" ? 0 : parseInt(raw, 10));
+                        }}
+                        onBlur={() => {
+                          if (hsqBsStr === "") setHsqBsStr("0");
+                        }}
+                        required
+                      />
+                      <button
+                        type="button"
+                        className={`${styles.numberInputBtn} ${styles.numberInputBtnRight}`}
+                        onClick={() => {
+                          const v = quanSoHsqBs + 1;
+                          setQuanSoHsqBs(v);
+                          setHsqBsStr(String(v));
+                        }}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className={styles.totalCard}>
+                    <span className={styles.totalLabel}>Tổng quân số</span>
+                    <span className={styles.totalValue}>{quanSoTong}</span>
+                  </div>
+                </div>
+
+                <div className={styles.formActions}>
                   <button
-                    type="button"
-                    className={`${styles.numberInputBtn} ${styles.numberInputBtnLeft}`}
-                    onClick={() => {
-                      const v = Math.max(0, quanSoHsqBs - 1);
-                      setQuanSoHsqBs(v);
-                      setHsqBsStr(String(v));
-                    }}
+                    type="submit"
+                    className={styles.saveBtn}
+                    disabled={saving}
                   >
-                    −
-                  </button>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    value={hsqBsStr}
-                    onChange={(e) => {
-                      const raw = e.target.value.replace(/[^0-9]/g, "");
-                      setHsqBsStr(raw);
-                      setQuanSoHsqBs(raw === "" ? 0 : parseInt(raw, 10));
-                    }}
-                    onBlur={() => {
-                      if (hsqBsStr === "") setHsqBsStr("0");
-                    }}
-                    required
-                  />
-                  <button
-                    type="button"
-                    className={`${styles.numberInputBtn} ${styles.numberInputBtnRight}`}
-                    onClick={() => {
-                      const v = quanSoHsqBs + 1;
-                      setQuanSoHsqBs(v);
-                      setHsqBsStr(String(v));
-                    }}
-                  >
-                    +
+                    {saving ? "Đang lưu..." : "Lưu thay đổi"}
                   </button>
                 </div>
-              </div>
+              </form>
             </div>
+          )}
 
-            <div className={styles.formActions}>
-              <button
-                type="submit"
-                className={styles.saveBtn}
-                disabled={saving}
-              >
-                {saving ? "Đang lưu..." : "Lưu thay đổi"}
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      <div className={styles.cardSection}>
-        <div className={styles.cardHeader}>
-          <h2 className={styles.cardTitle}>Đổi mật khẩu</h2>
-        </div>
-
-        <form className={styles.form} onSubmit={handleChangePassword}>
-          <div className={styles.infoGrid}>
-            <div className={styles.formGroup}>
-              <label>Mật khẩu mới</label>
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Nhập mật khẩu mới"
+          <div className={styles.cardSection}>
+            <div className={styles.cardHeader}>
+              <FontAwesomeIcon
+                icon={faLock}
+                className={styles.cardHeaderIcon}
               />
+              <h2 className={styles.cardTitle}>Đổi mật khẩu</h2>
             </div>
 
-            <div className={styles.formGroup}>
-              <label>Xác nhận mật khẩu</label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Nhập lại mật khẩu mới"
-              />
-            </div>
-          </div>
+            <form className={styles.form} onSubmit={handleChangePassword}>
+              <div className={styles.infoGrid}>
+                <div className={styles.formGroup}>
+                  <label>Mật khẩu mới</label>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Nhập mật khẩu mới"
+                  />
+                </div>
 
-          <div className={styles.formActions}>
-            <button
-              type="submit"
-              className={styles.saveBtn}
-              disabled={changingPassword}
-            >
-              {changingPassword ? "Đang lưu..." : "Đổi mật khẩu"}
-            </button>
+                <div className={styles.formGroup}>
+                  <label>Xác nhận mật khẩu</label>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Nhập lại mật khẩu mới"
+                  />
+                </div>
+              </div>
+
+              <div className={styles.formActions}>
+                <button
+                  type="submit"
+                  className={styles.saveBtn}
+                  disabled={changingPassword}
+                >
+                  {changingPassword ? "Đang lưu..." : "Đổi mật khẩu"}
+                </button>
+              </div>
+            </form>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
