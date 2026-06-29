@@ -20,7 +20,7 @@ interface CreateReportProps {
   initialData: PoliticalWorkRow | null;
 }
 
-interface ReportFormData {
+export interface ReportFormData {
   reporterName: string;
   reporterRank: string;
   reporterPosition: string;
@@ -42,7 +42,7 @@ const MAX_INCIDENT = 1000;
 const MAX_PROPOSAL = 1000;
 
 const RANK_OPTIONS = [
-  "Thiếu úy", "Trung úy", "Thượng úy", "Đại úy", 
+  "Thiếu úy", "Trung úy", "Thượng úy", "Đại úy",
   "Thiếu tá", "Trung tá", "Thượng tá", "Đại tá"
 ];
 
@@ -64,7 +64,7 @@ const DEFAULT_FORM_DATA: ReportFormData = {
 
 export default function CreateReport({ open, onClose, onSubmit, initialData }: CreateReportProps) {
   const [formData, setFormData] = useState<ReportFormData>(DEFAULT_FORM_DATA);
-  
+
   // State quản lý việc đóng mở dropdown tùy biến
   const [reporterDropdownOpen, setReporterDropdownOpen] = useState(false);
   const [ctdDropdownOpen, setCtdDropdownOpen] = useState(false);
@@ -77,11 +77,11 @@ export default function CreateReport({ open, onClose, onSubmit, initialData }: C
       if (initialData) {
         setFormData({
           reporterName: initialData.reporter || "",
-          reporterRank: "Thượng úy", 
+          reporterRank: "Thượng úy",
           reporterPosition: "Trực ban",
           reporterPhone: "",
           ctdName: initialData.reportCTD || "",
-          ctdRank: "Đại úy", 
+          ctdRank: "Đại úy",
           ctdPosition: "Trực CTĐ, CTCT",
           ctdPhone: "",
           activity: initialData.activities ? initialData.activities.join("\n") : "",
@@ -96,7 +96,6 @@ export default function CreateReport({ open, onClose, onSubmit, initialData }: C
     }
   }, [initialData, open]);
 
-  // Click ra ngoài để đóng dropdown
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (reporterRef.current && !reporterRef.current.contains(event.target as Node)) {
@@ -114,8 +113,31 @@ export default function CreateReport({ open, onClose, onSubmit, initialData }: C
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  // Khôi phục hàm handleSubmit xử lý dữ liệu và kích hoạt onSubmit nhận từ props
   const handleSubmit = () => {
+    if (!formData.reporterName.trim()) {
+      alert("Vui lòng nhập họ tên trực ban nội vụ");
+      return;
+    }
+    if (!formData.reporterRank) {
+      alert("Vui lòng chọn cấp bậc trực ban nội vụ");
+      return;
+    }
+    if (!formData.ctdName.trim()) {
+      alert("Vui lòng nhập họ tên trực CTĐ, CTCT");
+      return;
+    }
+    if (!formData.ctdRank) {
+      alert("Vui lòng chọn cấp bậc trực CTĐ, CTCT");
+      return;
+    }
+    if (!formData.activity.trim()) {
+      alert("Vui lòng nhập tình hình hoạt động");
+      return;
+    }
+    if (!formData.result.trim()) {
+      alert("Vui lòng nhập kết quả");
+      return;
+    }
     onSubmit?.(formData);
   };
 
@@ -124,7 +146,7 @@ export default function CreateReport({ open, onClose, onSubmit, initialData }: C
   return (
     <div className="report-modal-overlay">
       <div className="report-modal">
-        
+
         <div className="report-header">
           <h2 className="report-header-title">
             {initialData ? "Cập nhật báo cáo hoạt động" : "Tạo báo cáo hoạt động CTĐ,CTCT"}
@@ -133,8 +155,7 @@ export default function CreateReport({ open, onClose, onSubmit, initialData }: C
         </div>
 
         <div className="report-body">
-          
-          {/* TRỰC BAN NỘI VỤ */}
+
           <section className="report-section">
             <h3 className="section-title section-title--green">Trực ban nội vụ</h3>
             <div className="report-grid-4col">
@@ -148,10 +169,9 @@ export default function CreateReport({ open, onClose, onSubmit, initialData }: C
                 />
               </div>
 
-              {/* Custom Dropdown Cấp bậc 1 */}
               <div className="form-group" ref={reporterRef}>
                 <label>Cấp bậc <span className="required-mark">*</span></label>
-                <div 
+                <div
                   className={`custom-select-trigger ${reporterDropdownOpen ? "open" : ""} ${!formData.reporterRank ? "is-placeholder" : ""}`}
                   onClick={() => setReporterDropdownOpen(!reporterDropdownOpen)}
                 >
@@ -161,8 +181,8 @@ export default function CreateReport({ open, onClose, onSubmit, initialData }: C
                 {reporterDropdownOpen && (
                   <div className="custom-options-wrapper">
                     {RANK_OPTIONS.map((rank) => (
-                      <div 
-                        key={rank} 
+                      <div
+                        key={rank}
                         className={`custom-option ${formData.reporterRank === rank ? "selected" : ""}`}
                         onClick={() => {
                           handleChange("reporterRank", rank);
@@ -197,7 +217,6 @@ export default function CreateReport({ open, onClose, onSubmit, initialData }: C
             </div>
           </section>
 
-          {/* TRỰC CÔNG TÁC ĐẢNG, CÔNG TÁC CHÍNH TRỊ */}
           <section className="report-section">
             <h3 className="section-title section-title--green">Trực công tác đảng, công tác chính trị</h3>
             <div className="report-grid-4col">
@@ -211,10 +230,9 @@ export default function CreateReport({ open, onClose, onSubmit, initialData }: C
                 />
               </div>
 
-              {/* Custom Dropdown Cấp bậc 2 */}
               <div className="form-group" ref={ctdRef}>
                 <label>Cấp bậc <span className="required-mark">*</span></label>
-                <div 
+                <div
                   className={`custom-select-trigger ${ctdDropdownOpen ? "open" : ""} ${!formData.ctdRank ? "is-placeholder" : ""}`}
                   onClick={() => setCtdDropdownOpen(!ctdDropdownOpen)}
                 >
@@ -224,8 +242,8 @@ export default function CreateReport({ open, onClose, onSubmit, initialData }: C
                 {ctdDropdownOpen && (
                   <div className="custom-options-wrapper">
                     {RANK_OPTIONS.map((rank) => (
-                      <div 
-                        key={rank} 
+                      <div
+                        key={rank}
                         className={`custom-option ${formData.ctdRank === rank ? "selected" : ""}`}
                         onClick={() => {
                           handleChange("ctdRank", rank);
@@ -260,7 +278,6 @@ export default function CreateReport({ open, onClose, onSubmit, initialData }: C
             </div>
           </section>
 
-          {/* TÌNH HÌNH HOẠT ĐỘNG TRONG NGÀY */}
           <section className="report-section">
             <h3 className="section-title">
               Tình hình hoạt động CTĐ, CTCT trong ngày <span className="required-mark">*</span>
@@ -277,7 +294,6 @@ export default function CreateReport({ open, onClose, onSubmit, initialData }: C
             </div>
           </section>
 
-          {/* KẾT QUẢ ĐẠT ĐƯỢC */}
           <section className="report-section">
             <h3 className="section-title">Kết quả <span className="required-mark">*</span></h3>
             <div className="form-group">
@@ -292,7 +308,6 @@ export default function CreateReport({ open, onClose, onSubmit, initialData }: C
             </div>
           </section>
 
-          {/* VỤ VIỆC ĐỘT XUẤT */}
           <section className="report-section">
             <h3 className="section-title">Những vụ việc đột xuất xảy ra trong ngày</h3>
             <div className="radio-group">
@@ -331,7 +346,6 @@ export default function CreateReport({ open, onClose, onSubmit, initialData }: C
             )}
           </section>
 
-          {/* KIẾN NGHỊ ĐỀ XUẤT */}
           <section className="report-section">
             <h3 className="section-title">Kiến nghị, đề xuất</h3>
             <div className="form-group">
