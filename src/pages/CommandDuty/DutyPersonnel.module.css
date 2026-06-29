@@ -7,7 +7,7 @@
   margin: 0 auto;  
   width: 100%;  
   padding: 24px 0 0;  
-}
+}  
   
 .page > * + * {  
   margin-top: 20px;  
@@ -20,7 +20,7 @@
   padding: 0 0 20px;  
   flex-shrink: 0;  
   border-bottom: 1.5px solid var(--login-border);  
-}
+}  
   
 .pageHeaderLeft {  
   display: flex;  
@@ -391,22 +391,101 @@
   cursor: not-allowed;  
 }  
   
-.editInlineForm {  
-  padding: 16px;  
-  background: color-mix(in srgb, var(--primary-color) 4%, transparent);  
-  border-left: 3px solid var(--primary-color);  
+/* ===== Modal chỉnh sửa người trực ===== */  
+.overlay {  
+  position: fixed;  
+  top: 0;  
+  left: var(--current-sidebar-width, var(--sidebar-width, 280px));  
+  width: calc(  
+    100vw - var(--current-sidebar-width, var(--sidebar-width, 280px))  
+  );  
+  height: 100vh;  
+  background-color: var(--modal-overlay-bg);  
   display: flex;  
-  flex-direction: column;  
+  justify-content: center;  
+  align-items: center;  
+  z-index: 999;  
+  backdrop-filter: blur(4px);  
+  transition:  
+    left 0.2s ease,  
+    width 0.2s ease;  
 }  
   
-.editInlineForm > * + * {  
-  margin-top: 14px;  
+:global(body:has([class*="collapsed"])) .overlay {  
+  left: var(--sidebar-collapsed-width);  
+  width: calc(100vw - var(--sidebar-collapsed-width));  
+}  
+  
+.modal {  
+  background-color: var(--modal-bg);  
+  border: 1px solid var(--modal-border);  
+  border-radius: 12px;  
+  width: 95%;  
+  max-width: 640px;  
+  max-height: 92vh;  
+  display: flex;  
+  flex-direction: column;  
+  box-shadow: 0 20px 25px -5px var(--shadow-color);  
+  overflow: hidden;  
+}  
+  
+.modalHeader {  
+  display: flex;  
+  align-items: center;  
+  justify-content: space-between;  
+  padding: 20px 24px;  
+  border-bottom: 1px solid var(--login-border);  
+  border-top: 3px solid var(--primary-color);  
+}  
+  
+.modalTitle {  
+  font-size: 15px;  
+  font-weight: 700;  
+  color: var(--primary-color);  
+  text-transform: uppercase;  
+  letter-spacing: 0.5px;  
+  margin: 0;  
+}  
+  
+.modalCloseBtn {  
+  display: inline-flex;  
+  align-items: center;  
+  justify-content: center;  
+  width: 36px;  
+  height: 36px;  
+  border: none;  
+  border-radius: 8px;  
+  background: transparent;  
+  color: var(--login-text-muted);  
+  font-size: 18px;  
+  cursor: pointer;  
+  transition:  
+    background 0.15s,  
+    color 0.15s;  
+}  
+  
+.modalCloseBtn:hover {  
+  background: var(--table-row-even);  
+  color: var(--login-text);  
+}  
+  
+.modalBody {  
+  padding: 24px;  
+  overflow-y: auto;  
+}  
+  
+.modalFooter {  
+  display: flex;  
+  justify-content: flex-end;  
+  gap: 10px;  
+  padding: 16px 24px;  
+  border-top: 1px solid var(--login-border);  
 }  
   
 .editFormGrid {  
   display: grid;  
   grid-template-columns: 1fr 1fr;  
-  gap: 10px 16px;  
+  gap: 16px 20px;  
 }  
   
 .editFormGroup {  
@@ -415,22 +494,13 @@
 }  
   
 .editFormGroup > * + * {  
-  margin-top: 5px;  
+  margin-top: 6px;  
 }  
   
 .editFormGroup label {  
-  font-size: 13px;  
+  font-size: 14px;  
   font-weight: 600;  
   color: var(--login-text);  
-}  
-  
-.editActions {  
-  display: flex;  
-  justify-content: flex-end;  
-}  
-  
-.editActions > * + * {  
-  margin-left: 8px;  
 }  
   
 .btnSave {  
@@ -541,5 +611,10 @@
   
   .editFormGrid {  
     grid-template-columns: 1fr;  
+  }  
+  
+  .overlay {  
+    left: 0;  
+    width: 100vw;  
   }  
 }

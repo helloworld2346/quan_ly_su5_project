@@ -232,6 +232,16 @@ export default function DutyPersonnel() {
     [showSuccess, showError],
   );
 
+  // Đóng modal bằng phím Escape
+  useEffect(() => {
+    if (!editingId) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") handleCancelEdit();
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [editingId, handleCancelEdit]);
+
   const capBacOptions = useMemo(() => {
     const allowed = dutyType === "chiHuy" ? CHI_HUY_CAP_BAC : TAC_CHIEN_CAP_BAC;
     return allowed
@@ -272,133 +282,58 @@ export default function DutyPersonnel() {
     return tacChienList.filter((p) => p.tenNguoitruc.toLowerCase().includes(q));
   }, [tacChienList, search]);
 
+  const editingPerson = useMemo(() => {
+    if (!editingId) return undefined;
+    return (
+      chiHuyList.find((p) => p.idNguoitruc === editingId) ??
+      tacChienList.find((p) => p.idNguoitruc === editingId)
+    );
+  }, [editingId, chiHuyList, tacChienList]);
+
   const renderPersonCard = (person: NguoiTrucWithCaTruc, type: DutyType) => {
-    const isEditing = editingId === person.idNguoitruc;
     const isDeleting = deletingId === person.idNguoitruc;
 
     return (
       <div key={person.idNguoitruc} className={styles.personCard}>
-        {isEditing ? (
-          <div className={styles.editInlineForm}>
-            <div className={styles.editFormGrid}>
-              <div className={styles.editFormGroup}>
-                <label>
-                  Họ và tên <span className={styles.required}>*</span>
-                </label>
-                <input
-                  className={styles.input}
-                  value={editForm.tenNguoitruc}
-                  onChange={(e) =>
-                    setEditForm((prev) => ({
-                      ...prev,
-                      tenNguoitruc: e.target.value,
-                    }))
-                  }
-                  placeholder="Họ và tên..."
-                />
-              </div>
-              <div className={styles.editFormGroup}>
-                <label>
-                  Cấp bậc <span className={styles.required}>*</span>
-                </label>
-                <CustomSelect
-                  options={editCapBacOptions}
-                  value={editForm.capbacNguoitruc}
-                  onChange={(val) =>
-                    setEditForm((prev) => ({ ...prev, capbacNguoitruc: val }))
-                  }
-                  placeholder="-- Chọn cấp bậc --"
-                />
-              </div>
-              <div className={styles.editFormGroup}>
-                <label>
-                  Chức vụ <span className={styles.required}>*</span>
-                </label>
-                <CustomSelect
-                  options={editChucVuOptions}
-                  value={editForm.chucvuNguoitruc}
-                  onChange={(val) =>
-                    setEditForm((prev) => ({ ...prev, chucvuNguoitruc: val }))
-                  }
-                  placeholder="-- Chọn chức vụ --"
-                />
-              </div>
-              <div className={styles.editFormGroup}>
-                <label>Số điện thoại</label>
-                <input
-                  className={styles.input}
-                  type="tel"
-                  value={editForm.sodienthoai}
-                  onChange={(e) => {
-                    const val = e.target.value.replace(/[^\d+\-\s]/g, "");
-                    setEditForm((prev) => ({ ...prev, sodienthoai: val }));
-                  }}
-                  placeholder="Số điện thoại..."
-                />
-              </div>
-            </div>
-            <div className={styles.editActions}>
-              <button
-                type="button"
-                className={styles.btnSave}
-                onClick={() => void handleSaveEdit()}
-                disabled={saving}
-              >
-                <FontAwesomeIcon icon={faCheck} />
-                {saving ? "Đang lưu..." : "Lưu"}
-              </button>
-              <button
-                type="button"
-                className={styles.btnCancelEdit}
-                onClick={handleCancelEdit}
-                disabled={saving}
-              >
-                <FontAwesomeIcon icon={faXmark} />
-                Hủy
-              </button>
-            </div>
+        <div className={styles.personRow}>
+          <div className={styles.personAvatar}>
+            {getInitials(person.tenNguoitruc)}
           </div>
-        ) : (
-          <div className={styles.personRow}>
-            <div className={styles.personAvatar}>
-              {getInitials(person.tenNguoitruc)}
+          <div className={styles.personInfo}>
+            <div className={styles.personName}>
+              {person.capbacNguoitruc}{" "}
+              <span className={styles.personNameBold}>
+                {person.tenNguoitruc}
+              </span>
             </div>
-            <div className={styles.personInfo}>
-              <div className={styles.personName}>
-                {person.capbacNguoitruc}{" "}
-                <span className={styles.personNameBold}>
-                  {person.tenNguoitruc}
-                </span>
+            <div className={styles.personMeta}>{person.chucvuNguoitruc}</div>
+            {person.sodienthoai && (
+              <div className={styles.personPhone}>
+                <FontAwesomeIcon icon={faPhone} />
+                {person.sodienthoai}
               </div>
-              <div className={styles.personMeta}>{person.chucvuNguoitruc}</div>
-              {person.sodienthoai && (
-                <div className={styles.personPhone}>
-                  <FontAwesomeIcon icon={faPhone} />
-                  {person.sodienthoai}
-                </div>
-              )}
-            </div>
-            <div className={styles.personActions}>
-              <button
-                type="button"
-                className={styles.btnEdit}
-                onClick={() => handleStartEdit(person, type)}
-                title="Sửa"
-              >
-                <FontAwesomeIcon icon={faPenToSquare} />
-              </button>
-              <button
-                type="button"
-                className={styles.btnDelete}
-                onClick={() => void handleDelete(person, type)}
-                disabled={isDeleting}
-                title="Xóa"
-              >
-                <FontAwesomeIcon icon={faTrash} />
-              </button>
-            </div>
+            )}
           </div>
-        )}
+          <div className={styles.personActions}>
+            <button
+              type="button"
+              className={styles.btnEdit}
+              onClick={() => handleStartEdit(person, type)}
+              title="Sửa"
+            >
+              <FontAwesomeIcon icon={faPenToSquare} />
+            </button>
+            <button
+              type="button"
+              className={styles.btnDelete}
+              onClick={() => void handleDelete(person, type)}
+              disabled={isDeleting}
+              title="Xóa"
+            >
+              <FontAwesomeIcon icon={faTrash} />
+            </button>
+          </div>
+        </div>
       </div>
     );
   };
@@ -550,6 +485,108 @@ export default function DutyPersonnel() {
               ) : (
                 filteredTacChien.map((p) => renderPersonCard(p, "tacChien"))
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {editingId && (
+        <div className={styles.overlay} onClick={handleCancelEdit}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <p className={styles.modalTitle}>
+                Chỉnh sửa người trực
+                {editingPerson ? ` — ${editingPerson.tenNguoitruc}` : ""}
+              </p>
+              <button
+                type="button"
+                className={styles.modalCloseBtn}
+                onClick={handleCancelEdit}
+                aria-label="Đóng"
+              >
+                <FontAwesomeIcon icon={faXmark} />
+              </button>
+            </div>
+
+            <div className={styles.modalBody}>
+              <div className={styles.editFormGrid}>
+                <div className={styles.editFormGroup}>
+                  <label>
+                    Họ và tên <span className={styles.required}>*</span>
+                  </label>
+                  <input
+                    className={styles.input}
+                    value={editForm.tenNguoitruc}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({
+                        ...prev,
+                        tenNguoitruc: e.target.value,
+                      }))
+                    }
+                    placeholder="Họ và tên..."
+                  />
+                </div>
+                <div className={styles.editFormGroup}>
+                  <label>
+                    Cấp bậc <span className={styles.required}>*</span>
+                  </label>
+                  <CustomSelect
+                    options={editCapBacOptions}
+                    value={editForm.capbacNguoitruc}
+                    onChange={(val) =>
+                      setEditForm((prev) => ({ ...prev, capbacNguoitruc: val }))
+                    }
+                    placeholder="-- Chọn cấp bậc --"
+                  />
+                </div>
+                <div className={styles.editFormGroup}>
+                  <label>
+                    Chức vụ <span className={styles.required}>*</span>
+                  </label>
+                  <CustomSelect
+                    options={editChucVuOptions}
+                    value={editForm.chucvuNguoitruc}
+                    onChange={(val) =>
+                      setEditForm((prev) => ({ ...prev, chucvuNguoitruc: val }))
+                    }
+                    placeholder="-- Chọn chức vụ --"
+                  />
+                </div>
+                <div className={styles.editFormGroup}>
+                  <label>Số điện thoại</label>
+                  <input
+                    className={styles.input}
+                    type="tel"
+                    value={editForm.sodienthoai}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/[^\d+\-\s]/g, "");
+                      setEditForm((prev) => ({ ...prev, sodienthoai: val }));
+                    }}
+                    placeholder="Số điện thoại..."
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.modalFooter}>
+              <button
+                type="button"
+                className={styles.btnCancelEdit}
+                onClick={handleCancelEdit}
+                disabled={saving}
+              >
+                <FontAwesomeIcon icon={faXmark} />
+                Hủy
+              </button>
+              <button
+                type="button"
+                className={styles.btnSave}
+                onClick={() => void handleSaveEdit()}
+                disabled={saving}
+              >
+                <FontAwesomeIcon icon={faCheck} />
+                {saving ? "Đang lưu..." : "Lưu thay đổi"}
+              </button>
             </div>
           </div>
         </div>
