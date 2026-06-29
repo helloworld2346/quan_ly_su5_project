@@ -1,616 +1,614 @@
-.page {  
-  height: calc(100vh - 112px);  
-  display: flex;  
-  flex-direction: column;  
-  overflow: hidden;  
-  max-width: 1200px;  
-  margin: 0 auto;  
-  width: 100%;  
-  padding: 24px 0 0;  
-}  
-  
-.page > * + * {  
-  margin-top: 20px;  
-}  
-  
-.pageHeader {  
-  display: flex;  
-  align-items: center;  
-  justify-content: space-between;  
-  padding: 0 0 20px;  
-  flex-shrink: 0;  
-  border-bottom: 1.5px solid var(--login-border);  
-}  
-  
-.pageHeaderLeft {  
-  display: flex;  
-  align-items: center;  
-  padding-left: 16px;  
-  border-left: 4px solid var(--primary-color);  
-}  
-  
-.pageHeaderLeft > * + * {  
-  margin-left: 16px;  
-}  
-  
-.pageTitle {  
-  font-size: 24px;  
-  font-weight: 800;  
-  color: var(--login-text);  
-  margin: 0;  
-  letter-spacing: -0.4px;  
-  line-height: 1.2;  
-}  
-  
-.pageBadge {  
-  display: inline-flex;  
-  align-items: center;  
-  padding: 5px 14px;  
-  background: var(--primary-color);  
-  color: var(--text-white);  
-  border-radius: 20px;  
-  font-size: 14px;  
-  font-weight: 700;  
-  white-space: nowrap;  
-  flex-shrink: 0;  
-  letter-spacing: 0.2px;  
-}  
-  
-.searchBar {  
-  display: flex;  
-  flex-shrink: 0;  
-}  
-  
-.formCard {  
-  background: var(--surface-card);  
-  border: 1px solid var(--login-border);  
-  border-radius: 14px;  
-  padding: 24px 28px;  
-  display: flex;  
-  flex-direction: column;  
-  flex-shrink: 0;  
-}  
-  
-.formCard > * + * {  
-  margin-top: 18px;  
-}  
-  
-.typeToggle {  
-  display: flex;  
-}  
-  
-.typeToggle > * + * {  
-  margin-left: 10px;  
-}  
-  
-.typeBtn {  
-  display: flex;  
-  align-items: center;  
-  padding: 10px 20px;  
-  border: 1.5px solid var(--login-border);  
-  border-radius: 8px;  
-  background: transparent;  
-  color: var(--login-text-muted);  
-  font-size: 14px;  
-  font-weight: 600;  
-  cursor: pointer;  
-  transition:  
-    border-color 0.15s,  
-    background 0.15s,  
-    color 0.15s;  
-}  
-  
-.typeBtn > * + * {  
-  margin-left: 8px;  
-}  
-  
-.typeBtn:hover {  
-  border-color: var(--primary-color);  
-  color: var(--primary-color);  
-}  
-  
-.typeBtnActive {  
-  border-color: var(--primary-color);  
-  background: var(--primary-a10);  
-  color: var(--primary-color);  
-}  
-  
-.formGrid {  
-  display: grid;  
-  grid-template-columns: 1fr 1fr;  
-  gap: 14px 24px;  
-}  
-  
-.formGroup {  
-  display: flex;  
-  flex-direction: column;  
-}  
-  
-.formGroup > * + * {  
-  margin-top: 6px;  
-}  
-  
-.formGroup label {  
-  font-size: 14px;  
-  font-weight: 600;  
-  color: var(--login-text);  
-}  
-  
-.required {  
-  color: var(--dialog-danger-icon);  
-  margin-left: 2px;  
-}  
-  
-.input {  
-  height: 44px;  
-  padding: 0 14px;  
-  border: 1px solid var(--login-border);  
-  border-radius: 8px;  
-  font-size: 14px;  
-  font-family: inherit;  
-  color: var(--login-text);  
-  background: var(--input-bg);  
-  outline: none;  
-  transition: border-color 0.15s;  
-}  
-  
-.input:focus {  
-  border-color: var(--primary-color);  
-  box-shadow: 0 0 0 3px var(--modal-input-focus-shadow);  
-}  
-  
-.formActions {  
-  display: flex;  
-  justify-content: flex-end;  
-}  
-  
-.btnAdd {  
-  display: flex;  
-  align-items: center;  
-  padding: 11px 24px;  
-  background: var(--primary-color);  
-  color: var(--text-white);  
-  border: none;  
-  border-radius: 8px;  
-  font-size: 15px;  
-  font-weight: 600;  
-  cursor: pointer;  
-  transition: opacity 0.15s;  
-}  
-  
-.btnAdd > * + * {  
-  margin-left: 8px;  
-}  
-  
-.btnAdd:hover:not(:disabled) {  
-  opacity: 0.88;  
-}  
-  
-.btnAdd:disabled {  
-  opacity: 0.6;  
-  cursor: not-allowed;  
-}  
-  
-.loading {  
-  text-align: center;  
-  color: var(--login-text-muted);  
-  font-size: 14px;  
-  padding: 32px;  
-}  
-  
-.listsGrid {  
-  display: grid;  
-  grid-template-columns: 1fr 1fr;  
-  gap: 24px;  
-  flex: 1;  
-  min-height: 0;  
-  overflow: hidden;  
-}  
-  
-.listSection {  
-  background: var(--surface-card);  
-  border: 1px solid var(--login-border);  
-  border-radius: 14px;  
-  overflow: hidden;  
-  display: flex;  
-  flex-direction: column;  
-  min-height: 0;  
-}  
-  
-.listHeader {  
-  display: flex;  
-  align-items: center;  
-  padding: 14px 20px;  
-  background: var(--table-row-odd);  
-  border-bottom: 1px solid var(--login-border);  
-  font-size: 15px;  
-  font-weight: 700;  
-  color: var(--login-text);  
-  flex-shrink: 0;  
-}  
-  
-.listHeader > * + * {  
-  margin-left: 10px;  
-}  
-  
-.listHeaderIcon {  
-  color: var(--primary-color);  
-  font-size: 16px;  
-}  
-  
-.listCount {  
-  margin-left: auto;  
-  background: var(--primary-color);  
-  color: var(--text-white);  
-  font-size: 13px;  
-  font-weight: 700;  
-  padding: 2px 10px;  
-  border-radius: 20px;  
-  min-width: 28px;  
-  text-align: center;  
-}  
-  
-.listBody {  
-  display: flex;  
-  flex-direction: column;  
-  flex: 1;  
-  min-height: 0;  
-  overflow-y: auto;  
-}  
-  
-.emptyList {  
-  padding: 32px 20px;  
-  text-align: center;  
-  color: var(--login-text-muted);  
-  font-size: 14px;  
-  font-style: italic;  
-}  
-  
-.personCard {  
-  border-bottom: 1px solid var(--login-border);  
-  transition: background 0.12s;  
-}  
-  
-.personCard:last-child {  
-  border-bottom: none;  
-}  
-  
-.personCard:hover {  
-  background: var(--table-row-even);  
-}  
-  
-.personRow {  
-  display: flex;  
-  align-items: center;  
-  padding: 14px 16px;  
-}  
-  
-.personRow > * + * {  
-  margin-left: 14px;  
-}  
-  
-.personAvatar {  
-  width: 42px;  
-  height: 42px;  
-  border-radius: 50%;  
-  background: var(--primary-a15);  
-  color: var(--primary-color);  
-  font-size: 18px;  
-  font-weight: 700;  
-  display: flex;  
-  align-items: center;  
-  justify-content: center;  
-  flex-shrink: 0;  
-  border: 1.5px solid var(--primary-a30);  
-}  
-  
-.personInfo {  
-  flex: 1;  
-  min-width: 0;  
-  display: flex;  
-  flex-direction: column;  
-}  
-  
-.personInfo > * + * {  
-  margin-top: 3px;  
-}  
-  
-.personName {  
-  font-size: 14px;  
-  font-weight: 500;  
-  color: var(--login-text);  
-  white-space: nowrap;  
-  overflow: hidden;  
-  text-overflow: ellipsis;  
-}  
-  
-.personNameBold {  
-  font-weight: 700;  
-}  
-  
-.personMeta {  
-  font-size: 13px;  
-  color: var(--login-text-muted);  
-}  
-  
-.personPhone {  
-  display: flex;  
-  align-items: center;  
-  font-size: 13px;  
-  font-weight: 600;  
-  color: var(--primary-color);  
-  margin-top: 1px;  
-}  
-  
-.personPhone > * + * {  
-  margin-left: 5px;  
-}  
-  
-.personActions {  
-  display: flex;  
-  flex-shrink: 0;  
-}  
-  
-.personActions > * + * {  
-  margin-left: 6px;  
-}  
-  
-.btnEdit,  
-.btnDelete {  
-  width: 32px;  
-  height: 32px;  
-  border-radius: 8px;  
-  border: 1px solid var(--login-border);  
-  background: transparent;  
-  color: var(--login-text-muted);  
-  font-size: 14px;  
-  cursor: pointer;  
-  display: flex;  
-  align-items: center;  
-  justify-content: center;  
-  transition:  
-    background 0.12s,  
-    color 0.12s,  
-    border-color 0.12s;  
-}  
-  
-.btnEdit:hover {  
-  background: var(--primary-a10);  
-  color: var(--primary-color);  
-  border-color: var(--primary-color);  
-}  
-  
-.btnDelete:hover:not(:disabled) {  
-  background: var(--btn-refuse-bg);  
-  color: var(--btn-refuse-fg);  
-  border-color: var(--btn-refuse-border);  
-}  
-  
-.btnDelete:disabled {  
-  opacity: 0.5;  
-  cursor: not-allowed;  
-}  
-  
-/* ===== Modal chỉnh sửa người trực ===== */  
-.overlay {  
-  position: fixed;  
-  top: 0;  
-  left: var(--current-sidebar-width, var(--sidebar-width, 280px));  
-  width: calc(  
-    100vw - var(--current-sidebar-width, var(--sidebar-width, 280px))  
-  );  
-  height: 100vh;  
-  background-color: var(--modal-overlay-bg);  
-  display: flex;  
-  justify-content: center;  
-  align-items: center;  
-  z-index: 999;  
-  -webkit-backdrop-filter: blur(4px);  
-  backdrop-filter: blur(4px);  
-  transition:  
-    left 0.2s ease,  
-    width 0.2s ease;  
-}  
-  
-.modal {  
-  background-color: var(--modal-bg);  
-  border: 1px solid var(--modal-border);  
-  border-radius: 12px;  
-  width: 95%;  
-  max-width: 640px;  
-  max-height: 92vh;  
-  display: flex;  
-  flex-direction: column;  
-  box-shadow: 0 20px 25px -5px var(--shadow-color);  
-  overflow: hidden;  
-}  
-  
-.modalHeader {  
-  display: flex;  
-  align-items: center;  
-  justify-content: space-between;  
-  padding: 20px 24px;  
-  border-bottom: 1px solid var(--login-border);  
-  border-top: 3px solid var(--primary-color);  
-}  
-  
-.modalTitle {  
-  font-size: 15px;  
-  font-weight: 700;  
-  color: var(--primary-color);  
-  text-transform: uppercase;  
-  letter-spacing: 0.5px;  
-  margin: 0;  
-}  
-  
-.modalCloseBtn {  
-  display: inline-flex;  
-  align-items: center;  
-  justify-content: center;  
-  width: 36px;  
-  height: 36px;  
-  border: none;  
-  border-radius: 8px;  
-  background: transparent;  
-  color: var(--login-text-muted);  
-  font-size: 18px;  
-  cursor: pointer;  
-  transition:  
-    background 0.15s,  
-    color 0.15s;  
-}  
-  
-.modalCloseBtn:hover {  
-  background: var(--table-row-even);  
-  color: var(--login-text);  
-}  
-  
-.modalBody {  
-  padding: 24px;  
-  overflow-y: auto;  
-}  
-  
-.modalFooter {  
-  display: flex;  
-  justify-content: flex-end;  
-  gap: 10px;  
-  padding: 16px 24px;  
-  border-top: 1px solid var(--login-border);  
-}  
-  
-.editFormGrid {  
-  display: grid;  
-  grid-template-columns: 1fr 1fr;  
-  gap: 16px 20px;  
-}  
-  
-.editFormGroup {  
-  display: flex;  
-  flex-direction: column;  
-}  
-  
-.editFormGroup > * + * {  
-  margin-top: 6px;  
-}  
-  
-.editFormGroup label {  
-  font-size: 14px;  
-  font-weight: 600;  
-  color: var(--login-text);  
-}  
-  
-.btnSave {  
-  display: flex;  
-  align-items: center;  
-  padding: 8px 18px;  
-  background: var(--primary-color);  
-  color: var(--text-white);  
-  border: none;  
-  border-radius: 7px;  
-  font-size: 14px;  
-  font-weight: 600;  
-  cursor: pointer;  
-  transition: opacity 0.15s;  
-}  
-  
-.btnSave > * + * {  
-  margin-left: 6px;  
-}  
-  
-.btnSave:hover:not(:disabled) {  
-  opacity: 0.88;  
-}  
-  
-.btnSave:disabled {  
-  opacity: 0.6;  
-  cursor: not-allowed;  
-}  
-  
-.btnCancelEdit {  
-  display: flex;  
-  align-items: center;  
-  padding: 8px 18px;  
-  background: transparent;  
-  color: var(--login-text-muted);  
-  border: 1px solid var(--login-border);  
-  border-radius: 7px;  
-  font-size: 14px;  
-  font-weight: 600;  
-  cursor: pointer;  
-  transition:  
-    background 0.12s,  
-    color 0.12s;  
-}  
-  
-.btnCancelEdit > * + * {  
-  margin-left: 6px;  
-}  
-  
-.btnCancelEdit:hover:not(:disabled) {  
-  background: var(--table-row-even);  
-  color: var(--login-text);  
-}  
-  
-.btnCancelEdit:disabled {  
-  opacity: 0.6;  
-  cursor: not-allowed;  
-}  
-  
-@media (max-width: 1024px) {  
-  .formCard {  
-    padding: 20px 20px;  
-  }  
-  
-  .formGrid {  
-    gap: 12px 16px;  
-  }  
-}  
-  
-@media (max-width: 768px) {  
-  .page {  
-    height: auto;  
-    overflow: visible;  
-    padding: 16px;  
-  }  
-  
-  .searchBar {  
-    width: 100%;  
-  }  
-  
-  .formGrid {  
-    grid-template-columns: 1fr;  
-  }  
-  
-  .listsGrid {  
-    grid-template-columns: 1fr;  
-    flex: none;  
-    overflow: visible;  
-  }  
-  
-  .listSection {  
-    min-height: 300px;  
-  }  
-  
-  .listBody {  
-    max-height: 300px;  
-    overflow-y: auto;  
-  }  
-  
-  .typeToggle {  
-    flex-direction: column;  
-  }  
-  
-  .typeToggle > * + * {  
-    margin-left: 0;  
-    margin-top: 10px;  
-  }  
-  
-  .editFormGrid {  
-    grid-template-columns: 1fr;  
-  }  
-  
-  .overlay {  
-    left: 0;  
-    width: 100vw;  
-  }  
+.page {
+  height: calc(100vh - 112px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 24px 0 0;
+}
+
+.page > * + * {
+  margin-top: 20px;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0 20px;
+  flex-shrink: 0;
+  border-bottom: 1.5px solid var(--login-border);
+}
+
+.pageHeaderLeft {
+  display: flex;
+  align-items: center;
+  padding-left: 16px;
+  border-left: 4px solid var(--primary-color);
+}
+
+.pageHeaderLeft > * + * {
+  margin-left: 16px;
+}
+
+.pageTitle {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--login-text);
+  margin: 0;
+  letter-spacing: -0.4px;
+  line-height: 1.2;
+}
+
+.pageBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 14px;
+  background: var(--primary-color);
+  color: var(--text-white);
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.2px;
+}
+
+.searchBar {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.formCard {
+  background: var(--surface-card);
+  border: 1px solid var(--login-border);
+  border-radius: 14px;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.formCard > * + * {
+  margin-top: 18px;
+}
+
+.typeToggle {
+  display: flex;
+}
+
+.typeToggle > * + * {
+  margin-left: 10px;
+}
+
+.typeBtn {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  border: 1.5px solid var(--login-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--login-text-muted);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    color 0.15s;
+}
+
+.typeBtn > * + * {
+  margin-left: 8px;
+}
+
+.typeBtn:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.typeBtnActive {
+  border-color: var(--primary-color);
+  background: var(--primary-a10);
+  color: var(--primary-color);
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 24px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.formGroup > * + * {
+  margin-top: 6px;
+}
+
+.formGroup label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--login-text);
+}
+
+.required {
+  color: var(--dialog-danger-icon);
+  margin-left: 2px;
+}
+
+.input {
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--login-border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--login-text);
+  background: var(--input-bg);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--modal-input-focus-shadow);
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btnAdd {
+  display: flex;
+  align-items: center;
+  padding: 11px 24px;
+  background: var(--primary-color);
+  color: var(--text-white);
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.btnAdd > * + * {
+  margin-left: 8px;
+}
+
+.btnAdd:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.btnAdd:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.loading {
+  text-align: center;
+  color: var(--login-text-muted);
+  font-size: 14px;
+  padding: 32px;
+}
+
+.listsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.listSection {
+  background: var(--surface-card);
+  border: 1px solid var(--login-border);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.listHeader {
+  display: flex;
+  align-items: center;
+  padding: 14px 20px;
+  background: var(--table-row-odd);
+  border-bottom: 1px solid var(--login-border);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--login-text);
+  flex-shrink: 0;
+}
+
+.listHeader > * + * {
+  margin-left: 10px;
+}
+
+.listHeaderIcon {
+  color: var(--primary-color);
+  font-size: 16px;
+}
+
+.listCount {
+  margin-left: auto;
+  background: var(--primary-color);
+  color: var(--text-white);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 20px;
+  min-width: 28px;
+  text-align: center;
+}
+
+.listBody {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.emptyList {
+  padding: 32px 20px;
+  text-align: center;
+  color: var(--login-text-muted);
+  font-size: 14px;
+  font-style: italic;
+}
+
+.personCard {
+  border-bottom: 1px solid var(--login-border);
+  transition: background 0.12s;
+}
+
+.personCard:last-child {
+  border-bottom: none;
+}
+
+.personCard:hover {
+  background: var(--table-row-even);
+}
+
+.personRow {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+}
+
+.personRow > * + * {
+  margin-left: 14px;
+}
+
+.personAvatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--primary-a15);
+  color: var(--primary-color);
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1.5px solid var(--primary-a30);
+}
+
+.personInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.personInfo > * + * {
+  margin-top: 3px;
+}
+
+.personName {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--login-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.personNameBold {
+  font-weight: 700;
+}
+
+.personMeta {
+  font-size: 13px;
+  color: var(--login-text-muted);
+}
+
+.personPhone {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-top: 1px;
+}
+
+.personPhone > * + * {
+  margin-left: 5px;
+}
+
+.personActions {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.personActions > * + * {
+  margin-left: 6px;
+}
+
+.btnEdit,
+.btnDelete {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--login-border);
+  background: transparent;
+  color: var(--login-text-muted);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background 0.12s,
+    color 0.12s,
+    border-color 0.12s;
+}
+
+.btnEdit:hover {
+  background: var(--primary-a10);
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btnDelete:hover:not(:disabled) {
+  background: var(--btn-refuse-bg);
+  color: var(--btn-refuse-fg);
+  border-color: var(--btn-refuse-border);
+}
+
+.btnDelete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== Modal chỉnh sửa người trực ===== */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: var(--current-sidebar-width, var(--sidebar-width, 280px));
+  width: calc(
+    100vw - var(--current-sidebar-width, var(--sidebar-width, 280px))
+  );
+  height: 100vh;
+  background-color: var(--modal-overlay-bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  transition:
+    left 0.2s ease,
+    width 0.2s ease;
+}
+
+.modal {
+  background-color: var(--modal-bg);
+  border: 1px solid var(--modal-border);
+  border-radius: 12px;
+  width: 95%;
+  max-width: 640px;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 25px -5px var(--shadow-color);
+  overflow: hidden;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--login-border);
+  border-top: 3px solid var(--primary-color);
+}
+
+.modalTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary-color);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.modalCloseBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--login-text-muted);
+  font-size: 18px;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.modalCloseBtn:hover {
+  background: var(--table-row-even);
+  color: var(--login-text);
+}
+
+.modalBody {
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--login-border);
+}
+
+.editFormGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 20px;
+}
+
+.editFormGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.editFormGroup > * + * {
+  margin-top: 6px;
+}
+
+.editFormGroup label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--login-text);
+}
+
+.btnSave {
+  display: flex;
+  align-items: center;
+  padding: 8px 18px;
+  background: var(--primary-color);
+  color: var(--text-white);
+  border: none;
+  border-radius: 7px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.btnSave > * + * {
+  margin-left: 6px;
+}
+
+.btnSave:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.btnSave:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btnCancelEdit {
+  display: flex;
+  align-items: center;
+  padding: 8px 18px;
+  background: transparent;
+  color: var(--login-text-muted);
+  border: 1px solid var(--login-border);
+  border-radius: 7px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.12s,
+    color 0.12s;
+}
+
+.btnCancelEdit > * + * {
+  margin-left: 6px;
+}
+
+.btnCancelEdit:hover:not(:disabled) {
+  background: var(--table-row-even);
+  color: var(--login-text);
+}
+
+.btnCancelEdit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 1024px) {
+  .formCard {
+    padding: 20px 20px;
+  }
+
+  .formGrid {
+    gap: 12px 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page {
+    height: auto;
+    overflow: visible;
+    padding: 16px;
+  }
+
+  .searchBar {
+    width: 100%;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .listsGrid {
+    grid-template-columns: 1fr;
+    flex: none;
+    overflow: visible;
+  }
+
+  .listSection {
+    min-height: 300px;
+  }
+
+  .listBody {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .typeToggle {
+    flex-direction: column;
+  }
+
+  .typeToggle > * + * {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+
+  .editFormGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .overlay {
+    left: 0;
+    width: 100vw;
+  }
 }

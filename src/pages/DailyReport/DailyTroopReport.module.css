@@ -610,7 +610,9 @@
   max-height: 0;  
   opacity: 0;  
   overflow: hidden;  
-  transition: max-height 280ms ease, opacity 220ms ease;  
+  transition:  
+    max-height 280ms ease,  
+    opacity 220ms ease;  
 }  
   
 .nhiemVuAccordionBodyOpen {  
@@ -805,8 +807,6 @@
   justify-content: center;
   align-items: center;
   z-index: 999;
-  -webkit-backdrop-filter: blur(4px);  
-  backdrop-filter: blur(4px);
   transition:
     left 0.2s ease,
     width 0.2s ease;
