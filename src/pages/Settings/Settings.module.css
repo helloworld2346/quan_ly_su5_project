@@ -155,7 +155,7 @@
   font-weight: 700;  
   text-transform: uppercase;  
   letter-spacing: 0.6px;  
-  color: color-mix(in srgb, var(--primary-color) 65%, var(--login-text-muted));  
+  color: var(--primary-muted65);  
 }  
   
 .infoValue {  
@@ -222,10 +222,10 @@
 .formGroup label {  
   font-size: 14px;  
   font-weight: 700;  
-  color: color-mix(in srgb, var(--primary-color) 65%, var(--login-text-muted));  
+  color: var(--primary-muted65);  
   text-transform: uppercase;  
   letter-spacing: 0.6px;  
-}  
+} 
   
 .formGroup input {  
   height: 48px;  

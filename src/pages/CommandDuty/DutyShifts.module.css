@@ -177,7 +177,7 @@
 }  
   
 .rowEditing {  
-  background: color-mix(in srgb, var(--primary-color) 5%, transparent) !important;  
+  background: var(--primary-a05) !important;
 }  
   
 .dateCell {  
@@ -220,7 +220,7 @@
   text-transform: uppercase;  
   letter-spacing: 0.5px;  
   color: var(--primary-color);  
-  background: color-mix(in srgb, var(--primary-color) 10%, transparent);  
+  background: var(--primary-a10); 
   padding: 2px 8px;  
   border-radius: 4px;  
   width: fit-content;  
@@ -293,7 +293,7 @@
 .btnEdit:hover {  
   border-color: var(--primary-color);  
   color: var(--primary-color);  
-  background: color-mix(in srgb, var(--primary-color) 6%, transparent);  
+  background: var(--primary-a06);
 }  
   
 .btnCancel:hover {  
@@ -368,13 +368,9 @@
   justify-content: center;  
   align-items: center;  
   z-index: 999;  
+  -webkit-backdrop-filter: blur(4px);  
   backdrop-filter: blur(4px);  
   transition: left 0.2s ease, width 0.2s ease;  
-}  
-  
-:global(body:has([class*="collapsed"])) .overlay {  
-  left: var(--sidebar-collapsed-width);  
-  width: calc(100vw - var(--sidebar-collapsed-width));  
 }  
   
 .modal {  
@@ -524,7 +520,7 @@
 .btnRandom:hover {  
   border-color: var(--primary-color);  
   color: var(--primary-color);  
-  background: color-mix(in srgb, var(--primary-color) 6%, transparent);  
+  background: var(--primary-a06);
 }  
   
 @media (max-width: 1024px) {  

@@ -20,7 +20,7 @@
   display: flex;  
   align-items: flex-start;  
   padding: 14px 18px;  
-  background: color-mix(in srgb, var(--primary-color) 7%, var(--modal-bg));  
+  background: var(--primary-a07);  
   border-bottom: 1px solid var(--modal-border);  
   min-height: 80px;  
   align-items: center;  
@@ -114,7 +114,7 @@
 .radioLabel:hover {  
   border-color: var(--primary-color);  
   color: var(--primary-color);  
-  background: color-mix(in srgb, var(--primary-color) 6%, var(--modal-bg));  
+  background: var(--primary-a06);
 }  
   
 .radioLabel input[type="radio"] {  

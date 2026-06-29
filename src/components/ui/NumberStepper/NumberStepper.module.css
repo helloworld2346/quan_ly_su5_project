@@ -16,7 +16,7 @@
   font-weight: 700;  
   text-transform: uppercase;  
   letter-spacing: 0.6px;  
-  color: color-mix(in srgb, var(--primary-color) 65%, var(--login-text-muted));  
+  color: var(--primary-muted65);  
 }  
   
 .numberInput {  
@@ -71,12 +71,12 @@
 }  
   
 .numberInputBtn:hover {  
-  background: color-mix(in srgb, var(--primary-color) 12%, transparent);  
+  background: var(--primary-a12);  
 }  
   
 .numberInputBtn:active {  
-  background: color-mix(in srgb, var(--primary-color) 22%, transparent);  
-}  
+  background: var(--primary-a22);  
+}
   
 .numberInputBtnLeft {  
   border-right: 1px solid var(--login-border);  
