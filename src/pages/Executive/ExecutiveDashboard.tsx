@@ -9,7 +9,7 @@ import PieChart from "../../components/charts/PieChart/PieChart";
 import type { SubordinateUnitType } from "../../types/troopStats";
 import { CHART_GROUP_LABELS, CHART_GROUP_ORDER } from "../../data/troopData";
 import { troopStatsService, type ThongKeQuanSoResult, type DonViItem } from "../../services/troopStats";
-
+import { formatFullDate, shiftDay, toDateParam } from "../../utils/date";
 import styles from "./ExecutiveDashboard.module.css";
 
 type FilterKey = "all" | SubordinateUnitType;
@@ -34,29 +34,10 @@ function formatNum(value: number) {
   return value.toLocaleString("vi-VN");
 }
 
-function formatFullDate(date: Date) {
-  const days = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
-  const d = String(date.getDate()).padStart(2, "0");
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const y = date.getFullYear();
-  return `${days[date.getDay()]}, ${d}/${m}/${y}`;
-}
-
-function shiftDay(date: Date, delta: number) {
-  const d = new Date(date);
-  d.setDate(d.getDate() + delta);
-  return d;
-}
-
-function toDateParam(date: Date) {
-  return date.toISOString().split("T")[0];
-}
-
 function formatRate(rate: number) {
   return Number.isInteger(rate) ? `${rate}%` : `${rate.toFixed(1)}%`;
 }
 
-// Đại đội: số trước (19, 20, 23), sau đó Sửa chữa rồi Kho
 const COMPANY_SORT_SUFFIX: Record<string, number> = {
   "sửa chữa": 1,
   "kho": 2,
@@ -121,20 +102,35 @@ export default function ExecutiveDashboard() {
   const isToday = selectedDay.getTime() === today.getTime();
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
-    troopStatsService
-      .getThongKe(toDateParam(selectedDate))
-      .then(setData)
-      .catch((err) => {
+    let cancelled = false;
+
+    const loadData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await troopStatsService.getThongKe(
+          toDateParam(selectedDate),
+        );
+        if (!cancelled) setData(result);
+      } catch (err: unknown) {
         console.error("API Error:", err);
-        if (err.response?.status === 404) {
-          setError("Không có dữ liệu cho ngày này");
+        const e = err as { response?: { status?: number }; message?: string };
+        if (e.response?.status === 404) {
+          if (!cancelled) setError("Không có dữ liệu cho ngày này");
         } else {
-          setError(`Lỗi kết nối: ${err.response?.status || err.message}`);
+          if (!cancelled)
+            setError(`Lỗi kết nối: ${e.response?.status ?? e.message}`);
         }
-      })
-      .finally(() => setLoading(false));
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    loadData();
+
+    return () => {
+      cancelled = true;
+    };
   }, [selectedDate]);
 
   const visibleGroups = data ? groupDonVi(data.danhSachDonVi, filter) : [];

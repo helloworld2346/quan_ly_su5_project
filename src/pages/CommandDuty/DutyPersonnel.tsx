@@ -19,6 +19,9 @@ import type {
   ChucVu,
 } from "../../types/duty";
 import CustomSelect from "../../components/ui/CustomSelect/CustomSelect";
+import SearchBar from "../../components/ui/SearchBar/SearchBar";
+
+import { buildAllowedOptions } from "../../utils/duty";
 
 const CHI_HUY_CAP_BAC = ["Đại tá", "Thượng tá", "Trung tá"];
 const CHI_HUY_CHUC_VU = [
@@ -68,6 +71,9 @@ export default function DutyPersonnel() {
   const [dutyType, setDutyType] = useState<DutyType>("chiHuy");
   const [form, setForm] = useState<TrucNguoiPayload>({ ...EMPTY_FORM });
   const [submitting, setSubmitting] = useState(false);
+
+  // Search state
+  const [search, setSearch] = useState("");
 
   // Edit state
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -228,170 +234,136 @@ export default function DutyPersonnel() {
     [showSuccess, showError],
   );
 
-  const capBacOptions = useMemo(() => {
-    const allowed = dutyType === "chiHuy" ? CHI_HUY_CAP_BAC : TAC_CHIEN_CAP_BAC;
-    return allowed
-      .filter((name) => capBacList.some((c) => c.tenCapBac === name))
-      .map((name) => ({ value: name, label: name }));
-  }, [capBacList, dutyType]);
+  // Đóng modal bằng phím Escape
+  useEffect(() => {
+    if (!editingId) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") handleCancelEdit();
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [editingId, handleCancelEdit]);
 
-  const chucVuOptions = useMemo(() => {
-    const allowed = dutyType === "chiHuy" ? CHI_HUY_CHUC_VU : TAC_CHIEN_CHUC_VU;
-    return allowed
-      .filter((name) => chucVuList.some((c) => c.tenChucVu === name))
-      .map((name) => ({ value: name, label: name }));
-  }, [chucVuList, dutyType]);
+  const capBacOptions = useMemo(
+    () =>
+      buildAllowedOptions(
+        dutyType === "chiHuy" ? CHI_HUY_CAP_BAC : TAC_CHIEN_CAP_BAC,
+        capBacList,
+        (c) => c.tenCapBac,
+      ),
+    [capBacList, dutyType],
+  );
 
-  const editCapBacOptions = useMemo(() => {
-    const allowed = editType === "chiHuy" ? CHI_HUY_CAP_BAC : TAC_CHIEN_CAP_BAC;
-    return allowed
-      .filter((name) => capBacList.some((c) => c.tenCapBac === name))
-      .map((name) => ({ value: name, label: name }));
-  }, [capBacList, editType]);
+  const chucVuOptions = useMemo(
+    () =>
+      buildAllowedOptions(
+        dutyType === "chiHuy" ? CHI_HUY_CHUC_VU : TAC_CHIEN_CHUC_VU,
+        chucVuList,
+        (c) => c.tenChucVu,
+      ),
+    [chucVuList, dutyType],
+  );
 
-  const editChucVuOptions = useMemo(() => {
-    const allowed = editType === "chiHuy" ? CHI_HUY_CHUC_VU : TAC_CHIEN_CHUC_VU;
-    return allowed
-      .filter((name) => chucVuList.some((c) => c.tenChucVu === name))
-      .map((name) => ({ value: name, label: name }));
-  }, [chucVuList, editType]);
+  const editCapBacOptions = useMemo(
+    () =>
+      buildAllowedOptions(
+        editType === "chiHuy" ? CHI_HUY_CAP_BAC : TAC_CHIEN_CAP_BAC,
+        capBacList,
+        (c) => c.tenCapBac,
+      ),
+    [capBacList, editType],
+  );
+
+  const editChucVuOptions = useMemo(
+    () =>
+      buildAllowedOptions(
+        editType === "chiHuy" ? CHI_HUY_CHUC_VU : TAC_CHIEN_CHUC_VU,
+        chucVuList,
+        (c) => c.tenChucVu,
+      ),
+    [chucVuList, editType],
+  );
+
+  const filteredChiHuy = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return chiHuyList;
+    return chiHuyList.filter((p) => p.tenNguoitruc.toLowerCase().includes(q));
+  }, [chiHuyList, search]);
+
+  const filteredTacChien = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return tacChienList;
+    return tacChienList.filter((p) => p.tenNguoitruc.toLowerCase().includes(q));
+  }, [tacChienList, search]);
+
+  const editingPerson = useMemo(() => {
+    if (!editingId) return undefined;
+    return (
+      chiHuyList.find((p) => p.idNguoitruc === editingId) ??
+      tacChienList.find((p) => p.idNguoitruc === editingId)
+    );
+  }, [editingId, chiHuyList, tacChienList]);
 
   const renderPersonCard = (person: NguoiTrucWithCaTruc, type: DutyType) => {
-    const isEditing = editingId === person.idNguoitruc;
     const isDeleting = deletingId === person.idNguoitruc;
 
     return (
       <div key={person.idNguoitruc} className={styles.personCard}>
-        {isEditing ? (
-          <div className={styles.editInlineForm}>
-            <div className={styles.editFormGrid}>
-              <div className={styles.editFormGroup}>
-                <label>
-                  Họ và tên <span className={styles.required}>*</span>
-                </label>
-                <input
-                  className={styles.input}
-                  value={editForm.tenNguoitruc}
-                  onChange={(e) =>
-                    setEditForm((prev) => ({
-                      ...prev,
-                      tenNguoitruc: e.target.value,
-                    }))
-                  }
-                  placeholder="Họ và tên..."
-                />
-              </div>
-              <div className={styles.editFormGroup}>
-                <label>
-                  Cấp bậc <span className={styles.required}>*</span>
-                </label>
-                <CustomSelect
-                  options={editCapBacOptions}
-                  value={editForm.capbacNguoitruc}
-                  onChange={(val) =>
-                    setEditForm((prev) => ({ ...prev, capbacNguoitruc: val }))
-                  }
-                  placeholder="-- Chọn cấp bậc --"
-                />
-              </div>
-              <div className={styles.editFormGroup}>
-                <label>
-                  Chức vụ <span className={styles.required}>*</span>
-                </label>
-                <CustomSelect
-                  options={editChucVuOptions}
-                  value={editForm.chucvuNguoitruc}
-                  onChange={(val) =>
-                    setEditForm((prev) => ({ ...prev, chucvuNguoitruc: val }))
-                  }
-                  placeholder="-- Chọn chức vụ --"
-                />
-              </div>
-              <div className={styles.editFormGroup}>
-                <label>Số điện thoại</label>
-                <input
-                  className={styles.input}
-                  type="tel"
-                  value={editForm.sodienthoai}
-                  onChange={(e) => {
-                    const val = e.target.value.replace(/[^\d+\-\s]/g, "");
-                    setEditForm((prev) => ({ ...prev, sodienthoai: val }));
-                  }}
-                  placeholder="Số điện thoại..."
-                />
-              </div>
-            </div>
-            <div className={styles.editActions}>
-              <button
-                type="button"
-                className={styles.btnSave}
-                onClick={() => void handleSaveEdit()}
-                disabled={saving}
-              >
-                <FontAwesomeIcon icon={faCheck} />
-                {saving ? "Đang lưu..." : "Lưu"}
-              </button>
-              <button
-                type="button"
-                className={styles.btnCancelEdit}
-                onClick={handleCancelEdit}
-                disabled={saving}
-              >
-                <FontAwesomeIcon icon={faXmark} />
-                Hủy
-              </button>
-            </div>
+        <div className={styles.personRow}>
+          <div className={styles.personAvatar}>
+            {getInitials(person.tenNguoitruc)}
           </div>
-        ) : (
-          <div className={styles.personRow}>
-            <div className={styles.personAvatar}>
-              {getInitials(person.tenNguoitruc)}
+          <div className={styles.personInfo}>
+            <div className={styles.personName}>
+              {person.capbacNguoitruc}{" "}
+              <span className={styles.personNameBold}>
+                {person.tenNguoitruc}
+              </span>
             </div>
-            <div className={styles.personInfo}>
-              <div className={styles.personName}>
-                {person.capbacNguoitruc}{" "}
-                <span className={styles.personNameBold}>
-                  {person.tenNguoitruc}
-                </span>
+            <div className={styles.personMeta}>{person.chucvuNguoitruc}</div>
+            {person.sodienthoai && (
+              <div className={styles.personPhone}>
+                <FontAwesomeIcon icon={faPhone} />
+                {person.sodienthoai}
               </div>
-              <div className={styles.personMeta}>{person.chucvuNguoitruc}</div>
-              {person.sodienthoai && (
-                <div className={styles.personPhone}>
-                  <FontAwesomeIcon icon={faPhone} />
-                  {person.sodienthoai}
-                </div>
-              )}
-            </div>
-            <div className={styles.personActions}>
-              <button
-                type="button"
-                className={styles.btnEdit}
-                onClick={() => handleStartEdit(person, type)}
-                title="Sửa"
-              >
-                <FontAwesomeIcon icon={faPenToSquare} />
-              </button>
-              <button
-                type="button"
-                className={styles.btnDelete}
-                onClick={() => void handleDelete(person, type)}
-                disabled={isDeleting}
-                title="Xóa"
-              >
-                <FontAwesomeIcon icon={faTrash} />
-              </button>
-            </div>
+            )}
           </div>
-        )}
+          <div className={styles.personActions}>
+            <button
+              type="button"
+              className={styles.btnEdit}
+              onClick={() => handleStartEdit(person, type)}
+              title="Sửa"
+            >
+              <FontAwesomeIcon icon={faPenToSquare} />
+            </button>
+            <button
+              type="button"
+              className={styles.btnDelete}
+              onClick={() => void handleDelete(person, type)}
+              disabled={isDeleting}
+              title="Xóa"
+            >
+              <FontAwesomeIcon icon={faTrash} />
+            </button>
+          </div>
+        </div>
       </div>
     );
   };
 
   return (
     <div className={styles.page}>
-      <div className={styles.formCard}>
-        <h2 className={styles.formTitle}>Thêm người trực</h2>
+      <div className={styles.pageHeader}>
+        <div className={styles.pageHeaderLeft}>
+          <h1 className={styles.pageTitle}>Quản lý trực ban</h1>
+          <span className={styles.pageBadge}>
+            {filteredChiHuy.length + filteredTacChien.length} người trực
+          </span>
+        </div>
+      </div>
 
+      <div className={styles.formCard}>
         <div className={styles.typeToggle}>
           <button
             type="button"
@@ -476,6 +448,14 @@ export default function DutyPersonnel() {
         </div>
       </div>
 
+      <div className={styles.searchBar}>
+        <SearchBar
+          value={search}
+          onChange={setSearch}
+          placeholder="Tìm theo tên người trực..."
+        />
+      </div>
+
       {loadingList ? (
         <div className={styles.loading}>Đang tải danh sách...</div>
       ) : (
@@ -487,13 +467,15 @@ export default function DutyPersonnel() {
                 className={styles.listHeaderIcon}
               />
               <span>Trực chỉ huy</span>
-              <span className={styles.listCount}>{chiHuyList.length}</span>
+              <span className={styles.listCount}>{filteredChiHuy.length}</span>
             </div>
             <div className={styles.listBody}>
-              {chiHuyList.length === 0 ? (
-                <div className={styles.emptyList}>Chưa có người trực</div>
+              {filteredChiHuy.length === 0 ? (
+                <div className={styles.emptyList}>
+                  {search ? "Không tìm thấy người trực" : "Chưa có người trực"}
+                </div>
               ) : (
-                chiHuyList.map((p) => renderPersonCard(p, "chiHuy"))
+                filteredChiHuy.map((p) => renderPersonCard(p, "chiHuy"))
               )}
             </div>
           </div>
@@ -505,14 +487,120 @@ export default function DutyPersonnel() {
                 className={styles.listHeaderIcon}
               />
               <span>Trực ban tác chiến</span>
-              <span className={styles.listCount}>{tacChienList.length}</span>
+              <span className={styles.listCount}>
+                {filteredTacChien.length}
+              </span>
             </div>
             <div className={styles.listBody}>
-              {tacChienList.length === 0 ? (
-                <div className={styles.emptyList}>Chưa có người trực</div>
+              {filteredTacChien.length === 0 ? (
+                <div className={styles.emptyList}>
+                  {search ? "Không tìm thấy người trực" : "Chưa có người trực"}
+                </div>
               ) : (
-                tacChienList.map((p) => renderPersonCard(p, "tacChien"))
+                filteredTacChien.map((p) => renderPersonCard(p, "tacChien"))
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {editingId && (
+        <div className={styles.overlay} onClick={handleCancelEdit}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <p className={styles.modalTitle}>
+                Chỉnh sửa người trực
+                {editingPerson ? ` — ${editingPerson.tenNguoitruc}` : ""}
+              </p>
+              <button
+                type="button"
+                className={styles.modalCloseBtn}
+                onClick={handleCancelEdit}
+                aria-label="Đóng"
+              >
+                <FontAwesomeIcon icon={faXmark} />
+              </button>
+            </div>
+
+            <div className={styles.modalBody}>
+              <div className={styles.editFormGrid}>
+                <div className={styles.editFormGroup}>
+                  <label>
+                    Họ và tên <span className={styles.required}>*</span>
+                  </label>
+                  <input
+                    className={styles.input}
+                    value={editForm.tenNguoitruc}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({
+                        ...prev,
+                        tenNguoitruc: e.target.value,
+                      }))
+                    }
+                    placeholder="Họ và tên..."
+                  />
+                </div>
+                <div className={styles.editFormGroup}>
+                  <label>
+                    Cấp bậc <span className={styles.required}>*</span>
+                  </label>
+                  <CustomSelect
+                    options={editCapBacOptions}
+                    value={editForm.capbacNguoitruc}
+                    onChange={(val) =>
+                      setEditForm((prev) => ({ ...prev, capbacNguoitruc: val }))
+                    }
+                    placeholder="-- Chọn cấp bậc --"
+                  />
+                </div>
+                <div className={styles.editFormGroup}>
+                  <label>
+                    Chức vụ <span className={styles.required}>*</span>
+                  </label>
+                  <CustomSelect
+                    options={editChucVuOptions}
+                    value={editForm.chucvuNguoitruc}
+                    onChange={(val) =>
+                      setEditForm((prev) => ({ ...prev, chucvuNguoitruc: val }))
+                    }
+                    placeholder="-- Chọn chức vụ --"
+                  />
+                </div>
+                <div className={styles.editFormGroup}>
+                  <label>Số điện thoại</label>
+                  <input
+                    className={styles.input}
+                    type="tel"
+                    value={editForm.sodienthoai}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/[^\d+\-\s]/g, "");
+                      setEditForm((prev) => ({ ...prev, sodienthoai: val }));
+                    }}
+                    placeholder="Số điện thoại..."
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.modalFooter}>
+              <button
+                type="button"
+                className={styles.btnCancelEdit}
+                onClick={handleCancelEdit}
+                disabled={saving}
+              >
+                <FontAwesomeIcon icon={faXmark} />
+                Hủy
+              </button>
+              <button
+                type="button"
+                className={styles.btnSave}
+                onClick={() => void handleSaveEdit()}
+                disabled={saving}
+              >
+                <FontAwesomeIcon icon={faCheck} />
+                {saving ? "Đang lưu..." : "Lưu thay đổi"}
+              </button>
             </div>
           </div>
         </div>

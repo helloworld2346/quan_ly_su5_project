@@ -20,7 +20,6 @@
   border-radius: 8px;  
   background: var(--toast-bg);  
   box-shadow: 0 4px 12px var(--shadow-color);  
-  backdrop-filter: blur(10px);  
   animation: slideIn 0.3s ease-out;  
 }  
   

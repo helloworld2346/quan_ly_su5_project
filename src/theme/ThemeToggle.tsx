@@ -24,7 +24,7 @@ export default function ThemeToggle({
       }
       onClick={onToggle}
     >
-      <FontAwesomeIcon icon={isDark ? faSun : faMoon} />
+      <FontAwesomeIcon icon={isDark ? faMoon : faSun} />
     </button>
   );
 }

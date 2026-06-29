@@ -1,7 +1,6 @@
 import { useId } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faMagnifyingGlass,
   faPlus,
   faLayerGroup,
   faFileWord,
@@ -13,6 +12,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import styles from "./ReportToolbar.module.css";
+import SearchBar from "../../ui/SearchBar/SearchBar";
 
 type Props = {
   query: string;
@@ -64,34 +64,15 @@ export default function ReportToolbar({
   hasReport = false,
   showExport = false,
 }: Props) {
-  const searchId = useId();
   const dateId = useId();
 
   return (
     <div className={styles.toolbar}>
-      <div className={styles.searchWrap}>
-        <input
-          id={searchId}
-          type="search"
-          className={styles.searchInput}
-          placeholder="Bạn cần tìm gì!?"
-          value={query}
-          onChange={(e) => onQueryChange(e.target.value)}
-          autoComplete="off"
-        />
-        <span className={styles.searchDivider} aria-hidden />
-        <button
-          type="button"
-          className={styles.searchIconBtn}
-          aria-label="Tìm kiếm"
-          onClick={() => document.getElementById(searchId)?.focus()}
-        >
-          <FontAwesomeIcon
-            icon={faMagnifyingGlass}
-            className={styles.searchIcon}
-          />
-        </button>
-      </div>
+      <SearchBar
+        value={query}
+        onChange={onQueryChange}
+        placeholder="Bạn cần tìm gì!?"
+      />
 
       <div className={styles.dateWrap}>
         <input

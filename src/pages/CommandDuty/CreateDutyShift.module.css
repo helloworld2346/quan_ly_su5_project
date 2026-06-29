@@ -1,308 +1,262 @@
-.page {  
-  padding: 32px;  
-  max-width: 1100px;  
-  margin: 0 auto;  
-  display: flex;  
-  flex-direction: column;  
-}  
-  
-.page > * + * {  
-  margin-top: 32px;  
-}  
-  
-.formCard {  
-  background: var(--dialog-bg);  
-  border: 1px solid var(--login-border);  
-  border-radius: 16px;  
-  padding: 40px;  
-  display: flex;  
-  flex-direction: column;  
-}  
-  
-.formCard > * + * {  
-  margin-top: 32px;  
-}  
-  
-.cardTitle {  
-  font-size: 22px;  
-  font-weight: 700;  
-  color: var(--login-text);  
-  margin: 0;  
-}  
-  
-.formGrid {  
-  display: grid;  
-  grid-template-columns: 1fr 1fr;  
-  gap: 24px;  
-}  
-  
-.formGroup {  
-  display: flex;  
-  flex-direction: column;  
-}  
-  
-.formGroup > * + * {  
-  margin-top: 10px;  
-}  
-  
-.fullWidth {  
-  grid-column: 1 / -1;  
-}  
-  
-.label {  
-  font-size: 15px;  
-  font-weight: 600;  
-  color: var(--modal-label-text);  
-}  
-  
-.required {  
-  color: var(--dialog-danger-icon);  
-}  
-  
-.input {  
-  padding: 14px 18px;  
-  border: 1px solid var(--modal-input-border);  
-  border-radius: 8px;  
-  font-size: 15px;  
-  background: var(--modal-input-bg);  
-  color: var(--modal-input-text);  
-  transition: border-color 0.15s;  
-  width: 100%;  
-  box-sizing: border-box;  
-  font-family: inherit;  
-}  
-  
-.input:focus {  
-  outline: none;  
-  border-color: var(--modal-input-focus-border);  
-  box-shadow: 0 0 0 2px var(--modal-input-focus-shadow);  
-}  
-  
-.textarea {  
-  height: 80px;  
-  min-height: 80px;  
-  resize: vertical;  
-}  
-  
-.trucGrid {  
-  display: grid;  
-  grid-template-columns: 1fr 1fr;  
-  gap: 28px;  
-}  
-  
-.trucColumn {  
-  display: flex;  
-  flex-direction: column;  
-}  
-  
-.trucColumn > * + * {  
-  margin-top: 14px;  
-}  
-  
-.trucColumnHeader {  
-  display: flex;  
-  align-items: center;  
-}  
-  
-.trucColumnHeader > * + * {  
-  margin-left: 8px;  
-}  
-  
-.trucColumnLabel {  
-  font-size: 16px;  
-  font-weight: 700;  
-  color: var(--login-text);  
-  text-transform: uppercase;  
-  letter-spacing: 0.5px;  
-}  
-  
-.personCard {  
-  display: flex;  
-  flex-direction: column;  
-  padding: 20px 24px;  
-  border: 1px solid var(--login-border);  
-  border-radius: 12px;  
-  background: var(--surface-muted);  
-}  
-  
-.personCard > * + * {  
-  margin-top: 5px;  
-}  
-  
-.personRole {  
-  font-size: 14px;  
-  font-weight: 700;  
-  text-transform: uppercase;  
-  letter-spacing: 0.8px;  
-  color: var(--primary-color);  
-  margin-bottom: 2px;  
-}  
-  
-.personName {  
-  font-size: 18px;  
-  font-weight: 700;  
-  color: var(--login-text);  
-}  
-  
-.personMeta {  
-  font-size: 15px;  
-  color: var(--login-text-muted);  
-}  
-  
-.personPhone {  
-  display: flex;  
-  align-items: center;  
-  font-size: 15px;  
-  font-weight: 600;  
-  color: var(--primary-color);  
-  text-decoration: none;  
-  margin-top: 4px;  
-}  
-  
-.personPhone > * + * {  
-  margin-left: 6px;  
-}  
-  
-.personEmpty {  
-  font-size: 14px;  
-  color: var(--login-text-muted);  
-  font-style: italic;  
-  padding: 14px 0;  
-}  
-  
-.actions {  
-  display: flex;  
-  justify-content: flex-end;  
-}  
-  
-.actions > * + * {  
-  margin-left: 12px;  
-}  
-  
-.btnSubmit {  
-  display: flex;  
-  align-items: center;  
-  padding: 14px 40px;  
-  border: none;  
-  border-radius: 8px;  
-  background: var(--primary-color);  
-  color: var(--text-white);  
-  font-size: 16px;  
-  font-weight: 700;  
-  cursor: pointer;  
-  transition: opacity 0.15s;  
-}  
-  
-.btnSubmit > * + * {  
-  margin-left: 8px;  
-}  
-  
-.btnSubmit:hover:not(:disabled) {  
-  opacity: 0.88;  
-}  
-  
-.btnSubmit:disabled {  
-  opacity: 0.55;  
-  cursor: not-allowed;  
-}  
-  
-.successBanner {  
-  display: flex;  
-  align-items: center;  
-  padding: 20px 28px;  
-  background: color-mix(in srgb, var(--primary-color) 12%, transparent);  
-  border: 1.5px solid var(--primary-color);  
-  border-radius: 12px;  
-  font-size: 17px;  
-  font-weight: 600;  
-  color: var(--primary-color);  
-}  
-  
-.successBanner > * + * {  
-  margin-left: 12px;  
-}  
-  
-.successIcon {  
-  font-size: 22px;  
-}  
-  
-@media (max-width: 1024px) {  
-  .page {  
-    padding: 24px;  
-  }  
-  
-  .page > * + * {  
-    margin-top: 24px;  
-  }  
-  
-  .formCard {  
-    padding: 28px 24px;  
-  }  
-  
-  .formCard > * + * {  
-    margin-top: 24px;  
-  }  
-  
-  .formGrid {  
-    gap: 16px;  
-  }  
-  
-  .trucGrid {  
-    gap: 20px;  
-  }  
-}  
-  
-@media (max-width: 768px) {  
-  .page {  
-    padding: 16px;  
-  }  
-  
-  .page > * + * {  
-    margin-top: 20px;  
-  }  
-  
-  .formCard {  
-    padding: 24px 20px;  
-  }  
-  
-  .formCard > * + * {  
-    margin-top: 24px;  
-  }  
-  
-  .formGrid {  
-    grid-template-columns: 1fr;  
-  }  
-  
-  .trucGrid {  
-    grid-template-columns: 1fr;  
-    gap: 20px;  
-  }  
-  
-  .btnSubmit {  
-    width: 100%;  
-    justify-content: center;  
-  }  
-  
-  .actions {  
-    justify-content: stretch;  
-  }  
-}  
-  
-@media (max-width: 480px) {  
-  .formCard {  
-    padding: 16px;  
-  }  
-  
-  .cardTitle {  
-    font-size: 18px;  
-  }  
-  
-  .personCard {  
-    padding: 14px 16px;  
-  }  
-  
-  .successBanner {  
-    padding: 14px 16px;  
-    font-size: 15px;  
-  }  
+.page {
+  height: calc(100vh - 112px);
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 0 32px;
+  overflow-y: auto;
+}
+
+.page > * + * {
+  margin-top: 24px;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0 20px;
+  flex-shrink: 0;
+  border-bottom: 1.5px solid var(--login-border);
+}
+
+.pageHeaderLeft {
+  display: flex;
+  align-items: center;
+  padding-left: 16px;
+  border-left: 4px solid var(--primary-color);
+}
+
+.pageTitle {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--login-text);
+  margin: 0;
+  letter-spacing: -0.4px;
+  line-height: 1.2;
+}
+
+.stackLayout {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.formPanel {
+  background: var(--dialog-bg);
+  border: 1px solid var(--login-border);
+  border-radius: 16px;
+  padding: 32px 40px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.previewPanel {
+  display: flex;
+  flex-direction: column;
+}
+
+.previewPanel > * + * {
+  margin-top: 12px;
+}
+
+.previewLabel {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--login-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.formGroup > * + * {
+  margin-top: 10px;
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--modal-label-text);
+}
+
+.required {
+  color: var(--dialog-danger-icon);
+}
+
+.input {
+  padding: 14px 18px;
+  border: 1px solid var(--modal-input-border);
+  border-radius: 8px;
+  font-size: 15px;
+  background: var(--modal-input-bg);
+  color: var(--modal-input-text);
+  transition: border-color 0.15s;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--modal-input-focus-border);
+  box-shadow: 0 0 0 2px var(--modal-input-focus-shadow);
+}
+
+.textarea {
+  height: 80px;
+  min-height: 80px;
+  resize: vertical;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.actions > * + * {
+  margin-left: 12px;
+}
+
+.btnSubmit {
+  display: flex;
+  align-items: center;
+  padding: 14px 40px;
+  border: none;
+  border-radius: 8px;
+  background: var(--primary-color);
+  color: var(--text-white);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.btnSubmit > * + * {
+  margin-left: 8px;
+}
+
+.btnSubmit:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.btnSubmit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.successBanner {
+  display: flex;
+  align-items: center;
+  padding: 20px 28px;
+  background: var(--primary-a12);
+  border-radius: 12px;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.successBanner > * + * {
+  margin-left: 12px;
+}
+
+.successIcon {
+  font-size: 22px;
+}
+
+@media (max-width: 1024px) {
+  .formPanel {
+    padding: 28px 24px;
+  }
+
+  .formGrid {
+    gap: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page {
+    height: auto;
+    overflow: visible;
+    padding: 16px;
+  }
+
+  .pageHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .formPanel {
+    padding: 24px 20px;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .btnSubmit {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .actions {
+    justify-content: stretch;
+  }
+}
+
+.passwordRow {
+  display: flex;
+  align-items: stretch;
+}
+
+.passwordRow > * + * {
+  margin-left: 10px;
+}
+
+.passwordRow > .input {
+  flex: 1;
+}
+
+.btnRandom {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 0 16px;
+  border: 1px solid var(--modal-input-border);
+  border-radius: 8px;
+  background: var(--modal-input-bg);
+  color: var(--login-text);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.btnRandom > * + * {
+  margin-left: 8px;
+}
+
+.btnRandom:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
 }
