@@ -1,18 +1,18 @@
-import React from "react";
 import { useState, useEffect, useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPenToSquare,
   faCheck,
   faXmark,
+  faDice,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./DutyShifts.module.css";
 import { dutyService } from "../../services/duty/dutyService";
 import { useToast } from "../../context/useToast";
 import type { CaTrucDetail, NguoiTrucWithCaTruc } from "../../types/duty";
 import CustomSelect from "../../components/ui/CustomSelect/CustomSelect";
-
 import SearchBar from "../../components/ui/SearchBar/SearchBar";
+import { generateMatKhau } from "../../utils/passwordGenerator";
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr + "T00:00:00").toLocaleDateString("vi-VN", {
@@ -114,6 +114,16 @@ export default function DutyShifts() {
     void load();
   }, [showError]);
 
+  // Đóng modal bằng phím Escape
+  useEffect(() => {
+    if (!editingId) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setEditingId(null);
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [editingId]);
+
   const filterPrefix = `${filterYear}-${String(filterMonthNum).padStart(2, "0")}`;
 
   const filteredList = useMemo(() => {
@@ -140,6 +150,8 @@ export default function DutyShifts() {
     value: p.idNguoitruc,
     label: `${p.capbacNguoitruc} ${p.tenNguoitruc} — ${p.chucvuNguoitruc}`,
   }));
+
+  const editingShift = shiftList.find((s) => s.idCatruc === editingId);
 
   const handleEdit = (shift: CaTrucDetail) => {
     setEditingId(shift.idCatruc);
@@ -209,12 +221,12 @@ export default function DutyShifts() {
           </div>
         </div>
 
-        <SearchBar  
-          value={filterSearch}  
-          onChange={setFilterSearch}  
-          placeholder="Tìm theo tên người trực..."  
+        <SearchBar
+          value={filterSearch}
+          onChange={setFilterSearch}
+          placeholder="Tìm theo tên người trực..."
         />
-        </div>
+      </div>
 
       <div className={styles.tableWrapper}>
         {loading ? (
@@ -237,187 +249,183 @@ export default function DutyShifts() {
             </thead>
             <tbody>
               {filteredList.map((shift) => (
-                <React.Fragment key={shift.idCatruc}>
-                  <tr
-                    className={
-                      editingId === shift.idCatruc
-                        ? styles.rowEditing
-                        : styles.row
-                    }
-                  >
-                    <td className={styles.dateCell}>
-                      {formatDate(shift.ngaytruc)}
-                    </td>
-                    <td>
-                      {shift.trucChiHuy ? (
-                        <div className={styles.personCell}>
-                          <span className={styles.personRank}>
-                            {shift.trucChiHuy.capbacNguoitruc}
-                          </span>
-                          <span className={styles.personName}>
-                            {shift.trucChiHuy.tenNguoitruc}
-                          </span>
-                          <span className={styles.personMeta}>
-                            {shift.trucChiHuy.chucvuNguoitruc}
-                          </span>
-                        </div>
-                      ) : (
-                        <span className={styles.empty}>—</span>
-                      )}
-                    </td>
-                    <td>
-                      {shift.trucBanTacChien ? (
-                        <div className={styles.personCell}>
-                          <span className={styles.personRank}>
-                            {shift.trucBanTacChien.capbacNguoitruc}
-                          </span>
-                          <span className={styles.personName}>
-                            {shift.trucBanTacChien.tenNguoitruc}
-                          </span>
-                          <span className={styles.personMeta}>
-                            {shift.trucBanTacChien.chucvuNguoitruc}
-                          </span>
-                        </div>
-                      ) : (
-                        <span className={styles.empty}>—</span>
-                      )}
-                    </td>
-                    <td className={styles.passwordCell}>
-                      <span className={styles.passwordValue}>
-                        {shift.matkhau || "—"}
-                      </span>
-                    </td>
-                    <td className={styles.noteCell}>
-                      {shift.ghichu || <span className={styles.noNote}>—</span>}
-                    </td>
-                    <td className={styles.actionCell}>
-                      <button
-                        type="button"
-                        className={
-                          editingId === shift.idCatruc
-                            ? styles.btnCancel
-                            : styles.btnEdit
-                        }
-                        onClick={() =>
-                          editingId === shift.idCatruc
-                            ? handleCancelEdit()
-                            : handleEdit(shift)
-                        }
-                      >
-                        <FontAwesomeIcon
-                          icon={
-                            editingId === shift.idCatruc
-                              ? faXmark
-                              : faPenToSquare
-                          }
-                        />
-                        {editingId === shift.idCatruc ? " Hủy" : " Sửa"}
-                      </button>
-                    </td>
-                  </tr>
-
-                  {editingId === shift.idCatruc && (
-                    <tr className={styles.editRow}>
-                      <td colSpan={6}>
-                        <div className={styles.editPanel}>
-                          <p className={styles.editPanelTitle}>
-                            Chỉnh sửa ca trực — {formatDate(shift.ngaytruc)}
-                          </p>
-                          <div className={styles.editGrid}>
-                            <div className={styles.editGroup}>
-                              <label className={styles.editLabel}>
-                                Trực chỉ huy
-                              </label>
-                              <CustomSelect
-                                options={chiHuyOptions}
-                                value={editForm.trucChiHuy}
-                                onChange={(v) =>
-                                  setEditForm((f) => ({
-                                    ...f,
-                                    trucChiHuy: v,
-                                  }))
-                                }
-                                placeholder="-- Chọn trực chỉ huy --"
-                              />
-                            </div>
-                            <div className={styles.editGroup}>
-                              <label className={styles.editLabel}>
-                                Trực ban tác chiến
-                              </label>
-                              <CustomSelect
-                                options={tacChienOptions}
-                                value={editForm.trucBanTacChien}
-                                onChange={(v) =>
-                                  setEditForm((f) => ({
-                                    ...f,
-                                    trucBanTacChien: v,
-                                  }))
-                                }
-                                placeholder="-- Chọn trực ban tác chiến --"
-                              />
-                            </div>
-                            <div className={styles.editGroup}>
-                              <label className={styles.editLabel}>
-                                Mật khẩu{" "}
-                                <span className={styles.required}>*</span>
-                              </label>
-                              <input
-                                className={styles.editInput}
-                                value={editForm.matkhau}
-                                onChange={(e) =>
-                                  setEditForm((f) => ({
-                                    ...f,
-                                    matkhau: e.target.value,
-                                  }))
-                                }
-                                placeholder="Nhập mật khẩu..."
-                              />
-                            </div>
-                            <div className={styles.editGroup}>
-                              <label className={styles.editLabel}>
-                                Ghi chú
-                              </label>
-                              <input
-                                className={styles.editInput}
-                                value={editForm.ghichu}
-                                onChange={(e) =>
-                                  setEditForm((f) => ({
-                                    ...f,
-                                    ghichu: e.target.value,
-                                  }))
-                                }
-                                placeholder="Nhập ghi chú..."
-                              />
-                            </div>
-                          </div>
-                          <div className={styles.editActions}>
-                            <button
-                              type="button"
-                              className={styles.btnCancelEdit}
-                              onClick={handleCancelEdit}
-                            >
-                              <FontAwesomeIcon icon={faXmark} /> Hủy
-                            </button>
-                            <button
-                              type="button"
-                              className={styles.btnSave}
-                              onClick={() => handleSave(shift.idCatruc)}
-                              disabled={saving}
-                            >
-                              <FontAwesomeIcon icon={faCheck} />
-                              {saving ? " Đang lưu..." : " Lưu thay đổi"}
-                            </button>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                </React.Fragment>
+                <tr
+                  key={shift.idCatruc}
+                  className={
+                    editingId === shift.idCatruc
+                      ? styles.rowEditing
+                      : styles.row
+                  }
+                >
+                  <td className={styles.dateCell}>
+                    {formatDate(shift.ngaytruc)}
+                  </td>
+                  <td>
+                    {shift.trucChiHuy ? (
+                      <div className={styles.personCell}>
+                        <span className={styles.personRank}>
+                          {shift.trucChiHuy.capbacNguoitruc}
+                        </span>
+                        <span className={styles.personName}>
+                          {shift.trucChiHuy.tenNguoitruc}
+                        </span>
+                        <span className={styles.personMeta}>
+                          {shift.trucChiHuy.chucvuNguoitruc}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className={styles.empty}>—</span>
+                    )}
+                  </td>
+                  <td>
+                    {shift.trucBanTacChien ? (
+                      <div className={styles.personCell}>
+                        <span className={styles.personRank}>
+                          {shift.trucBanTacChien.capbacNguoitruc}
+                        </span>
+                        <span className={styles.personName}>
+                          {shift.trucBanTacChien.tenNguoitruc}
+                        </span>
+                        <span className={styles.personMeta}>
+                          {shift.trucBanTacChien.chucvuNguoitruc}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className={styles.empty}>—</span>
+                    )}
+                  </td>
+                  <td className={styles.passwordCell}>
+                    <span className={styles.passwordValue}>
+                      {shift.matkhau || "—"}
+                    </span>
+                  </td>
+                  <td className={styles.noteCell}>
+                    {shift.ghichu || <span className={styles.noNote}>—</span>}
+                  </td>
+                  <td className={styles.actionCell}>
+                    <button
+                      type="button"
+                      className={styles.btnEdit}
+                      onClick={() => handleEdit(shift)}
+                    >
+                      <FontAwesomeIcon icon={faPenToSquare} />
+                      {" Sửa"}
+                    </button>
+                  </td>
+                </tr>
               ))}
             </tbody>
           </table>
         )}
       </div>
+
+      {editingId && (
+        <div className={styles.overlay} onClick={handleCancelEdit}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <p className={styles.modalTitle}>
+                Chỉnh sửa ca trực
+                {editingShift ? ` — ${formatDate(editingShift.ngaytruc)}` : ""}
+              </p>
+              <button
+                type="button"
+                className={styles.modalCloseBtn}
+                onClick={handleCancelEdit}
+                aria-label="Đóng"
+              >
+                <FontAwesomeIcon icon={faXmark} />
+              </button>
+            </div>
+
+            <div className={styles.modalBody}>
+              <div className={styles.editGrid}>
+                <div className={styles.editGroup}>
+                  <label className={styles.editLabel}>Trực chỉ huy</label>
+                  <CustomSelect
+                    options={chiHuyOptions}
+                    value={editForm.trucChiHuy}
+                    onChange={(v) =>
+                      setEditForm((f) => ({ ...f, trucChiHuy: v }))
+                    }
+                    placeholder="-- Chọn trực chỉ huy --"
+                  />
+                </div>
+                <div className={styles.editGroup}>
+                  <label className={styles.editLabel}>Trực ban tác chiến</label>
+                  <CustomSelect
+                    options={tacChienOptions}
+                    value={editForm.trucBanTacChien}
+                    onChange={(v) =>
+                      setEditForm((f) => ({ ...f, trucBanTacChien: v }))
+                    }
+                    placeholder="-- Chọn trực ban tác chiến --"
+                  />
+                </div>
+                <div className={styles.editGroup}>
+                  <label className={styles.editLabel}>
+                    Mật khẩu <span className={styles.required}>*</span>
+                  </label>
+                  <div className={styles.passwordRow}>
+                    <input
+                      className={styles.editInput}
+                      value={editForm.matkhau}
+                      onChange={(e) =>
+                        setEditForm((f) => ({ ...f, matkhau: e.target.value }))
+                      }
+                      placeholder="Nhập mật khẩu..."
+                    />
+                    <button
+                      type="button"
+                      className={styles.btnRandom}
+                      onClick={() =>
+                        setEditForm((f) => ({
+                          ...f,
+                          matkhau: generateMatKhau(),
+                        }))
+                      }
+                      title="Tạo mật khẩu ngẫu nhiên"
+                    >
+                      <FontAwesomeIcon icon={faDice} />
+                      {" Ngẫu nhiên"}
+                    </button>
+                  </div>
+                </div>
+                <div className={styles.editGroup}>
+                  <label className={styles.editLabel}>Ghi chú</label>
+                  <input
+                    className={styles.editInput}
+                    value={editForm.ghichu}
+                    onChange={(e) =>
+                      setEditForm((f) => ({ ...f, ghichu: e.target.value }))
+                    }
+                    placeholder="Nhập ghi chú..."
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.modalFooter}>
+              <button
+                type="button"
+                className={styles.btnCancelEdit}
+                onClick={handleCancelEdit}
+                disabled={saving}
+              >
+                <FontAwesomeIcon icon={faXmark} /> Hủy
+              </button>
+              <button
+                type="button"
+                className={styles.btnSave}
+                onClick={() => handleSave(editingId)}
+                disabled={saving}
+              >
+                <FontAwesomeIcon icon={faCheck} />
+                {saving ? " Đang lưu..." : " Lưu thay đổi"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
