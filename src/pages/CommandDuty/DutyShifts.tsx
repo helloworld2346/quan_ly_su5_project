@@ -14,14 +14,8 @@ import CustomSelect from "../../components/ui/CustomSelect/CustomSelect";
 import SearchBar from "../../components/ui/SearchBar/SearchBar";
 import { generateMatKhau } from "../../utils/passwordGenerator";
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr + "T00:00:00").toLocaleDateString("vi-VN", {
-    weekday: "long",
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-}
+import { formatDateLong as formatDate } from "../../utils/date";
+import { formatNguoiTrucLabel } from "../../utils/duty";
 
 const MONTHS = [
   "Tháng 1",
@@ -141,15 +135,23 @@ export default function DutyShifts() {
     });
   }, [shiftList, filterPrefix, filterSearch]);
 
-  const chiHuyOptions = chiHuyList.map((p) => ({
-    value: p.idNguoitruc,
-    label: `${p.capbacNguoitruc} ${p.tenNguoitruc} — ${p.chucvuNguoitruc}`,
-  }));
+  const chiHuyOptions = useMemo(
+    () =>
+      chiHuyList.map((p) => ({
+        value: p.idNguoitruc,
+        label: formatNguoiTrucLabel(p),
+      })),
+    [chiHuyList],
+  );
 
-  const tacChienOptions = tacChienList.map((p) => ({
-    value: p.idNguoitruc,
-    label: `${p.capbacNguoitruc} ${p.tenNguoitruc} — ${p.chucvuNguoitruc}`,
-  }));
+  const tacChienOptions = useMemo(
+    () =>
+      tacChienList.map((p) => ({
+        value: p.idNguoitruc,
+        label: formatNguoiTrucLabel(p),
+      })),
+    [tacChienList],
+  );
 
   const editingShift = shiftList.find((s) => s.idCatruc === editingId);
 

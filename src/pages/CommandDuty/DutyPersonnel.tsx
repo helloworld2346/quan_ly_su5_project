@@ -21,6 +21,8 @@ import type {
 import CustomSelect from "../../components/ui/CustomSelect/CustomSelect";
 import SearchBar from "../../components/ui/SearchBar/SearchBar";
 
+import { buildAllowedOptions } from "../../utils/duty";
+
 const CHI_HUY_CAP_BAC = ["Đại tá", "Thượng tá", "Trung tá"];
 const CHI_HUY_CHUC_VU = [
   "Sư đoàn trưởng",
@@ -242,33 +244,45 @@ export default function DutyPersonnel() {
     return () => document.removeEventListener("keydown", handleKey);
   }, [editingId, handleCancelEdit]);
 
-  const capBacOptions = useMemo(() => {
-    const allowed = dutyType === "chiHuy" ? CHI_HUY_CAP_BAC : TAC_CHIEN_CAP_BAC;
-    return allowed
-      .filter((name) => capBacList.some((c) => c.tenCapBac === name))
-      .map((name) => ({ value: name, label: name }));
-  }, [capBacList, dutyType]);
+  const capBacOptions = useMemo(
+    () =>
+      buildAllowedOptions(
+        dutyType === "chiHuy" ? CHI_HUY_CAP_BAC : TAC_CHIEN_CAP_BAC,
+        capBacList,
+        (c) => c.tenCapBac,
+      ),
+    [capBacList, dutyType],
+  );
 
-  const chucVuOptions = useMemo(() => {
-    const allowed = dutyType === "chiHuy" ? CHI_HUY_CHUC_VU : TAC_CHIEN_CHUC_VU;
-    return allowed
-      .filter((name) => chucVuList.some((c) => c.tenChucVu === name))
-      .map((name) => ({ value: name, label: name }));
-  }, [chucVuList, dutyType]);
+  const chucVuOptions = useMemo(
+    () =>
+      buildAllowedOptions(
+        dutyType === "chiHuy" ? CHI_HUY_CHUC_VU : TAC_CHIEN_CHUC_VU,
+        chucVuList,
+        (c) => c.tenChucVu,
+      ),
+    [chucVuList, dutyType],
+  );
 
-  const editCapBacOptions = useMemo(() => {
-    const allowed = editType === "chiHuy" ? CHI_HUY_CAP_BAC : TAC_CHIEN_CAP_BAC;
-    return allowed
-      .filter((name) => capBacList.some((c) => c.tenCapBac === name))
-      .map((name) => ({ value: name, label: name }));
-  }, [capBacList, editType]);
+  const editCapBacOptions = useMemo(
+    () =>
+      buildAllowedOptions(
+        editType === "chiHuy" ? CHI_HUY_CAP_BAC : TAC_CHIEN_CAP_BAC,
+        capBacList,
+        (c) => c.tenCapBac,
+      ),
+    [capBacList, editType],
+  );
 
-  const editChucVuOptions = useMemo(() => {
-    const allowed = editType === "chiHuy" ? CHI_HUY_CHUC_VU : TAC_CHIEN_CHUC_VU;
-    return allowed
-      .filter((name) => chucVuList.some((c) => c.tenChucVu === name))
-      .map((name) => ({ value: name, label: name }));
-  }, [chucVuList, editType]);
+  const editChucVuOptions = useMemo(
+    () =>
+      buildAllowedOptions(
+        editType === "chiHuy" ? CHI_HUY_CHUC_VU : TAC_CHIEN_CHUC_VU,
+        chucVuList,
+        (c) => c.tenChucVu,
+      ),
+    [chucVuList, editType],
+  );
 
   const filteredChiHuy = useMemo(() => {
     const q = search.trim().toLowerCase();

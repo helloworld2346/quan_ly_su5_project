@@ -9,6 +9,8 @@ import CustomSelect from "../../components/ui/CustomSelect/CustomSelect";
 import CaTrucInfoCard from "../../components/ui/CaTrucInfoCard/CaTrucInfoCard";
 import { generateMatKhau } from "../../utils/passwordGenerator";
 
+import { formatNguoiTrucLabel } from "../../utils/duty";
+
 function getToday(): string {
   const d = new Date();
   const y = d.getFullYear();
@@ -61,12 +63,12 @@ export default function CreateDutyShift() {
 
   const chiHuyOptions = chiHuyList.map((p) => ({
     value: p.idNguoitruc,
-    label: `${p.capbacNguoitruc} ${p.tenNguoitruc} — ${p.chucvuNguoitruc}`,
+    label: formatNguoiTrucLabel(p),
   }));
 
   const tacChienOptions = tacChienList.map((p) => ({
     value: p.idNguoitruc,
-    label: `${p.capbacNguoitruc} ${p.tenNguoitruc} — ${p.chucvuNguoitruc}`,
+    label: formatNguoiTrucLabel(p),
   }));
 
   const handleSubmit = async () => {
