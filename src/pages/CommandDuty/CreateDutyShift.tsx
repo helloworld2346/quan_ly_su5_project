@@ -89,6 +89,16 @@ export default function CreateDutyShift() {
 
     setSubmitting(true);
     try {
+      try {
+        const existing = await dutyService.getCaTrucByDate(ngayTruc);
+        if (existing.success && existing.Result) {
+          showError("Ngày này đã có ca trực, không thể tạo thêm");
+          return;
+        }
+      } catch {
+        // Nếu backend trả lỗi khi không tìm thấy (vd 404), bỏ qua và tiếp tục tạo
+      }
+
       const res = await dutyService.createCaTruc({
         ngaytruc: ngayTruc,
         matkhau: matKhau,
