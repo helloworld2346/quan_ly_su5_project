@@ -38,35 +38,38 @@ export default function CaTrucInfoCard({
           : ""}
       </div>
       <div className={styles.caTrucBody}>
-        <div className={styles.caTrucLeft}>
-          {[
-            { label: "Trực chỉ huy", data: trucChiHuy },
-            { label: "Trực ban tác chiến", data: trucBanTacChien },
-          ].map(({ label, data }) => (
-            <div key={label} className={styles.caTrucCard}>
-              <span className={styles.caTrucRole}>{label}</span>
-              {data ? (
-                <div className={styles.caTrucCardBody}>
-                  <div className={styles.caTrucPersonName}>
-                    {data.capbacNguoitruc} - {data.tenNguoitruc}
-                  </div>
-                  <div className={styles.caTrucPersonMeta}>
-                    {data.chucvuNguoitruc}
-                  </div>
-                  {data.sodienthoai && (
-                    <a className={styles.caTrucPhone}>{data.sodienthoai}</a>
-                  )}
+        {[
+          { label: "Trực chỉ huy", data: trucChiHuy },
+          { label: "Trực ban tác chiến", data: trucBanTacChien },
+        ].map(({ label, data }) => (
+          <div key={label} className={styles.caTrucCard}>
+            <span className={styles.caTrucRole}>{label}</span>
+            {data ? (
+              <div className={styles.caTrucCardBody}>
+                <div
+                  className={styles.caTrucPersonName}
+                  title={`${data.capbacNguoitruc} - ${data.tenNguoitruc}`}
+                >
+                  {data.capbacNguoitruc} - {data.tenNguoitruc}
                 </div>
-              ) : (
-                <div className={styles.caTrucEmpty}>Chưa có thông tin</div>
-              )}
-            </div>
-          ))}
-        </div>
+                <div className={styles.caTrucPersonMeta}>
+                  {data.chucvuNguoitruc}
+                </div>
+                {data.sodienthoai && (
+                  <a className={styles.caTrucPhone}>{data.sodienthoai}</a>
+                )}
+              </div>
+            ) : (
+              <div className={styles.caTrucEmpty}>Chưa có thông tin</div>
+            )}
+          </div>
+        ))}
         <div className={styles.caTrucRight}>
           <div className={styles.caTrucMatKhauLabel}>Mật Khẩu</div>
           <div className={styles.caTrucHoiDap}>Hỏi - Đáp</div>
-          <div className={styles.caTrucMatKhau}>{matkhau || "—"}</div>
+          <div className={styles.caTrucMatKhau} title={matkhau || undefined}>
+            {matkhau || "—"}
+          </div>
         </div>
       </div>
       {ghichu && (

@@ -1,15 +1,13 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCheck,
-  faPlus,
-} from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faPlus, faDice } from "@fortawesome/free-solid-svg-icons";
 import styles from "./CreateDutyShift.module.css";
 import { dutyService } from "../../services/duty/dutyService";
 import { useToast } from "../../context/useToast";
 import type { NguoiTrucWithCaTruc, CaTrucDetail } from "../../types/duty";
 import CustomSelect from "../../components/ui/CustomSelect/CustomSelect";
-import CaTrucInfoCard from "../../components/ui/CaTrucInfoCard/CaTrucInfoCard";  
+import CaTrucInfoCard from "../../components/ui/CaTrucInfoCard/CaTrucInfoCard";
+import { generateMatKhau } from "../../utils/passwordGenerator";
 
 function getToday(): string {
   const d = new Date();
@@ -149,120 +147,112 @@ export default function CreateDutyShift() {
 
   return (
     <section className={styles.page}>
-      <div className={styles.formCard}>
-        <h2 className={styles.cardTitle}>Tạo ca trực</h2>
+      <div className={styles.pageHeader}>
+        <div className={styles.pageHeaderLeft}>
+          <h1 className={styles.pageTitle}>Tạo ca trực</h1>
+        </div>
+      </div>
 
-        <div className={styles.formGrid}>
-          <div className={styles.formGroup}>
-            <label className={styles.label}>
-              Ngày trực <span className={styles.required}>*</span>
-            </label>
-            <input
-              type="date"
-              className={styles.input}
-              value={ngayTruc}
-              min={today}
-              onChange={(e) => setNgayTruc(e.target.value)}
-            />
+      <div className={styles.stackLayout}>
+        <div className={styles.formPanel}>
+          <div className={styles.formGrid}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>
+                Ngày trực <span className={styles.required}>*</span>
+              </label>
+              <input
+                type="date"
+                className={styles.input}
+                value={ngayTruc}
+                min={today}
+                onChange={(e) => setNgayTruc(e.target.value)}
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>
+                Mật khẩu <span className={styles.required}>*</span>
+              </label>
+              <div className={styles.passwordRow}>
+                <input
+                  className={styles.input}
+                  value={matKhau}
+                  onChange={(e) => setMatKhau(e.target.value)}
+                  placeholder="Nhập mật khẩu ca trực..."
+                />
+                <button
+                  type="button"
+                  className={styles.btnRandom}
+                  onClick={() => setMatKhau(generateMatKhau())}
+                  title="Tạo mật khẩu ngẫu nhiên"
+                >
+                  <FontAwesomeIcon icon={faDice} />
+                  Ngẫu nhiên
+                </button>
+              </div>
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>
+                Trực chỉ huy <span className={styles.required}>*</span>
+              </label>
+              <CustomSelect
+                options={chiHuyOptions}
+                value={selectedChiHuyId}
+                onChange={setSelectedChiHuyId}
+                placeholder={
+                  loadingPersonnel ? "Đang tải..." : "-- Chọn trực chỉ huy --"
+                }
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>
+                Trực ban tác chiến <span className={styles.required}>*</span>
+              </label>
+              <CustomSelect
+                options={tacChienOptions}
+                value={selectedTacChienId}
+                onChange={setSelectedTacChienId}
+                placeholder={
+                  loadingPersonnel
+                    ? "Đang tải..."
+                    : "-- Chọn trực ban tác chiến --"
+                }
+              />
+            </div>
+            <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+              <label className={styles.label}>Ghi chú</label>
+              <textarea
+                className={`${styles.input} ${styles.textarea}`}
+                value={ghiChu}
+                onChange={(e) => setGhiChu(e.target.value)}
+                placeholder="Nhập ghi chú..."
+                rows={2}
+              />
+            </div>
           </div>
-          <div className={styles.formGroup}>
-            <label className={styles.label}>
-              Mật khẩu <span className={styles.required}>*</span>
-            </label>
-            <input
-              className={styles.input}
-              value={matKhau}
-              onChange={(e) => setMatKhau(e.target.value)}
-              placeholder="Nhập mật khẩu ca trực..."
-            />
-          </div>
-          <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-            <label className={styles.label}>Ghi chú</label>
-            <textarea
-              className={`${styles.input} ${styles.textarea}`}
-              value={ghiChu}
-              onChange={(e) => setGhiChu(e.target.value)}
-              placeholder="Nhập ghi chú..."
-              rows={2}
-            />
+
+          <div className={styles.actions}>
+            <button
+              type="button"
+              className={styles.btnSubmit}
+              onClick={handleSubmit}
+              disabled={submitting}
+            >
+              {submitting ? "Đang tạo..." : "Tạo ca trực"}
+              {!submitting && <FontAwesomeIcon icon={faCheck} />}
+            </button>
           </div>
         </div>
 
-        <div className={styles.trucGrid}>
-          <div className={styles.trucColumn}>
-            <div className={styles.trucColumnHeader}>
-              <span className={styles.trucColumnLabel}>Trực chỉ huy</span>
-            </div>
-            <CustomSelect
-              options={chiHuyOptions}
-              value={selectedChiHuyId}
-              onChange={setSelectedChiHuyId}
-              placeholder={
-                loadingPersonnel ? "Đang tải..." : "-- Chọn trực chỉ huy --"
-              }
-            />
-            {selectedChiHuy && (
-              <div className={styles.personCard}>
-                <span className={styles.personRole}>Trực chỉ huy</span>
-                <div className={styles.personName}>
-                  {selectedChiHuy.capbacNguoitruc} {selectedChiHuy.tenNguoitruc}
-                </div>
-                <div className={styles.personMeta}>
-                  {selectedChiHuy.chucvuNguoitruc}
-                </div>
-                {selectedChiHuy.sodienthoai && (
-                  <a className={styles.personPhone}>
-                    {selectedChiHuy.sodienthoai}
-                  </a>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className={styles.trucColumn}>
-            <div className={styles.trucColumnHeader}>
-              <span className={styles.trucColumnLabel}>Trực ban tác chiến</span>
-            </div>
-            <CustomSelect
-              options={tacChienOptions}
-              value={selectedTacChienId}
-              onChange={setSelectedTacChienId}
-              placeholder={
-                loadingPersonnel
-                  ? "Đang tải..."
-                  : "-- Chọn trực ban tác chiến --"
-              }
-            />
-            {selectedTacChien && (
-              <div className={styles.personCard}>
-                <span className={styles.personRole}>Trực ban tác chiến</span>
-                <div className={styles.personName}>
-                  {selectedTacChien.capbacNguoitruc}{" "}
-                  {selectedTacChien.tenNguoitruc}
-                </div>
-                <div className={styles.personMeta}>
-                  {selectedTacChien.chucvuNguoitruc}
-                </div>
-                {selectedTacChien.sodienthoai && (
-                  <a className={styles.personPhone}>
-                    {selectedTacChien.sodienthoai}
-                  </a>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className={styles.actions}>
-          <button
-            type="button"
-            className={styles.btnSubmit}
-            onClick={handleSubmit}
-            disabled={submitting}
-          >
-            {submitting ? "Đang tạo..." : "Tạo ca trực"}
-            {!submitting && <FontAwesomeIcon icon={faCheck} />}
-          </button>
+        {/* DÒNG 2: Live preview */}
+        <div className={styles.previewPanel}>
+          <span className={styles.previewLabel}>Xem trước</span>
+          <CaTrucInfoCard
+            ngaytruc={ngayTruc}
+            matkhau={matKhau}
+            ghichu={ghiChu || undefined}
+            trucChiHuy={selectedChiHuy ?? undefined}
+            trucBanTacChien={selectedTacChien ?? undefined}
+          />
         </div>
       </div>
     </section>
