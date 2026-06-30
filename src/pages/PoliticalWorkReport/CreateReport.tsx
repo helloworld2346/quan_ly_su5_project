@@ -1,23 +1,16 @@
 import { useState, useEffect, useRef } from "react";
-import "./CreateReport.css";
-
-interface PoliticalWorkRow {
-  id: string;
-  status: string;
-  unit: string;
-  activities: string[];
-  result: string;
-  hasIncident: boolean;
-  hasProposal: boolean;
-  reporter: string;
-  reportCTD: string;
-}
+import styles from "./CreateReport.module.css";
+import type {
+  PoliticalWorkRow,
+  PoliticalWorkRequest,
+} from "../../types/politicalWork";
 
 interface CreateReportProps {
   open: boolean;
   onClose: () => void;
-  onSubmit?: (data: ReportFormData) => void;
+  onSubmit?: (data: PoliticalWorkRequest) => void;
   initialData: PoliticalWorkRow | null;
+  maDonViCurrent: string;
 }
 
 interface ReportFormData {
@@ -42,8 +35,14 @@ const MAX_INCIDENT = 1000;
 const MAX_PROPOSAL = 1000;
 
 const RANK_OPTIONS = [
-  "Thiếu úy", "Trung úy", "Thượng úy", "Đại úy", 
-  "Thiếu tá", "Trung tá", "Thượng tá", "Đại tá"
+  "Thiếu úy",
+  "Trung úy",
+  "Thượng úy",
+  "Đại úy",
+  "Thiếu tá",
+  "Trung tá",
+  "Thượng tá",
+  "Đại tá",
 ];
 
 const DEFAULT_FORM_DATA: ReportFormData = {
@@ -62,44 +61,42 @@ const DEFAULT_FORM_DATA: ReportFormData = {
   proposal: "",
 };
 
-export default function CreateReport({ open, onClose, onSubmit, initialData }: CreateReportProps) {
-  const [formData, setFormData] = useState<ReportFormData>(DEFAULT_FORM_DATA);
-  
-  // State quản lý việc đóng mở dropdown tùy biến
+export default function CreateReport({
+  open,
+  onClose,
+  onSubmit,
+  initialData,
+  maDonViCurrent,
+}: CreateReportProps) {
+
   const [reporterDropdownOpen, setReporterDropdownOpen] = useState(false);
   const [ctdDropdownOpen, setCtdDropdownOpen] = useState(false);
 
   const reporterRef = useRef<HTMLDivElement>(null);
   const ctdRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (open) {
-      if (initialData) {
-        setFormData({
-          reporterName: initialData.reporter || "",
-          reporterRank: "Thượng úy", 
-          reporterPosition: "Trực ban",
-          reporterPhone: "",
-          ctdName: initialData.reportCTD || "",
-          ctdRank: "Đại úy", 
-          ctdPosition: "Trực CTĐ, CTCT",
-          ctdPhone: "",
-          activity: initialData.activities ? initialData.activities.join("\n") : "",
-          result: initialData.result || "",
-          hasIncident: initialData.hasIncident || false,
-          incidentContent: initialData.hasIncident ? "Phát sinh vụ việc đột xuất cần xử lý" : "",
-          proposal: initialData.hasProposal ? "Kiến nghị đề xuất từ đơn vị" : "",
-        });
-      } else {
-        setFormData(DEFAULT_FORM_DATA);
-      }
+  const [formData, setFormData] = useState<ReportFormData>(() => {
+    if (initialData) {
+      return {
+        ...DEFAULT_FORM_DATA,
+        reporterName: initialData.trucBanNoiVu || "",
+        ctdName: initialData.trucBanCtDangCt || "",
+        activity: initialData.tinhHinh || "",
+        result: initialData.ketQua || "",
+        hasIncident: Boolean(initialData.noiDungDotXuat),
+        incidentContent: initialData.noiDungDotXuat || "",
+        proposal: initialData.kienNghi || "",
+      };
     }
-  }, [initialData, open]);
+    return DEFAULT_FORM_DATA;
+  });
 
-  // Click ra ngoài để đóng dropdown
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (reporterRef.current && !reporterRef.current.contains(event.target as Node)) {
+      if (
+        reporterRef.current &&
+        !reporterRef.current.contains(event.target as Node)
+      ) {
         setReporterDropdownOpen(false);
       }
       if (ctdRef.current && !ctdRef.current.contains(event.target as Node)) {
@@ -110,36 +107,59 @@ export default function CreateReport({ open, onClose, onSubmit, initialData }: C
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleChange = (field: keyof ReportFormData, value: string | boolean) => {
+  const handleChange = (
+    field: keyof ReportFormData,
+    value: string | boolean,
+  ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  // Khôi phục hàm handleSubmit xử lý dữ liệu và kích hoạt onSubmit nhận từ props
   const handleSubmit = () => {
-    onSubmit?.(formData);
+    const payload: PoliticalWorkRequest = {
+      tinhHinh: formData.activity,
+      noiDungDotXuat: formData.hasIncident ? formData.incidentContent : "",
+      ketQua: formData.result,
+      trucBanNoiVu: formData.reporterName,
+      trucBanCtDangCt: formData.ctdName,
+      kienNghi: formData.proposal,
+      donVi: maDonViCurrent,
+    };
+    onSubmit?.(payload);
   };
 
   if (!open) return null;
 
   return (
-    <div className="report-modal-overlay">
-      <div className="report-modal">
-        
-        <div className="report-header">
-          <h2 className="report-header-title">
-            {initialData ? "Cập nhật báo cáo hoạt động" : "Tạo báo cáo hoạt động CTĐ,CTCT"}
+    <div className={styles["report-modal-overlay"]}>
+      <div className={styles["report-modal"]}>
+        <div className={styles["report-header"]}>
+          <h2 className={styles["report-header-title"]}>
+            {initialData
+              ? "Cập nhật báo cáo hoạt động"
+              : "Tạo báo cáo hoạt động CTĐ,CTCT"}
           </h2>
-          <button className="report-close-btn" onClick={onClose} aria-label="Đóng">✕</button>
+          <button
+            className={styles["report-close-btn"]}
+            onClick={onClose}
+            aria-label="Đóng"
+          >
+            ✕
+          </button>
         </div>
 
-        <div className="report-body">
-          
+        <div className={styles["report-body"]}>
           {/* TRỰC BAN NỘI VỤ */}
-          <section className="report-section">
-            <h3 className="section-title section-title--green">Trực ban nội vụ</h3>
-            <div className="report-grid-4col">
-              <div className="form-group">
-                <label>Họ và tên <span className="required-mark">*</span></label>
+          <section className={styles["report-section"]}>
+            <h3
+              className={`${styles["section-title"]} ${styles["section-title--green"]}`}
+            >
+              Trực ban nội vụ
+            </h3>
+            <div className={styles["report-grid-4col"]}>
+              <div className={styles["form-group"]}>
+                <label>
+                  Họ và tên <span className={styles["required-mark"]}>*</span>
+                </label>
                 <input
                   type="text"
                   placeholder="Nhập họ và tên..."
@@ -148,22 +168,23 @@ export default function CreateReport({ open, onClose, onSubmit, initialData }: C
                 />
               </div>
 
-              {/* Custom Dropdown Cấp bậc 1 */}
-              <div className="form-group" ref={reporterRef}>
-                <label>Cấp bậc <span className="required-mark">*</span></label>
-                <div 
-                  className={`custom-select-trigger ${reporterDropdownOpen ? "open" : ""} ${!formData.reporterRank ? "is-placeholder" : ""}`}
+              <div className={styles["form-group"]} ref={reporterRef}>
+                <label>
+                  Cấp bậc <span className={styles["required-mark"]}>*</span>
+                </label>
+                <div
+                  className={`${styles["custom-select-trigger"]} ${reporterDropdownOpen ? styles.open : ""} ${!formData.reporterRank ? styles["is-placeholder"] : ""}`}
                   onClick={() => setReporterDropdownOpen(!reporterDropdownOpen)}
                 >
                   <span>{formData.reporterRank || "Chọn cấp bậc"}</span>
-                  <span className="arrow-icon"></span>
+                  <span className={styles["arrow-icon"]}></span>
                 </div>
                 {reporterDropdownOpen && (
-                  <div className="custom-options-wrapper">
+                  <div className={styles["custom-options-wrapper"]}>
                     {RANK_OPTIONS.map((rank) => (
-                      <div 
-                        key={rank} 
-                        className={`custom-option ${formData.reporterRank === rank ? "selected" : ""}`}
+                      <div
+                        key={rank}
+                        className={`${styles["custom-option"]} ${formData.reporterRank === rank ? styles.selected : ""}`}
                         onClick={() => {
                           handleChange("reporterRank", rank);
                           setReporterDropdownOpen(false);
@@ -176,33 +197,45 @@ export default function CreateReport({ open, onClose, onSubmit, initialData }: C
                 )}
               </div>
 
-              <div className="form-group">
-                <label>Chức vụ <span className="required-mark">*</span></label>
+              <div className={styles["form-group"]}>
+                <label>
+                  Chức vụ <span className={styles["required-mark"]}>*</span>
+                </label>
                 <input
                   type="text"
                   placeholder="Nhập chức vụ..."
                   value={formData.reporterPosition}
-                  onChange={(e) => handleChange("reporterPosition", e.target.value)}
+                  onChange={(e) =>
+                    handleChange("reporterPosition", e.target.value)
+                  }
                 />
               </div>
-              <div className="form-group">
+              <div className={styles["form-group"]}>
                 <label>Số điện thoại</label>
                 <input
                   type="text"
                   placeholder="Nhập số điện thoại..."
                   value={formData.reporterPhone}
-                  onChange={(e) => handleChange("reporterPhone", e.target.value)}
+                  onChange={(e) =>
+                    handleChange("reporterPhone", e.target.value)
+                  }
                 />
               </div>
             </div>
           </section>
 
           {/* TRỰC CÔNG TÁC ĐẢNG, CÔNG TÁC CHÍNH TRỊ */}
-          <section className="report-section">
-            <h3 className="section-title section-title--green">Trực công tác đảng, công tác chính trị</h3>
-            <div className="report-grid-4col">
-              <div className="form-group">
-                <label>Họ và tên <span className="required-mark">*</span></label>
+          <section className={styles["report-section"]}>
+            <h3
+              className={`${styles["section-title"]} ${styles["section-title--green"]}`}
+            >
+              Trực công tác đảng, công tác chính trị
+            </h3>
+            <div className={styles["report-grid-4col"]}>
+              <div className={styles["form-group"]}>
+                <label>
+                  Họ và tên <span className={styles["required-mark"]}>*</span>
+                </label>
                 <input
                   type="text"
                   placeholder="Nhập họ và tên..."
@@ -211,22 +244,23 @@ export default function CreateReport({ open, onClose, onSubmit, initialData }: C
                 />
               </div>
 
-              {/* Custom Dropdown Cấp bậc 2 */}
-              <div className="form-group" ref={ctdRef}>
-                <label>Cấp bậc <span className="required-mark">*</span></label>
-                <div 
-                  className={`custom-select-trigger ${ctdDropdownOpen ? "open" : ""} ${!formData.ctdRank ? "is-placeholder" : ""}`}
+              <div className={styles["form-group"]} ref={ctdRef}>
+                <label>
+                  Cấp bậc <span className={styles["required-mark"]}>*</span>
+                </label>
+                <div
+                  className={`${styles["custom-select-trigger"]} ${ctdDropdownOpen ? styles.open : ""} ${!formData.ctdRank ? styles["is-placeholder"] : ""}`}
                   onClick={() => setCtdDropdownOpen(!ctdDropdownOpen)}
                 >
                   <span>{formData.ctdRank || "Chọn cấp bậc"}</span>
-                  <span className="arrow-icon"></span>
+                  <span className={styles["arrow-icon"]}></span>
                 </div>
                 {ctdDropdownOpen && (
-                  <div className="custom-options-wrapper">
+                  <div className={styles["custom-options-wrapper"]}>
                     {RANK_OPTIONS.map((rank) => (
-                      <div 
-                        key={rank} 
-                        className={`custom-option ${formData.ctdRank === rank ? "selected" : ""}`}
+                      <div
+                        key={rank}
+                        className={`${styles["custom-option"]} ${formData.ctdRank === rank ? styles.selected : ""}`}
                         onClick={() => {
                           handleChange("ctdRank", rank);
                           setCtdDropdownOpen(false);
@@ -239,8 +273,10 @@ export default function CreateReport({ open, onClose, onSubmit, initialData }: C
                 )}
               </div>
 
-              <div className="form-group">
-                <label>Chức vụ <span className="required-mark">*</span></label>
+              <div className={styles["form-group"]}>
+                <label>
+                  Chức vụ <span className={styles["required-mark"]}>*</span>
+                </label>
                 <input
                   type="text"
                   placeholder="Nhập chức vụ..."
@@ -248,7 +284,7 @@ export default function CreateReport({ open, onClose, onSubmit, initialData }: C
                   onChange={(e) => handleChange("ctdPosition", e.target.value)}
                 />
               </div>
-              <div className="form-group">
+              <div className={styles["form-group"]}>
                 <label>Số điện thoại</label>
                 <input
                   type="text"
@@ -261,11 +297,12 @@ export default function CreateReport({ open, onClose, onSubmit, initialData }: C
           </section>
 
           {/* TÌNH HÌNH HOẠT ĐỘNG TRONG NGÀY */}
-          <section className="report-section">
-            <h3 className="section-title">
-              Tình hình hoạt động CTĐ, CTCT trong ngày <span className="required-mark">*</span>
+          <section className={styles["report-section"]}>
+            <h3 className={styles["section-title"]}>
+              Tình hình hoạt động CTĐ, CTCT trong ngày{" "}
+              <span className={styles["required-mark"]}>*</span>
             </h3>
-            <div className="form-group">
+            <div className={styles["form-group"]}>
               <textarea
                 rows={5}
                 maxLength={MAX_ACTIVITY}
@@ -273,14 +310,18 @@ export default function CreateReport({ open, onClose, onSubmit, initialData }: C
                 value={formData.activity}
                 onChange={(e) => handleChange("activity", e.target.value)}
               />
-              <div className="textarea-counter">{formData.activity.length}/{MAX_ACTIVITY}</div>
+              <div className={styles["textarea-counter"]}>
+                {formData.activity.length}/{MAX_ACTIVITY}
+              </div>
             </div>
           </section>
 
-          {/* KẾT QUẢ ĐẠT ĐƯỢC */}
-          <section className="report-section">
-            <h3 className="section-title">Kết quả <span className="required-mark">*</span></h3>
-            <div className="form-group">
+          {/* KẾT QUẢ */}
+          <section className={styles["report-section"]}>
+            <h3 className={styles["section-title"]}>
+              Kết quả <span className={styles["required-mark"]}>*</span>
+            </h3>
+            <div className={styles["form-group"]}>
               <textarea
                 rows={4}
                 maxLength={MAX_RESULT}
@@ -288,15 +329,19 @@ export default function CreateReport({ open, onClose, onSubmit, initialData }: C
                 value={formData.result}
                 onChange={(e) => handleChange("result", e.target.value)}
               />
-              <div className="textarea-counter">{formData.result.length}/{MAX_RESULT}</div>
+              <div className={styles["textarea-counter"]}>
+                {formData.result.length}/{MAX_RESULT}
+              </div>
             </div>
           </section>
 
           {/* VỤ VIỆC ĐỘT XUẤT */}
-          <section className="report-section">
-            <h3 className="section-title">Những vụ việc đột xuất xảy ra trong ngày</h3>
-            <div className="radio-group">
-              <label className="radio-item">
+          <section className={styles["report-section"]}>
+            <h3 className={styles["section-title"]}>
+              Những vụ việc đột xuất xảy ra trong ngày
+            </h3>
+            <div className={styles["radio-group"]}>
+              <label className={styles["radio-item"]}>
                 <input
                   type="radio"
                   name="incident"
@@ -305,7 +350,7 @@ export default function CreateReport({ open, onClose, onSubmit, initialData }: C
                 />
                 <span>Không có</span>
               </label>
-              <label className="radio-item">
+              <label className={styles["radio-item"]}>
                 <input
                   type="radio"
                   name="incident"
@@ -317,24 +362,30 @@ export default function CreateReport({ open, onClose, onSubmit, initialData }: C
             </div>
 
             {formData.hasIncident && (
-              <div className="incident-box">
-                <label className="incident-label">Nội dung vụ việc đột xuất</label>
+              <div className={styles["incident-box"]}>
+                <label className={styles["incident-label"]}>
+                  Nội dung vụ việc đột xuất
+                </label>
                 <textarea
                   rows={4}
                   maxLength={MAX_INCIDENT}
                   placeholder="Nhập nội dung chi tiết các vụ việc đột xuất xảy ra..."
                   value={formData.incidentContent}
-                  onChange={(e) => handleChange("incidentContent", e.target.value)}
+                  onChange={(e) =>
+                    handleChange("incidentContent", e.target.value)
+                  }
                 />
-                <div className="textarea-counter">{formData.incidentContent.length}/{MAX_INCIDENT}</div>
+                <div className={styles["textarea-counter"]}>
+                  {formData.incidentContent.length}/{MAX_INCIDENT}
+                </div>
               </div>
             )}
           </section>
 
           {/* KIẾN NGHỊ ĐỀ XUẤT */}
-          <section className="report-section">
-            <h3 className="section-title">Kiến nghị, đề xuất</h3>
-            <div className="form-group">
+          <section className={styles["report-section"]}>
+            <h3 className={styles["section-title"]}>Kiến nghị, đề xuất</h3>
+            <div className={styles["form-group"]}>
               <textarea
                 rows={4}
                 maxLength={MAX_PROPOSAL}
@@ -342,16 +393,26 @@ export default function CreateReport({ open, onClose, onSubmit, initialData }: C
                 value={formData.proposal}
                 onChange={(e) => handleChange("proposal", e.target.value)}
               />
-              <div className="textarea-counter">{formData.proposal.length}/{MAX_PROPOSAL}</div>
+              <div className={styles["textarea-counter"]}>
+                {formData.proposal.length}/{MAX_PROPOSAL}
+              </div>
             </div>
           </section>
         </div>
 
-        <div className="report-footer">
-          <button type="button" className="btn-outline btn-cancel" onClick={onClose}>
+        <div className={styles["report-footer"]}>
+          <button
+            type="button"
+            className={`${styles["btn-outline"]} ${styles["btn-cancel"]}`}
+            onClick={onClose}
+          >
             <span>Hủy bỏ</span>
           </button>
-          <button type="button" className="btn-primary" onClick={handleSubmit}>
+          <button
+            type="button"
+            className={styles["btn-primary"]}
+            onClick={handleSubmit}
+          >
             <span>Lưu báo cáo</span>
           </button>
         </div>

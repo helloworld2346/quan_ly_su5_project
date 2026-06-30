@@ -18,9 +18,9 @@
   transition: left 0.2s ease, width 0.2s ease;
 }
 
-body:has([class*="collapsed"]) .report-modal-overlay {
-  left: var(--sidebar-collapsed-width, 88px);
-  width: calc(100vw - var(--sidebar-collapsed-width, 88px));
+:global(body):has([class*="collapsed"]) .report-modal-overlay {  
+  left: var(--sidebar-collapsed-width, 88px);  
+  width: calc(100vw - var(--sidebar-collapsed-width, 88px));  
 }
 
 .report-modal {
