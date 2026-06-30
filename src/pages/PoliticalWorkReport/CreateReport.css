@@ -1,11 +1,13 @@
-
+/* ==========================================================================
+   OVERLAY & MODAL CONTAINER
+   ========================================================================== */
 .report-modal-overlay {
   position: fixed;
   top: 0;
   left: var(--sidebar-width, 280px);
   width: calc(100vw - var(--sidebar-width, 280px));
   height: 100vh;
-  background: var(--modal-overlay-bg, rgba(15, 23, 42, 0.6));
+  background: rgba(15, 23, 42, 0.45);
   backdrop-filter: blur(3px);
   display: flex;
   justify-content: center;
@@ -25,28 +27,29 @@ body:has([class*="collapsed"]) .report-modal-overlay {
   width: 95%;
   max-width: 1240px;
   max-height: 92vh;
-  background: var(--modal-bg, #ffffff);
+  background: var(--surface-card, #ffffff);
   border-radius: 12px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25);
-  border: 1px solid var(--modal-border, #e2e8f0);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.18);
 }
 
+/* ==========================================================================
+   HEADER SECTION
+   ========================================================================== */
 .report-header {
   background: var(--primary-color, #1f5c3f);
-  padding: 14px 20px;
+  padding: 16px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .report-header-title {
   color: var(--text-white, #ffffff);
   margin: 0;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -60,31 +63,30 @@ body:has([class*="collapsed"]) .report-modal-overlay {
   justify-content: center;
   background: rgba(255, 255, 255, 0.15);
   border: none;
-  border-radius: 50%;
+  border-radius: 6px;
   color: var(--text-white, #ffffff);
+  font-size: 13px;
   cursor: pointer;
-  padding: 0;
-  transition: background 0.2s ease, transform 0.1s ease;
+  transition: background 0.2s ease;
 }
 
 .report-close-btn:hover {
   background: rgba(255, 255, 255, 0.28);
 }
 
-.report-close-btn:active {
-  transform: scale(0.92);
-}
-
+/* ==========================================================================
+   BODY & WORK SECTIONS
+   ========================================================================== */
 .report-body {
   padding: 24px;
   overflow-y: auto;
   flex: 1;
-  background: var(--modal-section-bg, #f8fafc); 
+  background: var(--body-bg, #f8fafc);
 }
 
 .report-section {
-  background: var(--modal-card-bg, #f8fafc); 
-  border: 1px solid var(--modal-card-border, #e2e8f0); 
+  background: var(--surface-card, #ffffff);
+  border: 1px solid var(--border-color, #cbd5e1);
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 20px;
@@ -95,12 +97,12 @@ body:has([class*="collapsed"]) .report-modal-overlay {
   margin-bottom: 14px;
   font-size: 14px;
   font-weight: 700;
-  color: var(--modal-card-title, #334155); 
+  color: var(--text-dark, #1d1d1d);
 }
 
 .section-title--green {
   color: var(--primary-color, #1f5c3f);
-  border-bottom: 1px solid var(--modal-card-border, #e2e8f0);
+  border-bottom: 1px solid var(--border-color, #edf2f7);
   padding-bottom: 8px;
   text-transform: uppercase;
   font-size: 13px;
@@ -113,6 +115,9 @@ body:has([class*="collapsed"]) .report-modal-overlay {
   margin-top: 12px;
 }
 
+/* ==========================================================================
+   FORM CONTROLS & PLACEHOLDER UNIFICATION (Đồng bộ font chữ)
+   ========================================================================== */
 .form-group {
   position: relative;
   display: flex;
@@ -122,7 +127,7 @@ body:has([class*="collapsed"]) .report-modal-overlay {
 .form-group label {
   display: block;
   margin-bottom: 6px;
-  color: var(--modal-label-text, #64748b); 
+  color: #475569;
   font-size: 13px;
   font-weight: 600;
 }
@@ -137,47 +142,51 @@ body:has([class*="collapsed"]) .report-modal-overlay {
 .incident-box textarea {
   width: 100%;
   padding: 10px 14px;
-  border: 1px solid var(--modal-input-border, #cbd5e1);
+  border: 1px solid var(--border-color, #cbd5e1);
   border-radius: 6px;
-  background-color: var(--modal-input-bg, #ffffff); 
-  color: var(--modal-input-text, #1e293b); 
-  font-family: inherit;
+  background-color: var(--surface-card, #ffffff);
+  color: var(--text-dark, #1d1d1d);
+  font-family: inherit; /* Đồng bộ font chữ hệ thống */
   font-size: 13.5px;
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
   box-sizing: border-box;
 }
 
+/* Ép font chữ placeholder đồng bộ hoàn toàn */
 .form-group input::placeholder,
 .form-group textarea::placeholder,
 .incident-box textarea::placeholder {
   font-family: inherit;
-  color: var(--modal-input-placeholder, #94a3b8);
+  color: var(--input-placeholder, #94a3b8);
   font-size: 13.5px;
 }
 
 .form-group input[type="text"]:focus,
 .form-group textarea:focus,
 .incident-box textarea:focus {
-  border-color: var(--modal-input-focus-border, #0f766e);
-  box-shadow: 0 0 0 3px var(--modal-input-focus-shadow, rgba(15, 118, 110, 0.1));
+  border-color: var(--primary-color, #1f5c3f);
+  box-shadow: 0 0 0 3px rgba(31, 92, 63, 0.12);
 }
 
 .textarea-counter {
   text-align: right;
   font-size: 11px;
-  color: var(--modal-input-placeholder, #94a3b8);
+  color: #94a3b8;
   margin-top: 4px;
 }
 
+/* ==========================================================================
+   CUSTOM SELECT DROPDOWN (Y hệt ảnh mẫu 1)
+   ========================================================================== */
 .custom-select-trigger {
   width: 100%;
   height: 38px;
   padding: 0 14px;
-  border: 1px solid var(--modal-input-border, #cbd5e1);
+  border: 1px solid var(--border-color, #cbd5e1);
   border-radius: 6px;
-  background-color: var(--modal-input-bg, #ffffff);
-  color: var(--modal-input-text, #1e293b);
+  background-color: var(--surface-card, #ffffff);
+  color: var(--text-dark, #1d1d1d);
   font-size: 13.5px;
   display: flex;
   align-items: center;
@@ -188,19 +197,21 @@ body:has([class*="collapsed"]) .report-modal-overlay {
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+/* Custom text khi là placeholder */
 .custom-select-trigger.is-placeholder span {
-  color: var(--modal-input-placeholder, #94a3b8);
+  color: var(--input-placeholder, #94a3b8);
 }
 
 .custom-select-trigger:hover,
 .custom-select-trigger.open {
-  border-color: var(--modal-input-focus-border, #0f766e);
+  border-color: var(--primary-color, #1f5c3f);
 }
 
 .custom-select-trigger.open {
-  box-shadow: 0 0 0 3px var(--modal-input-focus-shadow, rgba(15, 118, 110, 0.1));
+  box-shadow: 0 0 0 3px rgba(31, 92, 63, 0.12);
 }
 
+/* Icon mũi tên custom mượt mà */
 .custom-select-trigger .arrow-icon {
   width: 14px;
   height: 14px;
@@ -215,38 +226,43 @@ body:has([class*="collapsed"]) .report-modal-overlay {
   transform: rotate(180deg);
 }
 
+/* Khung bọc danh sách option đổ xuống */
 .custom-options-wrapper {
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
   width: 100%;
-  background: var(--modal-bg, #ffffff);
-  border: 1px solid var(--modal-input-focus-border, #0f766e);
+  background: var(--surface-card, #ffffff);
+  border: 1px solid var(--primary-color, #1f5c3f);
   border-radius: 6px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   z-index: 999;
   max-height: 220px;
   overflow-y: auto;
 }
 
+/* Từng option bên trong */
 .custom-option {
   padding: 10px 14px;
   font-size: 13.5px;
-  color: var(--modal-input-text, #1e293b);
+  color: var(--text-dark, #1d1d1d);
   cursor: pointer;
   transition: background-color 0.15s ease;
 }
 
 .custom-option:hover {
-  background-color: var(--modal-section-bg, #f8fafc);
+  background-color: var(--body-bg, #f1f5f9);
 }
 
 .custom-option.selected {
-  background-color: rgba(31, 92, 63, 0.15);
-  color: var(--primary-color, #6bb892);
+  background-color: rgba(31, 92, 63, 0.08);
+  color: var(--primary-color, #1f5c3f);
   font-weight: 600;
 }
 
+/* ==========================================================================
+   RADIO BUTTONS & INCIDENT BOX
+   ========================================================================== */
 .radio-group {
   display: flex;
   gap: 24px;
@@ -259,7 +275,7 @@ body:has([class*="collapsed"]) .report-modal-overlay {
   gap: 8px;
   cursor: pointer;
   font-size: 13.5px;
-  color: var(--modal-input-text, #1e293b);
+  color: var(--text-dark, #1d1d1d);
   font-weight: 500;
 }
 
@@ -272,32 +288,35 @@ body:has([class*="collapsed"]) .report-modal-overlay {
 .incident-box {
   margin-top: 14px;
   padding: 14px;
-  background-color: var(--modal-section-bg, #f8fafc);
+  background-color: #f8fafc;
   border-radius: 6px;
-  border: 1px dashed var(--modal-input-border, #cbd5e1);
+  border: 1px dashed var(--border-color, #cbd5e1);
 }
 
 .incident-label {
   display: block;
   font-size: 13px;
   font-weight: 600;
-  color: var(--modal-label-text, #64748b);
+  color: #475569;
   margin-bottom: 6px;
 }
 
+/* ==========================================================================
+   FOOTER ACTIONS
+   ========================================================================== */
 .report-footer {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
   padding: 16px 24px;
-  border-top: 1px solid var(--modal-border, #e2e8f0);
-  background-color: var(--modal-bg, #ffffff);
+  border-top: 1px solid var(--border-color, #cbd5e1);
+  background-color: var(--surface-card, #ffffff);
 }
 
 .btn-outline.btn-cancel {
-  background-color: var(--modal-btn-draft-bg, #f1f5f9);
-  border: 1px solid var(--modal-input-border, #cbd5e1);
-  color: var(--modal-btn-draft-text, #475569);
+  background-color: var(--surface-card, #ffffff);
+  border: 1px solid var(--border-color, #cbd5e1);
+  color: #475569;
   padding: 9px 20px;
   border-radius: 6px;
   font-size: 13.5px;
@@ -307,27 +326,30 @@ body:has([class*="collapsed"]) .report-modal-overlay {
 }
 
 .btn-outline.btn-cancel:hover {
-  background-color: var(--modal-btn-draft-hover-bg, #e2e8f0);
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+  color: #1e293b;
 }
 
 .btn-primary {
-  background-color: var(--modal-btn-submit-bg, #0f766e);
-  border: 1px solid var(--modal-btn-submit-bg, #0f766e);
-  color: var(--modal-btn-submit-text, #ffffff);
+  background-color: var(--primary-color, #1f5c3f);
+  border: 1px solid var(--primary-color, #1f5c3f);
+  color: var(--text-white, #ffffff);
   padding: 9px 20px;
   border-radius: 6px;
   font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: var(--modal-btn-submit-shadow, rgba(15, 118, 110, 0.2));
+  box-shadow: 0 2px 4px rgba(31, 92, 63, 0.15);
   transition: background-color 0.15s ease;
 }
 
 .btn-primary:hover {
-  background-color: var(--modal-btn-submit-hover-bg, #0d5e58);
-  border-color: var(--modal-btn-submit-hover-bg, #0d5e58);
+  background-color: var(--primary-hover, #184a32);
+  border-color: var(--primary-hover, #184a32);
 }
 
+/* RESPONSIVE */
 @media (max-width: 900px) {
   .report-modal-overlay {
     left: 0;
