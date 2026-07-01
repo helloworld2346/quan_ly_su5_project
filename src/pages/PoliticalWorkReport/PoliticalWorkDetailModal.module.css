@@ -1,0 +1,133 @@
+.overlay {  
+  position: fixed;  
+  top: 0;  
+  right: 0;  
+  bottom: 0;  
+  left: var(--current-sidebar-width, var(--sidebar-width));  
+  background: var(--dialog-overlay-bg);  
+  display: flex;  
+  align-items: center;  
+  justify-content: center;  
+  z-index: 99999;  
+  padding: 16px;  
+}  
+  
+.modal {  
+  background: var(--dialog-bg);  
+  border-radius: 16px;  
+  width: min(900px, calc(100% - 32px));  
+  max-height: 95vh;  
+  display: flex;  
+  flex-direction: column;  
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);  
+  overflow: hidden;  
+}  
+  
+.header {  
+  position: relative;  
+  padding: 20px 24px;  
+  border-bottom: 1px solid var(--login-border);  
+  display: flex;  
+  justify-content: center;  
+  align-items: center;  
+  flex-shrink: 0;  
+}  
+  
+.headerContent {  
+  display: flex;  
+  flex-direction: column;  
+  align-items: center;  
+  gap: 8px;  
+}  
+  
+.subTitle {  
+  font-size: 20px;  
+  font-weight: 800;  
+  color: var(--dialog-title-text);  
+}  
+  
+.closeBtn {  
+  position: absolute;  
+  right: 24px;  
+  top: 50%;  
+  transform: translateY(-50%);  
+  display: flex;  
+  align-items: center;  
+  justify-content: center;  
+  width: 32px;  
+  height: 32px;  
+  border: none;  
+  border-radius: 8px;  
+  background: transparent;  
+  color: var(--dialog-message-text);  
+  cursor: pointer;  
+  font-size: 22px;  
+  transition:  
+    background 0.15s,  
+    color 0.15s;  
+}  
+  
+.closeBtn:hover {  
+  background: var(--dialog-cancel-hover-bg);  
+  color: var(--dialog-title-text);  
+}  
+  
+.body {  
+  flex: 1;  
+  overflow-y: auto;  
+  padding: 20px 24px 24px;  
+  min-height: 0;  
+}  
+  
+.trucGrid {  
+  display: grid;  
+  grid-template-columns: repeat(2, 1fr);  
+  gap: 16px;  
+  margin-bottom: 20px;  
+}  
+  
+.trucCard {  
+  border: 1px solid var(--login-border);  
+  border-radius: 10px;  
+  padding: 12px 14px;  
+  background: var(--surface-muted, transparent);  
+}  
+  
+.trucRole {  
+  display: block;  
+  font-size: 13px;  
+  color: var(--login-text-muted);  
+  margin-bottom: 6px;  
+}  
+  
+.trucName {  
+  font-size: 16px;  
+  font-weight: 600;  
+  color: var(--dialog-title-text);  
+}  
+  
+.section {  
+  margin-bottom: 18px;  
+}  
+  
+.sectionTitle {  
+  font-size: 15px;  
+  font-weight: 700;  
+  color: var(--dialog-title-text);  
+  margin: 0 0 8px;  
+}  
+  
+.sectionText {  
+  font-size: 14px;  
+  line-height: 1.6;  
+  color: var(--dialog-message-text);  
+  margin: 0;  
+  white-space: pre-wrap;  
+  word-break: break-word;  
+}
+
+.trucMeta {  
+  font-size: 13px;  
+  color: var(--login-text-muted);  
+  margin-top: 4px;  
+}

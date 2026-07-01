@@ -4,7 +4,7 @@ import type {
   PoliticalWorkRow,
   PoliticalWorkRequest,
 } from "../../types/politicalWork";
-
+import { parseTrucNguoi, stringifyTrucNguoi } from "./utils/trucNguoi";
 interface CreateReportProps {
   open: boolean;
   onClose: () => void;
@@ -68,7 +68,6 @@ export default function CreateReport({
   initialData,
   maDonViCurrent,
 }: CreateReportProps) {
-
   const [reporterDropdownOpen, setReporterDropdownOpen] = useState(false);
   const [ctdDropdownOpen, setCtdDropdownOpen] = useState(false);
 
@@ -77,10 +76,18 @@ export default function CreateReport({
 
   const [formData, setFormData] = useState<ReportFormData>(() => {
     if (initialData) {
+      const noiVu = parseTrucNguoi(initialData.trucBanNoiVu);
+      const ctd = parseTrucNguoi(initialData.trucBanCtDangCt);
       return {
         ...DEFAULT_FORM_DATA,
-        reporterName: initialData.trucBanNoiVu || "",
-        ctdName: initialData.trucBanCtDangCt || "",
+        reporterName: noiVu.hoTen,
+        reporterRank: noiVu.capBac,
+        reporterPosition: noiVu.chucVu,
+        reporterPhone: noiVu.soDienThoai,
+        ctdName: ctd.hoTen,
+        ctdRank: ctd.capBac,
+        ctdPosition: ctd.chucVu,
+        ctdPhone: ctd.soDienThoai,
         activity: initialData.tinhHinh || "",
         result: initialData.ketQua || "",
         hasIncident: Boolean(initialData.noiDungDotXuat),
@@ -119,8 +126,18 @@ export default function CreateReport({
       tinhHinh: formData.activity,
       noiDungDotXuat: formData.hasIncident ? formData.incidentContent : "",
       ketQua: formData.result,
-      trucBanNoiVu: formData.reporterName,
-      trucBanCtDangCt: formData.ctdName,
+      trucBanNoiVu: stringifyTrucNguoi({
+        hoTen: formData.reporterName,
+        capBac: formData.reporterRank,
+        chucVu: formData.reporterPosition,
+        soDienThoai: formData.reporterPhone,
+      }),
+      trucBanCtDangCt: stringifyTrucNguoi({
+        hoTen: formData.ctdName,
+        capBac: formData.ctdRank,
+        chucVu: formData.ctdPosition,
+        soDienThoai: formData.ctdPhone,
+      }),
       kienNghi: formData.proposal,
       donVi: maDonViCurrent,
     };

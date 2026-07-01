@@ -75,8 +75,8 @@ export function usePoliticalWorkData({
     const handler = () => {
       void fetchReports();
     };
-    window.addEventListener("political-work-changed", handler);
-    return () => window.removeEventListener("political-work-changed", handler);
+    window.addEventListener("report-data-changed", handler);
+    return () => window.removeEventListener("report-data-changed", handler);
   }, [fetchReports]);
 
   return {

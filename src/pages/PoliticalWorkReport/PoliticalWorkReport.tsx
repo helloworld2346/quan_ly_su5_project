@@ -16,6 +16,7 @@ import ReportToolbar from "../../components/report/ReportToolbar";
 import ReportStatusBadge from "../../components/ui/ReportStatusBadge/ReportStatusBadge";
 import RefuseDialog from "../../components/ui/RefuseDialog/RefuseDialog";
 import CreateReport from "./CreateReport";
+import PoliticalWorkDetailModal from "./PoliticalWorkDetailModal";
 import styles from "./PoliticalWorkReport.module.css";
 
 import { useAuth } from "../../context/useAuth";
@@ -28,6 +29,8 @@ import { usePoliticalWorkData } from "./hooks/usePoliticalWorkData";
 import { usePoliticalWorkActions } from "./hooks/usePoliticalWorkActions";
 import { usePoliticalWorkPermissions } from "./hooks/usePoliticalWorkPermissions";
 import type { PoliticalWorkRow } from "../../types/politicalWork";
+
+import { parseTrucNguoi } from "./utils/trucNguoi";
 
 function StatCard({
   tone,
@@ -80,6 +83,7 @@ export default function PoliticalWorkReport() {
   const [reportDate, setReportDate] = useState(todayIsoDate());
   const [isCreateReportOpen, setIsCreateReportOpen] = useState(false);
   const [editingRow, setEditingRow] = useState<PoliticalWorkRow | null>(null);
+  const [detailRow, setDetailRow] = useState<PoliticalWorkRow | null>(null);
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -281,9 +285,9 @@ export default function PoliticalWorkReport() {
                   <td>
                     <StatusBadge active={Boolean(row.kienNghi)} />
                   </td>
-                  <td>{row.trucBanNoiVu}</td>
+                  <td>{parseTrucNguoi(row.trucBanNoiVu).hoTen}</td>
                   <td className={styles["political-ctd-cell"]}>
-                    {row.trucBanCtDangCt}
+                    {parseTrucNguoi(row.trucBanCtDangCt).hoTen}
                   </td>
                   <td>
                     <ReportStatusBadge status={row.status} />
@@ -333,7 +337,7 @@ export default function PoliticalWorkReport() {
                             className={styles["political-menu-item"]}
                             onClick={() => {
                               setActiveMenuId(null);
-                              console.log("Xem chi tiết row:", row);
+                              setDetailRow(row);
                             }}
                           >
                             <FontAwesomeIcon icon={faEye} />
@@ -412,6 +416,13 @@ export default function PoliticalWorkReport() {
         onConfirm={handleRefuseConfirm}
         onCancel={handleRefuseCancel}
       />
+
+      {detailRow && (
+        <PoliticalWorkDetailModal
+          row={detailRow}
+          onClose={() => setDetailRow(null)}
+        />
+      )}
     </section>
   );
 }
