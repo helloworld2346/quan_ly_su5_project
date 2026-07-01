@@ -1,6 +1,6 @@
 .report-section {  
-  background: var(--surface-card, #ffffff);  
-  border: 1px solid var(--border-color, #cbd5e1);  
+  background: var(--modal-bg, #ffffff);  
+  border: 1px solid var(--modal-border, #e2e8f0);  
   border-radius: 8px;  
   padding: 20px;  
   margin-bottom: 20px;  
@@ -11,12 +11,11 @@
   margin-bottom: 14px;  
   font-size: 14px;  
   font-weight: 700;  
-  color: var(--text-dark, #1d1d1d);  
+  color: var(--modal-title-text, #1e293b);  
 }  
   
 .section-title--green {  
   color: var(--primary-color, #1f5c3f);  
-  border-bottom: 1px solid var(--border-color, #edf2f7);  
   padding-bottom: 8px;  
   text-transform: uppercase;  
   font-size: 13px;  
@@ -28,7 +27,7 @@
   gap: 16px;  
   margin-top: 12px;  
 }  
-
+  
 .form-group {  
   position: relative;  
   display: flex;  
@@ -38,13 +37,13 @@
 .form-group label {  
   display: block;  
   margin-bottom: 6px;  
-  color: #475569;  
+  color: var(--modal-label-text, #64748b);  
   font-size: 13px;  
   font-weight: 600;  
 }  
   
 .required-mark {  
-  color: var(--dialog-danger-bg, #ef4444);  
+  color: var(--dialog-danger-icon, #ef4444);  
   margin-left: 2px;  
 }  
   
@@ -53,11 +52,11 @@
 .incident-box textarea {  
   width: 100%;  
   padding: 10px 14px;  
-  border: 1px solid var(--border-color, #cbd5e1);  
+  border: 1px solid var(--modal-input-border, #cbd5e1);  
   border-radius: 6px;  
-  background-color: var(--surface-card, #ffffff);  
-  color: var(--text-dark, #1d1d1d);  
-  font-family: inherit;
+  background-color: var(--modal-input-bg, #ffffff);  
+  color: var(--modal-input-text, #1e293b);  
+  font-family: inherit;  
   font-size: 13.5px;  
   outline: none;  
   transition: border-color 0.15s ease, box-shadow 0.15s ease;  
@@ -68,143 +67,105 @@
 .form-group textarea::placeholder,  
 .incident-box textarea::placeholder {  
   font-family: inherit;  
-  color: var(--input-placeholder, #94a3b8);  
+  color: var(--modal-input-placeholder, #94a3b8);  
   font-size: 13.5px;  
 }  
   
 .form-group input[type="text"]:focus,  
 .form-group textarea:focus,  
 .incident-box textarea:focus {  
-  border-color: var(--primary-color, #1f5c3f);  
-  box-shadow: 0 0 0 3px rgba(31, 92, 63, 0.12);  
+  border-color: var(--modal-input-focus-border, #1f5c3f);  
+  box-shadow: 0 0 0 3px var(--modal-input-focus-shadow, rgba(31, 92, 63, 0.12));  
 }  
   
 .textarea-counter {  
   text-align: right;  
   font-size: 11px;  
-  color: #94a3b8;  
+  color: var(--modal-input-placeholder, #94a3b8);  
   margin-top: 4px;  
 }  
-    
-.custom-select-trigger {  
-  width: 100%;  
-  height: 38px;  
-  padding: 0 14px;  
-  border: 1px solid var(--border-color, #cbd5e1);  
-  border-radius: 6px;  
-  background-color: var(--surface-card, #ffffff);  
-  color: var(--text-dark, #1d1d1d);  
-  font-size: 13.5px;  
-  display: flex;  
-  align-items: center;  
-  justify-content: space-between;  
-  cursor: pointer;  
-  user-select: none;  
-  box-sizing: border-box;  
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;  
-}  
   
-.custom-select-trigger.is-placeholder span {  
-  color: var(--input-placeholder, #94a3b8);  
-}  
-  
-.custom-select-trigger:hover,  
-.custom-select-trigger.open {  
-  border-color: var(--primary-color, #1f5c3f);  
-}  
-  
-.custom-select-trigger.open {  
-  box-shadow: 0 0 0 3px rgba(31, 92, 63, 0.12);  
-}  
-  
-.custom-select-trigger .arrow-icon {  
-  width: 14px;  
-  height: 14px;  
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");  
-  background-repeat: no-repeat;  
-  background-position: center;  
-  background-size: contain;  
-  transition: transform 0.2s ease;  
-}  
-  
-.custom-select-trigger.open .arrow-icon {  
-  transform: rotate(180deg);  
-}  
-  
-.custom-options-wrapper {  
-  position: absolute;  
-  top: calc(100% + 4px);  
-  left: 0;  
-  width: 100%;  
-  background: var(--surface-card, #ffffff);  
-  border: 1px solid var(--primary-color, #1f5c3f);  
-  border-radius: 6px;  
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);  
-  z-index: 999;  
-  max-height: 220px;  
-  overflow-y: auto;  
-}  
-  
-.custom-option {  
-  padding: 10px 14px;  
-  font-size: 13.5px;  
-  color: var(--text-dark, #1d1d1d);  
-  cursor: pointer;  
-  transition: background-color 0.15s ease;  
-}  
-  
-.custom-option:hover {  
-  background-color: var(--body-bg, #f1f5f9);  
-}  
-  
-.custom-option.selected {  
-  background-color: rgba(31, 92, 63, 0.08);  
-  color: var(--primary-color, #1f5c3f);  
-  font-weight: 600;  
-}  
- 
 .radio-group {  
   display: flex;  
-  gap: 24px;  
+  flex-wrap: wrap;  
   margin-top: 8px;  
 }  
   
+.radio-group > * + * {  
+  margin-left: 8px;  
+}  
+  
 .radio-item {  
-  display: flex;  
+  position: relative;  
+  display: inline-flex;  
   align-items: center;  
-  gap: 8px;  
+  justify-content: center;  
   cursor: pointer;  
-  font-size: 13.5px;  
-  color: var(--text-dark, #1d1d1d);  
-  font-weight: 500;  
+  font-size: 13px;  
+  font-weight: 600;  
+  padding: 6px 18px;  
+  border: 1.5px solid var(--modal-border, #cbd5e1);  
+  border-radius: 8px;  
+  background: var(--modal-bg, #ffffff);  
+  color: var(--modal-label-text, #64748b);  
+  transition: border-color 0.15s, background 0.15s, color 0.15s;  
+  user-select: none;  
+}  
+  
+.radio-item:hover {  
+  border-color: var(--primary-color, #1f5c3f);  
+  color: var(--primary-color, #1f5c3f);  
+  background: var(--primary-a06, rgba(31, 92, 63, 0.06));  
 }  
   
 .radio-item input[type="radio"] {  
-  accent-color: var(--primary-color, #1f5c3f);  
-  width: 16px;  
-  height: 16px;  
+  position: absolute;  
+  opacity: 0;  
+  width: 0;  
+  height: 0;  
+  pointer-events: none;  
+}  
+  
+.radio-item.is-checked {  
+  border-color: var(--primary-color, #1f5c3f);  
+  background: var(--primary-color, #1f5c3f);  
+  color: #fff;  
+  font-weight: 700;  
 }  
   
 .incident-box {  
   margin-top: 14px;  
   padding: 14px;  
-  background-color: #f8fafc;  
+  background-color: var(--modal-section-bg, #f8fafc);  
   border-radius: 6px;  
-  border: 1px dashed var(--border-color, #cbd5e1);  
+  border: 1px dashed var(--modal-border, #cbd5e1);  
 }  
   
 .incident-label {  
   display: block;  
   font-size: 13px;  
   font-weight: 600;  
-  color: #475569;  
+  color: var(--modal-label-text, #64748b);  
   margin-bottom: 6px;  
+}
+
+.radio-item.is-danger {  
+  border-color: var(--dialog-danger-bg, #ef4444);  
+  background: var(--dialog-danger-bg, #ef4444);  
+  color: #fff;  
+  font-weight: 700;  
+}  
+  
+.radio-item.is-danger:hover {  
+  border-color: var(--dialog-danger-bg, #ef4444);  
+  background: var(--dialog-danger-bg, #ef4444);  
+  color: #fff;  
 }  
   
 .btn-outline.btn-cancel {  
-  background-color: var(--surface-card, #ffffff);  
-  border: 1px solid var(--border-color, #cbd5e1);  
-  color: #475569;  
+  background-color: var(--dialog-cancel-bg, #ffffff);  
+  border: 1px solid var(--modal-border, #cbd5e1);  
+  color: var(--modal-label-text, #475569);  
   padding: 9px 20px;  
   border-radius: 6px;  
   font-size: 13.5px;  
@@ -214,9 +175,9 @@
 }  
   
 .btn-outline.btn-cancel:hover {  
-  background-color: #f1f5f9;  
-  border-color: #94a3b8;  
-  color: #1e293b;  
+  background-color: var(--dialog-cancel-hover-bg, #f1f5f9);  
+  border-color: var(--primary-color, #94a3b8);  
+  color: var(--modal-title-text, #1e293b);  
 }  
   
 .btn-primary {  
@@ -235,16 +196,4 @@
 .btn-primary:hover {  
   background-color: var(--primary-hover, #184a32);  
   border-color: var(--primary-hover, #184a32);  
-}  
-  
-@media (max-width: 900px) {  
-  .report-grid-4col {  
-    grid-template-columns: repeat(2, 1fr);  
-  }  
-}  
-  
-@media (max-width: 600px) {  
-  .report-grid-4col {  
-    grid-template-columns: 1fr;  
-  }  
 }

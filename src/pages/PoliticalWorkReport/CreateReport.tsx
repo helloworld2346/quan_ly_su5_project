@@ -311,7 +311,11 @@ export default function CreateReport({
           Những vụ việc đột xuất xảy ra trong ngày
         </h3>
         <div className={styles["radio-group"]}>
-          <label className={styles["radio-item"]}>
+          <label
+            className={`${styles["radio-item"]} ${
+              !formData.hasIncident ? styles["is-checked"] : ""
+            }`}
+          >
             <input
               type="radio"
               name="incident"
@@ -320,7 +324,11 @@ export default function CreateReport({
             />
             <span>Không có</span>
           </label>
-          <label className={styles["radio-item"]}>
+          <label
+            className={`${styles["radio-item"]} ${
+              formData.hasIncident ? styles["is-danger"] : ""
+            }`}
+          >
             <input
               type="radio"
               name="incident"
