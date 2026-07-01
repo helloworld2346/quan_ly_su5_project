@@ -1,4 +1,3 @@
-// src/pages/PoliticalWorkReport/utils/politicalWorkUtils.ts
 import type {
   PoliticalWorkItem,
   PoliticalWorkRow,
@@ -19,5 +18,28 @@ export function mapItemToRow(item: PoliticalWorkItem): PoliticalWorkRow {
     status: item.status,
     ghiChu: (item.ghiChu ?? "") || "",
     rawItem: item,
+  };
+}
+
+export function createEmptyPoliticalWorkRow(args: {
+  maDonVi: string;
+  tenDonVi: string;
+  kyhieuDonVi?: string;
+}): PoliticalWorkRow {
+  return {
+    idCongtac: args.maDonVi,
+    donVi: args.maDonVi,
+    tenDonVi: args.tenDonVi,
+    kyhieuDonVi: args.kyhieuDonVi,
+    tinhHinh: "",
+    noiDungDotXuat: "",
+    ketQua: "",
+    trucBanNoiVu: "",
+    trucBanCtDangCt: "",
+    kienNghi: "",
+    status: "Chưa_Nộp",
+    ghiChu: "",
+    notSubmitted: true,
+    rawItem: {} as PoliticalWorkItem,
   };
 }

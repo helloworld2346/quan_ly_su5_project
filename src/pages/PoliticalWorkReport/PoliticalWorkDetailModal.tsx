@@ -75,14 +75,18 @@ export default function PoliticalWorkDetailModal({ row, onClose }: Props) {
       <section className={styles.section}>
         <h3 className={styles.sectionTitle}>Vụ việc đột xuất trong ngày</h3>
         <p className={styles.sectionText}>
-          {row.noiDungDotXuat ? row.noiDungDotXuat : "Không có"}
+          {row.notSubmitted
+            ? "—"
+            : row.noiDungDotXuat
+              ? row.noiDungDotXuat
+              : "Không có"}
         </p>
       </section>
 
       <section className={styles.section}>
         <h3 className={styles.sectionTitle}>Kiến nghị, đề xuất</h3>
         <p className={styles.sectionText}>
-          {row.kienNghi ? row.kienNghi : "Không có"}
+          {row.notSubmitted ? "—" : row.kienNghi ? row.kienNghi : "Không có"}
         </p>
       </section>
 

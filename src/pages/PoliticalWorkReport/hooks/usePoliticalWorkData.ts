@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { politicalWorkService } from "../../../services/politicalWork/politicalWorkService";
+import { donviService } from "../../../services/unit/unitService";
 import { handleApiError } from "../../../utils/errorHandler";
 import { mapItemToRow } from "../utils/politicalWorkUtils";
 import type { PoliticalWorkRow } from "../../../types/politicalWork";
+import type { DonVi } from "../../../types/account";
 
 export function usePoliticalWorkData({
   maDonViCurrent,
@@ -16,6 +18,7 @@ export function usePoliticalWorkData({
   const [reportData, setReportData] = useState<PoliticalWorkRow[]>([]);
   const [parentReportData, setParentReportData] =
     useState<PoliticalWorkRow | null>(null);
+  const [childUnits, setChildUnits] = useState<DonVi[]>([]);
   const [loading, setLoading] = useState(false);
 
   const showErrorRef = useRef(showError);
@@ -79,9 +82,32 @@ export function usePoliticalWorkData({
     return () => window.removeEventListener("report-data-changed", handler);
   }, [fetchReports]);
 
+  useEffect(() => {
+    const fetchDonViInfo = async () => {
+      if (!maDonViCurrent || !isParentUnit) {
+        setChildUnits([]);
+        return;
+      }
+      try {
+        const allUnits = await donviService.getDonVi();
+        const children = allUnits.filter((u) => {
+          if (!u.maDonVi.startsWith(maDonViCurrent + ".")) return false;
+          const suffix = u.maDonVi.slice(maDonViCurrent.length + 1);
+          return !suffix.includes(".");
+        });
+        setChildUnits(children);
+      } catch (err) {
+        console.error("Không thể tải thông tin đơn vị:", err);
+        setChildUnits([]);
+      }
+    };
+    void fetchDonViInfo();
+  }, [maDonViCurrent, isParentUnit]);
+
   return {
     reportData,
     parentReportData,
+    childUnits,
     loading,
     fetchReports,
   };
