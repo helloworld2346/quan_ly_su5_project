@@ -77,7 +77,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             notificationStorage.set(mapped);
             setNotifications(mapped);
           } catch {
-            // Không block auth nếu notification lỗi
           }
         }
       }

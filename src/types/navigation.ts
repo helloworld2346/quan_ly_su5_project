@@ -3,6 +3,7 @@ import { normalizeRoleName } from "../utils/reportUtils";
 
 export type NavItemId =
   | "executive"
+  | "executive-political-work"
   | "executive-training"
   | "report-troop"
   | "report-political-work"
@@ -23,6 +24,10 @@ export type NavItem = {
 
 const ExecutiveDashboard = lazy(
   () => import("../pages/Executive/ExecutiveDashboard"),
+);
+
+const PoliticalDashboard = lazy(
+  () => import("../pages/PoliticalDashboard/PoliticalDashboard"),
 );
 
 const DailyTroopReport = lazy(
@@ -51,9 +56,19 @@ export const EXECUTIVE_NAV: NavItem = {
   allowedRoles: ["Quản Trị Viên", "Trực ban tác chiến"],
 };
 
+export const EXECUTIVE_POLITICAL_NAV: NavItem = {
+  id: "executive-political-work",
+  label: "Tổng hợp CTĐ, CTCT",
+  path: "/political-dashboard",
+  loadingTitle: "Đang tải tổng hợp CTĐ, CTCT",
+  loadingSubtitle: "Đang tải dữ liệu…",
+  component: PoliticalDashboard,
+  allowedRoles: ["Quản Trị Viên", "Trực ban tác chiến"], 
+};
+
 export const EXECUTIVE_NAV_GROUP = {
   label: "Tổng hợp điều hành",
-  items: [EXECUTIVE_NAV],
+  items: [EXECUTIVE_NAV, EXECUTIVE_POLITICAL_NAV],
 };
 
 export const REPORT_NAV_GROUP = {
@@ -144,6 +159,7 @@ export const SETTINGS_NAV: NavItem = {
 
 export const NAV_PAGE_TITLES: Record<NavItemId, string> = {
   executive: "Tổng hợp ngày",
+  "executive-political-work": "Tổng hợp hoạt động Công tác Đảng, công tác chính trị",
   "executive-training": "Tổng hợp huấn luyện",
   "report-troop": "Thống kê quân số hoạt động trong ngày",
   "report-political-work": "Hoạt động công tác Đảng, công tác chính trị",
@@ -154,7 +170,7 @@ export const NAV_PAGE_TITLES: Record<NavItemId, string> = {
 };
 
 export const ALL_NAV_ITEMS: NavItem[] = [
-  EXECUTIVE_NAV,
+  ...EXECUTIVE_NAV_GROUP.items,
   ...REPORT_NAV_GROUP.items,
   ...DUTY_NAV_GROUP.items,
   SETTINGS_NAV,
@@ -259,10 +275,12 @@ export function getNavItemsByRole(
 
   const isCoreNav = (item: NavItem) =>
     item.id === "executive" ||
+    item.id === "executive-political-work" || 
     item.id.startsWith("report-") ||
     item.id === "settings";
 
-  const isExecutiveItem = (item: NavItem) => item.id === "executive";
+  const isExecutiveItem = (item: NavItem) => 
+    item.id === "executive" || item.id === "executive-political-work";
 
   if (normalizedRole === "Quản Trị Viên") {
     return ALL_NAV_ITEMS;

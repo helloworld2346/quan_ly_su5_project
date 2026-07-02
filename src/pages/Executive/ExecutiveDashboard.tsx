@@ -182,10 +182,6 @@ export default function ExecutiveDashboard() {
         </dl>
       </header>
 
-   
-
-     
-          {/* Datebar */}
           <div className={styles.datebar}>
             <div style={{ width: 220 }} />
             <div className={styles.dateNav}>

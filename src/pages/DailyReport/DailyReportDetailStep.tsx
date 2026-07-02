@@ -1,4 +1,4 @@
-// src/pages/DailyReport/DailyReportDetailStep.tsx
+
 import styles from "./DailyReportDetailStep.module.css";
 import { useState, useCallback } from "react";
 

@@ -55,7 +55,7 @@ export default function Sidebar({
   const hasQuota = unitQuota > 0;
 
   const hiddenSidebarIds: NavItemId[] = [
-    "executive-training", // Tổng hợp huấn luyện
+    "executive-training",
   ];
 
   const capDonVi = donVi?.capDonVi ?? account?.donVi?.capDonVi ?? null;
