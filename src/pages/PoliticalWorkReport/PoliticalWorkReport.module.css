@@ -357,3 +357,13 @@
     padding: 16px;
   }
 }
+
+.political-row--not-submitted td {  
+  background: var(--row-danger-bg) !important;  
+  color: var(--row-danger-text);  
+  font-weight: 600;  
+}  
+  
+.political-row--not-submitted .political-unit-cell {  
+  font-weight: 700;  
+}

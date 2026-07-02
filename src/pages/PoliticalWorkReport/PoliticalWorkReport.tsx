@@ -14,120 +14,24 @@ import {
 
 import ReportToolbar from "../../components/report/ReportToolbar";
 import ReportStatusBadge from "../../components/ui/ReportStatusBadge/ReportStatusBadge";
+import RefuseDialog from "../../components/ui/RefuseDialog/RefuseDialog";
 import CreateReport from "./CreateReport";
-import "./PoliticalWorkReport.css";
+import PoliticalWorkDetailModal from "./PoliticalWorkDetailModal";
+import styles from "./PoliticalWorkReport.module.css";
 
 import { useAuth } from "../../context/useAuth";
 import { useToast } from "../../context/useToast";
 import { handleApiError } from "../../utils/errorHandler";
-import {
-  politicalWorkReportService,
-  type CtDangCtApiItem,
-} from "../../services/politicalWorkReport/politicalWorkReportService";
-import type { ReportFormData } from "./CreateReport";
+import { todayIsoDate, normalizeRoleName } from "../../utils/reportUtils";
+import { politicalWorkService } from "../../services/politicalWork/politicalWorkService";
 
-type PoliticalWorkRow = {
-  id: string;
-  status: string;
-  unit: string;
-  donVi: string;
-  activities: string[];
-  result: string;
-  hasIncident: boolean;
-  incidentContent: string;
-  hasProposal: boolean;
-  proposal: string;
-  reporter: string;
-  reportCTD: string;
-  rawItem: CtDangCtApiItem;
-};
+import { usePoliticalWorkData } from "./hooks/usePoliticalWorkData";
+import { usePoliticalWorkActions } from "./hooks/usePoliticalWorkActions";
+import { usePoliticalWorkPermissions } from "./hooks/usePoliticalWorkPermissions";
+import type { PoliticalWorkRow } from "../../types/politicalWork";
 
-type PoliticalWorkPayloadNew = {
-  tinhHinh: string;
-  noiDungDotXuat: string;
-  ketQua: string;
-  trucBanNoiVu: string;
-  trucBanCtDangCt: string;
-  kienNghi: string;
-  donVi: string;
-};
-
-function readJson<T>(value: unknown, fallback: T): T {
-  if (!value || typeof value !== "string") return fallback;
-  try {
-    return JSON.parse(value) as T;
-  } catch {
-    return fallback;
-  }
-}
-
-function normalizeStatus(status?: string) {
-  if (!status) return "Nháp";
-  if (status === "Chờ duyệt") return "Chờ_Duyệt";
-  if (status === "Đã duyệt") return "Đã_Duyệt";
-  if (status === "Từ chiên" || status === "Từ chối") return "Từ_Chối";
-  return status;
-}
-
-function mapApiToRow(item: CtDangCtApiItem): PoliticalWorkRow {
-  const trucBan = readJson<{ tenNguoitruc?: string }>(item.trucBanNoiVu, {});
-  const trucCtd = readJson<{ tenNguoitruc?: string }>(item.trucBanCtDangCt, {});
-
-  const activity = item.tinhHinh ?? "";
-  const incident = item.noiDungDotXuat ?? "";
-  const proposal = item.kienNghi ?? "";
-  const donVi = item.donVi ?? {};
-
-  return {
-    id: item.idCongtac ?? item.id,
-    status: normalizeStatus(item.status ?? item.trangThai),
-    unit: donVi.kyhieuDonvi ?? donVi.tenDonvi ?? "",
-    donVi: donVi.maDonVi ?? "",
-    activities: String(activity)
-      .split("\n")
-      .map((line) => line.trim())
-      .filter(Boolean),
-    result: item.ketQua ?? "",
-    hasIncident: Boolean(String(incident).trim()),
-    incidentContent: incident,
-    hasProposal: Boolean(String(proposal).trim()),
-    proposal,
-    reporter: trucBan.tenNguoitruc ?? "",
-    reportCTD: trucCtd.tenNguoitruc ?? "",
-    rawItem: item,
-  };
-}
-
-function buildPayload(data: ReportFormData, maDonViCurrent: string) {
-  return {
-    tinhHinh: data.activity,
-    noiDungDotXuat: data.hasIncident ? data.incidentContent : "",
-    ketQua: data.result,
-    trucBanNoiVu: JSON.stringify({
-      tenNguoitruc: data.reporterName,
-      capbacNguoitruc: data.reporterRank,
-      chucvuNguoitruc: data.reporterPosition,
-      sodienthoai: data.reporterPhone,
-    }),
-    trucBanCtDangCt: JSON.stringify({
-      tenNguoitruc: data.ctdName,
-      capbacNguoitruc: data.ctdRank,
-      chucvuNguoitruc: data.ctdPosition,
-      sodienthoai: data.ctdPhone,
-    }),
-    kienNghi: data.proposal,
-    donVi: maDonViCurrent,
-  };
-}
-
-function todayIsoDate() {
-  const d = new Date();
-  return [
-    d.getFullYear(),
-    String(d.getMonth() + 1).padStart(2, "0"),
-    String(d.getDate()).padStart(2, "0"),
-  ].join("-");
-}
+import { parseTrucNguoi } from "./utils/trucNguoi";
+import { createEmptyPoliticalWorkRow } from "./utils/politicalWorkUtils";
 
 function StatCard({
   tone,
@@ -141,8 +45,12 @@ function StatCard({
   value: number;
 }) {
   return (
-    <article className="political-stat-card">
-      <span className={`political-stat-icon political-stat-icon--${tone}`}>{icon}</span>
+    <article className={styles["political-stat-card"]}>
+      <span
+        className={`${styles["political-stat-icon"]} ${styles[`political-stat-icon--${tone}`]}`}
+      >
+        {icon}
+      </span>
       <div>
         <p>{title}</p>
         <strong>{value}</strong>
@@ -151,13 +59,19 @@ function StatCard({
   );
 }
 
-function StatusBadge({ active, danger = false }: { active: boolean; danger?: boolean }) {
+function StatusBadge({
+  active,
+  danger = false,
+}: {
+  active: boolean;
+  danger?: boolean;
+}) {
   return (
     <span
       className={[
-        "political-badge",
-        active ? "political-badge--yes" : "political-badge--no",
-        danger && active ? "political-badge--danger" : "",
+        styles["political-badge"],
+        active ? styles["political-badge--yes"] : styles["political-badge--no"],
+        danger && active ? styles["political-badge--danger"] : "",
       ].join(" ")}
     >
       {active ? "Có" : "Không"}
@@ -166,57 +80,68 @@ function StatusBadge({ active, danger = false }: { active: boolean; danger?: boo
 }
 
 export default function PoliticalWorkReport() {
-  const [reports, setReports] = useState<PoliticalWorkRow[]>([]);
-  const [loading, setLoading] = useState(false);
-  const { account } = useAuth();
-  const { showSuccess, showError } = useToast();
-
   const [query, setQuery] = useState("");
   const [reportDate, setReportDate] = useState(todayIsoDate());
   const [isCreateReportOpen, setIsCreateReportOpen] = useState(false);
-
-  const [selectedRow, setSelectedRow] = useState<PoliticalWorkRow | null>(null);
   const [editingRow, setEditingRow] = useState<PoliticalWorkRow | null>(null);
+  const [detailRow, setDetailRow] = useState<PoliticalWorkRow | null>(null);
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
+  const { account } = useAuth();
+  const { showError, showSuccess } = useToast();
+
   const maDonViCurrent = account?.donVi?.maDonVi;
   const capDonVi = account?.donVi?.capDonVi;
-  const userRole = account?.vaiTro?.tenVaiTro ?? "";
+  const userRole = account?.vaiTro?.tenVaiTro;
+  const normalizedRole = normalizeRoleName(userRole ?? undefined);
+  const isTacChien = normalizedRole === "Trực ban tác chiến";
+  const isNoiVu = normalizedRole === "Trực ban nội vụ";
+  const hasChildren = (account?.donVi?.donViCon?.length ?? 0) > 0;
 
-  const ownReport = reports.find((row) => row.donVi === maDonViCurrent) ?? reports[0] ?? null;
+  const isParentUnit =
+    (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
+    (isNoiVu && capDonVi === "TIEU_DOAN");
 
-  const fetchPoliticalReports = async () => {
-    if (!maDonViCurrent) return;
 
-    setLoading(true);
-    try {
-      const isParentUnit = capDonVi === "TIEU_DOAN" || capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN";
-      const result = isParentUnit
-        ? await politicalWorkReportService.getChildrenByParentUnit(maDonViCurrent)
-        : await politicalWorkReportService.getByUnit(maDonViCurrent);
+  const { reportData, parentReportData, childUnits, loading, fetchReports } =
+    usePoliticalWorkData({ maDonViCurrent, isParentUnit, showError });
 
-      const list = Array.isArray(result) ? result : result ? [result] : [];
-      setReports(list.map(mapApiToRow));
-    } catch (error) {
-      handleApiError(error, {
-        showError,
-        errorMessage: "Không thể tải dữ liệu báo cáo CTĐ, CTCT",
-        clearData: () => setReports([]),
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const ownReport =
+    parentReportData ??
+    reportData.find((r) => r.donVi === maDonViCurrent) ??
+    reportData[0] ??
+    null;
+  const commanderReport =
+    reportData.find((r) => r.status === "Chờ_Duyệt") ?? null;
 
-  useEffect(() => {
-    void fetchPoliticalReports();
-  }, [maDonViCurrent, capDonVi, reportDate]);
+  const {
+    showRefuseDialog,
+    refuseUnitName,
+    handleApproveReport,
+    handleSubmitReport,
+    handleRecallReport,
+    handleRefuseReportClick,
+    handleRefuseConfirm,
+    handleRefuseCancel,
+  } = usePoliticalWorkActions({ showSuccess, showError, fetchReports });
+
+  const { canApprove, canRefuse, canSubmit, canRecall } =
+    usePoliticalWorkPermissions(
+      userRole,
+      capDonVi,
+      ownReport,
+      commanderReport,
+      hasChildren,
+    );
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setActiveMenuId(null);
       }
     }
@@ -229,108 +154,106 @@ export default function PoliticalWorkReport() {
   }, [activeMenuId]);
 
   const canEditReport = (row: PoliticalWorkRow) =>
-    row.status === "Nháp" || row.status === "Từ_Chối" || row.status === "Từ chối";
+    row.status === "Nháp" || row.status === "Từ_Chối";
 
-  const handleSubmitReport = async (id: string) => {
-    try {
-      await politicalWorkReportService.submitReport(id);
-      showSuccess("Đã trình phê duyệt thành công");
-    } catch (error) {
-      handleApiError(error, { showError, errorMessage: "Không thể trình phê duyệt" });
-    } finally {
-      await fetchPoliticalReports();
-    }
-  };
+  const displayRows = useMemo<PoliticalWorkRow[]>(() => {
+    if (!isParentUnit) return reportData;
 
-  const handleRecallReport = async (id: string) => {
-    try {
-      await politicalWorkReportService.recallReport(id);
-      showSuccess("Đã thu hồi báo cáo thành công");
-    } catch (error) {
-      handleApiError(error, { showError, errorMessage: "Không thể thu hồi báo cáo" });
-    } finally {
-      await fetchPoliticalReports();
-    }
-  };
+    const ownRow: PoliticalWorkRow = parentReportData
+      ? { ...parentReportData, notSubmitted: false }
+      : createEmptyPoliticalWorkRow({
+          maDonVi: maDonViCurrent ?? "",
+          tenDonVi: account?.donVi?.tenDonvi ?? "",
+          kyhieuDonVi: account?.donVi?.kyhieuDonvi,
+        });
 
-  const handleApproveReport = async (id: string) => {
-    try {
-      await politicalWorkReportService.approveReport(id);
-      showSuccess("Phê duyệt báo cáo thành công");
-    } catch (error) {
-      handleApiError(error, { showError, errorMessage: "Không thể phê duyệt báo cáo" });
-    } finally {
-      await fetchPoliticalReports();
-    }
-  };
+    const childRows = (childUnits ?? []).map((unit) => {
+      const matched = reportData.find((r) => r.donVi === unit.maDonVi);
+      if (matched) return { ...matched, notSubmitted: false };
+      return createEmptyPoliticalWorkRow({
+        maDonVi: unit.maDonVi,
+        tenDonVi: unit.tenDonvi,
+        kyhieuDonVi: unit.kyhieuDonvi,
+      });
+    });
+
+    return [ownRow, ...childRows];
+  }, [
+    isParentUnit,
+    parentReportData,
+    childUnits,
+    reportData,
+    maDonViCurrent,
+    account,
+  ]);
 
   const filteredRows = useMemo(() => {
     const keyword = query.trim().toLowerCase();
-    if (!keyword) return reports;
-
-    return reports.filter((row) =>
+    if (!keyword) return displayRows;
+    return displayRows.filter((row) =>
       [
-        row.unit,
-        row.activities.join(" "),
-        row.result,
+        row.tenDonVi,
+        row.kyhieuDonVi,
+        row.tinhHinh,
+        row.ketQua,
+        row.kienNghi,
+        row.trucBanNoiVu,
+        row.trucBanCtDangCt,
         row.status,
-        row.hasIncident ? "có vụ việc đột xuất" : "không vụ việc đột xuất",
-        row.hasProposal ? "có kiến nghị đề xuất" : "không kiến nghị đề xuất",
-        row.reporter,
-        row.reportCTD,
       ]
         .join(" ")
         .toLowerCase()
-        .includes(keyword)
+        .includes(keyword),
     );
-  }, [query, reports]);
+  }, [query, displayRows]);
 
-  const totalReports = 18;
-  const reported = reports.length;
-  const notReported = totalReports - reported;
-  const incidents = filteredRows.filter((row) => row.hasIncident).length;
-  const proposals = filteredRows.filter((row) => row.hasProposal).length;
+  const totalUnits = account?.donVi?.donViCon?.length ?? reportData.length;
+  const reported = reportData.length;
+  const notReported = Math.max(totalUnits - reported, 0);
+  const incidents = reportData.filter((row) =>
+    Boolean(row.noiDungDotXuat),
+  ).length;
+  const proposals = reportData.filter((row) => Boolean(row.kienNghi)).length;
 
   return (
-    <section className="political-report" aria-labelledby="political-report-heading">
+    <section
+      className={styles["political-report"]}
+      aria-labelledby="political-report-heading"
+    >
       <ReportToolbar
         query={query}
         onQueryChange={setQuery}
         reportDate={reportDate}
         onReportDateChange={setReportDate}
-        onAddReport={
-          ownReport
-            ? undefined
-            : () => {
-              setEditingRow(null);
-              setIsCreateReportOpen(true);
-            }
+        onAddReport={() => {
+          setEditingRow(null);
+          setIsCreateReportOpen(true);
+        }}
+        onApprove={
+          canApprove
+            ? () => handleApproveReport(commanderReport!.idCongtac)
+            : undefined
+        }
+        onRefuse={
+          canRefuse
+            ? () => handleRefuseReportClick(commanderReport!)
+            : undefined
         }
         onSubmit={
-          ownReport?.status === "Nháp"
-            ? () => void handleSubmitReport(ownReport.id)
-            : undefined
+          canSubmit ? () => handleSubmitReport(ownReport!.idCongtac) : undefined
         }
         onRecall={
-          ownReport?.status === "Chờ_Duyệt"
-            ? () => void handleRecallReport(ownReport.id)
-            : undefined
+          canRecall ? () => handleRecallReport(ownReport!.idCongtac) : undefined
         }
-        onApprove={
-          userRole.toLowerCase().includes("chỉ huy") && ownReport?.status === "Chờ_Duyệt"
-            ? () => void handleApproveReport(ownReport.id)
-            : undefined
-        }
-        onRefuse={undefined}
         hasReport={Boolean(ownReport)}
       />
 
-      <div className="political-stats-grid">
+      <div className={styles["political-stats-grid"]}>
         <StatCard
           tone="green"
           icon={<FontAwesomeIcon icon={faFileCircleCheck} />}
           title="Tổng báo cáo"
-          value={totalReports}
+          value={totalUnits}
         />
         <StatCard
           tone="blue"
@@ -358,79 +281,104 @@ export default function PoliticalWorkReport() {
         />
       </div>
 
-      <div className="political-table-card">
+      <div className={styles["political-table-card"]}>
         <h2 id="political-report-heading">Danh sách báo cáo</h2>
 
-        <div className="political-table-scroll">
-          {loading ? (
-            <div style={{ padding: "20px", textAlign: "center" }}>Đang tải dữ liệu...</div>
-          ) : (
-            <table className="political-table">
-              <thead>
-                <tr>
-                  <th>Đơn vị</th>
-                  <th>Tình hình hoạt động trong ngày</th>
-                  <th>Kết quả</th>
-                  <th>Vụ việc đột xuất</th>
-                  <th>Kiến nghị, đề xuất</th>
-                  <th>Trực ban</th>
-                  <th>Trực CTĐ, CTCT</th>
-                  <th>Trạng thái</th>
-                  <th>Thao tác</th>
-                </tr>
-              </thead>
+        <div className={styles["political-table-scroll"]}>
+          <table className={styles["political-table"]}>
+            <thead>
+              <tr>
+                <th>Đơn vị</th>
+                <th>Tình hình hoạt động trong ngày</th>
+                <th>Kết quả</th>
+                <th>Vụ việc đột xuất</th>
+                <th>Kiến nghị, đề xuất</th>
+                <th>Trực ban</th>
+                <th>Trực CTĐ, CTCT</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
 
-              <tbody>
-                {filteredRows.map((row) => (
-                  <tr key={`${row.unit}-${row.id}`}>
-                    <td className="political-unit-cell">{row.unit}</td>
-                    <td className="political-text-cell">
-                      {row.activities.map((activity) => (
-                        <p key={activity}>- {activity}</p>
-                      ))}
+            <tbody>
+              {filteredRows.map((row) =>
+                row.notSubmitted ? (
+                  <tr
+                    key={row.idCongtac}
+                    className={styles["political-row--not-submitted"]}
+                  >
+                    <td className={styles["political-unit-cell"]}>
+                      {row.kyhieuDonVi || row.tenDonVi}
                     </td>
-                    <td className="political-text-cell">{row.result}</td>
+                    <td className={styles["political-text-cell"]}>—</td>
+                    <td className={styles["political-text-cell"]}>—</td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td className={styles["political-ctd-cell"]}>—</td>
                     <td>
-                      <StatusBadge active={row.hasIncident} danger />
+                      <ReportStatusBadge status="Chưa_Nộp" />
+                    </td>
+                    <td className={styles["political-action-cell"]}>—</td>
+                  </tr>
+                ) : (
+                  <tr key={row.idCongtac}>
+                    <td className={styles["political-unit-cell"]}>
+                      {row.kyhieuDonVi || row.tenDonVi}
+                    </td>
+                    <td className={styles["political-text-cell"]}>
+                      {row.tinhHinh}
+                    </td>
+                    <td className={styles["political-text-cell"]}>
+                      {row.ketQua}
                     </td>
                     <td>
-                      <StatusBadge active={row.hasProposal} />
+                      <StatusBadge
+                        active={Boolean(row.noiDungDotXuat)}
+                        danger
+                      />
                     </td>
-                    <td>{row.reporter}</td>
-                    <td className="political-ctd-cell">{row.reportCTD}</td>
+                    <td>
+                      <StatusBadge active={Boolean(row.kienNghi)} />
+                    </td>
+                    <td>{parseTrucNguoi(row.trucBanNoiVu).hoTen}</td>
+                    <td className={styles["political-ctd-cell"]}>
+                      {parseTrucNguoi(row.trucBanCtDangCt).hoTen}
+                    </td>
                     <td>
                       <ReportStatusBadge status={row.status} />
                     </td>
-                    <td className="political-action-cell" style={{ position: "relative" }}>
+                    <td
+                      className={styles["political-action-cell"]}
+                      style={{ position: "relative" }}
+                    >
                       <button
                         type="button"
-                        className="political-ellipsis-btn"
+                        className={styles["political-ellipsis-btn"]}
                         aria-label="Tùy chọn thao tác"
                         onClick={(event) => {
                           event.stopPropagation();
-
-                          if (activeMenuId === row.id) {
+                          if (activeMenuId === row.idCongtac) {
                             setActiveMenuId(null);
                             return;
                           }
-
-                          const rect = event.currentTarget.getBoundingClientRect();
+                          const rect =
+                            event.currentTarget.getBoundingClientRect();
                           setMenuPosition({
                             top: rect.bottom + window.scrollY + 4,
                             left: rect.right + window.scrollX - 220,
                           });
-
-                          setActiveMenuId(row.id);
+                          setActiveMenuId(row.idCongtac);
                         }}
                       >
                         <FontAwesomeIcon icon={faEllipsisVertical} />
                       </button>
 
-                      {activeMenuId === row.id &&
+                      {activeMenuId === row.idCongtac &&
                         createPortal(
                           <div
                             ref={dropdownRef}
-                            className="political-dropdown-menu"
+                            className={styles["political-dropdown-menu"]}
                             role="menu"
                             style={{
                               position: "absolute",
@@ -442,11 +390,10 @@ export default function PoliticalWorkReport() {
                           >
                             <button
                               type="button"
-                              className="political-menu-item"
+                              className={styles["political-menu-item"]}
                               onClick={() => {
-                                setSelectedRow(row);
                                 setActiveMenuId(null);
-                                console.log("Xem chi tiết row:", row);
+                                setDetailRow(row);
                               }}
                             >
                               <FontAwesomeIcon icon={faEye} />
@@ -456,7 +403,7 @@ export default function PoliticalWorkReport() {
                             {canEditReport(row) && (
                               <button
                                 type="button"
-                                className="political-menu-item"
+                                className={styles["political-menu-item"]}
                                 onClick={() => {
                                   setEditingRow(row);
                                   setIsCreateReportOpen(true);
@@ -468,51 +415,47 @@ export default function PoliticalWorkReport() {
                               </button>
                             )}
                           </div>,
-                          document.body
+                          document.body,
                         )}
                     </td>
                   </tr>
-                ))}
+                ),
+              )}
 
-                {filteredRows.length === 0 && (
-                  <tr>
-                    <td className="political-empty-cell" colSpan={9}>
-                      Không tìm thấy báo cáo phù hợp.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          )}
+              {!loading && filteredRows.length === 0 && (
+                <tr>
+                  <td className={styles["political-empty-cell"]} colSpan={9}>
+                    Không tìm thấy báo cáo phù hợp.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 
       <CreateReport
+        key={editingRow?.idCongtac ?? "new"}
         open={isCreateReportOpen}
         onClose={() => {
           setIsCreateReportOpen(false);
           setEditingRow(null);
         }}
         initialData={editingRow}
-
-        onSubmit={async (data) => {
-          if (!maDonViCurrent) {
-            showError("Không xác định được đơn vị hiện tại");
-            return;
-          }
-
+        maDonViCurrent={maDonViCurrent ?? ""}
+        onSubmit={async (payload) => {
           try {
-            const payload = buildPayload(data, maDonViCurrent);
-
             if (editingRow) {
-              await politicalWorkReportService.updateReport(editingRow.id, payload);
-              showSuccess("Cập nhật báo cáo thành công");
+              await politicalWorkService.updateReport(
+                editingRow.idCongtac,
+                payload,
+              );
+              showSuccess("Cập nhật báo cáo (nháp) thành công");
             } else {
-              await politicalWorkReportService.createReport(payload);
-              showSuccess("Lưu báo cáo thành công");
+              await politicalWorkService.createReport(payload);
+              showSuccess("Lưu báo cáo nháp thành công");
             }
-
-            await fetchPoliticalReports();
+            await fetchReports();
             setIsCreateReportOpen(false);
             setEditingRow(null);
           } catch (error) {
@@ -523,6 +466,20 @@ export default function PoliticalWorkReport() {
           }
         }}
       />
+
+      <RefuseDialog
+        isOpen={showRefuseDialog}
+        unitName={refuseUnitName}
+        onConfirm={handleRefuseConfirm}
+        onCancel={handleRefuseCancel}
+      />
+
+      {detailRow && (
+        <PoliticalWorkDetailModal
+          row={detailRow}
+          onClose={() => setDetailRow(null)}
+        />
+      )}
     </section>
   );
 }
