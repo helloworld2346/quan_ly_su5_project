@@ -21,16 +21,20 @@ export function mapItemToRow(item: PoliticalWorkItem): PoliticalWorkRow {
   };
 }
 
-export function createEmptyPoliticalWorkRow(args: {
+export function createEmptyPoliticalWorkRow({
+  maDonVi,
+  tenDonVi,
+  kyhieuDonVi,
+}: {
   maDonVi: string;
   tenDonVi: string;
   kyhieuDonVi?: string;
 }): PoliticalWorkRow {
   return {
-    idCongtac: args.maDonVi,
-    donVi: args.maDonVi,
-    tenDonVi: args.tenDonVi,
-    kyhieuDonVi: args.kyhieuDonVi,
+    idCongtac: maDonVi,
+    donVi: maDonVi,
+    tenDonVi,
+    kyhieuDonVi,
     tinhHinh: "",
     noiDungDotXuat: "",
     ketQua: "",
@@ -40,6 +44,6 @@ export function createEmptyPoliticalWorkRow(args: {
     status: "Chưa_Nộp",
     ghiChu: "",
     notSubmitted: true,
-    rawItem: {} as PoliticalWorkItem,
+    rawItem: null as unknown as PoliticalWorkItem,
   };
 }

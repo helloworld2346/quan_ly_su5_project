@@ -28,37 +28,10 @@ import { politicalWorkService } from "../../services/politicalWork/politicalWork
 import { usePoliticalWorkData } from "./hooks/usePoliticalWorkData";
 import { usePoliticalWorkActions } from "./hooks/usePoliticalWorkActions";
 import { usePoliticalWorkPermissions } from "./hooks/usePoliticalWorkPermissions";
-import type {
-  PoliticalWorkRow,
-  PoliticalWorkItem,
-} from "../../types/politicalWork";
+import type { PoliticalWorkRow } from "../../types/politicalWork";
 
 import { parseTrucNguoi } from "./utils/trucNguoi";
-
-type ChildUnit = {
-  maDonVi: string;
-  tenDonvi: string;
-  kyhieuDonvi?: string;
-};
-
-function createEmptyPoliticalWorkRow(unit: ChildUnit): PoliticalWorkRow {
-  return {
-    idCongtac: unit.maDonVi,
-    donVi: unit.maDonVi,
-    tenDonVi: unit.tenDonvi,
-    kyhieuDonVi: unit.kyhieuDonvi,
-    tinhHinh: "",
-    noiDungDotXuat: "",
-    ketQua: "",
-    trucBanNoiVu: "",
-    trucBanCtDangCt: "",
-    kienNghi: "",
-    status: "Chưa_Nộp",
-    ghiChu: "",
-    notSubmitted: true,
-    rawItem: {} as PoliticalWorkItem,
-  };
-}
+import { createEmptyPoliticalWorkRow } from "./utils/politicalWorkUtils";
 
 function StatCard({
   tone,
@@ -131,6 +104,7 @@ export default function PoliticalWorkReport() {
     (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
     (isNoiVu && capDonVi === "TIEU_DOAN");
 
+
   const { reportData, parentReportData, childUnits, loading, fetchReports } =
     usePoliticalWorkData({ maDonViCurrent, isParentUnit, showError });
 
@@ -180,17 +154,38 @@ export default function PoliticalWorkReport() {
   }, [activeMenuId]);
 
   const canEditReport = (row: PoliticalWorkRow) =>
-    !row.notSubmitted && (row.status === "Nháp" || row.status === "Từ_Chối");
+    row.status === "Nháp" || row.status === "Từ_Chối";
 
-  // Ghép đơn vị con: đơn vị đã nộp -> dùng báo cáo; chưa nộp -> dòng placeholder
   const displayRows = useMemo<PoliticalWorkRow[]>(() => {
     if (!isParentUnit) return reportData;
-    return (childUnits ?? []).map((unit) => {
+
+    const ownRow: PoliticalWorkRow = parentReportData
+      ? { ...parentReportData, notSubmitted: false }
+      : createEmptyPoliticalWorkRow({
+          maDonVi: maDonViCurrent ?? "",
+          tenDonVi: account?.donVi?.tenDonvi ?? "",
+          kyhieuDonVi: account?.donVi?.kyhieuDonvi,
+        });
+
+    const childRows = (childUnits ?? []).map((unit) => {
       const matched = reportData.find((r) => r.donVi === unit.maDonVi);
       if (matched) return { ...matched, notSubmitted: false };
-      return createEmptyPoliticalWorkRow(unit);
+      return createEmptyPoliticalWorkRow({
+        maDonVi: unit.maDonVi,
+        tenDonVi: unit.tenDonvi,
+        kyhieuDonVi: unit.kyhieuDonvi,
+      });
     });
-  }, [isParentUnit, childUnits, reportData]);
+
+    return [ownRow, ...childRows];
+  }, [
+    isParentUnit,
+    parentReportData,
+    childUnits,
+    reportData,
+    maDonViCurrent,
+    account,
+  ]);
 
   const filteredRows = useMemo(() => {
     const keyword = query.trim().toLowerCase();
@@ -212,14 +207,13 @@ export default function PoliticalWorkReport() {
     );
   }, [query, displayRows]);
 
-  const submittedRows = displayRows.filter((r) => !r.notSubmitted);
-  const totalUnits = displayRows.length;
-  const reported = submittedRows.length;
-  const notReported = displayRows.filter((r) => r.notSubmitted).length;
-  const incidents = submittedRows.filter((row) =>
+  const totalUnits = account?.donVi?.donViCon?.length ?? reportData.length;
+  const reported = reportData.length;
+  const notReported = Math.max(totalUnits - reported, 0);
+  const incidents = reportData.filter((row) =>
     Boolean(row.noiDungDotXuat),
   ).length;
-  const proposals = submittedRows.filter((row) => Boolean(row.kienNghi)).length;
+  const proposals = reportData.filter((row) => Boolean(row.kienNghi)).length;
 
   return (
     <section
@@ -307,31 +301,27 @@ export default function PoliticalWorkReport() {
             </thead>
 
             <tbody>
-              {filteredRows.map((row) => {
-                if (row.notSubmitted) {
-                  return (
-                    <tr
-                      key={row.idCongtac}
-                      className={styles["political-row--not-submitted"]}
-                    >
-                      <td className={styles["political-unit-cell"]}>
-                        {row.kyhieuDonVi || row.tenDonVi}
-                      </td>
-                      <td className={styles["political-text-cell"]}>—</td>
-                      <td className={styles["political-text-cell"]}>—</td>
-                      <td>—</td>
-                      <td>—</td>
-                      <td>—</td>
-                      <td className={styles["political-ctd-cell"]}>—</td>
-                      <td>
-                        <ReportStatusBadge status="Chưa_Nộp" />
-                      </td>
-                      <td>—</td>
-                    </tr>
-                  );
-                }
-
-                return (
+              {filteredRows.map((row) =>
+                row.notSubmitted ? (
+                  <tr
+                    key={row.idCongtac}
+                    className={styles["political-row--not-submitted"]}
+                  >
+                    <td className={styles["political-unit-cell"]}>
+                      {row.kyhieuDonVi || row.tenDonVi}
+                    </td>
+                    <td className={styles["political-text-cell"]}>—</td>
+                    <td className={styles["political-text-cell"]}>—</td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td className={styles["political-ctd-cell"]}>—</td>
+                    <td>
+                      <ReportStatusBadge status="Chưa_Nộp" />
+                    </td>
+                    <td className={styles["political-action-cell"]}>—</td>
+                  </tr>
+                ) : (
                   <tr key={row.idCongtac}>
                     <td className={styles["political-unit-cell"]}>
                       {row.kyhieuDonVi || row.tenDonVi}
@@ -429,8 +419,8 @@ export default function PoliticalWorkReport() {
                         )}
                     </td>
                   </tr>
-                );
-              })}
+                ),
+              )}
 
               {!loading && filteredRows.length === 0 && (
                 <tr>
