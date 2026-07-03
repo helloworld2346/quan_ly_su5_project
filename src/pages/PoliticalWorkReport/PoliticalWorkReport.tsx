@@ -334,12 +334,18 @@ export default function PoliticalWorkReport() {
                     <td className={styles["political-unit-cell"]}>
                       {row.kyhieuDonVi || row.tenDonVi}
                     </td>
+
                     <td className={styles["political-text-cell"]}>
-                      {row.tinhHinh}
+                      <div className={styles.textEllipsisContainer}>
+                        {row.tinhHinh}
+                      </div>
                     </td>
                     <td className={styles["political-text-cell"]}>
-                      {row.ketQua}
+                      <div className={styles.textEllipsisContainer}>
+                        {row.ketQua}
+                      </div>
                     </td>
+
                     <td>
                       <StatusBadge
                         active={Boolean(row.noiDungDotXuat)}
@@ -352,10 +358,14 @@ export default function PoliticalWorkReport() {
                         type="proposal"
                       />
                     </td>
-                    <td>{parseTrucNguoi(row.trucBanNoiVu).hoTen}</td>
-                    <td className={styles["political-ctd-cell"]}>
+              
+                    <td className={styles.nowrapCell}>
+                      {parseTrucNguoi(row.trucBanNoiVu).hoTen}
+                    </td>
+                    <td className={`${styles["political-ctd-cell"]} ${styles.nowrapCell}`}>
                       {parseTrucNguoi(row.trucBanCtDangCt).hoTen}
                     </td>
+                    
                     <td>
                       <ReportStatusBadge status={row.status} />
                     </td>

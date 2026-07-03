@@ -183,6 +183,21 @@
 .political-text-cell {
   text-align: left !important;
   word-break: break-word;
+  max-width: 320px; 
+}
+
+.nowrapCell {
+  white-space: nowrap !important;
+}
+
+.textEllipsisContainer {
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;  
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: default;
+  line-height: 1.5;
 }
 
 .political-text-cell p {
