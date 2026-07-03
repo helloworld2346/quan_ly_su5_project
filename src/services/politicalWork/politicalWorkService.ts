@@ -36,18 +36,24 @@ export const politicalWorkService = {
     return response.data;
   },
 
-  getByDonVi: async (idDonVi: string): Promise<PoliticalWorkSingleResponse> => {
+  getByDonVi: async (
+    idDonVi: string,
+    ngayLoc: string,
+  ): Promise<PoliticalWorkSingleResponse> => {
     const response = await api.get<PoliticalWorkSingleResponse>(
-      `/ctdangct/donVi/${idDonVi}`,
+      `/ctdangct/search/DonVi/${idDonVi}`,
+      { params: { ngayLoc } },
     );
     return response.data;
   },
 
   getByDonViCha: async (
-    idDonViCha: string,
+    idDonVi: string,
+    ngayLoc: string,
   ): Promise<PoliticalWorkListResponse> => {
     const response = await api.get<PoliticalWorkListResponse>(
-      `/ctdangct/donViCha/${idDonViCha}`,
+      `/ctdangct/search/DonVi/${idDonVi}/children`,
+      { params: { ngayLoc } },
     );
     return response.data;
   },

@@ -106,7 +106,12 @@ export default function PoliticalWorkReport() {
 
 
   const { reportData, parentReportData, childUnits, loading, fetchReports } =
-    usePoliticalWorkData({ maDonViCurrent, isParentUnit, showError });
+    usePoliticalWorkData({
+      maDonViCurrent,
+      isParentUnit,
+      showError,
+      reportDate
+    });
 
   const ownReport =
     parentReportData ??

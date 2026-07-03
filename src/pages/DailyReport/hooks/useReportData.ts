@@ -11,7 +11,9 @@ import type {
 } from "../../../types/dailyReport";
 import type { DonVi } from "../../../types/account";
 import type { CaTrucDetail } from "../../../types/duty";
-import { generateId } from "../../../utils/uuid";  
+import { generateId } from "../../../utils/uuid";
+import { getDirectChildUnits } from "../../report/shared/utils/reportUnitTree";
+import { useReportDataChangedListener } from "../../report/shared/hooks/useReportDataChangedListener";
 
 export type { ReportRow };
 
@@ -98,13 +100,7 @@ export function useReportData({
     return () => clearTimeout(id);
   }, [fetchReports]);
 
-  useEffect(() => {
-    const handler = () => {
-      void fetchReports();
-    };
-    window.addEventListener("report-data-changed", handler);
-    return () => window.removeEventListener("report-data-changed", handler);
-  }, [fetchReports]);
+  useReportDataChangedListener(fetchReports);
 
   useEffect(() => {
     const fetchDonViInfo = async () => {
@@ -114,12 +110,7 @@ export function useReportData({
         const unit = allUnits.find((u) => u.maDonVi === maDonViCurrent);
         if (unit) setDonViQuanSoTong(unit.quanSoTong);
         if (isParentUnit) {
-          const children = allUnits.filter((u) => {
-            if (!u.maDonVi.startsWith(maDonViCurrent + ".")) return false;
-            const suffix = u.maDonVi.slice(maDonViCurrent.length + 1);
-            return !suffix.includes(".");
-          });
-          setChildUnits(children);
+          setChildUnits(getDirectChildUnits(allUnits, maDonViCurrent));
         }
       } catch (err) {
         console.error("Không thể tải thông tin đơn vị:", err);

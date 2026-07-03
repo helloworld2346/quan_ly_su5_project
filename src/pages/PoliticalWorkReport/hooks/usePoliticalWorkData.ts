@@ -5,15 +5,19 @@ import { handleApiError } from "../../../utils/errorHandler";
 import { mapItemToRow } from "../utils/politicalWorkUtils";
 import type { PoliticalWorkRow } from "../../../types/politicalWork";
 import type { DonVi } from "../../../types/account";
+import { getDirectChildUnits } from "../../report/shared/utils/reportUnitTree";
+import { useReportDataChangedListener } from "../../report/shared/hooks/useReportDataChangedListener";
 
-export function usePoliticalWorkData({
-  maDonViCurrent,
-  isParentUnit,
-  showError,
-}: {
-  maDonViCurrent: string | undefined;
-  isParentUnit: boolean;
-  showError: (msg: string) => void;
+export function usePoliticalWorkData({  
+  maDonViCurrent,  
+  isParentUnit,  
+  reportDate,  
+  showError,  
+}: {  
+  maDonViCurrent: string | undefined;  
+  isParentUnit: boolean;  
+  reportDate: string;  
+  showError: (msg: string) => void;  
 }) {
   const [reportData, setReportData] = useState<PoliticalWorkRow[]>([]);
   const [parentReportData, setParentReportData] =
@@ -31,14 +35,20 @@ export function usePoliticalWorkData({
     setLoading(true);
     try {
       if (isParentUnit) {
-        const res = await politicalWorkService.getByDonViCha(maDonViCurrent);
+        const res = await politicalWorkService.getByDonViCha(
+          maDonViCurrent,
+          reportDate,
+        );
         if (res.success && res.Result) {
           setReportData(res.Result.map((item) => mapItemToRow(item)));
         } else {
           setReportData([]);
         }
         try {
-          const ownRes = await politicalWorkService.getByDonVi(maDonViCurrent);
+          const ownRes = await politicalWorkService.getByDonVi(
+            maDonViCurrent,
+            reportDate,
+          );
           if (ownRes.success && ownRes.Result) {
             setParentReportData(mapItemToRow(ownRes.Result));
           } else {
@@ -48,7 +58,10 @@ export function usePoliticalWorkData({
           setParentReportData(null);
         }
       } else {
-        const res = await politicalWorkService.getByDonVi(maDonViCurrent);
+        const res = await politicalWorkService.getByDonVi(
+          maDonViCurrent,
+          reportDate,
+        );
         setParentReportData(null);
         if (res.success && res.Result) {
           setReportData([mapItemToRow(res.Result)]);
@@ -65,7 +78,7 @@ export function usePoliticalWorkData({
     } finally {
       setLoading(false);
     }
-  }, [maDonViCurrent, isParentUnit]);
+  }, [maDonViCurrent, isParentUnit, reportDate]);
 
   useEffect(() => {
     const id = setTimeout(() => {
@@ -74,13 +87,7 @@ export function usePoliticalWorkData({
     return () => clearTimeout(id);
   }, [fetchReports]);
 
-  useEffect(() => {
-    const handler = () => {
-      void fetchReports();
-    };
-    window.addEventListener("report-data-changed", handler);
-    return () => window.removeEventListener("report-data-changed", handler);
-  }, [fetchReports]);
+  useReportDataChangedListener(fetchReports);
 
   useEffect(() => {
     const fetchDonViInfo = async () => {
@@ -90,12 +97,7 @@ export function usePoliticalWorkData({
       }
       try {
         const allUnits = await donviService.getDonVi();
-        const children = allUnits.filter((u) => {
-          if (!u.maDonVi.startsWith(maDonViCurrent + ".")) return false;
-          const suffix = u.maDonVi.slice(maDonViCurrent.length + 1);
-          return !suffix.includes(".");
-        });
-        setChildUnits(children);
+        setChildUnits(getDirectChildUnits(allUnits, maDonViCurrent));
       } catch (err) {
         console.error("Không thể tải thông tin đơn vị:", err);
         setChildUnits([]);
