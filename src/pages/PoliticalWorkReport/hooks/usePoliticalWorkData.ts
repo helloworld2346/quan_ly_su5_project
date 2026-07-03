@@ -1,29 +1,29 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { politicalWorkService } from "../../../services/politicalWork/politicalWorkService";
-import { donviService } from "../../../services/unit/unitService";
 import { handleApiError } from "../../../utils/errorHandler";
 import { mapItemToRow } from "../utils/politicalWorkUtils";
 import type { PoliticalWorkRow } from "../../../types/politicalWork";
-import type { DonVi } from "../../../types/account";
-import { getDirectChildUnits } from "../../report/shared/utils/reportUnitTree";
-import { useReportDataChangedListener } from "../../report/shared/hooks/useReportDataChangedListener";
+import { useReportDataChangedListener } from "../../../shared/report/hooks/useReportDataChangedListener";
+import { useInitialFetch } from "../../../shared/report/hooks/useInitialFetch";
+import { useChildUnits } from "../../../shared/report/hooks/useChildUnits";
 
-export function usePoliticalWorkData({  
-  maDonViCurrent,  
-  isParentUnit,  
-  reportDate,  
-  showError,  
-}: {  
-  maDonViCurrent: string | undefined;  
-  isParentUnit: boolean;  
-  reportDate: string;  
-  showError: (msg: string) => void;  
+export function usePoliticalWorkData({
+  maDonViCurrent,
+  isParentUnit,
+  reportDate,
+  showError,
+}: {
+  maDonViCurrent: string | undefined;
+  isParentUnit: boolean;
+  reportDate: string;
+  showError: (msg: string) => void;
 }) {
   const [reportData, setReportData] = useState<PoliticalWorkRow[]>([]);
   const [parentReportData, setParentReportData] =
     useState<PoliticalWorkRow | null>(null);
-  const [childUnits, setChildUnits] = useState<DonVi[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const { childUnits } = useChildUnits(maDonViCurrent, isParentUnit);
 
   const showErrorRef = useRef(showError);
   useEffect(() => {
@@ -80,31 +80,8 @@ export function usePoliticalWorkData({
     }
   }, [maDonViCurrent, isParentUnit, reportDate]);
 
-  useEffect(() => {
-    const id = setTimeout(() => {
-      void fetchReports();
-    }, 0);
-    return () => clearTimeout(id);
-  }, [fetchReports]);
-
+  useInitialFetch(fetchReports);
   useReportDataChangedListener(fetchReports);
-
-  useEffect(() => {
-    const fetchDonViInfo = async () => {
-      if (!maDonViCurrent || !isParentUnit) {
-        setChildUnits([]);
-        return;
-      }
-      try {
-        const allUnits = await donviService.getDonVi();
-        setChildUnits(getDirectChildUnits(allUnits, maDonViCurrent));
-      } catch (err) {
-        console.error("Không thể tải thông tin đơn vị:", err);
-        setChildUnits([]);
-      }
-    };
-    void fetchDonViInfo();
-  }, [maDonViCurrent, isParentUnit]);
 
   return {
     reportData,

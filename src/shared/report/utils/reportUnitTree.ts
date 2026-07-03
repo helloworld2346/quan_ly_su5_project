@@ -1,4 +1,4 @@
-import type { DonVi } from "../../../../types/account";
+import type { DonVi } from "../../../types/account";
 
 export function getDirectChildUnits(
   allUnits: DonVi[],

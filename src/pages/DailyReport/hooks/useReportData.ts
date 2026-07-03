@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { dailyReportService } from "../../../services/dailyReport/dailyReportService";
-import { donviService } from "../../../services/unit/unitService";
 import { dutyService } from "../../../services/duty/dutyService";
 import { handleApiError } from "../../../utils/errorHandler";
 import { sumVang, mapItemToRow } from "../../../utils/reportUtils";
@@ -9,11 +8,11 @@ import type {
   VangChiTiet,
   ReportRow,
 } from "../../../types/dailyReport";
-import type { DonVi } from "../../../types/account";
 import type { CaTrucDetail } from "../../../types/duty";
 import { generateId } from "../../../utils/uuid";
-import { getDirectChildUnits } from "../../report/shared/utils/reportUnitTree";
-import { useReportDataChangedListener } from "../../report/shared/hooks/useReportDataChangedListener";
+import { useReportDataChangedListener } from "../../../shared/report/hooks/useReportDataChangedListener";
+import { useInitialFetch } from "../../../shared/report/hooks/useInitialFetch";
+import { useChildUnits } from "../../../shared/report/hooks/useChildUnits";
 
 export type { ReportRow };
 
@@ -35,9 +34,13 @@ export function useReportData({
     null,
   );
   const [loading, setLoading] = useState(false);
-  const [donViQuanSoTong, setDonViQuanSoTong] = useState<number>(0);
-  const [childUnits, setChildUnits] = useState<DonVi[]>([]);
   const [caTrucFromApi, setCaTrucFromApi] = useState<CaTrucDetail | null>(null);
+
+  const { childUnits, currentUnit } = useChildUnits(
+    maDonViCurrent,
+    isParentUnit,
+  );
+  const donViQuanSoTong = currentUnit?.quanSoTong ?? 0;
 
   const showErrorRef = useRef(showError);
   useEffect(() => {
@@ -93,31 +96,8 @@ export function useReportData({
     }
   }, [maDonViCurrent, isParentUnit, reportDate]);
 
-  useEffect(() => {
-    const id = setTimeout(() => {
-      void fetchReports();
-    }, 0);
-    return () => clearTimeout(id);
-  }, [fetchReports]);
-
+  useInitialFetch(fetchReports);
   useReportDataChangedListener(fetchReports);
-
-  useEffect(() => {
-    const fetchDonViInfo = async () => {
-      if (!maDonViCurrent) return;
-      try {
-        const allUnits = await donviService.getDonVi();
-        const unit = allUnits.find((u) => u.maDonVi === maDonViCurrent);
-        if (unit) setDonViQuanSoTong(unit.quanSoTong);
-        if (isParentUnit) {
-          setChildUnits(getDirectChildUnits(allUnits, maDonViCurrent));
-        }
-      } catch (err) {
-        console.error("Không thể tải thông tin đơn vị:", err);
-      }
-    };
-    void fetchDonViInfo();
-  }, [maDonViCurrent, isParentUnit]);
 
   useEffect(() => {
     if (!isTacChien) return;

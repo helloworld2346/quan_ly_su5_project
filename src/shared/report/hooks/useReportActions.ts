@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { handleApiError } from "../../../../utils/errorHandler";
+import { handleApiError } from "../../../utils/errorHandler";
 
 export interface ReportActionService {
   approveReport: (id: string) => Promise<unknown>;

@@ -1,5 +1,5 @@
 import { politicalWorkService } from "../../../services/politicalWork/politicalWorkService";
-import { useReportActions } from "../../report/shared/hooks/useReportActions";
+import { useReportActions } from "../../../shared/report/hooks/useReportActions";
 import type { PoliticalWorkRow } from "../../../types/politicalWork";
 
 export function usePoliticalWorkActions(args: {

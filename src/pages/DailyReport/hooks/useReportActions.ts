@@ -1,5 +1,5 @@
 import { dailyReportService } from "../../../services/dailyReport/dailyReportService";
-import { useReportActions as useReportActionsBase } from "../../report/shared/hooks/useReportActions";
+import { useReportActions as useReportActionsBase } from "../../../shared/report/hooks/useReportActions";
 import type { ReportRow } from "../../../types/dailyReport";
 
 export function useReportActions(args: {

@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { normalizeRoleName } from "../../../../utils/reportUtils";
+import { normalizeRoleName } from "../../../utils/reportUtils";
 
 export interface ApprovableRow {
   status: string;

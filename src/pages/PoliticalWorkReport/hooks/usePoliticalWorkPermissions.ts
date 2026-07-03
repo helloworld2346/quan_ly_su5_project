@@ -1,4 +1,4 @@
-import { useReportPermissions } from "../../report/shared/hooks/useReportPermissions";
+import { useReportPermissions } from "../../../shared/report/hooks/useReportPermissions";
 import type { PoliticalWorkRow } from "../../../types/politicalWork";
 
 export function usePoliticalWorkPermissions(

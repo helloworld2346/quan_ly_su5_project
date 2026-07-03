@@ -11,8 +11,7 @@ import { notificationStorage } from "../utils/notificationStorage";
 import type { Notification } from "../components/ui/NotificationBell/NotificationBell";
 import type { ApiNotification } from "../types/notification";
 import { useToast } from "./useToast";
-import { generateId } from "../utils/uuid";  
-
+import { generateId } from "../utils/uuid";
 
 function mapApiNotification(n: ApiNotification): Notification {
   return {
@@ -77,6 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             notificationStorage.set(mapped);
             setNotifications(mapped);
           } catch {
+            ///////
           }
         }
       }

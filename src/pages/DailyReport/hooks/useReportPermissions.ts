@@ -1,4 +1,4 @@
-import { useReportPermissions as useReportPermissionsBase } from "../../report/shared/hooks/useReportPermissions";
+import { useReportPermissions as useReportPermissionsBase } from "../../../shared/report/hooks/useReportPermissions";
 import type { ReportRow } from "../../../types/dailyReport";
 
 export function useReportPermissions(
