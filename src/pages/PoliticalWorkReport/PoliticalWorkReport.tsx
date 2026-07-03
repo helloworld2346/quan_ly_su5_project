@@ -66,7 +66,7 @@ function StatusBadge({
   active: boolean;
   type?: "incident" | "proposal" | "default";
 }) {
-  let badgeClass = styles["political-badge--no"]; 
+  let badgeClass = styles["political-badge--no"];
 
   if (active) {
     if (type === "incident" || type === "proposal") {
@@ -108,12 +108,14 @@ export default function PoliticalWorkReport() {
     (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
     (isNoiVu && capDonVi === "TIEU_DOAN");
 
+  const shouldHideConsolidatedSections = isTacChien && capDonVi === "SU_DOAN";
+
   const { reportData, parentReportData, childUnits, loading, fetchReports } =
     usePoliticalWorkData({
       maDonViCurrent,
       isParentUnit,
       showError,
-      reportDate
+      reportDate,
     });
 
   const ownReport =
@@ -164,18 +166,9 @@ export default function PoliticalWorkReport() {
   const canEditReport = (row: PoliticalWorkRow) =>
     row.status === "Nháp" || row.status === "Từ_Chối";
 
-  const displayRows = useMemo<PoliticalWorkRow[]>(() => {
-    if (!isParentUnit) return reportData;
-
-    const ownRow: PoliticalWorkRow = parentReportData
-      ? { ...parentReportData, notSubmitted: false }
-      : createEmptyPoliticalWorkRow({
-          maDonVi: maDonViCurrent ?? "",
-          tenDonVi: account?.donVi?.tenDonvi ?? "",
-          kyhieuDonVi: account?.donVi?.kyhieuDonvi,
-        });
-
-    const childRows = (childUnits ?? []).map((unit) => {
+  const childRows = useMemo<PoliticalWorkRow[]>(() => {
+    if (!isParentUnit) return [];
+    return (childUnits ?? []).map((unit) => {
       const matched = reportData.find((r) => r.donVi === unit.maDonVi);
       if (matched) return { ...matched, notSubmitted: false };
       return createEmptyPoliticalWorkRow({
@@ -184,36 +177,45 @@ export default function PoliticalWorkReport() {
         kyhieuDonVi: unit.kyhieuDonvi,
       });
     });
+  }, [isParentUnit, childUnits, reportData]);
 
-    return [ownRow, ...childRows];
-  }, [
-    isParentUnit,
-    parentReportData,
-    childUnits,
-    reportData,
-    maDonViCurrent,
-    account,
-  ]);
+  const parentRow = useMemo<PoliticalWorkRow>(() => {
+    return parentReportData
+      ? { ...parentReportData, notSubmitted: false }
+      : createEmptyPoliticalWorkRow({
+          maDonVi: maDonViCurrent ?? "",
+          tenDonVi: account?.donVi?.tenDonvi ?? "",
+          kyhieuDonVi: account?.donVi?.kyhieuDonvi,
+        });
+  }, [parentReportData, maDonViCurrent, account]);
 
-  const filteredRows = useMemo(() => {
+  const flatRows = useMemo<PoliticalWorkRow[]>(() => {
+    if (!isParentUnit) return reportData;
+    return [parentRow, ...childRows];
+  }, [isParentUnit, reportData, parentRow, childRows]);
+
+  const matchesQuery = (row: PoliticalWorkRow) => {
     const keyword = query.trim().toLowerCase();
-    if (!keyword) return displayRows;
-    return displayRows.filter((row) =>
-      [
-        row.tenDonVi,
-        row.kyhieuDonVi,
-        row.tinhHinh,
-        row.ketQua,
-        row.kienNghi,
-        row.trucBanNoiVu,
-        row.trucBanCtDangCt,
-        row.status,
-      ]
-        .join(" ")
-        .toLowerCase()
-        .includes(keyword),
-    );
-  }, [query, displayRows]);
+    if (!keyword) return true;
+    return [
+      row.tenDonVi,
+      row.kyhieuDonVi,
+      row.tinhHinh,
+      row.ketQua,
+      row.kienNghi,
+      row.trucBanNoiVu,
+      row.trucBanCtDangCt,
+      row.status,
+    ]
+      .join(" ")
+      .toLowerCase()
+      .includes(keyword);
+  };
+
+  const filteredChildRows = childRows.filter(matchesQuery);
+  const filteredFlatRows = flatRows.filter(matchesQuery);
+
+  const showTwoSections = isParentUnit && !shouldHideConsolidatedSections;
 
   const totalUnits = account?.donVi?.donViCon?.length ?? reportData.length;
   const reported = reportData.length;
@@ -222,6 +224,118 @@ export default function PoliticalWorkReport() {
     Boolean(row.noiDungDotXuat),
   ).length;
   const proposals = reportData.filter((row) => Boolean(row.kienNghi)).length;
+
+  const renderRow = (row: PoliticalWorkRow) =>
+    row.notSubmitted ? (
+      <tr
+        key={row.idCongtac}
+        className={styles["political-row--not-submitted"]}
+      >
+        <td className={styles["political-unit-cell"]}>
+          {row.kyhieuDonVi || row.tenDonVi}
+        </td>
+        <td className={styles["political-text-cell"]}>—</td>
+        <td className={styles["political-text-cell"]}>—</td>
+        <td>—</td>
+        <td>—</td>
+        <td>—</td>
+        <td className={styles["political-ctd-cell"]}>—</td>
+        <td>
+          <ReportStatusBadge status="Chưa_Nộp" />
+        </td>
+        <td className={styles["political-action-cell"]}>—</td>
+      </tr>
+    ) : (
+      <tr key={row.idCongtac}>
+        <td className={styles["political-unit-cell"]}>
+          {row.kyhieuDonVi || row.tenDonVi}
+        </td>
+        <td className={styles["political-text-cell"]}>{row.tinhHinh}</td>
+        <td className={styles["political-text-cell"]}>{row.ketQua}</td>
+        <td>
+          <StatusBadge active={Boolean(row.noiDungDotXuat)} type="incident" />
+        </td>
+        <td>
+          <StatusBadge active={Boolean(row.kienNghi)} type="proposal" />
+        </td>
+        <td>{parseTrucNguoi(row.trucBanNoiVu).hoTen}</td>
+        <td className={styles["political-ctd-cell"]}>
+          {parseTrucNguoi(row.trucBanCtDangCt).hoTen}
+        </td>
+        <td>
+          <ReportStatusBadge status={row.status} />
+        </td>
+        <td
+          className={styles["political-action-cell"]}
+          style={{ position: "relative" }}
+        >
+          <button
+            type="button"
+            className={styles["political-ellipsis-btn"]}
+            aria-label="Tùy chọn thao tác"
+            onClick={(event) => {
+              event.stopPropagation();
+              if (activeMenuId === row.idCongtac) {
+                setActiveMenuId(null);
+                return;
+              }
+              const rect = event.currentTarget.getBoundingClientRect();
+              setMenuPosition({
+                top: rect.bottom + window.scrollY + 4,
+                left: rect.right + window.scrollX - 220,
+              });
+              setActiveMenuId(row.idCongtac);
+            }}
+          >
+            <FontAwesomeIcon icon={faEllipsisVertical} />
+          </button>
+
+          {activeMenuId === row.idCongtac &&
+            createPortal(
+              <div
+                ref={dropdownRef}
+                className={styles["political-dropdown-menu"]}
+                role="menu"
+                style={{
+                  position: "absolute",
+                  top: `${menuPosition.top}px`,
+                  left: `${menuPosition.left}px`,
+                  zIndex: 9999,
+                }}
+                onClick={(event) => event.stopPropagation()}
+              >
+                <button
+                  type="button"
+                  className={styles["political-menu-item"]}
+                  onClick={() => {
+                    setActiveMenuId(null);
+                    setDetailRow(row);
+                  }}
+                >
+                  <FontAwesomeIcon icon={faEye} />
+                  Xem chi tiết
+                </button>
+
+                {canEditReport(row) && (
+                  <button
+                    type="button"
+                    className={styles["political-menu-item"]}
+                    onClick={() => {
+                      setEditingRow(row);
+                      setIsCreateReportOpen(true);
+                      setActiveMenuId(null);
+                    }}
+                  >
+                    <FontAwesomeIcon icon={faPenToSquare} />
+                    Chỉnh sửa
+                  </button>
+                )}
+              </div>,
+              document.body,
+            )}
+        </td>
+      </tr>
+    );
 
   return (
     <section
@@ -309,136 +423,52 @@ export default function PoliticalWorkReport() {
             </thead>
 
             <tbody>
-              {filteredRows.map((row) =>
-                row.notSubmitted ? (
-                  <tr
-                    key={row.idCongtac}
-                    className={styles["political-row--not-submitted"]}
-                  >
-                    <td className={styles["political-unit-cell"]}>
-                      {row.kyhieuDonVi || row.tenDonVi}
-                    </td>
-                    <td className={styles["political-text-cell"]}>—</td>
-                    <td className={styles["political-text-cell"]}>—</td>
-                    <td>—</td>
-                    <td>—</td>
-                    <td>—</td>
-                    <td className={styles["political-ctd-cell"]}>—</td>
-                    <td>
-                      <ReportStatusBadge status="Chưa_Nộp" />
-                    </td>
-                    <td className={styles["political-action-cell"]}>—</td>
+              {showTwoSections ? (
+                <>
+                  <tr className={styles["political-separator-row"]}>
+                    <td colSpan={9}>Báo cáo các đơn vị</td>
                   </tr>
-                ) : (
-                  <tr key={row.idCongtac}>
-                    <td className={styles["political-unit-cell"]}>
-                      {row.kyhieuDonVi || row.tenDonVi}
-                    </td>
-                    <td className={styles["political-text-cell"]}>
-                      {row.tinhHinh}
-                    </td>
-                    <td className={styles["political-text-cell"]}>
-                      {row.ketQua}
-                    </td>
-                    <td>
-                      <StatusBadge
-                        active={Boolean(row.noiDungDotXuat)}
-                        type="incident"
-                      />
-                    </td>
-                    <td>
-                      <StatusBadge 
-                        active={Boolean(row.kienNghi)} 
-                        type="proposal"
-                      />
-                    </td>
-                    <td>{parseTrucNguoi(row.trucBanNoiVu).hoTen}</td>
-                    <td className={styles["political-ctd-cell"]}>
-                      {parseTrucNguoi(row.trucBanCtDangCt).hoTen}
-                    </td>
-                    <td>
-                      <ReportStatusBadge status={row.status} />
-                    </td>
-                    <td
-                      className={styles["political-action-cell"]}
-                      style={{ position: "relative" }}
-                    >
-                      <button
-                        type="button"
-                        className={styles["political-ellipsis-btn"]}
-                        aria-label="Tùy chọn thao tác"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          if (activeMenuId === row.idCongtac) {
-                            setActiveMenuId(null);
-                            return;
-                          }
-                          const rect =
-                            event.currentTarget.getBoundingClientRect();
-                          setMenuPosition({
-                            top: rect.bottom + window.scrollY + 4,
-                            left: rect.right + window.scrollX - 220,
-                          });
-                          setActiveMenuId(row.idCongtac);
-                        }}
+
+                  {filteredChildRows.map(renderRow)}
+
+                  {filteredChildRows.length === 0 && (
+                    <tr>
+                      <td
+                        className={styles["political-empty-cell"]}
+                        colSpan={9}
                       >
-                        <FontAwesomeIcon icon={faEllipsisVertical} />
-                      </button>
+                        Không tìm thấy báo cáo phù hợp.
+                      </td>
+                    </tr>
+                  )}
 
-                      {activeMenuId === row.idCongtac &&
-                        createPortal(
-                          <div
-                            ref={dropdownRef}
-                            className={styles["political-dropdown-menu"]}
-                            role="menu"
-                            style={{
-                              position: "absolute",
-                              top: `${menuPosition.top}px`,
-                              left: `${menuPosition.left}px`,
-                              zIndex: 9999,
-                            }}
-                            onClick={(event) => event.stopPropagation()}
-                          >
-                            <button
-                              type="button"
-                              className={styles["political-menu-item"]}
-                              onClick={() => {
-                                setActiveMenuId(null);
-                                setDetailRow(row);
-                              }}
-                            >
-                              <FontAwesomeIcon icon={faEye} />
-                              Xem chi tiết
-                            </button>
-
-                            {canEditReport(row) && (
-                              <button
-                                type="button"
-                                className={styles["political-menu-item"]}
-                                onClick={() => {
-                                  setEditingRow(row);
-                                  setIsCreateReportOpen(true);
-                                  setActiveMenuId(null);
-                                }}
-                              >
-                                <FontAwesomeIcon icon={faPenToSquare} />
-                                Chỉnh sửa
-                              </button>
-                            )}
-                          </div>,
-                          document.body,
-                        )}
-                    </td>
+                  <tr className={styles["political-separator-row"]}>
+                    <td colSpan={9}>Báo cáo tổng hợp</td>
                   </tr>
-                ),
-              )}
 
-              {!loading && filteredRows.length === 0 && (
-                <tr>
-                  <td className={styles["political-empty-cell"]} colSpan={9}>
-                    Không tìm thấy báo cáo phù hợp.
-                  </td>
-                </tr>
+                  {parentReportData ? (
+                    renderRow(parentRow)
+                  ) : (
+                    <tr className={styles["political-no-consolidated-row"]}>
+                      <td colSpan={9}>Chưa có báo cáo tổng hợp</td>
+                    </tr>
+                  )}
+                </>
+              ) : (
+                <>
+                  {filteredFlatRows.map(renderRow)}
+
+                  {!loading && filteredFlatRows.length === 0 && (
+                    <tr>
+                      <td
+                        className={styles["political-empty-cell"]}
+                        colSpan={9}
+                      >
+                        Không tìm thấy báo cáo phù hợp.
+                      </td>
+                    </tr>
+                  )}
+                </>
               )}
             </tbody>
           </table>
