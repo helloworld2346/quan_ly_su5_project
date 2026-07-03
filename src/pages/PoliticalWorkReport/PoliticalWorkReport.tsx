@@ -210,8 +210,28 @@ export default function PoliticalWorkReport() {
         <td className={styles["political-unit-cell"]}>
           {row.kyhieuDonVi || row.tenDonVi}
         </td>
-        <td className={styles["political-text-cell"]}>—</td>
-        <td className={styles["political-text-cell"]}>—</td>
+        <td
+          className={`${styles["political-text-cell"]} ${
+            row.tinhHinh ? "" : styles["political-text-cell--empty"]
+          }`}
+        >
+          {row.tinhHinh ? (
+            <span className={styles["political-clamp"]}>{row.tinhHinh}</span>
+          ) : (
+            "—"
+          )}
+        </td>
+        <td
+          className={`${styles["political-text-cell"]} ${
+            row.ketQua ? "" : styles["political-text-cell--empty"]
+          }`}
+        >
+          {row.ketQua ? (
+            <span className={styles["political-clamp"]}>{row.ketQua}</span>
+          ) : (
+            "—"
+          )}
+        </td>
         <td>—</td>
         <td>—</td>
         <td>—</td>
@@ -383,77 +403,94 @@ export default function PoliticalWorkReport() {
         />
       </div>
 
-      <div className={styles["political-table-card"]}>
-        <h2 id="political-report-heading">Danh sách báo cáo</h2>
+      <section className={styles["political-section-block"]}>
+        <div className={styles["political-section-card"]}>
+          <div className={styles["political-section-heading"]}>
+            <div className={styles["political-section-title-group"]}>
+              <span className={styles["political-section-kicker"]}>I</span>
+              <div>
+                <h2
+                  className={styles["political-section-title"]}
+                  id="political-report-heading"
+                >
+                  DANH SÁCH BÁO CÁO
+                </h2>
+                <div className={styles["political-section-subtitle"]}>
+                  Tổng hợp báo cáo hoạt động CTĐ, CTCT trong ngày
+                </div>
+              </div>
+            </div>
+          </div>
 
-        <div className={styles["political-table-scroll"]}>
-          <table className={styles["political-table"]}>
-            <thead>
-              <tr>
-                <th>Đơn vị</th>
-                <th>Tình hình hoạt động trong ngày</th>
-                <th>Kết quả</th>
-                <th>Vụ việc đột xuất</th>
-                <th>Kiến nghị, đề xuất</th>
-                <th>Trực ban</th>
-                <th>Trực CTĐ, CTCT</th>
-                <th>Trạng thái</th>
-                <th>Thao tác</th>
-              </tr>
-            </thead>
+          <div className={styles["political-table-shell"]}>
+            <table className={styles["political-table"]}>
+              <thead>
+                <tr>
+                  <th>Đơn vị</th>
+                  <th>Tình hình hoạt động trong ngày</th>
+                  <th>Kết quả</th>
+                  <th>Vụ việc đột xuất</th>
+                  <th>Kiến nghị, đề xuất</th>
+                  <th>Trực ban</th>
+                  <th>Trực CTĐ, CTCT</th>
+                  <th>Trạng thái</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
 
-            <tbody>
-              {showTwoSections ? (
-                <>
-                  <tr className={styles["political-separator-row"]}>
-                    <td colSpan={9}>Báo cáo các đơn vị</td>
-                  </tr>
-
-                  {filteredChildRows.map(renderRow)}
-
-                  {filteredChildRows.length === 0 && (
-                    <tr>
-                      <td
-                        className={styles["political-empty-cell"]}
-                        colSpan={9}
-                      >
-                        Không tìm thấy báo cáo phù hợp.
-                      </td>
+              <tbody>
+                {showTwoSections ? (
+                  <>
+                    <tr className={styles["political-separator-row"]}>
+                      <td colSpan={9}>Báo cáo các đơn vị</td>
                     </tr>
-                  )}
 
-                  <tr className={styles["political-separator-row"]}>
-                    <td colSpan={9}>Báo cáo tổng hợp</td>
-                  </tr>
+                    {filteredChildRows.map(renderRow)}
 
-                  {parentReportData ? (
-                    renderRow(parentRow)
-                  ) : (
-                    <tr className={styles["political-no-consolidated-row"]}>
-                      <td colSpan={9}>Chưa có báo cáo tổng hợp</td>
+                    {filteredChildRows.length === 0 && (
+                      <tr>
+                        <td
+                          className={styles["political-empty-cell"]}
+                          colSpan={9}
+                        >
+                          Không tìm thấy báo cáo phù hợp.
+                        </td>
+                      </tr>
+                    )}
+
+                    <tr className={styles["political-separator-row"]}>
+                      <td colSpan={9}>Báo cáo tổng hợp</td>
                     </tr>
-                  )}
-                </>
-              ) : (
-                <>
-                  {filteredFlatRows.map(renderRow)}
 
-                  {!loading && filteredFlatRows.length === 0 && (
-                    <tr>
-                      <td
-                        className={styles["political-empty-cell"]}
-                        colSpan={9}
-                      >
-                        Không tìm thấy báo cáo phù hợp.
-                      </td>
-                    </tr>
-                  )}
-                </>
-              )}
-            </tbody>
-          </table>
+                    {parentReportData ? (
+                      renderRow(parentRow)
+                    ) : (
+                      <tr className={styles["political-no-consolidated-row"]}>
+                        <td colSpan={9}>Chưa có báo cáo tổng hợp</td>
+                      </tr>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {filteredFlatRows.map(renderRow)}
+
+                    {!loading && filteredFlatRows.length === 0 && (
+                      <tr>
+                        <td
+                          className={styles["political-empty-cell"]}
+                          colSpan={9}
+                        >
+                          Không tìm thấy báo cáo phù hợp.
+                        </td>
+                      </tr>
+                    )}
+                  </>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      </section>
 
       <CreateReport
         key={editingRow?.idCongtac ?? "new"}

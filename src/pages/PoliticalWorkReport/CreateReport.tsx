@@ -271,7 +271,7 @@ export default function CreateReport({
               value={formData.ctdPhone}
               onChange={(e) => {
                 const val = e.target.value.replace(/[^\d+\-\s]/g, "");
-                handleChange("reporterPhone", val); // hoặc "ctdPhone"
+                handleChange("ctdPhone", val);
               }}
             />
           </div>
