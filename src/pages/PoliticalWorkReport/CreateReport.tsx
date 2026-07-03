@@ -212,7 +212,10 @@ export default function CreateReport({
               type="text"
               placeholder="Nhập số điện thoại..."
               value={formData.reporterPhone}
-              onChange={(e) => handleChange("reporterPhone", e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value.replace(/[^\d+\-\s]/g, "");
+                handleChange("reporterPhone", val);
+              }}
             />
           </div>
         </div>
@@ -266,7 +269,10 @@ export default function CreateReport({
               type="text"
               placeholder="Nhập số điện thoại..."
               value={formData.ctdPhone}
-              onChange={(e) => handleChange("ctdPhone", e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value.replace(/[^\d+\-\s]/g, "");
+                handleChange("reporterPhone", val); // hoặc "ctdPhone"
+              }}
             />
           </div>
         </div>
@@ -315,8 +321,9 @@ export default function CreateReport({
         </h3>
         <div className={styles["radio-group"]}>
           <label
-            className={`${styles["radio-item"]} ${!formData.hasIncident ? styles["is-checked"] : ""
-              }`}
+            className={`${styles["radio-item"]} ${
+              !formData.hasIncident ? styles["is-checked"] : ""
+            }`}
           >
             <input
               type="radio"
@@ -327,8 +334,9 @@ export default function CreateReport({
             <span>Không có</span>
           </label>
           <label
-            className={`${styles["radio-item"]} ${formData.hasIncident ? styles["is-danger"] : ""
-              }`}
+            className={`${styles["radio-item"]} ${
+              formData.hasIncident ? styles["is-danger"] : ""
+            }`}
           >
             <input
               type="radio"
@@ -363,8 +371,9 @@ export default function CreateReport({
         <h3 className={styles["section-title"]}>Kiến nghị, đề xuất</h3>
         <div className={styles["radio-group"]}>
           <label
-            className={`${styles["radio-item"]} ${!formData.hasProposal ? styles["is-checked"] : ""
-              }`}
+            className={`${styles["radio-item"]} ${
+              !formData.hasProposal ? styles["is-checked"] : ""
+            }`}
           >
             <input
               type="radio"
@@ -375,8 +384,9 @@ export default function CreateReport({
             <span>Không có</span>
           </label>
           <label
-            className={`${styles["radio-item"]} ${formData.hasProposal ? styles["is-danger"] : ""
-              }`}
+            className={`${styles["radio-item"]} ${
+              formData.hasProposal ? styles["is-danger"] : ""
+            }`}
           >
             <input
               type="radio"
