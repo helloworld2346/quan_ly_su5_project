@@ -33,31 +33,7 @@ import type { PoliticalWorkRow } from "../../types/politicalWork";
 import { parseTrucNguoi } from "./utils/trucNguoi";
 import { createEmptyPoliticalWorkRow } from "./utils/politicalWorkUtils";
 
-function StatCard({
-  tone,
-  icon,
-  title,
-  value,
-}: {
-  tone: "green" | "blue" | "orange" | "red" | "purple";
-  icon: React.ReactNode;
-  title: string;
-  value: number;
-}) {
-  return (
-    <article className={styles["political-stat-card"]}>
-      <span
-        className={`${styles["political-stat-icon"]} ${styles[`political-stat-icon--${tone}`]}`}
-      >
-        {icon}
-      </span>
-      <div>
-        <p>{title}</p>
-        <strong>{value}</strong>
-      </div>
-    </article>
-  );
-}
+import StatCard from "../../components/ui/StatCard/StatCard";
 
 function StatusBadge({
   active,

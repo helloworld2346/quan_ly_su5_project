@@ -38,6 +38,9 @@ export type DisplayTotals = {
   quanSoTong: number;
   quanSoHienDien: number;
   quanSoVang: number;
+  vangSQ: number;
+  vangQNCN: number;
+  vangHSQBS: number;
   hoiThaiNgoaiSuDoan: number;
   hoiThaiEF: number;
   xayDungNgoaiSuDoan: number;
@@ -315,6 +318,30 @@ export function buildDisplayRows(args: {
   return [...ownUnitRow, ...childRows];
 }
 
+function classifyCapBac(capBac: string): "SQ" | "QNCN" | "HSQBS" {
+  const cb = (capBac ?? "").trim();
+  if (cb.includes("QNCN")) return "QNCN";
+  if (/úy|tá/i.test(cb)) return "SQ";
+  return "HSQBS";
+}
+
+function sumVangByRank(rows: ReportRow[]): {
+  vangSQ: number;
+  vangQNCN: number;
+  vangHSQBS: number;
+} {
+  const acc = { vangSQ: 0, vangQNCN: 0, vangHSQBS: 0 };
+  rows.forEach((r) => {
+    (r.chiTietVangList ?? []).forEach((qn) => {
+      const group = classifyCapBac(qn.capBac);
+      if (group === "SQ") acc.vangSQ += 1;
+      else if (group === "QNCN") acc.vangQNCN += 1;
+      else acc.vangHSQBS += 1;
+    });
+  });
+  return acc;
+}
+
 export function buildDisplayTotals(displayRows: ReportRow[]): DisplayTotals {
   const submittedRows = displayRows.filter((r) => !r.notSubmitted);
 
@@ -322,6 +349,7 @@ export function buildDisplayTotals(displayRows: ReportRow[]): DisplayTotals {
     quanSoTong: submittedRows.reduce((s, r) => s + r.quanSoTong, 0),
     quanSoHienDien: submittedRows.reduce((s, r) => s + r.quanSoHienDien, 0),
     quanSoVang: submittedRows.reduce((s, r) => s + r.quanSoVang, 0),
+    ...sumVangByRank(submittedRows),
     ...sumVang(submittedRows),
   };
 }

@@ -26,6 +26,18 @@ import { useDailyTroopReportViewModel } from "./hooks/useDailyTroopReportViewMod
 import DailyTroopStatisticsSection from "./components/DailyTroopStatisticsSection";
 import DailyTroopNhiemVuSection from "./components/DailyTroopNhiemVuSection";
 
+import {
+  faUsers,
+  faUserCheck,
+  faUserTie,
+  faUserGear,
+  faUserGroup,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";  
+
+import StatCard from "../../components/ui/StatCard/StatCard";
+
+
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
   const [reportDate, setReportDate] = useState(todayIsoDate());
@@ -417,6 +429,39 @@ export default function DailyTroopReport() {
         hasReport={checkIfDateHasReport}
         showExport={isTacChien && capDonVi === "SU_DOAN"}
       />
+
+      <div className={styles["daily-stats-grid"]}>
+        <StatCard
+          tone="green"
+          icon={<FontAwesomeIcon icon={faUsers} />}
+          title="Tổng quân số"
+          value={displayTotals.quanSoTong}
+        />
+        <StatCard
+          tone="blue"
+          icon={<FontAwesomeIcon icon={faUserCheck} />}
+          title="Hiện diện"
+          value={displayTotals.quanSoHienDien}
+        />
+        <StatCard
+          tone="orange"
+          icon={<FontAwesomeIcon icon={faUserTie} />}
+          title="Vắng SQ"
+          value={displayTotals.vangSQ}
+        />
+        <StatCard
+          tone="red"
+          icon={<FontAwesomeIcon icon={faUserGear} />}
+          title="Vắng QNCN"
+          value={displayTotals.vangQNCN}
+        />
+        <StatCard
+          tone="purple"
+          icon={<FontAwesomeIcon icon={faUserGroup} />}
+          title="Vắng HSQ-BS"
+          value={displayTotals.vangHSQBS}
+        />
+      </div>
 
       <DailyTroopStatisticsSection
         loading={loading}

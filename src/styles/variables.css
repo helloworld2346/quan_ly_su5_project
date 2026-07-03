@@ -218,10 +218,11 @@
   --primary-muted65: #2e5d46;
 
   /* --- TABLE HEADER TONES (Light Mode) --- */  
-  --table-header-brown: #8a5a2b;  /* nâu đất */  
-  --table-header-red: #a63a3a;    /* đỏ trầm */  
-  --table-header-amber: #a9791c;  /* hổ phách / vàng đậm */  
-  --table-header-purple: #6b4a8a; /* tím trầm */
+--table-header-brown:  #8a5a2b;  /* nâu đất */  
+--table-header-terra:  #a25438;  /* gạch nung */  
+--table-header-olive:  #6f7a2e;  /* xanh ô-liu */  
+--table-header-wine:   #8a3a52;  /* rượu vang */  
+--table-header-slate:  #3f5a70;  /* xám xanh */  
 }
 
 /* ==========================================================================  
@@ -413,8 +414,9 @@
   --primary-muted65: #7db59a;
 
   /* --- TABLE HEADER TONES (Dark Mode) --- */  
-  --table-header-brown: #6f4722;  
-  --table-header-red: #8a2f2f;  
-  --table-header-amber: #8a6216;  
-  --table-header-purple: #563b70;
+--table-header-brown:  #6f4722;  
+--table-header-terra:  #83422c;  
+--table-header-olive:  #59632434;  /* → dùng #596324 */  
+--table-header-wine:   #6f2e42;  
+--table-header-slate:  #324857;
 }
