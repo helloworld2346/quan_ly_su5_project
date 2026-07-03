@@ -13,29 +13,7 @@ export interface Notification {
   isRead: boolean;
 }
 
-// const MOCK_NOTIFICATIONS: Notification[] = [
-//   {
-//     id: "1",
-//     title: "Báo cáo mới",
-//     message: "Tiểu đoàn 1 vừa nộp báo cáo quân số ngày 06/06/2026",
-//     time: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-//     isRead: false,
-//   },
-//   {
-//     id: "2",
-//     title: "Báo cáo chờ duyệt",
-//     message: "Có 3 báo cáo đang chờ duyệt từ các đơn vị con",
-//     time: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-//     isRead: false,
-//   },
-//   {
-//     id: "3",
-//     title: "Báo cáo đã được duyệt",
-//     message: "Báo cáo của Đại đội 2 đã được phê duyệt",
-//     time: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-//     isRead: true,
-//   },
-// ];
+
 
 function formatRelativeTime(isoString: string): string {
   const diff = Date.now() - new Date(isoString).getTime();

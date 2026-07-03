@@ -31,6 +31,7 @@ interface ReportFormData {
   result: string;
   hasIncident: boolean;
   incidentContent: string;
+  hasProposal: boolean;
   proposal: string;
 }
 
@@ -63,6 +64,7 @@ const DEFAULT_FORM_DATA: ReportFormData = {
   result: "",
   hasIncident: false,
   incidentContent: "",
+  hasProposal: false,
   proposal: "",
 };
 
@@ -91,6 +93,7 @@ export default function CreateReport({
         result: initialData.ketQua || "",
         hasIncident: Boolean(initialData.noiDungDotXuat),
         incidentContent: initialData.noiDungDotXuat || "",
+        hasProposal: Boolean(initialData.kienNghi),
         proposal: initialData.kienNghi || "",
       };
     }
@@ -121,7 +124,7 @@ export default function CreateReport({
         chucVu: formData.ctdPosition,
         soDienThoai: formData.ctdPhone,
       }),
-      kienNghi: formData.proposal,
+      kienNghi: formData.hasProposal ? formData.proposal : "",
       donVi: maDonViCurrent,
     };
     onSubmit?.(payload);
@@ -312,9 +315,8 @@ export default function CreateReport({
         </h3>
         <div className={styles["radio-group"]}>
           <label
-            className={`${styles["radio-item"]} ${
-              !formData.hasIncident ? styles["is-checked"] : ""
-            }`}
+            className={`${styles["radio-item"]} ${!formData.hasIncident ? styles["is-checked"] : ""
+              }`}
           >
             <input
               type="radio"
@@ -325,9 +327,8 @@ export default function CreateReport({
             <span>Không có</span>
           </label>
           <label
-            className={`${styles["radio-item"]} ${
-              formData.hasIncident ? styles["is-danger"] : ""
-            }`}
+            className={`${styles["radio-item"]} ${formData.hasIncident ? styles["is-danger"] : ""
+              }`}
           >
             <input
               type="radio"
@@ -360,18 +361,50 @@ export default function CreateReport({
 
       <section className={styles["report-section"]}>
         <h3 className={styles["section-title"]}>Kiến nghị, đề xuất</h3>
-        <div className={styles["form-group"]}>
-          <textarea
-            rows={4}
-            maxLength={MAX_PROPOSAL}
-            placeholder="Nhập các kiến nghị, đề xuất từ đơn vị (nếu có)..."
-            value={formData.proposal}
-            onChange={(e) => handleChange("proposal", e.target.value)}
-          />
-          <div className={styles["textarea-counter"]}>
-            {formData.proposal.length}/{MAX_PROPOSAL}
-          </div>
+        <div className={styles["radio-group"]}>
+          <label
+            className={`${styles["radio-item"]} ${!formData.hasProposal ? styles["is-checked"] : ""
+              }`}
+          >
+            <input
+              type="radio"
+              name="proposalToggle"
+              checked={!formData.hasProposal}
+              onChange={() => handleChange("hasProposal", false)}
+            />
+            <span>Không có</span>
+          </label>
+          <label
+            className={`${styles["radio-item"]} ${formData.hasProposal ? styles["is-danger"] : ""
+              }`}
+          >
+            <input
+              type="radio"
+              name="proposalToggle"
+              checked={formData.hasProposal}
+              onChange={() => handleChange("hasProposal", true)}
+            />
+            <span>Có</span>
+          </label>
         </div>
+
+        {formData.hasProposal && (
+          <div className={styles["incident-box"]}>
+            <label className={styles["incident-label"]}>
+              Nội dung kiến nghị, đề xuất
+            </label>
+            <textarea
+              rows={4}
+              maxLength={MAX_PROPOSAL}
+              placeholder="Nhập các kiến nghị, đề xuất từ đơn vị..."
+              value={formData.proposal}
+              onChange={(e) => handleChange("proposal", e.target.value)}
+            />
+            <div className={styles["textarea-counter"]}>
+              {formData.proposal.length}/{MAX_PROPOSAL}
+            </div>
+          </div>
+        )}
       </section>
     </ModalShell>
   );

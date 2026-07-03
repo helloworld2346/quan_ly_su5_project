@@ -39,19 +39,19 @@ export const DIVISION_TROOP_CHART = buildChart(
   0.934,
 );
 
-/** Đơn vị trực thuộc Sư đoàn 5 — sắp theo: phòng/ban → trung đoàn → tiểu đoàn → đại đội */
+
 export const SUBORDINATE_TROOP_CHARTS: UnitTroopChart[] = [
-  // Phòng, ban trực thuộc
+
 
   buildChart("phong-tm", "Phòng Tham Mưu", "department", 110, 0.918),
   buildChart("phong-ct", "Phòng Chính Trị", "department", 95, 0.921),
   buildChart("phong-hckt", "Phòng Hậu Cần Kỹ Thuật", "department", 175, 0.912),
 
-  // Trung đoàn
+ 
   buildChart("td-4", "Trung đoàn 4", "regiment", 1320, 0.8),
   buildChart("td-5", "Trung đoàn 5", "regiment", 1295, 0.935),
   buildChart("td-271", "Trung đoàn 271", "regiment", 1310, 0.932),
-  // Tiểu đoàn
+
   buildChart("tdd-14", "Tiểu đoàn 14", "battalion", 368, 0.942),
   buildChart("tdd-15", "Tiểu đoàn 15", "battalion", 355, 0.939),
   buildChart("tdd-16", "Tiểu đoàn 16", "battalion", 342, 0.936),
@@ -59,7 +59,7 @@ export const SUBORDINATE_TROOP_CHARTS: UnitTroopChart[] = [
   buildChart("tdd-18", "Tiểu đoàn 18", "battalion", 338, 0.937),
   buildChart("tdd-24", "Tiểu đoàn 24", "battalion", 362, 1),
   buildChart("tdd-25", "Tiểu đoàn 25", "battalion", 349, 0.938),
-  // Đại đội
+  
   buildChart("dd-19", "Đại đội 19", "company", 98, 0.952),
   buildChart("dd-20", "Đại đội 20", "company", 92, 0.948),
   buildChart("dd-23", "Đại đội 23", "company", 88, 0.945),

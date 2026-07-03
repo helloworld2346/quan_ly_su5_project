@@ -61,19 +61,23 @@ function StatCard({
 
 function StatusBadge({
   active,
-  danger = false,
+  type = "default",
 }: {
   active: boolean;
-  danger?: boolean;
+  type?: "incident" | "proposal" | "default";
 }) {
+  let badgeClass = styles["political-badge--no"]; 
+
+  if (active) {
+    if (type === "incident" || type === "proposal") {
+      badgeClass = styles["political-badge--danger"];
+    } else {
+      badgeClass = styles["political-badge--yes"];
+    }
+  }
+
   return (
-    <span
-      className={[
-        styles["political-badge"],
-        active ? styles["political-badge--yes"] : styles["political-badge--no"],
-        danger && active ? styles["political-badge--danger"] : "",
-      ].join(" ")}
-    >
+    <span className={`${styles["political-badge"]} ${badgeClass}`}>
       {active ? "Có" : "Không"}
     </span>
   );
@@ -103,7 +107,6 @@ export default function PoliticalWorkReport() {
   const isParentUnit =
     (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
     (isNoiVu && capDonVi === "TIEU_DOAN");
-
 
   const { reportData, parentReportData, childUnits, loading, fetchReports } =
     usePoliticalWorkData({
@@ -340,11 +343,14 @@ export default function PoliticalWorkReport() {
                     <td>
                       <StatusBadge
                         active={Boolean(row.noiDungDotXuat)}
-                        danger
+                        type="incident"
                       />
                     </td>
                     <td>
-                      <StatusBadge active={Boolean(row.kienNghi)} />
+                      <StatusBadge 
+                        active={Boolean(row.kienNghi)} 
+                        type="proposal"
+                      />
                     </td>
                     <td>{parseTrucNguoi(row.trucBanNoiVu).hoTen}</td>
                     <td className={styles["political-ctd-cell"]}>

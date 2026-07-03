@@ -103,8 +103,6 @@ export default function DashboardLayout({
     );
   }, [sidebarCollapsed]);
 
-  // Khi chuyển sang mobile (≤640px): luôn hiện sidebar đầy đủ (không collapsed)
-  // và đóng drawer mỗi khi đổi breakpoint.
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 640px)");
     const handler = (e: MediaQueryListEvent | MediaQueryList) => {
