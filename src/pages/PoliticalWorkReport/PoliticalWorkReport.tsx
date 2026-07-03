@@ -250,8 +250,12 @@ export default function PoliticalWorkReport() {
         <td className={styles["political-unit-cell"]}>
           {row.kyhieuDonVi || row.tenDonVi}
         </td>
-        <td className={styles["political-text-cell"]}>{row.tinhHinh}</td>
-        <td className={styles["political-text-cell"]}>{row.ketQua}</td>
+        <td className={styles["political-text-cell"]}>
+          <span className={styles["political-clamp"]}>{row.tinhHinh}</span>
+        </td>
+        <td className={styles["political-text-cell"]}>
+          <span className={styles["political-clamp"]}>{row.ketQua}</span>
+        </td>
         <td>
           <StatusBadge active={Boolean(row.noiDungDotXuat)} type="incident" />
         </td>

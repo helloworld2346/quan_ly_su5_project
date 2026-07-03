@@ -108,11 +108,11 @@
 .political-table th {
   padding: 12px 8px;
   color: var(--text-white);
-  background: linear-gradient(180deg, #0d8b58 0%, #047246 100%);
+  background: var(--table-header-purple);
   border: 1px solid var(--login-border);
   font-size: 12px;
   line-height: 1.3;
-  font-weight: 800;
+  font-weight: 600;
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -180,9 +180,19 @@
   width: 2%;
 }
 
-.political-text-cell {
-  text-align: left !important;
-  word-break: break-word;
+.political-text-cell {  
+  text-align: left !important;  
+  vertical-align: top;  
+  word-break: break-word;  
+}  
+  
+.political-text-cell .political-clamp {  
+  display: -webkit-box;  
+  -webkit-box-orient: vertical;  
+  -webkit-line-clamp: 3;  
+  line-clamp: 3;  
+  overflow: hidden;  
+  max-height: calc(1.5em * 3);  
 }
 
 .political-text-cell p {
