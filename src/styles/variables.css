@@ -216,6 +216,12 @@
   --primary-a25: rgba(31, 92, 63, 0.25);  
   --primary-a30: rgba(31, 92, 63, 0.30);  
   --primary-muted65: #2e5d46;
+
+  /* --- TABLE HEADER TONES (Light Mode) --- */  
+  --table-header-brown: #8a5a2b;  /* nâu đất */  
+  --table-header-red: #a63a3a;    /* đỏ trầm */  
+  --table-header-amber: #a9791c;  /* hổ phách / vàng đậm */  
+  --table-header-purple: #6b4a8a; /* tím trầm */
 }
 
 /* ==========================================================================  
@@ -405,4 +411,10 @@
   --primary-a25: rgba(107, 184, 146, 0.25);  
   --primary-a30: rgba(107, 184, 146, 0.30);  
   --primary-muted65: #7db59a;
+
+  /* --- TABLE HEADER TONES (Dark Mode) --- */  
+  --table-header-brown: #6f4722;  
+  --table-header-red: #8a2f2f;  
+  --table-header-amber: #8a6216;  
+  --table-header-purple: #563b70;
 }
