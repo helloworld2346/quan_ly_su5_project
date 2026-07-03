@@ -138,10 +138,10 @@
   
 .large .body {  
   display: grid;  
-  grid-template-columns: auto 1fr;  
+  grid-template-columns: auto minmax(0, 1fr);  
   gap: 24px 32px;  
   align-items: center;  
-}  
+}
   
 .hero .body {  
   display: grid;  
@@ -443,10 +443,11 @@
   
 .large .legend {  
   width: 100%;  
+  min-width: 0;  
   max-width: 390px;  
   padding: 20px;  
   align-self: center;  
-}  
+}
   
 .large .legendBtn {  
   position: relative;  
@@ -467,31 +468,28 @@
   
 .large .legendLabel {  
   flex: 1 1 auto;  
-  padding-right: 96px;  
+  min-width: 0;  
   text-align: left;  
-  white-space: nowrap;  
   font-size: 17px;  
   font-weight: 700;  
-}  
-  
+}
+
 .large .legendValue {  
-  position: absolute;  
-  left: 50%;  
-  transform: translateX(-50%);  
+  flex: 0 0 auto;  
   width: auto;  
-  text-align: center;  
+  text-align: right;  
   font-size: 17px;  
   font-weight: 700;  
-}  
-  
+}
+
 .large .legendPercent {  
-  flex: 0 0 72px;  
+  flex: 0 0 auto;  
   margin-left: auto;  
   width: auto;  
   text-align: right;  
   font-size: 17px;  
   font-weight: 700;  
-}  
+}
   
 .large .tooltip {  
   right: auto;  
@@ -604,7 +602,7 @@
   color: var(--on-surface, #0f1f18);  
 }  
   
-@media (max-width: 900px) {  
+@media (max-width: 1150px) {  
   .large .body {  
     grid-template-columns: 1fr;  
     grid-template-rows: auto;  
@@ -614,7 +612,6 @@
     grid-row: auto;  
     margin: 0 auto;  
   }  
-  
   
   .hero .body {  
     grid-template-columns: 1fr;  
