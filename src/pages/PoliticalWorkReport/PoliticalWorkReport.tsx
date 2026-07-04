@@ -11,6 +11,8 @@ import {
   faEllipsisVertical,
   faPenToSquare,
 } from "@fortawesome/free-solid-svg-icons";
+import Skeleton from "../../components/ui/Skeleton/Skeleton";
+
 
 import ReportToolbar from "../../components/report/ReportToolbar";
 import ReportStatusBadge from "../../components/ui/ReportStatusBadge/ReportStatusBadge";
@@ -376,30 +378,35 @@ export default function PoliticalWorkReport() {
           icon={<FontAwesomeIcon icon={faFileCircleCheck} />}
           title="Tổng báo cáo"
           value={totalUnits}
+          loading={loading}
         />
         <StatCard
           tone="blue"
           icon={<FontAwesomeIcon icon={faCircleCheck} />}
           title="Đã báo cáo"
           value={reported}
+          loading={loading}
         />
         <StatCard
           tone="orange"
           icon={<FontAwesomeIcon icon={faClock} />}
           title="Chưa báo cáo"
           value={notReported}
+          loading={loading}
         />
         <StatCard
           tone="red"
           icon={<FontAwesomeIcon icon={faTriangleExclamation} />}
           title="Việc đột xuất"
           value={incidents}
+          loading={loading}
         />
         <StatCard
           tone="purple"
           icon={<FontAwesomeIcon icon={faClipboardList} />}
           title="Kiến nghị"
           value={proposals}
+          loading={loading}
         />
       </div>
 
@@ -439,7 +446,18 @@ export default function PoliticalWorkReport() {
               </thead>
 
               <tbody>
-                {showTwoSections ? (
+                {loading ? (
+                  Array.from({ length: 6 }).map((_, i) => (
+                    <tr key={`skeleton-${i}`}>
+                      <td
+                        colSpan={9}
+                        className={styles["political-skeleton-cell"]}
+                      >
+                        <Skeleton height={40} radius={8} />
+                      </td>
+                    </tr>
+                  ))
+                ) : showTwoSections ? (
                   <>
                     <tr className={styles["political-separator-row"]}>
                       <td colSpan={9}>Báo cáo các đơn vị</td>

@@ -1,0 +1,37 @@
+.skeleton {  
+  display: block;  
+  position: relative;  
+  overflow: hidden;  
+  background: var(--surface-muted);  
+  border-radius: 8px;  
+  isolation: isolate;  
+}  
+  
+.skeleton::after {  
+  content: "";  
+  position: absolute;  
+  top: 0;  
+  right: 0;  
+  bottom: 0;  
+  left: 0;  
+  transform: translateX(-100%);  
+  background: linear-gradient(  
+    90deg,  
+    rgba(255, 255, 255, 0) 0%,  
+    var(--skeleton-shine) 50%,  
+    rgba(255, 255, 255, 0) 100%  
+  );  
+  animation: skeletonShimmer 1.4s ease-in-out infinite;  
+}  
+  
+@keyframes skeletonShimmer {  
+  100% {  
+    transform: translateX(100%);  
+  }  
+}  
+  
+@media (prefers-reduced-motion: reduce) {  
+  .skeleton::after {  
+    animation: none;  
+  }  
+}

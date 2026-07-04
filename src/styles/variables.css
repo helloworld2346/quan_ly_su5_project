@@ -223,6 +223,10 @@
 --table-header-olive:  #6f7a2e;  /* xanh ô-liu */  
 --table-header-wine:   #8a3a52;  /* rượu vang */  
 --table-header-slate:  #3f5a70;  /* xám xanh */  
+
+/* :root (light) */  
+--surface-muted: #e9edf2;
+--skeleton-shine: rgba(255, 255, 255, 0.65);  
 }
 
 /* ==========================================================================  
@@ -419,4 +423,7 @@
 --table-header-olive:  #59632434;  /* → dùng #596324 */  
 --table-header-wine:   #6f2e42;  
 --table-header-slate:  #324857;
+
+--surface-muted: #2a2f3a;  
+--skeleton-shine: rgba(255, 255, 255, 0.08);
 }

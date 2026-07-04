@@ -33,10 +33,9 @@ import {
   faUserGear,
   faUserGroup,
 } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";  
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import StatCard from "../../components/ui/StatCard/StatCard";
-
 
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
@@ -436,30 +435,35 @@ export default function DailyTroopReport() {
           icon={<FontAwesomeIcon icon={faUsers} />}
           title="Tổng quân số"
           value={displayTotals.quanSoTong}
+          loading={loading}
         />
         <StatCard
           tone="blue"
           icon={<FontAwesomeIcon icon={faUserCheck} />}
           title="Hiện diện"
           value={displayTotals.quanSoHienDien}
+          loading={loading}
         />
         <StatCard
           tone="orange"
           icon={<FontAwesomeIcon icon={faUserTie} />}
           title="Vắng SQ"
           value={displayTotals.vangSQ}
+          loading={loading}
         />
         <StatCard
           tone="red"
           icon={<FontAwesomeIcon icon={faUserGear} />}
           title="Vắng QNCN"
           value={displayTotals.vangQNCN}
+          loading={loading}
         />
         <StatCard
           tone="purple"
           icon={<FontAwesomeIcon icon={faUserGroup} />}
           title="Vắng HSQ-BS"
           value={displayTotals.vangHSQBS}
+          loading={loading}
         />
       </div>
 
