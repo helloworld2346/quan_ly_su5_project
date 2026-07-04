@@ -17,6 +17,8 @@ import { generateMatKhau } from "../../utils/passwordGenerator";
 import { formatDateLong as formatDate } from "../../utils/date";
 import { formatNguoiTrucLabel } from "../../utils/duty";
 
+import Skeleton from "../../components/ui/Skeleton/Skeleton";
+
 const MONTHS = [
   "Tháng 1",
   "Tháng 2",
@@ -87,6 +89,7 @@ export default function DutyShifts() {
   useEffect(() => {
     const load = async () => {
       setLoading(true);
+      await new Promise((r) => setTimeout(r, 1000));
       try {
         const [shiftsRes, chiHuyRes, tacChienRes] = await Promise.all([
           dutyService.getAllCaTruc(),
@@ -232,7 +235,18 @@ export default function DutyShifts() {
 
       <div className={styles.tableWrapper}>
         {loading ? (
-          <div className={styles.loading}>Đang tải danh sách ca trực...</div>
+          <div className={styles.tableSkeleton}>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className={styles.tableSkeletonRow}>
+                <Skeleton height={20} width="70%" />
+                <Skeleton height={20} />
+                <Skeleton height={20} />
+                <Skeleton height={20} width="60%" />
+                <Skeleton height={20} />
+                <Skeleton height={20} width={40} />
+              </div>
+            ))}
+          </div>
         ) : filteredList.length === 0 ? (
           <div className={styles.empty}>
             <p>Không có ca trực nào trong tháng này</p>

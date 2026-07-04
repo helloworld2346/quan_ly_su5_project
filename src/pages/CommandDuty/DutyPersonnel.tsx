@@ -23,6 +23,9 @@ import SearchBar from "../../components/ui/SearchBar/SearchBar";
 
 import { buildAllowedOptions } from "../../utils/duty";
 
+import Skeleton from "../../components/ui/Skeleton/Skeleton";
+
+
 const CHI_HUY_CAP_BAC = ["Đại tá", "Thượng tá", "Trung tá"];
 const CHI_HUY_CHUC_VU = [
   "Sư đoàn trưởng",
@@ -72,10 +75,8 @@ export default function DutyPersonnel() {
   const [form, setForm] = useState<TrucNguoiPayload>({ ...EMPTY_FORM });
   const [submitting, setSubmitting] = useState(false);
 
-  // Search state
   const [search, setSearch] = useState("");
 
-  // Edit state
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editType, setEditType] = useState<DutyType | null>(null);
   const [editForm, setEditForm] = useState<TrucNguoiPayload>({ ...EMPTY_FORM });
@@ -84,6 +85,7 @@ export default function DutyPersonnel() {
 
   useEffect(() => {
     const fetchAll = async () => {
+      await new Promise((r) => setTimeout(r, 1000));
       try {
         const [capBacRes, chucVuRes, chiHuyRes, tacChienRes] =
           await Promise.all([
@@ -457,7 +459,23 @@ export default function DutyPersonnel() {
       </div>
 
       {loadingList ? (
-        <div className={styles.loading}>Đang tải danh sách...</div>
+        <div className={styles.listsGrid}>
+          {Array.from({ length: 2 }).map((_, col) => (
+            <div key={col} className={styles.listSection}>
+              <div className={styles.listBody}>
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className={styles.personCardSkeleton}>
+                    <Skeleton width={44} height={44} radius="50%" />
+                    <div className={styles.personCardSkeletonInfo}>
+                      <Skeleton height={16} width="60%" />
+                      <Skeleton height={12} width="40%" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       ) : (
         <div className={styles.listsGrid}>
           <div className={styles.listSection}>

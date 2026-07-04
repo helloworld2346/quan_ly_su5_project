@@ -612,3 +612,21 @@
     width: 100vw;
   }
 }
+
+.personCardSkeleton {  
+  display: flex;  
+  align-items: center;  
+  gap: 12px;  
+  padding: 12px 14px;  
+  border: 1px solid var(--login-border);  
+  border-radius: 12px;  
+  background: var(--surface-card);  
+  margin-bottom: 10px;  
+}  
+  
+.personCardSkeletonInfo {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 8px;  
+  flex: 1;  
+}
