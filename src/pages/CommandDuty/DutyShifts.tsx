@@ -89,7 +89,6 @@ export default function DutyShifts() {
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      await new Promise((r) => setTimeout(r, 1000));
       try {
         const [shiftsRes, chiHuyRes, tacChienRes] = await Promise.all([
           dutyService.getAllCaTruc(),

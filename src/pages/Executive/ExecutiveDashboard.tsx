@@ -129,7 +129,6 @@ export default function ExecutiveDashboard() {
 
     const loadData = async () => {
       setLoading(true);
-      await new Promise((r) => setTimeout(r, 1000));
       setError(null);
       try {
         const result = await troopStatsService.getThongKe(

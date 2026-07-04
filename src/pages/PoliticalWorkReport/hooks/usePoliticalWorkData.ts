@@ -33,8 +33,6 @@ export function usePoliticalWorkData({
   const fetchReports = useCallback(async () => {
     if (!maDonViCurrent) return;
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-
     try {
       if (isParentUnit) {
         const res = await politicalWorkService.getByDonViCha(

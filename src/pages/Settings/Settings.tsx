@@ -25,7 +25,6 @@ export default function Settings() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        await new Promise((r) => setTimeout(r, 1000));
         const accountRes = await accountService.getAccount();
         if (!accountRes.success) {
           setError(accountRes.message || "Không thể tải thông tin tài khoản");

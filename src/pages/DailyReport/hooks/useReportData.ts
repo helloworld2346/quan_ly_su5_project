@@ -50,7 +50,6 @@ export function useReportData({
   const fetchReports = useCallback(async () => {
     if (!maDonViCurrent) return;
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
     try {
       let response;
       if (isParentUnit) {

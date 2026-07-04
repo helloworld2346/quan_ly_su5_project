@@ -85,7 +85,6 @@ export default function DutyPersonnel() {
 
   useEffect(() => {
     const fetchAll = async () => {
-      await new Promise((r) => setTimeout(r, 1000));
       try {
         const [capBacRes, chucVuRes, chiHuyRes, tacChienRes] =
           await Promise.all([
