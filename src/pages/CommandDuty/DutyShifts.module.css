@@ -592,3 +592,9 @@
     width: 100vw;  
   }  
 }
+
+.fieldError {  
+  margin-top: 6px;  
+  font-size: 13px;  
+  color: var(--dialog-danger-icon);  
+}
