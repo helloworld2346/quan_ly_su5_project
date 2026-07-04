@@ -630,3 +630,9 @@
   gap: 8px;  
   flex: 1;  
 }
+
+.fieldError {  
+  margin-top: 6px;  
+  font-size: 13px;  
+  color: var(--dialog-danger-icon);  
+}
