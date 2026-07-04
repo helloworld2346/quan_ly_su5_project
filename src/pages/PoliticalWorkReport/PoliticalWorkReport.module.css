@@ -45,7 +45,7 @@
   height: 38px;  
   flex: 0 0 38px;  
   border-radius: 12px;  
-  background: var(--table-header-wine);  
+  background: linear-gradient(180deg, #0d8b58 0%, #047246 100%);;  
   color: var(--text-white);  
   font-size: 18px;  
   font-weight: 800;  
@@ -82,7 +82,7 @@
 .political-table th {  
   padding: 12px 8px;  
   color: var(--text-white);  
-  background: var(--table-header-wine);  
+  background: linear-gradient(180deg, #0d8b58 0%, #047246 100%);  
   border: 1px solid var(--login-border);  
   font-size: 12px;  
   line-height: 1.3;  
@@ -218,7 +218,7 @@
   display: inline-flex;  
   align-items: center;  
   justify-content: center;  
-  color: var(--table-header-wine);  
+  color: linear-gradient(180deg, #0d8b58 0%, #047246 100%);;  
   background: var(--surface-card);  
   border: 1px solid var(--login-border);  
   border-radius: 7px;  
@@ -232,8 +232,8 @@
   
 .political-view-btn:hover {  
   color: var(--text-white);  
-  background: var(--table-header-wine);  
-  border-color: var(--table-header-wine);  
+  background: linear-gradient(180deg, #0d8b58 0%, #047246 100%);;  
+  border-color: linear-gradient(180deg, #0d8b58 0%, #047246 100%);;  
 }  
   
 .political-view-btn:active {  
@@ -253,14 +253,14 @@
   border: 1px solid var(--login-border);  
   border-radius: 7px;  
   background: var(--surface-card);  
-  color: var(--table-header-wine);  
+  color: linear-gradient(180deg, #0d8b58 0%, #047246 100%);;  
   cursor: pointer;  
 }  
   
 .political-ellipsis-btn:hover {  
   color: var(--text-white);  
-  background: var(--table-header-wine);  
-  border-color: var(--table-header-wine);  
+  background: linear-gradient(180deg, #0d8b58 0%, #047246 100%);;  
+  border-color: linear-gradient(180deg, #0d8b58 0%, #047246 100%);;  
 }  
   
 .political-dropdown-menu {  
@@ -293,7 +293,7 @@
   
 .political-menu-item:hover {  
   background: var(--table-header-wine-a06);  
-  color: var(--table-header-wine);  
+  color: linear-gradient(180deg, #0d8b58 0%, #047246 100%);;  
 }  
   
 .political-separator-row td {  
