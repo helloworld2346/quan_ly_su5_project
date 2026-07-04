@@ -11,6 +11,7 @@ import ProfileCard from "./components/ProfileCard";
 import QuanSoForm from "./components/QuanSoForm";
 import PasswordForm from "./components/PasswordForm";
 import ThemeCard from "./components/ThemeCard";
+import Skeleton from "../../components/ui/Skeleton/Skeleton";
 
 import styles from "./Settings.module.css";
 
@@ -24,7 +25,7 @@ export default function Settings() {
     const fetchData = async () => {
       try {
         setLoading(true);
-
+        await new Promise((r) => setTimeout(r, 1000));
         const accountRes = await accountService.getAccount();
         if (!accountRes.success) {
           setError(accountRes.message || "Không thể tải thông tin tài khoản");
@@ -53,9 +54,62 @@ export default function Settings() {
   if (loading) {
     return (
       <div className={styles.container}>
-        <div className={styles.loading}>
-          <div className={styles.loadingSpinner} />
-          <span className={styles.loadingText}>Đang tải thông tin...</span>
+        <div className={styles.header}>
+          <Skeleton width={48} height={48} radius={12} />
+          <div className={styles.headerContent}>
+            <Skeleton width={220} height={26} radius={6} />
+            <div style={{ marginTop: 8 }}>
+              <Skeleton width={300} height={14} radius={6} />
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.layout}>
+          <div className={styles.profileCol}>
+            <div className={styles.profileCard}>
+              <Skeleton width={84} height={84} radius="50%" />
+              <div style={{ marginTop: 16 }}>
+                <Skeleton width={140} height={18} radius={6} />
+              </div>
+              <div style={{ marginTop: 10 }}>
+                <Skeleton width={90} height={24} radius={999} />
+              </div>
+              <div className={styles.infoList}>
+                <Skeleton height={56} radius={8} />
+                <Skeleton height={56} radius={8} />
+                <Skeleton height={56} radius={8} />
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.mainCol}>
+            <div className={styles.cardSection}>
+              <div className={styles.cardHeader}>
+                <Skeleton width={200} height={20} radius={6} />
+              </div>
+              <div className={styles.statGrid}>
+                <Skeleton height={92} radius={12} />
+                <Skeleton height={92} radius={12} />
+              </div>
+            </div>
+
+            <div className={styles.cardSection}>
+              <div className={styles.cardHeader}>
+                <Skeleton width={200} height={20} radius={6} />
+              </div>
+              <Skeleton height={48} radius={8} />
+              <div style={{ marginTop: 20 }}>
+                <Skeleton height={48} radius={8} />
+              </div>
+            </div>
+
+            <div className={styles.cardSection}>
+              <div className={styles.cardHeader}>
+                <Skeleton width={160} height={20} radius={6} />
+              </div>
+              <Skeleton height={44} radius={999} />
+            </div>
+          </div>
         </div>
       </div>
     );
