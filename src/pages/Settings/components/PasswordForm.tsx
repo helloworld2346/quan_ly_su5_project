@@ -1,7 +1,13 @@
 import { useState } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLock, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import {
+  faLock,
+  faEye,
+  faEyeSlash,
+  faCheck,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
 
 import { authService } from "../../../services/auth/authService";
 import { useToast } from "../../../context/useToast";
@@ -9,6 +15,8 @@ import {
   getPasswordStrength,
   MIN_PASSWORD_LENGTH,
 } from "../../../utils/passwordStrength";
+import ConfirmDialog from "../../../components/ui/ConfirmDialog/ConfirmDialog";
+import { useConfirmDialog } from "../../../components/ui/ConfirmDialog/useConfirmDialog";
 
 import styles from "../Settings.module.css";
 
@@ -20,6 +28,7 @@ const STRENGTH_CLASS = {
 
 export default function PasswordForm() {
   const { showError, showSuccess } = useToast();
+  const { confirm, isOpen, options, onConfirm, onCancel } = useConfirmDialog();
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -29,9 +38,22 @@ export default function PasswordForm() {
 
   const strength = getPasswordStrength(newPassword);
   const isMatch = confirmPassword !== "" && newPassword === confirmPassword;
-  const isPasswordValid =
-    newPassword.length >= MIN_PASSWORD_LENGTH &&
-    newPassword === confirmPassword;
+
+  const checks = [
+    {
+      label: `Ít nhất ${MIN_PASSWORD_LENGTH} ký tự`,
+      ok: newPassword.length >= MIN_PASSWORD_LENGTH,
+    },
+    {
+      label: "Có chữ hoa và chữ thường",
+      ok: /[A-Z]/.test(newPassword) && /[a-z]/.test(newPassword),
+    },
+    { label: "Có chữ số", ok: /\d/.test(newPassword) },
+    { label: "Có ký tự đặc biệt", ok: /[^A-Za-z0-9]/.test(newPassword) },
+  ];
+
+  const passesRequired = newPassword.length >= MIN_PASSWORD_LENGTH;
+  const isPasswordValid = passesRequired && newPassword === confirmPassword;
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +65,17 @@ export default function PasswordForm() {
       showError("Mật khẩu xác nhận không khớp");
       return;
     }
+
+    const confirmed = await confirm({
+      title: "Xác nhận đổi mật khẩu",
+      message:
+        "Bạn có chắc chắn muốn đổi mật khẩu? Bạn sẽ cần dùng mật khẩu mới cho các lần đăng nhập sau.",
+      confirmText: "Đổi mật khẩu",
+      cancelText: "Hủy",
+      type: "warning",
+    });
+    if (!confirmed) return;
+
     setChangingPassword(true);
     try {
       const res = await authService.changePassword({ matKhau: newPassword });
@@ -99,6 +132,23 @@ export default function PasswordForm() {
                 <span className={styles.strengthLabel}>{strength.label}</span>
               </div>
             )}
+
+            {newPassword !== "" && (
+              <ul className={styles.checklist}>
+                {checks.map((c) => (
+                  <li
+                    key={c.label}
+                    className={`${styles.checkItem} ${c.ok ? styles.checkItemOk : ""}`}
+                  >
+                    <FontAwesomeIcon
+                      icon={c.ok ? faCheck : faXmark}
+                      className={styles.checkIcon}
+                    />
+                    <span>{c.label}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           <div className={styles.formGroup}>
@@ -142,6 +192,17 @@ export default function PasswordForm() {
           </button>
         </div>
       </form>
+
+      <ConfirmDialog
+        isOpen={isOpen}
+        title={options.title}
+        message={options.message}
+        confirmText={options.confirmText}
+        cancelText={options.cancelText}
+        type={options.type}
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+      />
     </div>
   );
 }
