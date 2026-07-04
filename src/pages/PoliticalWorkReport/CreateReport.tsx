@@ -30,9 +30,9 @@ interface ReportFormData {
   ctdPhone: string;
   activity: string;
   result: string;
-  hasIncident: boolean;
+  hasIncident: boolean | null;
   incidentContent: string;
-  hasProposal: boolean;
+  hasProposal: boolean | null;
   proposal: string;
 }
 
@@ -63,9 +63,9 @@ const DEFAULT_FORM_DATA: ReportFormData = {
   ctdPhone: "",
   activity: "",
   result: "",
-  hasIncident: false,
+  hasIncident: null,
   incidentContent: "",
-  hasProposal: false,
+  hasProposal: null,
   proposal: "",
 };
 
@@ -372,26 +372,26 @@ export default function CreateReport({
         <div className={styles["radio-group"]}>
           <label
             className={`${styles["radio-item"]} ${
-              !formData.hasIncident ? styles["is-checked"] : ""
+              formData.hasIncident === false ? styles["is-checked"] : ""
             }`}
           >
             <input
               type="radio"
               name="incident"
-              checked={!formData.hasIncident}
+              checked={formData.hasIncident === false}
               onChange={() => handleChange("hasIncident", false)}
             />
             <span>Không có</span>
           </label>
           <label
             className={`${styles["radio-item"]} ${
-              formData.hasIncident ? styles["is-danger"] : ""
+              formData.hasIncident === true ? styles["is-danger"] : ""
             }`}
           >
             <input
               type="radio"
               name="incident"
-              checked={formData.hasIncident}
+              checked={formData.hasIncident === true}
               onChange={() => handleChange("hasIncident", true)}
             />
             <span>Có</span>
@@ -422,26 +422,26 @@ export default function CreateReport({
         <div className={styles["radio-group"]}>
           <label
             className={`${styles["radio-item"]} ${
-              !formData.hasProposal ? styles["is-checked"] : ""
+              formData.hasProposal === false ? styles["is-checked"] : ""
             }`}
           >
             <input
               type="radio"
               name="proposalToggle"
-              checked={!formData.hasProposal}
+              checked={formData.hasProposal === false}
               onChange={() => handleChange("hasProposal", false)}
             />
             <span>Không có</span>
           </label>
           <label
             className={`${styles["radio-item"]} ${
-              formData.hasProposal ? styles["is-danger"] : ""
+              formData.hasProposal === true ? styles["is-danger"] : ""
             }`}
           >
             <input
               type="radio"
               name="proposalToggle"
-              checked={formData.hasProposal}
+              checked={formData.hasProposal === true}
               onChange={() => handleChange("hasProposal", true)}
             />
             <span>Có</span>
