@@ -12,12 +12,12 @@ import { useToast } from "../../context/useToast";
 import type { CaTrucDetail, NguoiTrucWithCaTruc } from "../../types/duty";
 import CustomSelect from "../../components/ui/CustomSelect/CustomSelect";
 import SearchBar from "../../components/ui/SearchBar/SearchBar";
+import Skeleton from "../../components/ui/Skeleton/Skeleton";
+import { useMinLoading } from "../../hooks/useMinLoading";
 import { generateMatKhau } from "../../utils/passwordGenerator";
 
 import { formatDateLong as formatDate } from "../../utils/date";
 import { formatNguoiTrucLabel } from "../../utils/duty";
-
-import Skeleton from "../../components/ui/Skeleton/Skeleton";
 
 const MONTHS = [
   "Tháng 1",
@@ -68,6 +68,8 @@ export default function DutyShifts() {
   const [loading, setLoading] = useState(true);
   const [chiHuyList, setChiHuyList] = useState<NguoiTrucWithCaTruc[]>([]);
   const [tacChienList, setTacChienList] = useState<NguoiTrucWithCaTruc[]>([]);
+
+  const showSkeleton = useMinLoading(loading);
 
   const now = new Date();
   const [filterYear, setFilterYear] = useState<number>(now.getFullYear());
@@ -197,6 +199,36 @@ export default function DutyShifts() {
     }
   };
 
+  const renderSkeletonRows = () =>
+    Array.from({ length: 8 }).map((_, i) => (
+      <tr key={`sk-${i}`} className={styles.row}>
+        <td className={styles.dateCell}>
+          <Skeleton height={16} width="70%" />
+        </td>
+        <td>
+          <div className={styles.personCell}>
+            <Skeleton height={14} width="60%" />
+            <Skeleton height={12} width="45%" />
+          </div>
+        </td>
+        <td>
+          <div className={styles.personCell}>
+            <Skeleton height={14} width="60%" />
+            <Skeleton height={12} width="45%" />
+          </div>
+        </td>
+        <td className={styles.passwordCell}>
+          <Skeleton height={16} width="50%" />
+        </td>
+        <td className={styles.noteCell}>
+          <Skeleton height={16} width="80%" />
+        </td>
+        <td className={styles.actionCell}>
+          <Skeleton height={30} width={64} radius={8} />
+        </td>
+      </tr>
+    ));
+
   return (
     <div className={styles.page}>
       <div className={styles.pageHeader}>
@@ -233,19 +265,20 @@ export default function DutyShifts() {
       </div>
 
       <div className={styles.tableWrapper}>
-        {loading ? (
-          <div className={styles.tableSkeleton}>
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className={styles.tableSkeletonRow}>
-                <Skeleton height={20} width="70%" />
-                <Skeleton height={20} />
-                <Skeleton height={20} />
-                <Skeleton height={20} width="60%" />
-                <Skeleton height={20} />
-                <Skeleton height={20} width={40} />
-              </div>
-            ))}
-          </div>
+        {showSkeleton ? (
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th className={styles.thDate}>Ngày trực</th>
+                <th>Trực chỉ huy</th>
+                <th>Trực ban tác chiến</th>
+                <th className={styles.thPassword}>Mật khẩu</th>
+                <th className={styles.thNote}>Ghi chú</th>
+                <th className={styles.thAction}></th>
+              </tr>
+            </thead>
+            <tbody>{renderSkeletonRows()}</tbody>
+          </table>
         ) : filteredList.length === 0 ? (
           <div className={styles.empty}>
             <p>Không có ca trực nào trong tháng này</p>

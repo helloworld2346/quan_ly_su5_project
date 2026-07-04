@@ -12,6 +12,7 @@ import QuanSoForm from "./components/QuanSoForm";
 import PasswordForm from "./components/PasswordForm";
 import ThemeCard from "./components/ThemeCard";
 import Skeleton from "../../components/ui/Skeleton/Skeleton";
+import { useMinLoading } from "../../hooks/useMinLoading";
 
 import styles from "./Settings.module.css";
 
@@ -20,6 +21,7 @@ export default function Settings() {
   const [donVi, setDonVi] = useState<DonVi | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const showSkeleton = useMinLoading(loading);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,7 +52,7 @@ export default function Settings() {
     fetchData();
   }, []);
 
-  if (loading) {
+  if (showSkeleton) {
     return (
       <div className={styles.container}>
         <div className={styles.header}>

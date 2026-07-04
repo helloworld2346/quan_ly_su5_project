@@ -10,6 +10,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import PieChart from "../../components/charts/PieChart/PieChart";
+import Skeleton from "../../components/ui/Skeleton/Skeleton";
+import { useMinLoading } from "../../hooks/useMinLoading";
 import type { SubordinateUnitType } from "../../types/troopStats";
 import { CHART_GROUP_LABELS, CHART_GROUP_ORDER } from "../../data/troopData";
 import {
@@ -19,8 +21,6 @@ import {
 } from "../../services/troopStats";
 import { formatFullDate, shiftDay, toDateParam } from "../../utils/date";
 import styles from "./ExecutiveDashboard.module.css";
-
-import Skeleton from "../../components/ui/Skeleton/Skeleton";
 
 type FilterKey = "all" | SubordinateUnitType;
 
@@ -118,6 +118,8 @@ export default function ExecutiveDashboard() {
   const [error, setError] = useState<string | null>(null);
   const dateInputRef = useRef<HTMLInputElement>(null);
 
+  const showSkeleton = useMinLoading(loading);
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const selectedDay = new Date(selectedDate);
@@ -175,31 +177,57 @@ export default function ExecutiveDashboard() {
         <dl className={styles.metricsBar}>
           <div className={styles.metric}>
             <dt>Tổng quân số</dt>
-            <dd>{data ? formatNum(data.tongQuanSo) : "—"}</dd>
+            <dd>
+              {showSkeleton ? (
+                <Skeleton width={70} height={22} />
+              ) : data ? (
+                formatNum(data.tongQuanSo)
+              ) : (
+                "—"
+              )}
+            </dd>
           </div>
           <div className={`${styles.metric} ${styles.metricPresent}`}>
             <dt>Hiện diện</dt>
             <dd>
-              {data ? formatNum(data.tongHienDien) : "—"}
-              <span className={styles.metricPct}>
-                {data ? `${data.tyLeHienDien.toFixed(1)}%` : ""}
-              </span>
+              {showSkeleton ? (
+                <Skeleton width={90} height={22} />
+              ) : (
+                <>
+                  {data ? formatNum(data.tongHienDien) : "—"}
+                  <span className={styles.metricPct}>
+                    {data ? `${data.tyLeHienDien.toFixed(1)}%` : ""}
+                  </span>
+                </>
+              )}
             </dd>
           </div>
           <div className={`${styles.metric} ${styles.metricAbsent}`}>
             <dt>Vắng</dt>
             <dd>
-              {data ? formatNum(data.tongVang) : "—"}
-              <span className={styles.metricPct}>
-                {data ? `${data.tyLeVang.toFixed(1)}%` : ""}
-              </span>
+              {showSkeleton ? (
+                <Skeleton width={90} height={22} />
+              ) : (
+                <>
+                  {data ? formatNum(data.tongVang) : "—"}
+                  <span className={styles.metricPct}>
+                    {data ? `${data.tyLeVang.toFixed(1)}%` : ""}
+                  </span>
+                </>
+              )}
             </dd>
           </div>
           <div className={styles.metric}>
             <dt>Đơn vị trực thuộc</dt>
             <dd>
-              {subordinateCount}
-              <span className={styles.metricPct}>+ 1 toàn SD</span>
+              {showSkeleton ? (
+                <Skeleton width={60} height={22} />
+              ) : (
+                <>
+                  {subordinateCount}
+                  <span className={styles.metricPct}>+ 1 toàn SD</span>
+                </>
+              )}
             </dd>
           </div>
         </dl>
@@ -258,23 +286,59 @@ export default function ExecutiveDashboard() {
         </div>
       </div>
 
-      {loading && (
-        <div className={styles.chartSkeleton}>
-          <Skeleton height={20} width={280} radius={6} />
-          <Skeleton height={320} radius={12} />
-          <div className={styles.chartSkeletonRow}>
-            <Skeleton height={220} radius={12} />
-            <Skeleton height={220} radius={12} />
+      {showSkeleton && (
+        <div className={styles.chartSection}>
+          <div className={styles.featuredGrid}>
+            <div className={styles.comparisonPanel}>
+              <Skeleton width={120} height={16} />
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 12,
+                  marginTop: 16,
+                }}
+              >
+                <Skeleton height={40} radius={8} />
+                <Skeleton height={40} radius={8} />
+                <Skeleton height={40} radius={8} />
+              </div>
+            </div>
+            <div
+              className={styles.chartPanel}
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Skeleton width={220} height={220} radius="50%" />
+            </div>
+            <div className={styles.highlightPanel}>
+              <Skeleton width={120} height={16} />
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 12,
+                  marginTop: 16,
+                }}
+              >
+                <Skeleton height={56} radius={8} />
+                <Skeleton height={56} radius={8} />
+              </div>
+            </div>
           </div>
         </div>
       )}
-      {error && (
+
+      {!showSkeleton && error && (
         <p className={styles.filterNote} style={{ color: "#dc2626" }}>
           {error}
         </p>
       )}
 
-      {data && (
+      {!showSkeleton && data && (
         <>
           <div className={styles.chartSection}>
             <div className={styles.chartSectionHead}>

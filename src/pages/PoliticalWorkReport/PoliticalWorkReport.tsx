@@ -11,8 +11,6 @@ import {
   faEllipsisVertical,
   faPenToSquare,
 } from "@fortawesome/free-solid-svg-icons";
-import Skeleton from "../../components/ui/Skeleton/Skeleton";
-
 
 import ReportToolbar from "../../components/report/ReportToolbar";
 import ReportStatusBadge from "../../components/ui/ReportStatusBadge/ReportStatusBadge";
@@ -36,6 +34,8 @@ import { parseTrucNguoi } from "./utils/trucNguoi";
 import { createEmptyPoliticalWorkRow } from "./utils/politicalWorkUtils";
 
 import StatCard from "../../components/ui/StatCard/StatCard";
+import Skeleton from "../../components/ui/Skeleton/Skeleton";
+import { useMinLoading } from "../../hooks/useMinLoading";
 
 function StatusBadge({
   active,
@@ -95,6 +95,8 @@ export default function PoliticalWorkReport() {
       showError,
       reportDate,
     });
+
+  const showSkeleton = useMinLoading(loading);
 
   const ownReport =
     parentReportData ??
@@ -202,6 +204,39 @@ export default function PoliticalWorkReport() {
     Boolean(row.noiDungDotXuat),
   ).length;
   const proposals = reportData.filter((row) => Boolean(row.kienNghi)).length;
+
+  const renderSkeletonRows = (count = 6) =>
+    Array.from({ length: count }).map((_, index) => (
+      <tr key={`political-skeleton-${index}`}>
+        <td className={styles["political-unit-cell"]}>
+          <Skeleton height={16} />
+        </td>
+        <td className={styles["political-text-cell"]}>
+          <Skeleton height={16} />
+        </td>
+        <td className={styles["political-text-cell"]}>
+          <Skeleton height={16} />
+        </td>
+        <td>
+          <Skeleton width={44} height={22} radius={999} />
+        </td>
+        <td>
+          <Skeleton width={44} height={22} radius={999} />
+        </td>
+        <td>
+          <Skeleton height={16} />
+        </td>
+        <td className={styles["political-ctd-cell"]}>
+          <Skeleton height={16} />
+        </td>
+        <td>
+          <Skeleton width={80} height={22} radius={999} />
+        </td>
+        <td className={styles["political-action-cell"]}>
+          <Skeleton width={24} height={24} radius={6} />
+        </td>
+      </tr>
+    ));
 
   const renderRow = (row: PoliticalWorkRow) =>
     row.notSubmitted ? (
@@ -378,35 +413,30 @@ export default function PoliticalWorkReport() {
           icon={<FontAwesomeIcon icon={faFileCircleCheck} />}
           title="Tổng báo cáo"
           value={totalUnits}
-          loading={loading}
         />
         <StatCard
           tone="blue"
           icon={<FontAwesomeIcon icon={faCircleCheck} />}
           title="Đã báo cáo"
           value={reported}
-          loading={loading}
         />
         <StatCard
           tone="orange"
           icon={<FontAwesomeIcon icon={faClock} />}
           title="Chưa báo cáo"
           value={notReported}
-          loading={loading}
         />
         <StatCard
           tone="red"
           icon={<FontAwesomeIcon icon={faTriangleExclamation} />}
           title="Việc đột xuất"
           value={incidents}
-          loading={loading}
         />
         <StatCard
           tone="purple"
           icon={<FontAwesomeIcon icon={faClipboardList} />}
           title="Kiến nghị"
           value={proposals}
-          loading={loading}
         />
       </div>
 
@@ -446,17 +476,8 @@ export default function PoliticalWorkReport() {
               </thead>
 
               <tbody>
-                {loading ? (
-                  Array.from({ length: 6 }).map((_, i) => (
-                    <tr key={`skeleton-${i}`}>
-                      <td
-                        colSpan={9}
-                        className={styles["political-skeleton-cell"]}
-                      >
-                        <Skeleton height={40} radius={8} />
-                      </td>
-                    </tr>
-                  ))
+                {showSkeleton ? (
+                  renderSkeletonRows()
                 ) : showTwoSections ? (
                   <>
                     <tr className={styles["political-separator-row"]}>
@@ -492,7 +513,7 @@ export default function PoliticalWorkReport() {
                   <>
                     {filteredFlatRows.map(renderRow)}
 
-                    {!loading && filteredFlatRows.length === 0 && (
+                    {!showSkeleton && filteredFlatRows.length === 0 && (
                       <tr>
                         <td
                           className={styles["political-empty-cell"]}

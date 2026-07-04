@@ -20,11 +20,10 @@ import type {
 } from "../../types/duty";
 import CustomSelect from "../../components/ui/CustomSelect/CustomSelect";
 import SearchBar from "../../components/ui/SearchBar/SearchBar";
+import Skeleton from "../../components/ui/Skeleton/Skeleton";
+import { useMinLoading } from "../../hooks/useMinLoading";
 
 import { buildAllowedOptions } from "../../utils/duty";
-
-import Skeleton from "../../components/ui/Skeleton/Skeleton";
-
 
 const CHI_HUY_CAP_BAC = ["Đại tá", "Thượng tá", "Trung tá"];
 const CHI_HUY_CHUC_VU = [
@@ -70,13 +69,16 @@ export default function DutyPersonnel() {
   const [chiHuyList, setChiHuyList] = useState<NguoiTrucWithCaTruc[]>([]);
   const [tacChienList, setTacChienList] = useState<NguoiTrucWithCaTruc[]>([]);
   const [loadingList, setLoadingList] = useState(true);
+  const showSkeleton = useMinLoading(loadingList);
 
   const [dutyType, setDutyType] = useState<DutyType>("chiHuy");
   const [form, setForm] = useState<TrucNguoiPayload>({ ...EMPTY_FORM });
   const [submitting, setSubmitting] = useState(false);
 
+  // Search state
   const [search, setSearch] = useState("");
 
+  // Edit state
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editType, setEditType] = useState<DutyType | null>(null);
   const [editForm, setEditForm] = useState<TrucNguoiPayload>({ ...EMPTY_FORM });
@@ -353,6 +355,25 @@ export default function DutyPersonnel() {
     );
   };
 
+  const renderSkeletonCards = (count = 4) =>
+    Array.from({ length: count }).map((_, i) => (
+      <div key={i} className={styles.personCard}>
+        <div className={styles.personRow}>
+          <div className={styles.personAvatar}>
+            <Skeleton width={42} height={42} radius="50%" />
+          </div>
+          <div className={styles.personInfo}>
+            <Skeleton width="55%" height={14} />
+            <Skeleton width="40%" height={12} />
+          </div>
+          <div className={styles.personActions}>
+            <Skeleton width={32} height={32} radius={8} />
+            <Skeleton width={32} height={32} radius={8} />
+          </div>
+        </div>
+      </div>
+    ));
+
   return (
     <div className={styles.page}>
       <div className={styles.pageHeader}>
@@ -457,23 +478,29 @@ export default function DutyPersonnel() {
         />
       </div>
 
-      {loadingList ? (
+      {showSkeleton ? (
         <div className={styles.listsGrid}>
-          {Array.from({ length: 2 }).map((_, col) => (
-            <div key={col} className={styles.listSection}>
-              <div className={styles.listBody}>
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className={styles.personCardSkeleton}>
-                    <Skeleton width={44} height={44} radius="50%" />
-                    <div className={styles.personCardSkeletonInfo}>
-                      <Skeleton height={16} width="60%" />
-                      <Skeleton height={12} width="40%" />
-                    </div>
-                  </div>
-                ))}
-              </div>
+          <div className={styles.listSection}>
+            <div className={styles.listHeader}>
+              <FontAwesomeIcon
+                icon={faUser}
+                className={styles.listHeaderIcon}
+              />
+              <span>Trực chỉ huy</span>
             </div>
-          ))}
+            <div className={styles.listBody}>{renderSkeletonCards()}</div>
+          </div>
+
+          <div className={styles.listSection}>
+            <div className={styles.listHeader}>
+              <FontAwesomeIcon
+                icon={faUser}
+                className={styles.listHeaderIcon}
+              />
+              <span>Trực ban tác chiến</span>
+            </div>
+            <div className={styles.listBody}>{renderSkeletonCards()}</div>
+          </div>
         </div>
       ) : (
         <div className={styles.listsGrid}>

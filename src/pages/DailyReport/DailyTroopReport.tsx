@@ -22,6 +22,7 @@ import { useReportActions } from "./hooks/useReportActions";
 import { useReportPermissions } from "./hooks/useReportPermissions";
 import { shouldHideDraftAndUnsubmittedForCommander } from "./utils/dailyTroopReportVisibility";
 import { useDailyTroopReportViewModel } from "./hooks/useDailyTroopReportViewModel";
+import { useMinLoading } from "../../hooks/useMinLoading";
 
 import DailyTroopStatisticsSection from "./components/DailyTroopStatisticsSection";
 import DailyTroopNhiemVuSection from "./components/DailyTroopNhiemVuSection";
@@ -98,6 +99,8 @@ export default function DailyTroopReport() {
     reportDate,
     showError,
   });
+
+  const showSkeleton = useMinLoading(loading);
 
   const isChiHuyLeaf = isChiHuy && childUnits.length === 0;
   const shouldHideDraftAndUnsubmitted =
@@ -435,40 +438,35 @@ export default function DailyTroopReport() {
           icon={<FontAwesomeIcon icon={faUsers} />}
           title="Tổng quân số"
           value={displayTotals.quanSoTong}
-          loading={loading}
         />
         <StatCard
           tone="blue"
           icon={<FontAwesomeIcon icon={faUserCheck} />}
           title="Hiện diện"
           value={displayTotals.quanSoHienDien}
-          loading={loading}
         />
         <StatCard
           tone="orange"
           icon={<FontAwesomeIcon icon={faUserTie} />}
           title="Vắng SQ"
           value={displayTotals.vangSQ}
-          loading={loading}
         />
         <StatCard
           tone="red"
           icon={<FontAwesomeIcon icon={faUserGear} />}
           title="Vắng QNCN"
           value={displayTotals.vangQNCN}
-          loading={loading}
         />
         <StatCard
           tone="purple"
           icon={<FontAwesomeIcon icon={faUserGroup} />}
           title="Vắng HSQ-BS"
           value={displayTotals.vangHSQBS}
-          loading={loading}
         />
       </div>
 
       <DailyTroopStatisticsSection
-        loading={loading}
+        loading={showSkeleton}
         displayRows={displayRows}
         displayTotals={displayTotals}
         parentReportData={parentReportData}
