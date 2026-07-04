@@ -1,12 +1,21 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faPlus, faDice } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCheck,
+  faPlus,
+  faDice,
+  faCircleNotch,
+  faTriangleExclamation,
+  faCircleCheck,
+} from "@fortawesome/free-solid-svg-icons";
 import styles from "./CreateDutyShift.module.css";
 import { dutyService } from "../../services/duty/dutyService";
 import { useToast } from "../../context/useToast";
 import type { NguoiTrucWithCaTruc, CaTrucDetail } from "../../types/duty";
 import CustomSelect from "../../components/ui/CustomSelect/CustomSelect";
 import CaTrucInfoCard from "../../components/ui/CaTrucInfoCard/CaTrucInfoCard";
+import ConfirmDialog from "../../components/ui/ConfirmDialog/ConfirmDialog";
+import { useConfirmDialog } from "../../components/ui/ConfirmDialog/useConfirmDialog";
 import { generateMatKhau } from "../../utils/passwordGenerator";
 
 import { formatNguoiTrucLabel } from "../../utils/duty";
@@ -19,9 +28,20 @@ function getToday(): string {
   return `${y}-${m}-${day}`;
 }
 
+type FieldErrors = {
+  chiHuy?: string;
+  tacChien?: string;
+  ngayTruc?: string;
+  matKhau?: string;
+};
+
+type DateStatus = "idle" | "checking" | "available" | "taken";
+
 export default function CreateDutyShift() {
   const { showSuccess, showError } = useToast();
   const today = getToday();
+
+  const { confirm, isOpen, options, onConfirm, onCancel } = useConfirmDialog();
 
   const [chiHuyList, setChiHuyList] = useState<NguoiTrucWithCaTruc[]>([]);
   const [tacChienList, setTacChienList] = useState<NguoiTrucWithCaTruc[]>([]);
@@ -33,6 +53,12 @@ export default function CreateDutyShift() {
   const [ngayTruc, setNgayTruc] = useState(today);
   const [matKhau, setMatKhau] = useState("");
   const [ghiChu, setGhiChu] = useState("");
+
+  const [errors, setErrors] = useState<FieldErrors>({});
+  // Khởi tạo "checking" nếu đã có ngày mặc định (today), để effect chạy kiểm tra ngay khi mount
+  const [dateStatus, setDateStatus] = useState<DateStatus>(
+    today ? "checking" : "idle",
+  );
 
   const [submitting, setSubmitting] = useState(false);
   const [createdCaTruc, setCreatedCaTruc] = useState<CaTrucDetail | null>(null);
@@ -56,6 +82,32 @@ export default function CreateDutyShift() {
     void load();
   }, [showError]);
 
+  // Chỉ giữ phần gọi API có debounce trong effect.
+  // Các trạng thái tức thời (idle/checking) được set ở onChange + giá trị khởi tạo useState,
+  // nên KHÔNG còn setState đồng bộ trong thân effect (tránh lỗi react-hooks/set-state-in-effect).
+  useEffect(() => {
+    if (!ngayTruc) return;
+
+    let cancelled = false;
+
+    const timer = setTimeout(async () => {
+      try {
+        const existing = await dutyService.getCaTrucByDate(ngayTruc);
+        if (cancelled) return;
+        setDateStatus(
+          existing.success && existing.Result ? "taken" : "available",
+        );
+      } catch {
+        if (!cancelled) setDateStatus("available");
+      }
+    }, 400);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [ngayTruc]);
+
   const selectedChiHuy =
     chiHuyList.find((p) => p.idNguoitruc === selectedChiHuyId) ?? null;
   const selectedTacChien =
@@ -71,29 +123,40 @@ export default function CreateDutyShift() {
     label: formatNguoiTrucLabel(p),
   }));
 
+  const validate = (): boolean => {
+    const next: FieldErrors = {};
+    if (!selectedChiHuyId) next.chiHuy = "Vui lòng chọn trực chỉ huy";
+    if (!selectedTacChienId) next.tacChien = "Vui lòng chọn trực ban tác chiến";
+    if (!ngayTruc) next.ngayTruc = "Vui lòng chọn ngày trực";
+    else if (dateStatus === "taken")
+      next.ngayTruc = "Ngày này đã có ca trực, không thể tạo thêm";
+    if (!matKhau.trim()) next.matKhau = "Vui lòng nhập mật khẩu ca trực";
+    setErrors(next);
+    return Object.keys(next).length === 0;
+  };
+
   const handleSubmit = async () => {
-    if (!selectedChiHuyId) {
-      showError("Vui lòng chọn trực chỉ huy");
-      return;
-    }
-    if (!selectedTacChienId) {
-      showError("Vui lòng chọn trực ban tác chiến");
-      return;
-    }
-    if (!ngayTruc) {
-      showError("Vui lòng chọn ngày trực");
-      return;
-    }
-    if (!matKhau.trim()) {
-      showError("Vui lòng nhập mật khẩu ca trực");
-      return;
-    }
+    if (!validate()) return;
+
+    const confirmed = await confirm({
+      title: "Xác nhận tạo ca trực",
+      message: `Bạn có chắc chắn muốn tạo ca trực ngày ${ngayTruc}?`,
+      confirmText: "Tạo ca trực",
+      cancelText: "Hủy",
+      type: "info",
+    });
+    if (!confirmed) return;
 
     setSubmitting(true);
     try {
       try {
         const existing = await dutyService.getCaTrucByDate(ngayTruc);
         if (existing.success && existing.Result) {
+          setDateStatus("taken");
+          setErrors((prev) => ({
+            ...prev,
+            ngayTruc: "Ngày này đã có ca trực, không thể tạo thêm",
+          }));
           showError("Ngày này đã có ca trực, không thể tạo thêm");
           return;
         }
@@ -123,9 +186,12 @@ export default function CreateDutyShift() {
     setCreatedCaTruc(null);
     setSelectedChiHuyId("");
     setSelectedTacChienId("");
-    setNgayTruc(getToday());
+    const t = getToday();
+    setNgayTruc(t);
     setMatKhau("");
     setGhiChu("");
+    setErrors({});
+    setDateStatus(t ? "checking" : "idle");
   };
 
   if (createdCaTruc) {
@@ -174,11 +240,39 @@ export default function CreateDutyShift() {
               </label>
               <input
                 type="date"
-                className={styles.input}
+                className={`${styles.input} ${
+                  errors.ngayTruc ? styles.inputError : ""
+                }`}
                 value={ngayTruc}
                 min={today}
-                onChange={(e) => setNgayTruc(e.target.value)}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setNgayTruc(v);
+                  setDateStatus(v ? "checking" : "idle");
+                  setErrors((prev) => ({ ...prev, ngayTruc: undefined }));
+                }}
               />
+              {errors.ngayTruc ? (
+                <span className={styles.fieldError}>
+                  <FontAwesomeIcon icon={faTriangleExclamation} />
+                  {errors.ngayTruc}
+                </span>
+              ) : dateStatus === "checking" ? (
+                <span className={styles.fieldHint}>
+                  <FontAwesomeIcon icon={faCircleNotch} spin />
+                  Đang kiểm tra ngày...
+                </span>
+              ) : dateStatus === "taken" ? (
+                <span className={styles.fieldError}>
+                  <FontAwesomeIcon icon={faTriangleExclamation} />
+                  Ngày này đã có ca trực
+                </span>
+              ) : dateStatus === "available" ? (
+                <span className={styles.fieldOk}>
+                  <FontAwesomeIcon icon={faCircleCheck} />
+                  Ngày trống, có thể tạo ca trực
+                </span>
+              ) : null}
             </div>
             <div className={styles.formGroup}>
               <label className={styles.label}>
@@ -186,21 +280,35 @@ export default function CreateDutyShift() {
               </label>
               <div className={styles.passwordRow}>
                 <input
-                  className={styles.input}
+                  className={`${styles.input} ${
+                    errors.matKhau ? styles.inputError : ""
+                  }`}
                   value={matKhau}
-                  onChange={(e) => setMatKhau(e.target.value)}
+                  onChange={(e) => {
+                    setMatKhau(e.target.value);
+                    setErrors((prev) => ({ ...prev, matKhau: undefined }));
+                  }}
                   placeholder="Nhập mật khẩu ca trực..."
                 />
                 <button
                   type="button"
                   className={styles.btnRandom}
-                  onClick={() => setMatKhau(generateMatKhau())}
+                  onClick={() => {
+                    setMatKhau(generateMatKhau());
+                    setErrors((prev) => ({ ...prev, matKhau: undefined }));
+                  }}
                   title="Tạo mật khẩu ngẫu nhiên"
                 >
                   <FontAwesomeIcon icon={faDice} />
                   Ngẫu nhiên
                 </button>
               </div>
+              {errors.matKhau && (
+                <span className={styles.fieldError}>
+                  <FontAwesomeIcon icon={faTriangleExclamation} />
+                  {errors.matKhau}
+                </span>
+              )}
             </div>
             <div className={styles.formGroup}>
               <label className={styles.label}>
@@ -209,11 +317,20 @@ export default function CreateDutyShift() {
               <CustomSelect
                 options={chiHuyOptions}
                 value={selectedChiHuyId}
-                onChange={setSelectedChiHuyId}
+                onChange={(v) => {
+                  setSelectedChiHuyId(v);
+                  setErrors((prev) => ({ ...prev, chiHuy: undefined }));
+                }}
                 placeholder={
                   loadingPersonnel ? "Đang tải..." : "-- Chọn trực chỉ huy --"
                 }
               />
+              {errors.chiHuy && (
+                <span className={styles.fieldError}>
+                  <FontAwesomeIcon icon={faTriangleExclamation} />
+                  {errors.chiHuy}
+                </span>
+              )}
             </div>
             <div className={styles.formGroup}>
               <label className={styles.label}>
@@ -222,13 +339,22 @@ export default function CreateDutyShift() {
               <CustomSelect
                 options={tacChienOptions}
                 value={selectedTacChienId}
-                onChange={setSelectedTacChienId}
+                onChange={(v) => {
+                  setSelectedTacChienId(v);
+                  setErrors((prev) => ({ ...prev, tacChien: undefined }));
+                }}
                 placeholder={
                   loadingPersonnel
                     ? "Đang tải..."
                     : "-- Chọn trực ban tác chiến --"
                 }
               />
+              {errors.tacChien && (
+                <span className={styles.fieldError}>
+                  <FontAwesomeIcon icon={faTriangleExclamation} />
+                  {errors.tacChien}
+                </span>
+              )}
             </div>
             <div className={`${styles.formGroup} ${styles.fullWidth}`}>
               <label className={styles.label}>Ghi chú</label>
@@ -247,7 +373,7 @@ export default function CreateDutyShift() {
               type="button"
               className={styles.btnSubmit}
               onClick={handleSubmit}
-              disabled={submitting}
+              disabled={submitting || dateStatus === "checking"}
             >
               {submitting ? "Đang tạo..." : "Tạo ca trực"}
               {!submitting && <FontAwesomeIcon icon={faCheck} />}
@@ -267,6 +393,17 @@ export default function CreateDutyShift() {
           />
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={isOpen}
+        title={options.title}
+        message={options.message}
+        confirmText={options.confirmText}
+        cancelText={options.cancelText}
+        type={options.type}
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+      />
     </section>
   );
 }

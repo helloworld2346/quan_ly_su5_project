@@ -260,3 +260,34 @@
   border-color: var(--primary-color);
   color: var(--primary-color);
 }
+
+.inputError {  
+  border-color: var(--dialog-danger-icon);  
+}  
+  
+.inputError:focus {  
+  border-color: var(--dialog-danger-icon);  
+  box-shadow: 0 0 0 2px var(--dialog-danger-icon);  
+}  
+  
+.fieldError,  
+.fieldHint,  
+.fieldOk {  
+  display: flex;  
+  align-items: center;  
+  gap: 6px;  
+  font-size: 13px;  
+  font-weight: 500;  
+}  
+  
+.fieldError {  
+  color: var(--dialog-danger-icon);  
+}  
+  
+.fieldHint {  
+  color: var(--login-text-muted);  
+}  
+  
+.fieldOk {  
+  color: var(--primary-color);  
+}
