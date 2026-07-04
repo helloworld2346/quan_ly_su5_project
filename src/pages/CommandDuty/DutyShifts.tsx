@@ -14,6 +14,8 @@ import CustomSelect from "../../components/ui/CustomSelect/CustomSelect";
 import SearchBar from "../../components/ui/SearchBar/SearchBar";
 import ConfirmDialog from "../../components/ui/ConfirmDialog/ConfirmDialog";
 import { useConfirmDialog } from "../../components/ui/ConfirmDialog/useConfirmDialog";
+import Skeleton from "../../components/ui/Skeleton/Skeleton";
+import { useMinLoading } from "../../hooks/useMinLoading";
 import { generateMatKhau } from "../../utils/passwordGenerator";
 
 import { formatDateLong as formatDate } from "../../utils/date";
@@ -75,6 +77,8 @@ export default function DutyShifts() {
   const [loading, setLoading] = useState(true);
   const [chiHuyList, setChiHuyList] = useState<NguoiTrucWithCaTruc[]>([]);
   const [tacChienList, setTacChienList] = useState<NguoiTrucWithCaTruc[]>([]);
+
+  const showSkeleton = useMinLoading(loading);
 
   const now = new Date();
   const [filterYear, setFilterYear] = useState<number>(now.getFullYear());
@@ -253,6 +257,18 @@ export default function DutyShifts() {
     }
   };
 
+  const renderSkeletonRows = () =>
+    Array.from({ length: 6 }).map((_, i) => (
+      <div key={i} className={styles.tableSkeletonRow}>
+        <Skeleton height={20} radius={6} />
+        <Skeleton height={20} radius={6} />
+        <Skeleton height={20} radius={6} />
+        <Skeleton height={20} radius={6} />
+        <Skeleton height={20} radius={6} />
+        <Skeleton height={20} radius={6} />
+      </div>
+    ));
+
   return (
     <div className={styles.page}>
       <div className={styles.pageHeader}>
@@ -289,8 +305,8 @@ export default function DutyShifts() {
       </div>
 
       <div className={styles.tableWrapper}>
-        {loading ? (
-          <div className={styles.loading}>Đang tải danh sách ca trực...</div>
+        {showSkeleton ? (
+          <div className={styles.tableSkeleton}>{renderSkeletonRows()}</div>
         ) : filteredList.length === 0 ? (
           <div className={styles.empty}>
             <p>Không có ca trực nào trong tháng này</p>

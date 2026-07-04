@@ -22,6 +22,8 @@ import CustomSelect from "../../components/ui/CustomSelect/CustomSelect";
 import SearchBar from "../../components/ui/SearchBar/SearchBar";
 import ConfirmDialog from "../../components/ui/ConfirmDialog/ConfirmDialog";
 import { useConfirmDialog } from "../../components/ui/ConfirmDialog/useConfirmDialog";
+import Skeleton from "../../components/ui/Skeleton/Skeleton";
+import { useMinLoading } from "../../hooks/useMinLoading";
 
 import { buildAllowedOptions } from "../../utils/duty";
 
@@ -84,6 +86,7 @@ export default function DutyPersonnel() {
   const [chiHuyList, setChiHuyList] = useState<NguoiTrucWithCaTruc[]>([]);
   const [tacChienList, setTacChienList] = useState<NguoiTrucWithCaTruc[]>([]);
   const [loadingList, setLoadingList] = useState(true);
+  const showSkeleton = useMinLoading(loadingList);
 
   const [dutyType, setDutyType] = useState<DutyType>("chiHuy");
   const [form, setForm] = useState<TrucNguoiPayload>({ ...EMPTY_FORM });
@@ -430,6 +433,17 @@ export default function DutyPersonnel() {
     );
   };
 
+  const renderSkeletonCards = (count: number) =>
+    Array.from({ length: count }).map((_, i) => (
+      <div key={i} className={styles.personCardSkeleton}>
+        <Skeleton width={42} height={42} radius="50%" />
+        <div className={styles.personCardSkeletonInfo}>
+          <Skeleton width="60%" height={14} />
+          <Skeleton width="40%" height={12} />
+        </div>
+      </div>
+    ));
+
   return (
     <div className={styles.page}>
       <div className={styles.pageHeader}>
@@ -549,8 +563,29 @@ export default function DutyPersonnel() {
         />
       </div>
 
-      {loadingList ? (
-        <div className={styles.loading}>Đang tải danh sách...</div>
+      {showSkeleton ? (
+        <div className={styles.listsGrid}>
+          <div className={styles.listSection}>
+            <div className={styles.listHeader}>
+              <FontAwesomeIcon
+                icon={faUser}
+                className={styles.listHeaderIcon}
+              />
+              <span>Trực chỉ huy</span>
+            </div>
+            <div className={styles.listBody}>{renderSkeletonCards(3)}</div>
+          </div>
+          <div className={styles.listSection}>
+            <div className={styles.listHeader}>
+              <FontAwesomeIcon
+                icon={faUser}
+                className={styles.listHeaderIcon}
+              />
+              <span>Trực ban tác chiến</span>
+            </div>
+            <div className={styles.listBody}>{renderSkeletonCards(3)}</div>
+          </div>
+        </div>
       ) : (
         <div className={styles.listsGrid}>
           <div className={styles.listSection}>
