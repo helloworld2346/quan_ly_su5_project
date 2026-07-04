@@ -2,7 +2,6 @@ import { useMemo, useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faCircleCheck,
   faClock,
   faClipboardList,
   faEye,
@@ -36,6 +35,8 @@ import { createEmptyPoliticalWorkRow } from "./utils/politicalWorkUtils";
 import StatCard from "../../components/ui/StatCard/StatCard";
 import Skeleton from "../../components/ui/Skeleton/Skeleton";
 import { useMinLoading } from "../../hooks/useMinLoading";
+
+import { isApprovedStatus } from "../../utils/reportStatus";
 
 function StatusBadge({
   active,
@@ -197,9 +198,15 @@ export default function PoliticalWorkReport() {
 
   const showTwoSections = isParentUnit && !shouldHideConsolidatedSections;
 
-  const totalUnits = account?.donVi?.donViCon?.length ?? reportData.length;
-  const reported = reportData.length;
-  const notReported = Math.max(totalUnits - reported, 0);
+  const totalUnits = isParentUnit ? childRows.length : reportData.length;
+  const reported = isParentUnit
+    ? childRows.filter((r) => isApprovedStatus(r.status)).length
+    : reportData.filter((r) => isApprovedStatus(r.status)).length;
+
+  const notReported = isParentUnit
+    ? childRows.filter((r) => r.notSubmitted).length
+    : Math.max(totalUnits - reportData.length, 0);
+
   const incidents = reportData.filter((row) =>
     Boolean(row.noiDungDotXuat),
   ).length;
@@ -411,12 +418,12 @@ export default function PoliticalWorkReport() {
         <StatCard
           tone="green"
           icon={<FontAwesomeIcon icon={faFileCircleCheck} />}
-          title="Tổng báo cáo"
+          title="Tổng đơn vị"
           value={totalUnits}
         />
         <StatCard
           tone="blue"
-          icon={<FontAwesomeIcon icon={faCircleCheck} />}
+          icon={<FontAwesomeIcon icon={faFileCircleCheck} />}
           title="Đã báo cáo"
           value={reported}
         />
