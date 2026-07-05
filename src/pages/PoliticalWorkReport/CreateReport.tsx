@@ -1,6 +1,7 @@
 import { useState } from "react";
 import styles from "./CreateReport.module.css";
 import ModalShell from "../../components/ui/ModalShell/ModalShell";
+import { useToast } from "../../context/useToast";
 import CustomSelect, {
   type SelectOption,
 } from "../../components/ui/CustomSelect/CustomSelect";
@@ -29,9 +30,9 @@ interface ReportFormData {
   ctdPhone: string;
   activity: string;
   result: string;
-  hasIncident: boolean;
+  hasIncident: boolean | null;
   incidentContent: string;
-  hasProposal: boolean;
+  hasProposal: boolean | null;
   proposal: string;
 }
 
@@ -62,9 +63,9 @@ const DEFAULT_FORM_DATA: ReportFormData = {
   ctdPhone: "",
   activity: "",
   result: "",
-  hasIncident: false,
+  hasIncident: null,
   incidentContent: "",
-  hasProposal: false,
+  hasProposal: null,
   proposal: "",
 };
 
@@ -100,6 +101,31 @@ export default function CreateReport({
     return DEFAULT_FORM_DATA;
   });
 
+  const { showWarning } = useToast();
+  const [validationError, setValidationError] = useState("");
+
+  const validateForm = (): string => {
+    if (!formData.reporterName.trim())
+      return "Vui lòng nhập họ tên trực ban nội vụ.";
+    if (!formData.reporterRank.trim())
+      return "Vui lòng chọn cấp bậc trực ban nội vụ.";
+    if (!formData.reporterPosition.trim())
+      return "Vui lòng nhập chức vụ trực ban nội vụ.";
+    if (!formData.ctdName.trim()) return "Vui lòng nhập họ tên trực CTĐ, CTCT.";
+    if (!formData.ctdRank.trim())
+      return "Vui lòng chọn cấp bậc trực CTĐ, CTCT.";
+    if (!formData.ctdPosition.trim())
+      return "Vui lòng nhập chức vụ trực CTĐ, CTCT.";
+    if (!formData.activity.trim())
+      return "Vui lòng nhập tình hình hoạt động trong ngày.";
+    if (!formData.result.trim()) return "Vui lòng nhập kết quả.";
+    if (formData.hasIncident && !formData.incidentContent.trim())
+      return "Vui lòng nhập nội dung vụ việc đột xuất.";
+    if (formData.hasProposal && !formData.proposal.trim())
+      return "Vui lòng nhập nội dung kiến nghị, đề xuất.";
+    return "";
+  };
+
   const handleChange = (
     field: keyof ReportFormData,
     value: string | boolean,
@@ -107,7 +133,20 @@ export default function CreateReport({
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const handleClose = () => {
+    setValidationError("");
+    onClose();
+  };
+
   const handleSubmit = () => {
+    const error = validateForm();
+    if (error) {
+      setValidationError(error);
+      showWarning(error);
+      return;
+    }
+    setValidationError("");
+
     const payload: PoliticalWorkRequest = {
       tinhHinh: formData.activity,
       noiDungDotXuat: formData.hasIncident ? formData.incidentContent : "",
@@ -133,29 +172,40 @@ export default function CreateReport({
   if (!open) return null;
 
   const footer = (
-    <>
-      <button
-        type="button"
-        className={`${styles["btn-outline"]} ${styles["btn-cancel"]}`}
-        onClick={onClose}
-      >
-        <span>Hủy bỏ</span>
-      </button>
-      <button
-        type="button"
-        className={styles["btn-primary"]}
-        onClick={handleSubmit}
-      >
-        <span>Lưu báo cáo</span>
-      </button>
-    </>
+    <div className={styles["footer-inner"]}>
+      {validationError && (
+        <div
+          className={styles["validation-error"]}
+          role="alert"
+          aria-live="polite"
+        >
+          {validationError}
+        </div>
+      )}
+      <div className={styles["footer-actions"]}>
+        <button
+          type="button"
+          className={`${styles["btn-outline"]} ${styles["btn-cancel"]}`}
+          onClick={handleClose}
+        >
+          <span>Hủy bỏ</span>
+        </button>
+        <button
+          type="button"
+          className={styles["btn-primary"]}
+          onClick={handleSubmit}
+        >
+          <span>Lưu báo cáo</span>
+        </button>
+      </div>
+    </div>
   );
 
   return (
     <ModalShell
       variant="primary"
       size="lg"
-      onClose={onClose}
+      onClose={handleClose}
       closeOnOverlayClick={false}
       title={
         initialData
@@ -212,7 +262,10 @@ export default function CreateReport({
               type="text"
               placeholder="Nhập số điện thoại..."
               value={formData.reporterPhone}
-              onChange={(e) => handleChange("reporterPhone", e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value.replace(/[^\d+\-\s]/g, "");
+                handleChange("reporterPhone", val);
+              }}
             />
           </div>
         </div>
@@ -266,7 +319,10 @@ export default function CreateReport({
               type="text"
               placeholder="Nhập số điện thoại..."
               value={formData.ctdPhone}
-              onChange={(e) => handleChange("ctdPhone", e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value.replace(/[^\d+\-\s]/g, "");
+                handleChange("ctdPhone", val);
+              }}
             />
           </div>
         </div>
@@ -315,25 +371,27 @@ export default function CreateReport({
         </h3>
         <div className={styles["radio-group"]}>
           <label
-            className={`${styles["radio-item"]} ${!formData.hasIncident ? styles["is-checked"] : ""
-              }`}
+            className={`${styles["radio-item"]} ${
+              formData.hasIncident === false ? styles["is-checked"] : ""
+            }`}
           >
             <input
               type="radio"
               name="incident"
-              checked={!formData.hasIncident}
+              checked={formData.hasIncident === false}
               onChange={() => handleChange("hasIncident", false)}
             />
             <span>Không có</span>
           </label>
           <label
-            className={`${styles["radio-item"]} ${formData.hasIncident ? styles["is-danger"] : ""
-              }`}
+            className={`${styles["radio-item"]} ${
+              formData.hasIncident === true ? styles["is-danger"] : ""
+            }`}
           >
             <input
               type="radio"
               name="incident"
-              checked={formData.hasIncident}
+              checked={formData.hasIncident === true}
               onChange={() => handleChange("hasIncident", true)}
             />
             <span>Có</span>
@@ -363,25 +421,27 @@ export default function CreateReport({
         <h3 className={styles["section-title"]}>Kiến nghị, đề xuất</h3>
         <div className={styles["radio-group"]}>
           <label
-            className={`${styles["radio-item"]} ${!formData.hasProposal ? styles["is-checked"] : ""
-              }`}
+            className={`${styles["radio-item"]} ${
+              formData.hasProposal === false ? styles["is-checked"] : ""
+            }`}
           >
             <input
               type="radio"
               name="proposalToggle"
-              checked={!formData.hasProposal}
+              checked={formData.hasProposal === false}
               onChange={() => handleChange("hasProposal", false)}
             />
             <span>Không có</span>
           </label>
           <label
-            className={`${styles["radio-item"]} ${formData.hasProposal ? styles["is-danger"] : ""
-              }`}
+            className={`${styles["radio-item"]} ${
+              formData.hasProposal === true ? styles["is-danger"] : ""
+            }`}
           >
             <input
               type="radio"
               name="proposalToggle"
-              checked={formData.hasProposal}
+              checked={formData.hasProposal === true}
               onChange={() => handleChange("hasProposal", true)}
             />
             <span>Có</span>

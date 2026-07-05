@@ -5,7 +5,6 @@
   width: calc(100vw - var(--current-sidebar-width, var(--sidebar-width, 280px)));  
   height: 100vh;  
   background: rgba(15, 23, 42, 0.45);  
-  backdrop-filter: blur(3px);  
   display: flex;  
   justify-content: center;  
   align-items: center;  

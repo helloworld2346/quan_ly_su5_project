@@ -714,3 +714,22 @@
     padding: 10px;  
   }  
 }
+
+.chartSkeleton {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 16px;  
+  padding: 20px 0;  
+}  
+  
+.chartSkeletonRow {  
+  display: grid;  
+  grid-template-columns: 1fr 1fr;  
+  gap: 16px;  
+}  
+  
+@media (max-width: 720px) {  
+  .chartSkeletonRow {  
+    grid-template-columns: 1fr;  
+  }  
+}

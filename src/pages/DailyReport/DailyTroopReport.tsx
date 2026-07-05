@@ -22,9 +22,21 @@ import { useReportActions } from "./hooks/useReportActions";
 import { useReportPermissions } from "./hooks/useReportPermissions";
 import { shouldHideDraftAndUnsubmittedForCommander } from "./utils/dailyTroopReportVisibility";
 import { useDailyTroopReportViewModel } from "./hooks/useDailyTroopReportViewModel";
+import { useMinLoading } from "../../hooks/useMinLoading";
 
 import DailyTroopStatisticsSection from "./components/DailyTroopStatisticsSection";
 import DailyTroopNhiemVuSection from "./components/DailyTroopNhiemVuSection";
+
+import {
+  faUsers,
+  faUserCheck,
+  faUserTie,
+  faUserGear,
+  faUserGroup,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+import StatCard from "../../components/ui/StatCard/StatCard";
 
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
@@ -87,6 +99,8 @@ export default function DailyTroopReport() {
     reportDate,
     showError,
   });
+
+  const showSkeleton = useMinLoading(loading);
 
   const isChiHuyLeaf = isChiHuy && childUnits.length === 0;
   const shouldHideDraftAndUnsubmitted =
@@ -418,8 +432,41 @@ export default function DailyTroopReport() {
         showExport={isTacChien && capDonVi === "SU_DOAN"}
       />
 
+      <div className={styles["daily-stats-grid"]}>
+        <StatCard
+          tone="green"
+          icon={<FontAwesomeIcon icon={faUsers} />}
+          title="Tổng quân số"
+          value={displayTotals.quanSoTong}
+        />
+        <StatCard
+          tone="blue"
+          icon={<FontAwesomeIcon icon={faUserCheck} />}
+          title="Hiện diện"
+          value={displayTotals.quanSoHienDien}
+        />
+        <StatCard
+          tone="orange"
+          icon={<FontAwesomeIcon icon={faUserTie} />}
+          title="Vắng SQ"
+          value={displayTotals.vangSQ}
+        />
+        <StatCard
+          tone="red"
+          icon={<FontAwesomeIcon icon={faUserGear} />}
+          title="Vắng QNCN"
+          value={displayTotals.vangQNCN}
+        />
+        <StatCard
+          tone="purple"
+          icon={<FontAwesomeIcon icon={faUserGroup} />}
+          title="Vắng HSQ-BS"
+          value={displayTotals.vangHSQBS}
+        />
+      </div>
+
       <DailyTroopStatisticsSection
-        loading={loading}
+        loading={showSkeleton}
         displayRows={displayRows}
         displayTotals={displayTotals}
         parentReportData={parentReportData}

@@ -20,6 +20,10 @@ import type {
 } from "../../types/duty";
 import CustomSelect from "../../components/ui/CustomSelect/CustomSelect";
 import SearchBar from "../../components/ui/SearchBar/SearchBar";
+import ConfirmDialog from "../../components/ui/ConfirmDialog/ConfirmDialog";
+import { useConfirmDialog } from "../../components/ui/ConfirmDialog/useConfirmDialog";
+import Skeleton from "../../components/ui/Skeleton/Skeleton";
+import { useMinLoading } from "../../hooks/useMinLoading";
 
 import { buildAllowedOptions } from "../../utils/duty";
 
@@ -52,6 +56,20 @@ const EMPTY_FORM: TrucNguoiPayload = {
   sodienthoai: "",
 };
 
+type FormErrors = {
+  tenNguoitruc?: string;
+  capbacNguoitruc?: string;
+  chucvuNguoitruc?: string;
+};
+
+function validateForm(f: TrucNguoiPayload): FormErrors {
+  const errs: FormErrors = {};
+  if (!f.tenNguoitruc.trim()) errs.tenNguoitruc = "Vui lòng nhập họ và tên";
+  if (!f.capbacNguoitruc) errs.capbacNguoitruc = "Vui lòng chọn cấp bậc";
+  if (!f.chucvuNguoitruc) errs.chucvuNguoitruc = "Vui lòng chọn chức vụ";
+  return errs;
+}
+
 function getInitials(name: string): string {
   const parts = name.trim().split(/\s+/);
   if (parts.length === 0) return "?";
@@ -60,6 +78,7 @@ function getInitials(name: string): string {
 
 export default function DutyPersonnel() {
   const { showSuccess, showError } = useToast();
+  const { confirm, isOpen, options, onConfirm, onCancel } = useConfirmDialog();
 
   const [capBacList, setCapBacList] = useState<CapBac[]>([]);
   const [chucVuList, setChucVuList] = useState<ChucVu[]>([]);
@@ -67,9 +86,11 @@ export default function DutyPersonnel() {
   const [chiHuyList, setChiHuyList] = useState<NguoiTrucWithCaTruc[]>([]);
   const [tacChienList, setTacChienList] = useState<NguoiTrucWithCaTruc[]>([]);
   const [loadingList, setLoadingList] = useState(true);
+  const showSkeleton = useMinLoading(loadingList);
 
   const [dutyType, setDutyType] = useState<DutyType>("chiHuy");
   const [form, setForm] = useState<TrucNguoiPayload>({ ...EMPTY_FORM });
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
 
   // Search state
@@ -79,6 +100,10 @@ export default function DutyPersonnel() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editType, setEditType] = useState<DutyType | null>(null);
   const [editForm, setEditForm] = useState<TrucNguoiPayload>({ ...EMPTY_FORM });
+  const [editInitial, setEditInitial] = useState<TrucNguoiPayload>({
+    ...EMPTY_FORM,
+  });
+  const [editErrors, setEditErrors] = useState<FormErrors>({});
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -110,17 +135,24 @@ export default function DutyPersonnel() {
   const handleDutyTypeChange = (type: DutyType) => {
     setDutyType(type);
     setForm({ ...EMPTY_FORM });
+    setFormErrors({});
   };
 
   const handleFieldChange = (field: keyof TrucNguoiPayload, val: string) => {
     setForm((prev) => ({ ...prev, [field]: val }));
+    // Xóa lỗi inline của field ngay khi người dùng sửa
+    if (field in formErrors) {
+      setFormErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
   };
 
   const handleSubmit = async () => {
-    if (!form.tenNguoitruc || !form.capbacNguoitruc || !form.chucvuNguoitruc) {
-      showError("Vui lòng nhập đầy đủ họ tên, cấp bậc và chức vụ");
+    const errs = validateForm(form);
+    if (Object.keys(errs).length > 0) {
+      setFormErrors(errs);
       return;
     }
+    setFormErrors({});
     setSubmitting(true);
     try {
       if (dutyType === "chiHuy") {
@@ -144,34 +176,82 @@ export default function DutyPersonnel() {
 
   const handleStartEdit = useCallback(
     (person: NguoiTrucWithCaTruc, type: DutyType) => {
-      setEditingId(person.idNguoitruc);
-      setEditType(type);
-      setEditForm({
+      const initial: TrucNguoiPayload = {
         tenNguoitruc: person.tenNguoitruc,
         capbacNguoitruc: person.capbacNguoitruc,
         chucvuNguoitruc: person.chucvuNguoitruc,
         sodienthoai: person.sodienthoai ?? "",
-      });
+      };
+      setEditingId(person.idNguoitruc);
+      setEditType(type);
+      setEditForm(initial);
+      setEditInitial(initial);
+      setEditErrors({});
     },
     [],
   );
 
-  const handleCancelEdit = useCallback(() => {
+  const closeEditModal = useCallback(() => {
     setEditingId(null);
     setEditType(null);
     setEditForm({ ...EMPTY_FORM });
+    setEditInitial({ ...EMPTY_FORM });
+    setEditErrors({});
   }, []);
+
+  const editHasChanges = useMemo(
+    () =>
+      editForm.tenNguoitruc !== editInitial.tenNguoitruc ||
+      editForm.capbacNguoitruc !== editInitial.capbacNguoitruc ||
+      editForm.chucvuNguoitruc !== editInitial.chucvuNguoitruc ||
+      editForm.sodienthoai !== editInitial.sodienthoai,
+    [editForm, editInitial],
+  );
+
+  // Đóng modal: nếu có thay đổi chưa lưu thì xác nhận trước
+  const handleCancelEdit = useCallback(async () => {
+    if (editHasChanges) {
+      const confirmed = await confirm({
+        title: "Hủy thay đổi?",
+        message:
+          "Bạn có thay đổi chưa lưu. Đóng lại sẽ mất các thay đổi này. Tiếp tục?",
+        confirmText: "Đóng",
+        cancelText: "Ở lại",
+        type: "warning",
+      });
+      if (!confirmed) return;
+    }
+    closeEditModal();
+  }, [editHasChanges, confirm, closeEditModal]);
+
+  const handleEditFieldChange = (
+    field: keyof TrucNguoiPayload,
+    val: string,
+  ) => {
+    setEditForm((prev) => ({ ...prev, [field]: val }));
+    if (field in editErrors) {
+      setEditErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
+  };
 
   const handleSaveEdit = useCallback(async () => {
     if (!editingId || !editType) return;
-    if (
-      !editForm.tenNguoitruc ||
-      !editForm.capbacNguoitruc ||
-      !editForm.chucvuNguoitruc
-    ) {
-      showError("Vui lòng nhập đầy đủ họ tên, cấp bậc và chức vụ");
+    const errs = validateForm(editForm);
+    if (Object.keys(errs).length > 0) {
+      setEditErrors(errs);
       return;
     }
+    setEditErrors({});
+
+    const confirmed = await confirm({
+      title: "Xác nhận cập nhật",
+      message: "Bạn có chắc chắn muốn lưu thay đổi thông tin người trực?",
+      confirmText: "Lưu",
+      cancelText: "Hủy",
+      type: "info",
+    });
+    if (!confirmed) return;
+
     setSaving(true);
     try {
       if (editType === "chiHuy") {
@@ -195,22 +275,33 @@ export default function DutyPersonnel() {
         );
       }
       showSuccess("Cập nhật thành công");
-      handleCancelEdit();
+      closeEditModal();
     } catch (e: unknown) {
       showError(e instanceof Error ? e.message : "Không thể cập nhật");
     } finally {
       setSaving(false);
     }
-  }, [editingId, editType, editForm, showError, showSuccess, handleCancelEdit]);
+  }, [
+    editingId,
+    editType,
+    editForm,
+    confirm,
+    showError,
+    showSuccess,
+    closeEditModal,
+  ]);
 
   const handleDelete = useCallback(
     async (person: NguoiTrucWithCaTruc, type: DutyType) => {
-      if (
-        !window.confirm(
-          `Xóa "${person.capbacNguoitruc} ${person.tenNguoitruc}" khỏi danh sách?`,
-        )
-      )
-        return;
+      const confirmed = await confirm({
+        title: "Xác nhận xóa",
+        message: `Bạn có chắc chắn muốn xóa "${person.capbacNguoitruc} ${person.tenNguoitruc}" khỏi danh sách?`,
+        confirmText: "Xóa",
+        cancelText: "Hủy",
+        type: "danger",
+      });
+      if (!confirmed) return;
+
       setDeletingId(person.idNguoitruc);
       try {
         if (type === "chiHuy") {
@@ -231,18 +322,8 @@ export default function DutyPersonnel() {
         setDeletingId(null);
       }
     },
-    [showSuccess, showError],
+    [confirm, showSuccess, showError],
   );
-
-  // Đóng modal bằng phím Escape
-  useEffect(() => {
-    if (!editingId) return;
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") handleCancelEdit();
-    };
-    document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
-  }, [editingId, handleCancelEdit]);
 
   const capBacOptions = useMemo(
     () =>
@@ -352,6 +433,17 @@ export default function DutyPersonnel() {
     );
   };
 
+  const renderSkeletonCards = (count: number) =>
+    Array.from({ length: count }).map((_, i) => (
+      <div key={i} className={styles.personCardSkeleton}>
+        <Skeleton width={42} height={42} radius="50%" />
+        <div className={styles.personCardSkeletonInfo}>
+          <Skeleton width="60%" height={14} />
+          <Skeleton width="40%" height={12} />
+        </div>
+      </div>
+    ));
+
   return (
     <div className={styles.page}>
       <div className={styles.pageHeader}>
@@ -394,6 +486,11 @@ export default function DutyPersonnel() {
               }
               placeholder="Nhập họ và tên..."
             />
+            {formErrors.tenNguoitruc && (
+              <span className={styles.fieldError}>
+                {formErrors.tenNguoitruc}
+              </span>
+            )}
           </div>
 
           <div className={styles.formGroup}>
@@ -406,6 +503,11 @@ export default function DutyPersonnel() {
               onChange={(val) => handleFieldChange("capbacNguoitruc", val)}
               placeholder="-- Chọn cấp bậc --"
             />
+            {formErrors.capbacNguoitruc && (
+              <span className={styles.fieldError}>
+                {formErrors.capbacNguoitruc}
+              </span>
+            )}
           </div>
 
           <div className={styles.formGroup}>
@@ -418,6 +520,11 @@ export default function DutyPersonnel() {
               onChange={(val) => handleFieldChange("chucvuNguoitruc", val)}
               placeholder="-- Chọn chức vụ --"
             />
+            {formErrors.chucvuNguoitruc && (
+              <span className={styles.fieldError}>
+                {formErrors.chucvuNguoitruc}
+              </span>
+            )}
           </div>
 
           <div className={styles.formGroup}>
@@ -456,8 +563,29 @@ export default function DutyPersonnel() {
         />
       </div>
 
-      {loadingList ? (
-        <div className={styles.loading}>Đang tải danh sách...</div>
+      {showSkeleton ? (
+        <div className={styles.listsGrid}>
+          <div className={styles.listSection}>
+            <div className={styles.listHeader}>
+              <FontAwesomeIcon
+                icon={faUser}
+                className={styles.listHeaderIcon}
+              />
+              <span>Trực chỉ huy</span>
+            </div>
+            <div className={styles.listBody}>{renderSkeletonCards(3)}</div>
+          </div>
+          <div className={styles.listSection}>
+            <div className={styles.listHeader}>
+              <FontAwesomeIcon
+                icon={faUser}
+                className={styles.listHeaderIcon}
+              />
+              <span>Trực ban tác chiến</span>
+            </div>
+            <div className={styles.listBody}>{renderSkeletonCards(3)}</div>
+          </div>
+        </div>
       ) : (
         <div className={styles.listsGrid}>
           <div className={styles.listSection}>
@@ -505,7 +633,7 @@ export default function DutyPersonnel() {
       )}
 
       {editingId && (
-        <div className={styles.overlay} onClick={handleCancelEdit}>
+        <div className={styles.overlay} onClick={() => void handleCancelEdit()}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <p className={styles.modalTitle}>
@@ -515,7 +643,7 @@ export default function DutyPersonnel() {
               <button
                 type="button"
                 className={styles.modalCloseBtn}
-                onClick={handleCancelEdit}
+                onClick={() => void handleCancelEdit()}
                 aria-label="Đóng"
               >
                 <FontAwesomeIcon icon={faXmark} />
@@ -532,13 +660,15 @@ export default function DutyPersonnel() {
                     className={styles.input}
                     value={editForm.tenNguoitruc}
                     onChange={(e) =>
-                      setEditForm((prev) => ({
-                        ...prev,
-                        tenNguoitruc: e.target.value,
-                      }))
+                      handleEditFieldChange("tenNguoitruc", e.target.value)
                     }
                     placeholder="Họ và tên..."
                   />
+                  {editErrors.tenNguoitruc && (
+                    <span className={styles.fieldError}>
+                      {editErrors.tenNguoitruc}
+                    </span>
+                  )}
                 </div>
                 <div className={styles.editFormGroup}>
                   <label>
@@ -548,10 +678,15 @@ export default function DutyPersonnel() {
                     options={editCapBacOptions}
                     value={editForm.capbacNguoitruc}
                     onChange={(val) =>
-                      setEditForm((prev) => ({ ...prev, capbacNguoitruc: val }))
+                      handleEditFieldChange("capbacNguoitruc", val)
                     }
                     placeholder="-- Chọn cấp bậc --"
                   />
+                  {editErrors.capbacNguoitruc && (
+                    <span className={styles.fieldError}>
+                      {editErrors.capbacNguoitruc}
+                    </span>
+                  )}
                 </div>
                 <div className={styles.editFormGroup}>
                   <label>
@@ -561,10 +696,15 @@ export default function DutyPersonnel() {
                     options={editChucVuOptions}
                     value={editForm.chucvuNguoitruc}
                     onChange={(val) =>
-                      setEditForm((prev) => ({ ...prev, chucvuNguoitruc: val }))
+                      handleEditFieldChange("chucvuNguoitruc", val)
                     }
                     placeholder="-- Chọn chức vụ --"
                   />
+                  {editErrors.chucvuNguoitruc && (
+                    <span className={styles.fieldError}>
+                      {editErrors.chucvuNguoitruc}
+                    </span>
+                  )}
                 </div>
                 <div className={styles.editFormGroup}>
                   <label>Số điện thoại</label>
@@ -574,7 +714,7 @@ export default function DutyPersonnel() {
                     value={editForm.sodienthoai}
                     onChange={(e) => {
                       const val = e.target.value.replace(/[^\d+\-\s]/g, "");
-                      setEditForm((prev) => ({ ...prev, sodienthoai: val }));
+                      handleEditFieldChange("sodienthoai", val);
                     }}
                     placeholder="Số điện thoại..."
                   />
@@ -586,7 +726,7 @@ export default function DutyPersonnel() {
               <button
                 type="button"
                 className={styles.btnCancelEdit}
-                onClick={handleCancelEdit}
+                onClick={() => void handleCancelEdit()}
                 disabled={saving}
               >
                 <FontAwesomeIcon icon={faXmark} />
@@ -605,6 +745,17 @@ export default function DutyPersonnel() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={isOpen}
+        title={options.title}
+        message={options.message}
+        confirmText={options.confirmText}
+        cancelText={options.cancelText}
+        type={options.type}
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+      />
     </div>
   );
 }

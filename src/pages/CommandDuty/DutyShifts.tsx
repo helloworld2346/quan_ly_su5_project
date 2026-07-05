@@ -12,6 +12,10 @@ import { useToast } from "../../context/useToast";
 import type { CaTrucDetail, NguoiTrucWithCaTruc } from "../../types/duty";
 import CustomSelect from "../../components/ui/CustomSelect/CustomSelect";
 import SearchBar from "../../components/ui/SearchBar/SearchBar";
+import ConfirmDialog from "../../components/ui/ConfirmDialog/ConfirmDialog";
+import { useConfirmDialog } from "../../components/ui/ConfirmDialog/useConfirmDialog";
+import Skeleton from "../../components/ui/Skeleton/Skeleton";
+import { useMinLoading } from "../../hooks/useMinLoading";
 import { generateMatKhau } from "../../utils/passwordGenerator";
 
 import { formatDateLong as formatDate } from "../../utils/date";
@@ -59,13 +63,22 @@ interface EditForm {
   ngaytruc: string;
 }
 
+interface EditErrors {
+  trucChiHuy?: string;
+  trucBanTacChien?: string;
+  matkhau?: string;
+}
+
 export default function DutyShifts() {
   const { showSuccess, showError } = useToast();
+  const { confirm, isOpen, options, onConfirm, onCancel } = useConfirmDialog();
 
   const [shiftList, setShiftList] = useState<CaTrucDetail[]>([]);
   const [loading, setLoading] = useState(true);
   const [chiHuyList, setChiHuyList] = useState<NguoiTrucWithCaTruc[]>([]);
   const [tacChienList, setTacChienList] = useState<NguoiTrucWithCaTruc[]>([]);
+
+  const showSkeleton = useMinLoading(loading);
 
   const now = new Date();
   const [filterYear, setFilterYear] = useState<number>(now.getFullYear());
@@ -82,6 +95,7 @@ export default function DutyShifts() {
     ghichu: "",
     ngaytruc: "",
   });
+  const [editErrors, setEditErrors] = useState<EditErrors>({});
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -107,16 +121,6 @@ export default function DutyShifts() {
     };
     void load();
   }, [showError]);
-
-  // Đóng modal bằng phím Escape
-  useEffect(() => {
-    if (!editingId) return;
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setEditingId(null);
-    };
-    document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
-  }, [editingId]);
 
   const filterPrefix = `${filterYear}-${String(filterMonthNum).padStart(2, "0")}`;
 
@@ -155,8 +159,17 @@ export default function DutyShifts() {
 
   const editingShift = shiftList.find((s) => s.idCatruc === editingId);
 
+  const hasUnsavedChanges = editingShift
+    ? editForm.trucChiHuy !== (editingShift.trucChiHuy?.idNguoitruc ?? "") ||
+      editForm.trucBanTacChien !==
+        (editingShift.trucBanTacChien?.idNguoitruc ?? "") ||
+      editForm.matkhau !== (editingShift.matkhau ?? "") ||
+      editForm.ghichu !== (editingShift.ghichu ?? "")
+    : false;
+
   const handleEdit = (shift: CaTrucDetail) => {
     setEditingId(shift.idCatruc);
+    setEditErrors({});
     setEditForm({
       trucChiHuy: shift.trucChiHuy?.idNguoitruc ?? "",
       trucBanTacChien: shift.trucBanTacChien?.idNguoitruc ?? "",
@@ -166,13 +179,62 @@ export default function DutyShifts() {
     });
   };
 
-  const handleCancelEdit = () => setEditingId(null);
+  const closeModal = () => {
+    setEditingId(null);
+    setEditErrors({});
+  };
+
+  const handleCancelEdit = async () => {
+    if (saving) return;
+    if (hasUnsavedChanges) {
+      const confirmed = await confirm({
+        title: "Bỏ thay đổi?",
+        message:
+          "Bạn có thay đổi chưa lưu. Đóng cửa sổ này sẽ mất các thay đổi đó.",
+        confirmText: "Đóng",
+        cancelText: "Ở lại",
+        type: "warning",
+      });
+      if (!confirmed) return;
+    }
+    closeModal();
+  };
+
+  const validateEdit = (): boolean => {
+    const errors: EditErrors = {};
+    if (!editForm.trucChiHuy) {
+      errors.trucChiHuy = "Vui lòng chọn trực chỉ huy";
+    }
+    if (!editForm.trucBanTacChien) {
+      errors.trucBanTacChien = "Vui lòng chọn trực ban tác chiến";
+    }
+    if (
+      editForm.trucChiHuy &&
+      editForm.trucBanTacChien &&
+      editForm.trucChiHuy === editForm.trucBanTacChien
+    ) {
+      errors.trucBanTacChien =
+        "Trực ban tác chiến không được trùng với trực chỉ huy";
+    }
+    if (!editForm.matkhau.trim()) {
+      errors.matkhau = "Vui lòng nhập mật khẩu ca trực";
+    }
+    setEditErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleSave = async (idCatruc: string) => {
-    if (!editForm.matkhau.trim()) {
-      showError("Vui lòng nhập mật khẩu ca trực");
-      return;
-    }
+    if (!validateEdit()) return;
+
+    const confirmed = await confirm({
+      title: "Xác nhận lưu ca trực",
+      message: "Bạn có chắc chắn muốn lưu thay đổi ca trực này?",
+      confirmText: "Lưu",
+      cancelText: "Hủy",
+      type: "info",
+    });
+    if (!confirmed) return;
+
     setSaving(true);
     try {
       const res = await dutyService.updateCaTruc(idCatruc, {
@@ -187,13 +249,25 @@ export default function DutyShifts() {
       setShiftList((prev) =>
         prev.map((s) => (s.idCatruc === idCatruc ? res.Result : s)),
       );
-      setEditingId(null);
+      closeModal();
     } catch (e: unknown) {
       showError(e instanceof Error ? e.message : "Không thể cập nhật ca trực");
     } finally {
       setSaving(false);
     }
   };
+
+  const renderSkeletonRows = () =>
+    Array.from({ length: 6 }).map((_, i) => (
+      <div key={i} className={styles.tableSkeletonRow}>
+        <Skeleton height={20} radius={6} />
+        <Skeleton height={20} radius={6} />
+        <Skeleton height={20} radius={6} />
+        <Skeleton height={20} radius={6} />
+        <Skeleton height={20} radius={6} />
+        <Skeleton height={20} radius={6} />
+      </div>
+    ));
 
   return (
     <div className={styles.page}>
@@ -231,8 +305,8 @@ export default function DutyShifts() {
       </div>
 
       <div className={styles.tableWrapper}>
-        {loading ? (
-          <div className={styles.loading}>Đang tải danh sách ca trực...</div>
+        {showSkeleton ? (
+          <div className={styles.tableSkeleton}>{renderSkeletonRows()}</div>
         ) : filteredList.length === 0 ? (
           <div className={styles.empty}>
             <p>Không có ca trực nào trong tháng này</p>
@@ -346,22 +420,40 @@ export default function DutyShifts() {
                   <CustomSelect
                     options={chiHuyOptions}
                     value={editForm.trucChiHuy}
-                    onChange={(v) =>
-                      setEditForm((f) => ({ ...f, trucChiHuy: v }))
-                    }
+                    onChange={(v) => {
+                      setEditForm((f) => ({ ...f, trucChiHuy: v }));
+                      setEditErrors((prev) => ({
+                        ...prev,
+                        trucChiHuy: undefined,
+                      }));
+                    }}
                     placeholder="-- Chọn trực chỉ huy --"
                   />
+                  {editErrors.trucChiHuy && (
+                    <span className={styles.fieldError}>
+                      {editErrors.trucChiHuy}
+                    </span>
+                  )}
                 </div>
                 <div className={styles.editGroup}>
                   <label className={styles.editLabel}>Trực ban tác chiến</label>
                   <CustomSelect
                     options={tacChienOptions}
                     value={editForm.trucBanTacChien}
-                    onChange={(v) =>
-                      setEditForm((f) => ({ ...f, trucBanTacChien: v }))
-                    }
+                    onChange={(v) => {
+                      setEditForm((f) => ({ ...f, trucBanTacChien: v }));
+                      setEditErrors((prev) => ({
+                        ...prev,
+                        trucBanTacChien: undefined,
+                      }));
+                    }}
                     placeholder="-- Chọn trực ban tác chiến --"
                   />
+                  {editErrors.trucBanTacChien && (
+                    <span className={styles.fieldError}>
+                      {editErrors.trucBanTacChien}
+                    </span>
+                  )}
                 </div>
                 <div className={styles.editGroup}>
                   <label className={styles.editLabel}>
@@ -371,26 +463,40 @@ export default function DutyShifts() {
                     <input
                       className={styles.editInput}
                       value={editForm.matkhau}
-                      onChange={(e) =>
-                        setEditForm((f) => ({ ...f, matkhau: e.target.value }))
-                      }
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        setEditForm((f) => ({ ...f, matkhau: v }));
+                        setEditErrors((prev) => ({
+                          ...prev,
+                          matkhau: undefined,
+                        }));
+                      }}
                       placeholder="Nhập mật khẩu..."
                     />
                     <button
                       type="button"
                       className={styles.btnRandom}
-                      onClick={() =>
+                      onClick={() => {
                         setEditForm((f) => ({
                           ...f,
                           matkhau: generateMatKhau(),
-                        }))
-                      }
+                        }));
+                        setEditErrors((prev) => ({
+                          ...prev,
+                          matkhau: undefined,
+                        }));
+                      }}
                       title="Tạo mật khẩu ngẫu nhiên"
                     >
                       <FontAwesomeIcon icon={faDice} />
                       {" Ngẫu nhiên"}
                     </button>
                   </div>
+                  {editErrors.matkhau && (
+                    <span className={styles.fieldError}>
+                      {editErrors.matkhau}
+                    </span>
+                  )}
                 </div>
                 <div className={styles.editGroup}>
                   <label className={styles.editLabel}>Ghi chú</label>
@@ -428,6 +534,17 @@ export default function DutyShifts() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={isOpen}
+        title={options.title}
+        message={options.message}
+        confirmText={options.confirmText}
+        cancelText={options.cancelText}
+        type={options.type}
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+      />
     </div>
   );
 }

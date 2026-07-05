@@ -135,6 +135,20 @@
   font-size: 15px;  
   font-style: italic;  
 }  
+
+.tableSkeleton {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 10px;  
+  padding: 16px;  
+}  
+  
+.tableSkeletonRow {  
+  display: grid;  
+  grid-template-columns: 12% 1fr 1fr 12% 1fr 40px;  
+  gap: 12px;  
+  align-items: center;  
+}
   
 .table {  
   width: 100%;  
@@ -577,4 +591,10 @@
     left: 0;  
     width: 100vw;  
   }  
+}
+
+.fieldError {  
+  margin-top: 6px;  
+  font-size: 13px;  
+  color: var(--dialog-danger-icon);  
 }

@@ -5,6 +5,8 @@ import type { DisplayTotals } from "../utils/dailyTroopReportHelpers";
 import ReportTableHeader from "./ReportTableHeader";
 import ReportTableRow from "./ReportTableRow";
 import ReportTotalRow from "./ReportTotalRow";
+import Skeleton from "../../../components/ui/Skeleton/Skeleton";  
+
 
 type SharedRowProps = {
   isParentUnit: boolean;
@@ -70,7 +72,11 @@ export default function DailyTroopStatisticsSection({
 
         <div className={styles.tableShell}>
           {loading ? (
-            <div className={styles.loadingState}>Đang tải dữ liệu...</div>
+            <div className={styles.tableSkeleton}>
+              {Array.from({ length: 8 }).map((_, i) => (
+                <Skeleton key={i} height={40} radius={8} />
+              ))}
+            </div>
           ) : (
             <table className={styles.reportTable}>
               <colgroup>

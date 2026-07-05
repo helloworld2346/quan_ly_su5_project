@@ -1,0 +1,71 @@
+.card {  
+  min-height: 84px;  
+  display: flex;  
+  align-items: center;  
+  gap: 16px;  
+  padding: 16px 20px;  
+  background: var(--surface-card);  
+  border: 1px solid var(--login-border);  
+  border-radius: 12px;  
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);  
+  transition:  
+    box-shadow 0.2s,  
+    border-color 0.2s,  
+    background 0.25s ease;  
+}  
+  
+.card:hover {  
+  border-color: var(--login-border);  
+  box-shadow: 0 8px 24px var(--primary-a07);  
+}  
+  
+.icon {  
+  width: 48px;  
+  height: 48px;  
+  flex: 0 0 48px;  
+  display: inline-flex;  
+  align-items: center;  
+  justify-content: center;  
+  color: var(--text-white);  
+  border-radius: 12px;  
+  font-size: 20px;  
+}  
+  
+.icon--green {  
+  background: var(--chart-green);  
+}  
+.icon--blue {  
+  background: var(--chart-blue);  
+}  
+.icon--orange {  
+  background: var(--chart-orange);  
+}  
+.icon--red {  
+  background: var(--chart-red);  
+}  
+.icon--purple {  
+  background: var(--chart-purple);  
+}  
+  
+.card p {  
+  margin: 0 0 6px;  
+  color: var(--login-text-muted);  
+  font-size: 12px;  
+  font-weight: 700;  
+  text-transform: uppercase;  
+  letter-spacing: 0.6px;  
+}  
+  
+.card strong {  
+  display: block;  
+  color: var(--login-text);  
+  font-size: 26px;  
+  line-height: 1;  
+  font-weight: 800;  
+}  
+  
+@media (max-width: 720px) {  
+  .card {  
+    padding: 16px;  
+  }  
+}
