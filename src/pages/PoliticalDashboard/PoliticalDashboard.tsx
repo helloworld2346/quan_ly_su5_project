@@ -1,9 +1,7 @@
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
     faBuilding,
     faCalendarAlt,
-    faChartLine,
-    faCheckSquare,
     faChevronLeft,
     faChevronRight,
     faExclamationTriangle,
@@ -13,6 +11,15 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { formatFullDate, shiftDay, toDateParam } from "../../utils/date";
 import "./PoliticalDashboard.css";
+
+import {
+    politicalDashboardService,
+    type PoliticalDashboardResult,
+} from "../../services/politicalDashboard/politicalDashboardService";
+
+import { useAuth } from "../../context/useAuth";
+import { politicalWorkService } from "../../services/politicalWork/politicalWorkService";
+import { mapItemToRow } from "../PoliticalWorkReport/utils/politicalWorkUtils";
 
 type UnitType = "department" | "regiment" | "battalion" | "company";
 type FilterKey = "all" | UnitType;
@@ -25,86 +32,35 @@ const FILTER_OPTIONS: { key: FilterKey; label: string }[] = [
     { key: "company", label: "Đại đội" },
 ];
 
-const unitReports = [
-    {
-        name: "Phòng Chính trị",
-        type: "department" as const,
-        status: "Tốt",
-        completed: 6,
-        proposals: 1,
-        incidents: 0,
-        updatedAt: "29/06 - 07:10",
-    },
-    {
-        name: "Trung đoàn 1",
-        type: "regiment" as const,
-        status: "Tốt",
-        completed: 7,
-        proposals: 2,
-        incidents: 1,
-        updatedAt: "29/06 - 07:30",
-    },
-    {
-        name: "Trung đoàn 2",
-        type: "regiment" as const,
-        status: "Cần chú ý",
-        completed: 4,
-        proposals: 3,
-        incidents: 1,
-        updatedAt: "29/06 - 07:45",
-    },
-    {
-        name: "Tiểu đoàn 3",
-        type: "battalion" as const,
-        status: "Cần chú ý",
-        completed: 2,
-        proposals: 3,
-        incidents: 1,
-        updatedAt: "29/06 - 08:16",
-    },
-    {
-        name: "Đại đội 8",
-        type: "company" as const,
-        status: "Có vấn đề",
-        completed: 1,
-        proposals: 1,
-        incidents: 2,
-        updatedAt: "29/06 - 08:20",
-    },
-];
-
-const overview = {
-    totalUnits: 45,
-    completed: 28,
-    proposals: 10,
-    incidents: 7,
-};
-
-function percent(value: number) {
-    return Math.round((value / overview.totalUnits) * 100);
-}
-
-function totalByUnit(unit: (typeof unitReports)[number]) {
-    return unit.completed + unit.proposals + unit.incidents;
-}
-
-function unitPercent(value: number, unit: (typeof unitReports)[number]) {
-    const total = totalByUnit(unit);
-    return total ? Math.round((value / total) * 100) : 0;
-}
-
 export default function PoliticalDashboard() {
     const [filter, setFilter] = useState<FilterKey>("all");
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
+    const [dashboardData, setDashboardData] =
+        useState<PoliticalDashboardResult | null>(null);
+    const [loading, setLoading] = useState(false);
+
     const [hoveredData, setHoveredData] = useState<{
         unitName: string;
-        key: "completed" | "proposals" | "incidents" | null;
+        key: "proposals" | "incidents" | null;
     }>({
         unitName: "",
         key: null,
     });
 
     const dateInputRef = useRef<HTMLInputElement>(null);
+
+    const { account } = useAuth();
+    const maDonViCurrent = account?.donVi?.maDonVi;
+
+    const [workRows, setWorkRows] = useState<
+        {
+            maDonVi: string;
+            tenDonViText: string;
+            kienNghi: string;
+            noiDungDotXuat: string;
+        }[]
+    >([]);
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -114,10 +70,150 @@ export default function PoliticalDashboard() {
 
     const isToday = selectedDay.getTime() === today.getTime();
 
-    const visibleUnits =
-        filter === "all"
-            ? unitReports
-            : unitReports.filter((unit) => unit.type === filter);
+    useEffect(() => {
+        let ignore = false;
+
+        async function fetchDashboard() {
+            try {
+                setLoading(true);
+                const dateParam = toDateParam(selectedDate);
+
+                const dashboardPromise =
+                    politicalDashboardService.getThongKeCtDangCt(dateParam);
+
+                const workPromise = maDonViCurrent
+                    ? politicalWorkService.getByDonViCha(maDonViCurrent, dateParam)
+                    : Promise.resolve(null);
+
+                const [dashboard, workResponse] = await Promise.all([
+                    dashboardPromise,
+                    workPromise,
+                ]);
+
+                if (ignore) return;
+
+                setDashboardData(dashboard);
+
+                if (workResponse?.success && workResponse.Result) {
+                    setWorkRows(
+                        workResponse.Result.map((item: any) => {
+                            const row = mapItemToRow(item);
+                            return {
+                                maDonVi: String(item.maDonVi || item.idDonVi || "").trim(),
+                                tenDonViText: String(row.donVi || item.tenDonVi || "").trim(),
+                                kienNghi: row.kienNghi || "",
+                                noiDungDotXuat: row.noiDungDotXuat || "",
+                            };
+                        }),
+                    );
+                } else {
+                    setWorkRows([]);
+                }
+            } catch (error) {
+                console.error("Không thể tải thống kê CTĐ, CTCT", error);
+                if (!ignore) {
+                    setDashboardData(null);
+                    setWorkRows([]);
+                }
+            } finally {
+                if (!ignore) {
+                    setLoading(false);
+                }
+            }
+        }
+
+        fetchDashboard();
+
+        return () => {
+            ignore = true;
+        };
+    }, [selectedDate, maDonViCurrent]);
+
+    const overview = dashboardData ?? {
+        tongDonVi: 0,
+        donViCoKienNghi: 0,
+        donViCoDotXuat: 0,
+        danhSachDonVi: [],
+    };
+
+    const unitReports = useMemo(
+        () => {
+            return overview.danhSachDonVi.map((unit: any) => {
+                const unitIdStr = String(unit.idDonVi || "").trim();
+                const unitNameStr = String(unit.tenDonVi || "").trim();
+
+                const matchedWorkRows = workRows.filter((row) => {
+                    const rowMa = String(row.maDonVi || "").trim();
+                    const rowTen = String(row.tenDonViText || "").trim();
+                    const matchId = rowMa === unitIdStr;
+                    const matchSpecialSD5 = (unitIdStr === "GS003" && rowMa === "SD5") || (unitIdStr === "SD5" && rowMa === "GS003");
+                    const matchName = unitNameStr && rowTen && (rowTen.includes(unitNameStr) || unitNameStr.includes(rowTen));
+
+                    return matchId || matchSpecialSD5 || matchName;
+                });
+
+                const hasContent = (text: string) => {
+                    if (!text) return false;
+                    const cleanText = text.trim().toLowerCase();
+                    return cleanText.length > 0 &&
+                        cleanText !== "không" &&
+                        cleanText !== "không có" &&
+                        cleanText !== "0";
+                };
+
+                const proposalsCount = matchedWorkRows.length
+                    ? matchedWorkRows.filter((row) => hasContent(row.kienNghi)).length
+                    : Number(unit.soKienNghi) || 0;
+
+                const incidentsCount = matchedWorkRows.length
+                    ? matchedWorkRows.filter((row) => hasContent(row.noiDungDotXuat)).length
+                    : Number(unit.soDotXuat) || 0;
+
+                return {
+                    id: unit.idDonVi,
+                    name: unit.tenDonVi || "Đơn vị trực thuộc",
+                    status: unit.mucDo || "Tốt",
+                    proposals: proposalsCount,
+                    incidents: incidentsCount,
+                    totalIssues: proposalsCount + incidentsCount,
+                };
+            });
+        },
+        [overview.danhSachDonVi, workRows],
+    );
+
+
+    const visibleUnits = useMemo(() => {
+        if (filter === "all") return unitReports;
+
+        return unitReports.filter((unit) => {
+            const nameLower = (unit.name || "").toLowerCase();
+
+            if (filter === "department") {
+                return nameLower.includes("phòng");
+            }
+            if (filter === "regiment") {
+
+                return nameLower.includes("trung đoàn") || nameLower.includes("sư đoàn") || nameLower.includes("e ") || nameLower.startsWith("e");
+            }
+            if (filter === "battalion") {
+                return nameLower.includes("tiểu đoàn") || nameLower.includes("d ") || nameLower.startsWith("d");
+            }
+            if (filter === "company") {
+
+                return nameLower.includes("đại đội") || nameLower.includes("c ") || nameLower.startsWith("c");
+            }
+            return true;
+        });
+    }, [unitReports, filter]);
+
+    const percent = (value: number) =>
+        overview.tongDonVi > 0 ? Math.round((value / overview.tongDonVi) * 100) : 0;
+
+    const totalOverviewIssues = overview.donViCoKienNghi + overview.donViCoDotXuat;
+    const overviewGreenRatio = totalOverviewIssues
+        ? Math.round((overview.donViCoKienNghi / totalOverviewIssues) * 100)
+        : 0;
 
     return (
         <section className="political-dashboard">
@@ -173,11 +269,16 @@ export default function PoliticalDashboard() {
                 <div className="political-donut-block">
                     <h3 className="political-section-title">Tổng hợp hoạt động CTĐ,CTCT</h3>
 
-                    <div className="political-main-donut">
+                    <div
+                        className={`political-main-donut ${overview.tongDonVi === 0 ? "is-empty" : ""}`}
+                        style={{
+                            "--overview-green": `${overviewGreenRatio}%`
+                        } as React.CSSProperties}
+                    >
                         <div className="political-donut-center">
-                            <strong>{overview.totalUnits}</strong>
+                            <strong>{overview.tongDonVi}</strong>
                             <span>đơn vị</span>
-                            <small>(100%)</small>
+                            <small>({overview.tongDonVi > 0 ? "100%" : "0%"})</small>
                         </div>
                     </div>
 
@@ -189,46 +290,30 @@ export default function PoliticalDashboard() {
                 <div className="political-kpi-grid">
                     <article className="political-kpi political-kpi-green">
                         <span className="political-kpi-icon">
-                            <FontAwesomeIcon icon={faCheckSquare} />
-                        </span>
-                        <div>
-                            <p>Có kết quả hoạt động</p>
-                            <strong>{overview.completed}</strong>
-                            <div className="political-kpi-meta">
-                                <span>đơn vị</span>
-                                <b>{percent(overview.completed)}%</b>
-                            </div>
-                            <hr />
-                            <small>Đơn vị báo cáo có kết quả hoạt động trong ngày.</small>
-                        </div>
-                    </article>
-
-                    <article className="political-kpi political-kpi-orange">
-                        <span className="political-kpi-icon">
                             <FontAwesomeIcon icon={faLightbulb} />
                         </span>
                         <div>
                             <p>Có kiến nghị, đề xuất</p>
-                            <strong>{overview.proposals}</strong>
+                            <strong>{overview.donViCoKienNghi}</strong>
                             <div className="political-kpi-meta">
                                 <span>đơn vị</span>
-                                <b>{percent(overview.proposals)}%</b>
+                                <b>{percent(overview.donViCoKienNghi)}%</b>
                             </div>
                             <hr />
                             <small>Đơn vị báo cáo có kiến nghị, đề xuất cần xem xét.</small>
                         </div>
                     </article>
 
-                    <article className="political-kpi political-kpi-red">
+                    <article className="political-kpi political-kpi-orange">
                         <span className="political-kpi-icon">
                             <FontAwesomeIcon icon={faExclamationTriangle} />
                         </span>
                         <div>
                             <p>Có vụ việc đột xuất</p>
-                            <strong>{overview.incidents}</strong>
+                            <strong>{overview.donViCoDotXuat}</strong>
                             <div className="political-kpi-meta">
                                 <span>đơn vị</span>
-                                <b>{percent(overview.incidents)}%</b>
+                                <b>{percent(overview.donViCoDotXuat)}%</b>
                             </div>
                             <hr />
                             <small>Đơn vị báo cáo có vụ việc đột xuất phát sinh.</small>
@@ -239,7 +324,7 @@ export default function PoliticalDashboard() {
 
             <div className="political-subhead">
                 <h3>Thống kê theo đơn vị trực thuộc</h3>
-                <p>45 đơn vị - phòng, trung đoàn, tiểu đoàn, đại đội</p>
+                <p>{visibleUnits.length} đơn vị hiển thị</p>
             </div>
 
             <div className="political-toolbar">
@@ -259,19 +344,24 @@ export default function PoliticalDashboard() {
                 ))}
             </div>
 
+            {loading && <p className="political-updated">Đang tải dữ liệu...</p>}
+
+            {!loading && visibleUnits.length === 0 && (
+                <p className="political-updated">Không có dữ liệu thuộc nhóm đơn vị này.</p>
+            )}
+
             <div className="political-unit-grid">
-                {visibleUnits.map((unit) => {
+                {!loading && visibleUnits.map((unit) => {
                     const isCurrentUnit = hoveredData.unitName === unit.name;
                     const activeKey = isCurrentUnit ? hoveredData.key : null;
-                    const pGreen = unitPercent(unit.completed, unit);
-                    const pOrange = unitPercent(unit.completed + unit.proposals, unit);
-                    let centerValue = totalByUnit(unit);
-                    let centerLabel = "báo cáo";
 
-                    if (activeKey === "completed") {
-                        centerValue = unit.completed;
-                        centerLabel = "kết quả";
-                    } else if (activeKey === "proposals") {
+                    const totalIssues = unit.proposals + unit.incidents;
+                    const pGreen = totalIssues ? Math.round((unit.proposals / totalIssues) * 100) : 0;
+
+                    let centerValue = totalIssues;
+                    let centerLabel = "vấn đề";
+
+                    if (activeKey === "proposals") {
                         centerValue = unit.proposals;
                         centerLabel = "kiến nghị";
                     } else if (activeKey === "incidents") {
@@ -280,7 +370,7 @@ export default function PoliticalDashboard() {
                     }
 
                     return (
-                        <article className="political-unit-card" key={unit.name}>
+                        <article className="political-unit-card" key={unit.id}>
                             <div className="political-unit-head">
                                 <div>
                                     <FontAwesomeIcon icon={faBuilding} />
@@ -290,7 +380,7 @@ export default function PoliticalDashboard() {
                                     className={
                                         unit.status === "Tốt"
                                             ? "status-good"
-                                            : unit.status === "Cần chú ý"
+                                            : unit.status === "Cần chú ý" || unit.status === "Có vấn đề"
                                                 ? "status-warning"
                                                 : "status-danger"
                                     }
@@ -300,35 +390,26 @@ export default function PoliticalDashboard() {
                             </div>
 
                             <div className="political-unit-body">
-
                                 <div
-                                    className={`political-small-donut ${activeKey ? `hover-${activeKey}` : ""}`}
+                                    className={`political-small-donut ${totalIssues === 0 ? "is-empty" : ""} ${activeKey ? `hover-${activeKey}` : ""}`}
                                     style={
                                         {
-                                            "--green": `${pGreen}%`,
-                                            "--orange": `${pOrange}%`,
+                                            "--green-ratio": `${pGreen}%`,
                                         } as React.CSSProperties
                                     }
                                 >
-
                                     <div className="political-hover-zones">
                                         <div
                                             className="hover-zone-segment"
-                                            onMouseEnter={() => setHoveredData({ unitName: unit.name, key: "completed" })}
+                                            onMouseEnter={() => totalIssues > 0 && setHoveredData({ unitName: unit.name, key: "proposals" })}
                                             onMouseLeave={() => setHoveredData({ unitName: "", key: null })}
                                         />
                                         <div
                                             className="hover-zone-segment"
-                                            onMouseEnter={() => setHoveredData({ unitName: unit.name, key: "proposals" })}
-                                            onMouseLeave={() => setHoveredData({ unitName: "", key: null })}
-                                        />
-                                        <div
-                                            className="hover-zone-segment"
-                                            onMouseEnter={() => setHoveredData({ unitName: unit.name, key: "incidents" })}
+                                            onMouseEnter={() => totalIssues > 0 && setHoveredData({ unitName: unit.name, key: "incidents" })}
                                             onMouseLeave={() => setHoveredData({ unitName: "", key: null })}
                                         />
                                     </div>
-
 
                                     <div className="political-donut-inner-content">
                                         <strong className={activeKey ? `text-${activeKey}` : ""}>
@@ -338,52 +419,34 @@ export default function PoliticalDashboard() {
                                     </div>
                                 </div>
 
-
                                 <ul className={activeKey ? "has-active" : ""}>
                                     <li
-                                        className={isCurrentUnit && activeKey === "completed" ? "active-legend" : ""}
-                                        onMouseEnter={() => setHoveredData({ unitName: unit.name, key: "completed" })}
+                                        className={isCurrentUnit && activeKey === "proposals" ? "active-legend" : ""}
+                                        onMouseEnter={() => totalIssues > 0 && setHoveredData({ unitName: unit.name, key: "proposals" })}
                                         onMouseLeave={() => setHoveredData({ unitName: "", key: null })}
                                     >
                                         <span className="dot green" />
-                                        <span>Có kết quả</span>
-                                        <b>{unit.completed}</b>
-                                        <small>({unitPercent(unit.completed, unit)}%)</small>
-                                    </li>
-                                    <li
-                                        className={isCurrentUnit && activeKey === "proposals" ? "active-legend" : ""}
-                                        onMouseEnter={() => setHoveredData({ unitName: unit.name, key: "proposals" })}
-                                        onMouseLeave={() => setHoveredData({ unitName: "", key: null })}
-                                    >
-                                        <span className="dot orange" />
                                         <span>Có kiến nghị</span>
                                         <b>{unit.proposals}</b>
-                                        <small>({unitPercent(unit.proposals, unit)}%)</small>
+                                        <small>({totalIssues ? Math.round((unit.proposals / totalIssues) * 100) : 0}%)</small>
                                     </li>
                                     <li
                                         className={isCurrentUnit && activeKey === "incidents" ? "active-legend" : ""}
-                                        onMouseEnter={() => setHoveredData({ unitName: unit.name, key: "incidents" })}
+                                        onMouseEnter={() => totalIssues > 0 && setHoveredData({ unitName: unit.name, key: "incidents" })}
                                         onMouseLeave={() => setHoveredData({ unitName: "", key: null })}
                                     >
-                                        <span className="dot red" />
+                                        <span className="dot orange" />
                                         <span>Có đột xuất</span>
                                         <b>{unit.incidents}</b>
-                                        <small>({unitPercent(unit.incidents, unit)}%)</small>
+                                        <small>({totalIssues ? Math.round((unit.incidents / totalIssues) * 100) : 0}%)</small>
                                     </li>
                                 </ul>
                             </div>
 
-                            <p className="political-updated">Cập nhật: {unit.updatedAt}</p>
+                            <p className="political-updated">Chi tiết vấn đề: {unit.totalIssues}</p>
                         </article>
                     );
                 })}
-            </div>
-
-            <div className="political-more">
-                <button type="button">
-                    Xem tất cả đơn vị
-                    <FontAwesomeIcon icon={faChartLine} />
-                </button>
             </div>
         </section>
     );

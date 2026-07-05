@@ -29,14 +29,23 @@
   text-transform: uppercase;
 }
 
+/* Biểu đồ tổng - Đổi sang sử dụng biến động truyền từ code React */
 .political-main-donut {
   width: 190px;
   height: 190px;
   margin: 26px auto 12px;
   border-radius: 50%;
-  background: conic-gradient(#228b22 0 62%, #f59e0b 62% 84%, #ef2b20 84% 100%);
+  background: conic-gradient(
+    var(--chart-green) 0 var(--overview-green), 
+    var(--chart-orange) var(--overview-green) 100%
+  );
   display: grid;
   place-items: center;
+}
+
+/* Khi không có dữ liệu (0 đơn vị) thì chuyển sang màu xám nhạt rỗng */
+.political-main-donut.is-empty {
+  background: var(--login-border) !important;
 }
 
 .political-donut-center {
@@ -76,7 +85,7 @@
 
 .political-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
 }
 
 .political-kpi {
@@ -122,6 +131,7 @@
 .political-kpi-meta b {
   padding: 3px 10px;
   border-radius: 12px;
+  color: #fff;
 }
 
 .political-kpi hr {
@@ -137,33 +147,18 @@
 
 .political-kpi-green .political-kpi-icon,
 .political-kpi-green .political-kpi-meta b {
-  background: #228b22;
+  background: var(--chart-green);
 }
-
 .political-kpi-green strong {
-  color: #228b22;
+  color: var(--chart-green);
 }
 
 .political-kpi-orange .political-kpi-icon,
 .political-kpi-orange .political-kpi-meta b {
-  background: #f59e0b;
+  background: var(--chart-orange);
 }
-
 .political-kpi-orange strong {
-  color: #f59e0b;
-}
-
-.political-kpi-red .political-kpi-icon,
-.political-kpi-red .political-kpi-meta b {
-  background: #ef2b20;
-}
-
-.political-kpi-red strong {
-  color: #ef2b20;
-}
-
-.political-kpi-meta b {
-  color: #fff;
+  color: var(--chart-orange);
 }
 
 .political-subhead {
@@ -275,13 +270,17 @@
   flex: 0 0 auto;
   border-radius: 50%;
   background: conic-gradient(
-    #228b22 0 var(--green),
-    #f59e0b var(--green) var(--orange),
-    #ef2b20 var(--orange) 100%
+    var(--chart-green) 0 var(--green-ratio),
+    var(--chart-orange) var(--green-ratio) 100%
   );
   display: grid;
   place-items: center;
   transition: background 0.25s ease;
+}
+
+/* Trường hợp thẻ đơn vị rỗng không có vấn đề */
+.political-small-donut.is-empty {
+  background: var(--login-border) !important;
 }
 
 .political-hover-zones {
@@ -300,32 +299,20 @@
   background: transparent;
 }
 
-
-.political-small-donut.hover-completed {
-  background: conic-gradient(
-    #228b22 0 var(--green),
-    rgba(245, 158, 11, 0.15) var(--green) var(--orange),
-    rgba(239, 43, 32, 0.15) var(--orange) 100%
-  );
-}
-
 .political-small-donut.hover-proposals {
   background: conic-gradient(
-    rgba(34, 139, 34, 0.15) 0 var(--green),
-    #f59e0b var(--green) var(--orange),
-    rgba(239, 43, 32, 0.15) var(--orange) 100%
+    var(--chart-green) 0 var(--green-ratio),
+    rgba(249, 115, 22, 0.15) var(--green-ratio) 100%
   );
 }
 
 .political-small-donut.hover-incidents {
   background: conic-gradient(
-    rgba(34, 139, 34, 0.15) 0 var(--green),
-    rgba(245, 158, 11, 0.15) var(--green) var(--orange),
-    #ef2b20 var(--orange) 100%
+    rgba(34, 197, 94, 0.15) 0 var(--green-ratio),
+    var(--chart-orange) var(--green-ratio) 100%
   );
 }
 
-/* Lõi trắng bên trong biểu đồ nhỏ */
 .political-donut-inner-content {
   width: 58px;
   height: 58px;
@@ -336,7 +323,7 @@
   align-items: center;
   justify-content: center;
   z-index: 3;
-  pointer-events: none; /* Cho phép sự kiện chuột xuyên qua lớp lõi này */
+  pointer-events: none;
 }
 
 .political-donut-inner-content strong {
@@ -346,15 +333,11 @@
   transition: color 0.2s ease;
 }
 
-/* Đổi màu số ở giữa trùng khớp với loại dữ liệu được chọn */
-.political-donut-inner-content strong.text-completed {
-  color: #228b22;
-}
 .political-donut-inner-content strong.text-proposals {
-  color: #f59e0b;
+  color: var(--chart-green);
 }
 .political-donut-inner-content strong.text-incidents {
-  color: #ef2b20;
+  color: var(--chart-orange);
 }
 
 .political-donut-inner-content span {
@@ -363,7 +346,6 @@
   transition: color 0.2s ease;
 }
 
-/* --- LOGIC ĐIỀU KHIỂN DANH SÁCH CHÚ THÍCH BÊN PHẢI --- */
 .political-unit-body ul {
   flex: 1;
   list-style: none;
@@ -409,15 +391,11 @@
 }
 
 .dot.green {
-  background: #228b22;
+  background: var(--chart-green);
 }
 
 .dot.orange {
-  background: #f59e0b;
-}
-
-.dot.red {
-  background: #ef2b20;
+  background: var(--chart-orange);
 }
 
 .political-unit-body b {
@@ -435,18 +413,7 @@
   font-size: 12px;
 }
 
-.political-more {
-  display: flex;
-  justify-content: center;
-}
 
-.political-more button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--primary-color);
-  background: var(--surface-card);
-}
 
 .political-datebar {
   display: flex;
@@ -539,11 +506,9 @@
   .political-datebar {
     flex-direction: column;
   }
-
   .political-date-spacer {
     display: none;
   }
-
   .political-date-nav {
     gap: 20px;
     padding: 0;
@@ -556,7 +521,6 @@
   .political-unit-grid {
     grid-template-columns: 1fr 1fr;
   }
-
   .political-kpi {
     border-left: 0;
     border-top: 1px solid var(--login-border);
@@ -569,7 +533,6 @@
   .political-unit-grid {
     grid-template-columns: 1fr;
   }
-
   .political-toolbar {
     flex-wrap: wrap;
   }
