@@ -278,10 +278,12 @@ export default function PoliticalWorkReport() {
         </td>
         <td>—</td>
         <td>—</td>
-        {/* FIX: Thêm style chặn xuống dòng cho ô Tên Trực Ban ở dòng Chưa Nộp */}
-        <td style={{ whiteSpace: "nowrap" }}>—</td>
-        {/* FIX: Thêm style chặn xuống dòng cho ô Tên Trực CTĐ ở dòng Chưa Nộp */}
-        <td className={styles["political-ctd-cell"]} style={{ whiteSpace: "nowrap" }}>—</td>
+        <td className={styles["political-nowrap"]}>—</td>
+        <td
+          className={`${styles["political-ctd-cell"]} ${styles["political-nowrap"]}`}
+        >
+          —
+        </td>
         <td>
           <ReportStatusBadge status="Chưa_Nộp" />
         </td>
@@ -304,12 +306,12 @@ export default function PoliticalWorkReport() {
         <td>
           <StatusBadge active={Boolean(row.kienNghi)} type="proposal" />
         </td>
-        {/* FIX CHÍNH: Thêm style={{ whiteSpace: "nowrap" }} để ép tên trực ban nằm trên 1 hàng */}
-        <td style={{ whiteSpace: "nowrap" }}>
+        <td className={styles["political-nowrap"]}>
           {parseTrucNguoi(row.trucBanNoiVu).hoTen}
         </td>
-        {/* FIX CHÍNH: Thêm style={{ whiteSpace: "nowrap" }} cho cột Trực CTĐ, CTCT luôn để đồng bộ */}
-        <td className={styles["political-ctd-cell"]} style={{ whiteSpace: "nowrap" }}>
+        <td
+          className={`${styles["political-ctd-cell"]} ${styles["political-nowrap"]}`}
+        >
           {parseTrucNguoi(row.trucBanCtDangCt).hoTen}
         </td>
         <td>

@@ -343,6 +343,10 @@
   font-weight: 700;
 }
 
+.political-nowrap {  
+  white-space: nowrap;  
+}
+
 [data-theme="dark"] .political-section-title {
   color: var(--login-text);
 }

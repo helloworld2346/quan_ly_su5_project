@@ -13,13 +13,15 @@ import { formatFullDate, shiftDay, toDateParam } from "../../utils/date";
 import "./PoliticalDashboard.css";
 
 import {
-    politicalDashboardService,
-    type PoliticalDashboardResult,
-} from "../../services/politicalDashboard/politicalDashboardService";
+  politicalDashboardService,
+  type PoliticalDashboardResult,
+  type PoliticalDashboardUnit,
+} from "../../services/politicalDashboard/politicalDashboardService";  
 
 import { useAuth } from "../../context/useAuth";
 import { politicalWorkService } from "../../services/politicalWork/politicalWorkService";
 import { mapItemToRow } from "../PoliticalWorkReport/utils/politicalWorkUtils";
+import type { PoliticalWorkItem } from "../../types/politicalWork";
 
 type UnitType = "department" | "regiment" | "battalion" | "company";
 type FilterKey = "all" | UnitType;
@@ -96,15 +98,19 @@ export default function PoliticalDashboard() {
 
                 if (workResponse?.success && workResponse.Result) {
                     setWorkRows(
-                        workResponse.Result.map((item: any) => {
-                            const row = mapItemToRow(item);
-                            return {
-                                maDonVi: String(item.maDonVi || item.idDonVi || "").trim(),
-                                tenDonViText: String(row.donVi || item.tenDonVi || "").trim(),
-                                kienNghi: row.kienNghi || "",
-                                noiDungDotXuat: row.noiDungDotXuat || "",
-                            };
-                        }),
+                      workResponse.Result.map((item: PoliticalWorkItem) => {
+                        const row = mapItemToRow(item);
+                        return {
+                          maDonVi: String(
+                            row.donVi || item.donVi?.maDonVi || "",
+                          ).trim(),
+                          tenDonViText: String(
+                            row.tenDonVi || item.donVi?.tenDonvi || "",
+                          ).trim(),
+                          kienNghi: row.kienNghi || "",
+                          noiDungDotXuat: row.noiDungDotXuat || "",
+                        };
+                      }),
                     );
                 } else {
                     setWorkRows([]);
@@ -138,46 +144,59 @@ export default function PoliticalDashboard() {
 
     const unitReports = useMemo(
         () => {
-            return overview.danhSachDonVi.map((unit: any) => {
+            return overview.danhSachDonVi.map(
+              (unit: PoliticalDashboardUnit) => {
                 const unitIdStr = String(unit.idDonVi || "").trim();
                 const unitNameStr = String(unit.tenDonVi || "").trim();
 
                 const matchedWorkRows = workRows.filter((row) => {
-                    const rowMa = String(row.maDonVi || "").trim();
-                    const rowTen = String(row.tenDonViText || "").trim();
-                    const matchId = rowMa === unitIdStr;
-                    const matchSpecialSD5 = (unitIdStr === "GS003" && rowMa === "SD5") || (unitIdStr === "SD5" && rowMa === "GS003");
-                    const matchName = unitNameStr && rowTen && (rowTen.includes(unitNameStr) || unitNameStr.includes(rowTen));
+                  const rowMa = String(row.maDonVi || "").trim();
+                  const rowTen = String(row.tenDonViText || "").trim();
+                  const matchId = rowMa === unitIdStr;
+                  const matchSpecialSD5 =
+                    (unitIdStr === "GS003" && rowMa === "SD5") ||
+                    (unitIdStr === "SD5" && rowMa === "GS003");
+                  const matchName =
+                    unitNameStr &&
+                    rowTen &&
+                    (rowTen.includes(unitNameStr) ||
+                      unitNameStr.includes(rowTen));
 
-                    return matchId || matchSpecialSD5 || matchName;
+                  return matchId || matchSpecialSD5 || matchName;
                 });
 
                 const hasContent = (text: string) => {
-                    if (!text) return false;
-                    const cleanText = text.trim().toLowerCase();
-                    return cleanText.length > 0 &&
-                        cleanText !== "không" &&
-                        cleanText !== "không có" &&
-                        cleanText !== "0";
+                  if (!text) return false;
+                  const cleanText = text.trim().toLowerCase();
+                  return (
+                    cleanText.length > 0 &&
+                    cleanText !== "không" &&
+                    cleanText !== "không có" &&
+                    cleanText !== "0"
+                  );
                 };
 
                 const proposalsCount = matchedWorkRows.length
-                    ? matchedWorkRows.filter((row) => hasContent(row.kienNghi)).length
-                    : Number(unit.soKienNghi) || 0;
+                  ? matchedWorkRows.filter((row) => hasContent(row.kienNghi))
+                      .length
+                  : Number(unit.soKienNghi) || 0;
 
                 const incidentsCount = matchedWorkRows.length
-                    ? matchedWorkRows.filter((row) => hasContent(row.noiDungDotXuat)).length
-                    : Number(unit.soDotXuat) || 0;
+                  ? matchedWorkRows.filter((row) =>
+                      hasContent(row.noiDungDotXuat),
+                    ).length
+                  : Number(unit.soDotXuat) || 0;
 
                 return {
-                    id: unit.idDonVi,
-                    name: unit.tenDonVi || "Đơn vị trực thuộc",
-                    status: unit.mucDo || "Tốt",
-                    proposals: proposalsCount,
-                    incidents: incidentsCount,
-                    totalIssues: proposalsCount + incidentsCount,
+                  id: unit.idDonVi,
+                  name: unit.tenDonVi || "Đơn vị trực thuộc",
+                  status: unit.mucDo || "Tốt",
+                  proposals: proposalsCount,
+                  incidents: incidentsCount,
+                  totalIssues: proposalsCount + incidentsCount,
                 };
-            });
+              },
+            );
         },
         [overview.danhSachDonVi, workRows],
     );
