@@ -1,0 +1,84 @@
+.toolbar {  
+  display: flex;  
+  align-items: center;  
+  gap: 16px;  
+  flex-shrink: 0;  
+}  
+  
+.filterGroup {  
+  display: flex;  
+  gap: 12px;  
+  flex-shrink: 0;  
+  min-width: 360px;  
+}  
+  
+.filterGroup > * {  
+  flex: 1;  
+}  
+
+.pagination {  
+  display: flex;  
+  align-items: center;  
+  justify-content: space-between;  
+  flex-wrap: wrap;  
+  gap: 12px;  
+  padding: 16px 4px 4px;  
+  flex-shrink: 0;  
+}  
+  
+.paginationInfo {  
+  font-size: 13px;  
+  color: var(--login-text-muted);  
+  font-weight: 600;  
+}  
+  
+.paginationControls {  
+  display: flex;  
+  align-items: center;  
+  gap: 6px;  
+}  
+  
+.pageBtn {  
+  display: inline-flex;  
+  align-items: center;  
+  justify-content: center;  
+  min-width: 36px;  
+  height: 36px;  
+  padding: 0 10px;  
+  border: 1.5px solid var(--login-border);  
+  border-radius: 8px;  
+  background: var(--surface-card);  
+  color: var(--login-text);  
+  font-size: 14px;  
+  font-weight: 600;  
+  cursor: pointer;  
+  transition: border-color 0.15s, color 0.15s, background 0.15s;  
+}  
+  
+.pageBtn:hover:not(:disabled):not(.pageBtnActive) {  
+  border-color: var(--primary-color);  
+  color: var(--primary-color);  
+  background: var(--primary-a06);  
+}  
+  
+.pageBtnActive {  
+  background: var(--primary-color);  
+  border-color: var(--primary-color);  
+  color: var(--text-white);  
+  cursor: default;  
+}  
+  
+.pageBtn:disabled {  
+  opacity: 0.45;  
+  cursor: not-allowed;  
+}
+  
+@media (max-width: 768px) {  
+  .toolbar {  
+    flex-direction: column;  
+    align-items: stretch;  
+  }  
+  .filterGroup {  
+    min-width: 0;  
+  }  
+}

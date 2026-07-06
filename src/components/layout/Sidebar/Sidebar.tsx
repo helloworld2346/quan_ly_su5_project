@@ -6,12 +6,14 @@ import {
   faClipboardList,
   faGear,
   faChartPie,
+  faUsersGear,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./Sidebar.module.css";
 import logo from "../../../assets/images/logo-su5.png";
 import {
   REPORT_NAV_GROUP,
   DUTY_NAV_GROUP,
+  ADMIN_NAV_GROUP,
   SETTINGS_NAV,
   type NavItemId,
   getNavItemsByRole,
@@ -24,15 +26,14 @@ import SidebarTooltip from "./SidebarTooltip";
 import ConfirmDialog from "../../ui/ConfirmDialog/ConfirmDialog";
 import { useAuth } from "../../../context/useAuth";
 
-type Props = {  
-  activeId: NavItemId;  
-  onNavigate: (id: NavItemId) => void;  
-  onLogout?: () => void;  
-  collapsed?: boolean;  
-  onExpand?: () => void;  
-  mobileOpen?: boolean;  
-};  
-
+type Props = {
+  activeId: NavItemId;
+  onNavigate: (id: NavItemId) => void;
+  onLogout?: () => void;
+  collapsed?: boolean;
+  onExpand?: () => void;
+  mobileOpen?: boolean;
+};
 
 type TooltipState = {
   text: string;
@@ -54,9 +55,7 @@ export default function Sidebar({
   const unitQuota = donVi?.quanSoTong ?? account?.donVi?.quanSoTong ?? 0;
   const hasQuota = unitQuota > 0;
 
-  const hiddenSidebarIds: NavItemId[] = [
-    "executive-training",
-  ];
+  const hiddenSidebarIds: NavItemId[] = ["executive-training"];
 
   const capDonVi = donVi?.capDonVi ?? account?.donVi?.capDonVi ?? null;
 
@@ -88,6 +87,15 @@ export default function Sidebar({
       item.id === activeId && allowedNavItems.some((nav) => nav.id === item.id),
   );
   const showDutyGroup = DUTY_NAV_GROUP.items.some((item) =>
+    allowedNavItems.some((nav) => nav.id === item.id),
+  );
+
+  const [adminOpen, setAdminOpen] = useNavGroupState("adminOpen");
+  const adminActive = ADMIN_NAV_GROUP.items.some(
+    (item) =>
+      item.id === activeId && allowedNavItems.some((nav) => nav.id === item.id),
+  );
+  const showAdminGroup = ADMIN_NAV_GROUP.items.some((item) =>
     allowedNavItems.some((nav) => nav.id === item.id),
   );
 
@@ -125,6 +133,7 @@ export default function Sidebar({
     if (collapsed) {
       if (!reportActive) setReportsOpen(false);
       if (!dutyActive) setDutyOpen(false);
+      if (!adminActive) setAdminOpen(false);
     }
   }
 
@@ -223,6 +232,25 @@ export default function Sidebar({
               collapsed={collapsed}
               onExpand={onExpand}
               isActive={dutyActive}
+              onTooltipEnter={handleTooltipEnter}
+              onTooltipLeave={handleTooltipLeave}
+            />
+          )}
+
+          {showAdminGroup && (
+            <NavGroup
+              label={ADMIN_NAV_GROUP.label}
+              icon={faUsersGear}
+              items={ADMIN_NAV_GROUP.items.filter((item) =>
+                allowedNavItems.some((nav) => nav.id === item.id),
+              )}
+              isOpen={adminOpen}
+              onToggle={() => setAdminOpen(!adminOpen)}
+              activeId={activeId}
+              onNavigate={handleNavigate}
+              collapsed={collapsed}
+              onExpand={onExpand}
+              isActive={adminActive}
               onTooltipEnter={handleTooltipEnter}
               onTooltipLeave={handleTooltipLeave}
             />

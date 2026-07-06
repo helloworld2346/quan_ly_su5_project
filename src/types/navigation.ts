@@ -10,6 +10,7 @@ export type NavItemId =
   | "duty-personnel"
   | "duty-shifts"
   | "duty-create"
+  | "account-management"
   | "settings";
 
 export type NavItem = {
@@ -44,6 +45,10 @@ const CreateDutyShift = lazy(
   () => import("../pages/CommandDuty/CreateDutyShift"),
 );
 
+const AccountManagement = lazy(
+  () => import("../pages/AccountManagement/AccountManagement"),
+);
+
 const Settings = lazy(() => import("../pages/Settings/Settings"));
 
 export const EXECUTIVE_NAV: NavItem = {
@@ -63,7 +68,7 @@ export const EXECUTIVE_POLITICAL_NAV: NavItem = {
   loadingTitle: "Đang tải tổng hợp CTĐ, CTCT",
   loadingSubtitle: "Đang tải dữ liệu…",
   component: PoliticalDashboard,
-  allowedRoles: ["Quản Trị Viên", "Trực ban tác chiến"], 
+  allowedRoles: ["Quản Trị Viên", "Trực ban tác chiến"],
 };
 
 export const EXECUTIVE_NAV_GROUP = {
@@ -142,6 +147,21 @@ export const DUTY_NAV_GROUP = {
   ],
 };
 
+export const ADMIN_NAV_GROUP = {
+  label: "Quản trị",
+  items: [
+    {
+      id: "account-management" as const,
+      label: "Quản lý tài khoản",
+      path: "/account-management",
+      loadingTitle: "Đang tải quản lý tài khoản",
+      loadingSubtitle: "Đang tải dữ liệu…",
+      component: AccountManagement,
+      allowedRoles: ["Quản Trị Viên"],
+    },
+  ],
+};
+
 export const SETTINGS_NAV: NavItem = {
   id: "settings",
   label: "Cài đặt",
@@ -159,13 +179,15 @@ export const SETTINGS_NAV: NavItem = {
 
 export const NAV_PAGE_TITLES: Record<NavItemId, string> = {
   executive: "Tổng hợp ngày",
-  "executive-political-work": "Tổng hợp hoạt động Công tác Đảng, công tác chính trị",
+  "executive-political-work":
+    "Tổng hợp hoạt động Công tác Đảng, công tác chính trị",
   "executive-training": "Tổng hợp huấn luyện",
   "report-troop": "Thống kê quân số hoạt động trong ngày",
   "report-political-work": "Hoạt động công tác Đảng, công tác chính trị",
   "duty-personnel": "Quản lý trực ban",
   "duty-shifts": "Quản lý ca trực",
   "duty-create": "Tạo ca trực",
+  "account-management": "Quản lý tài khoản",
   settings: "Cài đặt",
 };
 
@@ -173,6 +195,7 @@ export const ALL_NAV_ITEMS: NavItem[] = [
   ...EXECUTIVE_NAV_GROUP.items,
   ...REPORT_NAV_GROUP.items,
   ...DUTY_NAV_GROUP.items,
+  ...ADMIN_NAV_GROUP.items,
   SETTINGS_NAV,
 ];
 
@@ -275,11 +298,11 @@ export function getNavItemsByRole(
 
   const isCoreNav = (item: NavItem) =>
     item.id === "executive" ||
-    item.id === "executive-political-work" || 
+    item.id === "executive-political-work" ||
     item.id.startsWith("report-") ||
     item.id === "settings";
 
-  const isExecutiveItem = (item: NavItem) => 
+  const isExecutiveItem = (item: NavItem) =>
     item.id === "executive" || item.id === "executive-political-work";
 
   if (normalizedRole === "Quản Trị Viên") {

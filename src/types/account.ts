@@ -41,6 +41,19 @@ export interface AccountResponse {
   Result: Account;
 }
 
+export interface AccountListResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  Result: Account[];
+}
+
+export interface UpdateAccountRequest {
+  tenTaiKhoan: string;
+  donVi: string;
+  vaiTro: string;
+}
+
 export interface RoleResponse {
   success: boolean;
   code: number;
