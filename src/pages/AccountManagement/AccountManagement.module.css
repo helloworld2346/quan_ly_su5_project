@@ -549,6 +549,27 @@
   cursor: not-allowed;
 }
 
+.tbodyAnimate {  
+  animation: fadeSlideIn 0.25s ease;  
+}  
+  
+@keyframes fadeSlideIn {  
+  from {  
+    opacity: 0;  
+    transform: translateY(6px);  
+  }  
+  to {  
+    opacity: 1;  
+    transform: translateY(0);  
+  }  
+}  
+  
+@media (prefers-reduced-motion: reduce) {  
+  .tbodyAnimate {  
+    animation: none;  
+  }  
+}
+
 @media (max-width: 768px) {
   .page {
     height: auto;

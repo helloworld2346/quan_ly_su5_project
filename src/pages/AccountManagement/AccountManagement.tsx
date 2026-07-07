@@ -432,7 +432,8 @@ export default function AccountManagement() {
                 <th className={styles.colActions}>Thao tác</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody key={safePage} className={styles.tbodyAnimate}>
+              {" "}
               {showSkeleton ? (
                 renderSkeletonRows(pageSize)
               ) : filtered.length === 0 ? (
