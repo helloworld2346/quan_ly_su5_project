@@ -6,9 +6,11 @@ import {
   faKey,
   faCheck,
   faXmark,
+  faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./AccountManagement.module.css";
 import { accountService } from "../../services/account/accountService";
+import type { CreateAccountRequest } from "../../services/account/accountService";
 import { donviService } from "../../services/unit/unitService";
 import { roleService } from "../../services/role/roleService";
 import type {
@@ -45,6 +47,34 @@ function validateEdit(f: EditForm): EditErrors {
   return errs;
 }
 
+type CreateForm = {
+  tenTaiKhoan: string;
+  tenDangNhap: string;
+  matkhau: string;
+  donVi: string;
+  vaiTro: string;
+};
+
+const EMPTY_CREATE: CreateForm = {
+  tenTaiKhoan: "",
+  tenDangNhap: "",
+  matkhau: "",
+  donVi: "",
+  vaiTro: "",
+};
+
+type CreateErrors = Partial<Record<keyof CreateForm, string>>;
+
+function validateCreate(f: CreateForm): CreateErrors {
+  const errs: CreateErrors = {};
+  if (!f.tenTaiKhoan.trim()) errs.tenTaiKhoan = "Vui lòng nhập tên tài khoản";
+  if (!f.tenDangNhap.trim()) errs.tenDangNhap = "Vui lòng nhập tên đăng nhập";
+  if (!f.matkhau.trim()) errs.matkhau = "Vui lòng nhập mật khẩu";
+  if (!f.donVi) errs.donVi = "Vui lòng chọn đơn vị";
+  if (!f.vaiTro) errs.vaiTro = "Vui lòng chọn vai trò";
+  return errs;
+}
+
 function getInitials(name: string): string {
   const parts = name.trim().split(/\s+/);
   if (parts.length === 0) return "?";
@@ -64,6 +94,7 @@ export default function AccountManagement() {
   const showSkeleton = useMinLoading(loadingList);
 
   const [search, setSearch] = useState("");
+  const [filterDonVi, setFilterDonVi] = useState("");
   const [filterVaiTro, setFilterVaiTro] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -73,6 +104,11 @@ export default function AccountManagement() {
   const [editInitial, setEditInitial] = useState<EditForm>({ ...EMPTY_EDIT });
   const [editErrors, setEditErrors] = useState<EditErrors>({});
   const [saving, setSaving] = useState(false);
+
+  const [createOpen, setCreateOpen] = useState(false);
+  const [createForm, setCreateForm] = useState<CreateForm>({ ...EMPTY_CREATE });
+  const [createErrors, setCreateErrors] = useState<CreateErrors>({});
+  const [creating, setCreating] = useState(false);
 
   const [resetId, setResetId] = useState<string | null>(null);
   const [newPassword, setNewPassword] = useState("");
@@ -115,6 +151,11 @@ export default function AccountManagement() {
     [roleList],
   );
 
+  const filterDonViOptions = useMemo(
+    () => [{ value: "", label: "Tất cả đơn vị" }, ...donViOptions],
+    [donViOptions],
+  );
+
   const filterVaiTroOptions = useMemo(
     () => [{ value: "", label: "Tất cả vai trò" }, ...roleOptions],
     [roleOptions],
@@ -129,10 +170,11 @@ export default function AccountManagement() {
           a.tenDangNhap.toLowerCase().includes(q);
         if (!hit) return false;
       }
+      if (filterDonVi && a.donVi?.maDonVi !== filterDonVi) return false;
       if (filterVaiTro && a.vaiTro?.idVaiTro !== filterVaiTro) return false;
       return true;
     });
-  }, [accounts, search, filterVaiTro]);
+  }, [accounts, search, filterDonVi, filterVaiTro]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const safePage = Math.min(currentPage, totalPages);
@@ -140,14 +182,6 @@ export default function AccountManagement() {
     (safePage - 1) * pageSize,
     safePage * pageSize,
   );
-
-  const hasActiveFilter = search.trim() !== "" || filterVaiTro !== "";
-
-  const handleClearFilter = useCallback(() => {
-    setSearch("");
-    setFilterVaiTro("");
-    setCurrentPage(1);
-  }, []);
 
   const handleStartEdit = useCallback((acc: Account) => {
     const initial: EditForm = {
@@ -236,6 +270,81 @@ export default function AccountManagement() {
       setSaving(false);
     }
   }, [editingId, editForm, confirm, showError, showSuccess, closeEditModal]);
+
+  const openCreateModal = useCallback(() => {
+    setCreateForm({ ...EMPTY_CREATE });
+    setCreateErrors({});
+    setCreateOpen(true);
+  }, []);
+
+  const createHasChanges = useMemo(
+    () =>
+      createForm.tenTaiKhoan !== "" ||
+      createForm.tenDangNhap !== "" ||
+      createForm.matkhau !== "" ||
+      createForm.donVi !== "" ||
+      createForm.vaiTro !== "",
+    [createForm],
+  );
+
+  const closeCreateModal = useCallback(async () => {
+    if (createHasChanges) {
+      const confirmed = await confirm({
+        title: "Hủy thay đổi?",
+        message:
+          "Bạn có thay đổi chưa lưu. Đóng lại sẽ mất các thay đổi này. Tiếp tục?",
+        confirmText: "Đóng",
+        cancelText: "Ở lại",
+        type: "warning",
+      });
+      if (!confirmed) return;
+    }
+    setCreateOpen(false);
+    setCreateForm({ ...EMPTY_CREATE });
+    setCreateErrors({});
+  }, [createHasChanges, confirm]);
+
+  const handleCreateFieldChange = (field: keyof CreateForm, val: string) => {
+    setCreateForm((prev) => ({ ...prev, [field]: val }));
+    if (field in createErrors) {
+      setCreateErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
+  };
+
+  const handleCreateSubmit = useCallback(async () => {
+    const errs = validateCreate(createForm);
+    if (Object.keys(errs).length > 0) {
+      setCreateErrors(errs);
+      return;
+    }
+
+    setCreating(true);
+    try {
+      const payload: CreateAccountRequest = {
+        tenTaiKhoan: createForm.tenTaiKhoan,
+        tenDangNhap: createForm.tenDangNhap,
+        matkhau: createForm.matkhau,
+        donVi: createForm.donVi,
+        vaiTro: createForm.vaiTro,
+      };
+      const res = await accountService.createAccount(payload);
+      if (!res.success) throw new Error(res.message);
+      setAccounts((prev) => [res.Result, ...prev]);
+      showSuccess("Tạo tài khoản thành công");
+      setCreateOpen(false);
+      setCreateForm({ ...EMPTY_CREATE });
+      setCreateErrors({});
+      setCurrentPage(1);
+    } catch (e: unknown) {
+      showError(
+        (e as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message ??
+          (e instanceof Error ? e.message : "Không thể tạo tài khoản"),
+      );
+    } finally {
+      setCreating(false);
+    }
+  }, [createForm, showError, showSuccess]);
 
   const closeResetModal = useCallback(() => {
     setResetId(null);
@@ -387,6 +496,14 @@ export default function AccountManagement() {
         <div className={styles.pageHeaderLeft}>
           <h1 className={styles.pageTitle}>Quản lý tài khoản</h1>
         </div>
+        <button
+          type="button"
+          className={styles.btnAddAccount}
+          onClick={openCreateModal}
+        >
+          <FontAwesomeIcon icon={faPlus} />
+          Thêm tài khoản
+        </button>
       </div>
 
       <div className={styles.toolbar}>
@@ -400,6 +517,15 @@ export default function AccountManagement() {
         />
         <div className={styles.filterGroup}>
           <CustomSelect
+            options={filterDonViOptions}
+            value={filterDonVi}
+            onChange={(v) => {
+              setFilterDonVi(v);
+              setCurrentPage(1);
+            }}
+            placeholder="Tất cả đơn vị"
+          />
+          <CustomSelect
             options={filterVaiTroOptions}
             value={filterVaiTro}
             onChange={(v) => {
@@ -408,16 +534,6 @@ export default function AccountManagement() {
             }}
             placeholder="Tất cả vai trò"
           />
-          {hasActiveFilter && (
-            <button
-              type="button"
-              className={styles.btnClearFilter}
-              onClick={handleClearFilter}
-            >
-              <FontAwesomeIcon icon={faXmark} />
-              Xóa lọc
-            </button>
-          )}
         </div>
       </div>
 
@@ -435,13 +551,12 @@ export default function AccountManagement() {
               </tr>
             </thead>
             <tbody key={safePage} className={styles.tbodyAnimate}>
-              {" "}
               {showSkeleton ? (
                 renderSkeletonRows(pageSize)
               ) : filtered.length === 0 ? (
                 <tr>
                   <td colSpan={6} className={styles.emptyRow}>
-                    {search || filterVaiTro
+                    {search || filterDonVi || filterVaiTro
                       ? "Không tìm thấy tài khoản"
                       : "Chưa có tài khoản"}
                   </td>
@@ -461,6 +576,142 @@ export default function AccountManagement() {
           />
         )}
       </div>
+
+      {createOpen &&
+        createPortal(
+          <div
+            className={styles.overlay}
+            onClick={() => void closeCreateModal()}
+          >
+            <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.modalHeader}>
+                <p className={styles.modalTitle}>Thêm tài khoản</p>
+                <button
+                  type="button"
+                  className={styles.modalCloseBtn}
+                  onClick={() => void closeCreateModal()}
+                  aria-label="Đóng"
+                >
+                  <FontAwesomeIcon icon={faXmark} />
+                </button>
+              </div>
+
+              <div className={styles.modalBody}>
+                <div className={styles.editFormGrid}>
+                  <div className={styles.editFormGroup}>
+                    <label>
+                      Tên tài khoản <span className={styles.required}>*</span>
+                    </label>
+                    <input
+                      className={styles.input}
+                      value={createForm.tenTaiKhoan}
+                      onChange={(e) =>
+                        handleCreateFieldChange("tenTaiKhoan", e.target.value)
+                      }
+                      placeholder="Tên tài khoản..."
+                    />
+                    {createErrors.tenTaiKhoan && (
+                      <span className={styles.fieldError}>
+                        {createErrors.tenTaiKhoan}
+                      </span>
+                    )}
+                  </div>
+                  <div className={styles.editFormGroup}>
+                    <label>
+                      Tên đăng nhập <span className={styles.required}>*</span>
+                    </label>
+                    <input
+                      className={styles.input}
+                      value={createForm.tenDangNhap}
+                      onChange={(e) =>
+                        handleCreateFieldChange("tenDangNhap", e.target.value)
+                      }
+                      placeholder="Tên đăng nhập..."
+                    />
+                    {createErrors.tenDangNhap && (
+                      <span className={styles.fieldError}>
+                        {createErrors.tenDangNhap}
+                      </span>
+                    )}
+                  </div>
+                  <div className={styles.editFormGroup}>
+                    <label>
+                      Mật khẩu <span className={styles.required}>*</span>
+                    </label>
+                    <input
+                      className={styles.input}
+                      type="password"
+                      value={createForm.matkhau}
+                      onChange={(e) =>
+                        handleCreateFieldChange("matkhau", e.target.value)
+                      }
+                      placeholder="Mật khẩu..."
+                    />
+                    {createErrors.matkhau && (
+                      <span className={styles.fieldError}>
+                        {createErrors.matkhau}
+                      </span>
+                    )}
+                  </div>
+                  <div className={styles.editFormGroup}>
+                    <label>
+                      Đơn vị <span className={styles.required}>*</span>
+                    </label>
+                    <CustomSelect
+                      options={donViOptions}
+                      value={createForm.donVi}
+                      onChange={(val) => handleCreateFieldChange("donVi", val)}
+                      placeholder="-- Chọn đơn vị --"
+                    />
+                    {createErrors.donVi && (
+                      <span className={styles.fieldError}>
+                        {createErrors.donVi}
+                      </span>
+                    )}
+                  </div>
+                  <div className={styles.editFormGroup}>
+                    <label>
+                      Vai trò <span className={styles.required}>*</span>
+                    </label>
+                    <CustomSelect
+                      options={roleOptions}
+                      value={createForm.vaiTro}
+                      onChange={(val) => handleCreateFieldChange("vaiTro", val)}
+                      placeholder="-- Chọn vai trò --"
+                    />
+                    {createErrors.vaiTro && (
+                      <span className={styles.fieldError}>
+                        {createErrors.vaiTro}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.modalFooter}>
+                <button
+                  type="button"
+                  className={styles.btnCancelEdit}
+                  onClick={() => void closeCreateModal()}
+                  disabled={creating}
+                >
+                  <FontAwesomeIcon icon={faXmark} />
+                  Hủy
+                </button>
+                <button
+                  type="button"
+                  className={styles.btnSave}
+                  onClick={() => void handleCreateSubmit()}
+                  disabled={creating}
+                >
+                  <FontAwesomeIcon icon={faCheck} />
+                  {creating ? "Đang tạo..." : "Tạo tài khoản"}
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
 
       {editingId &&
         createPortal(

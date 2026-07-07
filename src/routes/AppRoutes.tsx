@@ -6,8 +6,6 @@ import RequireRole from "./RequireRole";
 import { ALL_NAV_ITEMS } from "../types/navigation";
 import { useAuth } from "../context/useAuth";
 import RequireAuth from "./RequireAuth";
-import CreateUser from "../pages/CreateUser/CreateUser";  
-
 
 type Props = {
   isAuthenticated: boolean;
@@ -54,8 +52,6 @@ export default function AppRoutes({
           }
         />
       ))}
-
-      <Route path="/createuser" element={<CreateUser />} />
 
       <Route
         path="*"

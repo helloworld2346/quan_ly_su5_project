@@ -578,6 +578,40 @@
   background: var(--primary-a06);
 }
 
+.btnAddAccount {  
+  display: inline-flex;  
+  align-items: center;  
+  gap: 8px;  
+  height: 40px;  
+  padding: 0 18px;  
+  background: var(--primary-color);  
+  color: var(--text-white);  
+  border: none;  
+  border-radius: 8px;  
+  font-size: 14px;  
+  font-weight: 600;  
+  font-family: inherit;  
+  cursor: pointer;  
+  white-space: nowrap;  
+  flex-shrink: 0;  
+  transition:  
+    opacity 0.15s,  
+    transform 0.12s;  
+}  
+  
+.btnAddAccount:hover:not(:disabled) {  
+  opacity: 0.88;  
+}  
+  
+.btnAddAccount:active:not(:disabled) {  
+  transform: scale(0.97);  
+}  
+  
+.btnAddAccount:disabled {  
+  opacity: 0.6;  
+  cursor: not-allowed;  
+}
+
 @keyframes fadeSlideIn {
   from {
     opacity: 0;
@@ -617,4 +651,13 @@
     width: 100%;
     flex-wrap: wrap;
   }
+    .pageHeader {  
+    flex-direction: column;  
+    align-items: stretch;  
+    gap: 12px;  
+  }  
+  .btnAddAccount {  
+    width: 100%;  
+    justify-content: center;  
+  }  
 }
