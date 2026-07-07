@@ -1,15 +1,20 @@
 .overlay {  
   position: fixed;  
   top: 0;  
-  right: 0;  
-  bottom: 0;  
-  left: 0;  
+  left: var(--current-sidebar-width, var(--sidebar-width, 280px));  
+  width: calc(  
+    100vw - var(--current-sidebar-width, var(--sidebar-width, 280px))  
+  );  
+  height: 100vh;  
   background: var(--dialog-overlay-bg);  
   display: flex;  
   align-items: center;  
   justify-content: center;  
   z-index: 10000;  
   animation: fadeIn 0.2s ease-out;  
+  transition:  
+    left 0.2s ease,  
+    width 0.2s ease;  
 }
   
 @keyframes fadeIn {  
@@ -124,4 +129,11 @@
   
 .confirmButton.warning:hover {  
   background: var(--dialog-warning-hover-bg);  
+}
+
+@media (max-width: 768px) {  
+  .overlay {  
+    left: 0;  
+    width: 100vw;  
+  }  
 }

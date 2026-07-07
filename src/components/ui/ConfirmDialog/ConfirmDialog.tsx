@@ -6,6 +6,7 @@ import {
   faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./ConfirmDialog.module.css";
+import { createPortal } from "react-dom";
 
 type DialogType = "danger" | "warning" | "info";
 
@@ -101,7 +102,7 @@ export default function ConfirmDialog({
 
   const texts = defaultTexts[type];
 
-  return (
+  return createPortal(
     <div className={styles.overlay} onClick={onCancel}>
       <div
         className={styles.dialog}
@@ -139,6 +140,7 @@ export default function ConfirmDialog({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
