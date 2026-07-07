@@ -64,7 +64,6 @@ export default function AccountManagement() {
   const showSkeleton = useMinLoading(loadingList);
 
   const [search, setSearch] = useState("");
-  const [filterDonVi, setFilterDonVi] = useState("");
   const [filterVaiTro, setFilterVaiTro] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -116,11 +115,6 @@ export default function AccountManagement() {
     [roleList],
   );
 
-  const filterDonViOptions = useMemo(
-    () => [{ value: "", label: "Tất cả đơn vị" }, ...donViOptions],
-    [donViOptions],
-  );
-
   const filterVaiTroOptions = useMemo(
     () => [{ value: "", label: "Tất cả vai trò" }, ...roleOptions],
     [roleOptions],
@@ -135,11 +129,10 @@ export default function AccountManagement() {
           a.tenDangNhap.toLowerCase().includes(q);
         if (!hit) return false;
       }
-      if (filterDonVi && a.donVi?.maDonVi !== filterDonVi) return false;
       if (filterVaiTro && a.vaiTro?.idVaiTro !== filterVaiTro) return false;
       return true;
     });
-  }, [accounts, search, filterDonVi, filterVaiTro]);
+  }, [accounts, search, filterVaiTro]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const safePage = Math.min(currentPage, totalPages);
@@ -147,6 +140,14 @@ export default function AccountManagement() {
     (safePage - 1) * pageSize,
     safePage * pageSize,
   );
+
+  const hasActiveFilter = search.trim() !== "" || filterVaiTro !== "";
+
+  const handleClearFilter = useCallback(() => {
+    setSearch("");
+    setFilterVaiTro("");
+    setCurrentPage(1);
+  }, []);
 
   const handleStartEdit = useCallback((acc: Account) => {
     const initial: EditForm = {
@@ -399,15 +400,6 @@ export default function AccountManagement() {
         />
         <div className={styles.filterGroup}>
           <CustomSelect
-            options={filterDonViOptions}
-            value={filterDonVi}
-            onChange={(v) => {
-              setFilterDonVi(v);
-              setCurrentPage(1);
-            }}
-            placeholder="Tất cả đơn vị"
-          />
-          <CustomSelect
             options={filterVaiTroOptions}
             value={filterVaiTro}
             onChange={(v) => {
@@ -416,6 +408,16 @@ export default function AccountManagement() {
             }}
             placeholder="Tất cả vai trò"
           />
+          {hasActiveFilter && (
+            <button
+              type="button"
+              className={styles.btnClearFilter}
+              onClick={handleClearFilter}
+            >
+              <FontAwesomeIcon icon={faXmark} />
+              Xóa lọc
+            </button>
+          )}
         </div>
       </div>
 
@@ -439,7 +441,7 @@ export default function AccountManagement() {
               ) : filtered.length === 0 ? (
                 <tr>
                   <td colSpan={6} className={styles.emptyRow}>
-                    {search || filterDonVi || filterVaiTro
+                    {search || filterVaiTro
                       ? "Không tìm thấy tài khoản"
                       : "Chưa có tài khoản"}
                   </td>

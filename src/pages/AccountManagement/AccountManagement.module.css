@@ -209,7 +209,6 @@
   line-height: 1.2;
 }
 
-/* ===== Table ===== */
 .listSection {
   background: var(--surface-card);
   border: 1px solid var(--login-border);
@@ -358,7 +357,6 @@
   padding: 32px 16px;
 }
 
-/* ===== Modal ===== */
 .overlay {
   position: fixed;
   top: 0;
@@ -549,25 +547,52 @@
   cursor: not-allowed;
 }
 
-.tbodyAnimate {  
-  animation: fadeSlideIn 0.25s ease;  
-}  
-  
-@keyframes fadeSlideIn {  
-  from {  
-    opacity: 0;  
-    transform: translateY(6px);  
-  }  
-  to {  
-    opacity: 1;  
-    transform: translateY(0);  
-  }  
-}  
-  
-@media (prefers-reduced-motion: reduce) {  
-  .tbodyAnimate {  
-    animation: none;  
-  }  
+.tbodyAnimate {
+  animation: fadeSlideIn 0.25s ease;
+}
+
+.btnClearFilter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 14px;
+  border: 1.5px solid var(--login-border);
+  border-radius: 8px;
+  background: var(--surface-card);
+  color: var(--login-text);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  flex: 0 0 auto;
+  transition:
+    border-color 0.15s,
+    color 0.15s,
+    background 0.15s;
+}
+
+.btnClearFilter:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background: var(--primary-a06);
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tbodyAnimate {
+    animation: none;
+  }
 }
 
 @media (max-width: 768px) {
@@ -589,5 +614,7 @@
   }
   .filterGroup {
     min-width: 0;
+    width: 100%;
+    flex-wrap: wrap;
   }
 }
