@@ -6,7 +6,6 @@ import {
   faKey,
   faCheck,
   faXmark,
-  faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./AccountManagement.module.css";
 import { accountService } from "../../services/account/accountService";
@@ -26,6 +25,7 @@ import { useConfirmDialog } from "../../components/ui/ConfirmDialog/useConfirmDi
 import Skeleton from "../../components/ui/Skeleton/Skeleton";
 import { useMinLoading } from "../../hooks/useMinLoading";
 import Pagination from "../../components/ui/Pagination/Pagination";
+import { createPortal } from "react-dom";
 
 type EditForm = {
   tenTaiKhoan: string;
@@ -301,24 +301,27 @@ export default function AccountManagement() {
     [accounts, editingId],
   );
 
-  const renderCard = (acc: Account) => {
+  const renderRow = (acc: Account, index: number) => {
     const isDeleting = deletingId === acc.idTaiKhoan;
+    const stt = (safePage - 1) * pageSize + index + 1;
     return (
-      <div key={acc.idTaiKhoan} className={styles.personCard}>
-        <div className={styles.personRow}>
-          <div className={styles.personAvatar}>
-            {getInitials(acc.tenTaiKhoan)}
+      <tr key={acc.idTaiKhoan} className={styles.row}>
+        <td className={styles.colIndex}>{stt}</td>
+        <td>
+          <div className={styles.userCell}>
+            <div className={styles.avatar}>{getInitials(acc.tenTaiKhoan)}</div>
+            <span className={styles.userName}>{acc.tenTaiKhoan}</span>
           </div>
-          <div className={styles.personInfo}>
-            <div className={styles.personName}>
-              <span className={styles.personNameBold}>{acc.tenTaiKhoan}</span>
-            </div>
-            <div className={styles.personMeta}>@{acc.tenDangNhap}</div>
-            <div className={styles.personMeta}>
-              {acc.vaiTro?.tenVaiTro ?? "—"} · {acc.donVi?.tenDonvi ?? "—"}
-            </div>
-          </div>
-          <div className={styles.personActions}>
+        </td>
+        <td className={styles.muted}>@{acc.tenDangNhap}</td>
+        <td>
+          <span className={styles.roleBadge}>
+            {acc.vaiTro?.tenVaiTro ?? "—"}
+          </span>
+        </td>
+        <td className={styles.muted}>{acc.donVi?.tenDonvi ?? "—"}</td>
+        <td className={styles.colActions}>
+          <div className={styles.rowActions}>
             <button
               type="button"
               className={styles.btnEdit}
@@ -345,20 +348,36 @@ export default function AccountManagement() {
               <FontAwesomeIcon icon={faTrash} />
             </button>
           </div>
-        </div>
-      </div>
+        </td>
+      </tr>
     );
   };
 
-  const renderSkeletonCards = (count: number) =>
+  const renderSkeletonRows = (count: number) =>
     Array.from({ length: count }).map((_, i) => (
-      <div key={i} className={styles.personCardSkeleton}>
-        <Skeleton width={42} height={42} radius="50%" />
-        <div className={styles.personCardSkeletonInfo}>
-          <Skeleton width="55%" height={14} />
-          <Skeleton width="35%" height={12} />
-        </div>
-      </div>
+      <tr key={i}>
+        <td className={styles.colIndex}>
+          <Skeleton width={16} height={14} />
+        </td>
+        <td>
+          <div className={styles.userCell}>
+            <Skeleton width={36} height={36} radius="50%" />
+            <Skeleton width={120} height={14} />
+          </div>
+        </td>
+        <td>
+          <Skeleton width={90} height={12} />
+        </td>
+        <td>
+          <Skeleton width={80} height={12} />
+        </td>
+        <td>
+          <Skeleton width={120} height={12} />
+        </td>
+        <td className={styles.colActions}>
+          <Skeleton width={96} height={28} />
+        </td>
+      </tr>
     ));
 
   return (
@@ -366,7 +385,6 @@ export default function AccountManagement() {
       <div className={styles.pageHeader}>
         <div className={styles.pageHeaderLeft}>
           <h1 className={styles.pageTitle}>Quản lý tài khoản</h1>
-          <span className={styles.pageBadge}>{filtered.length} tài khoản</span>
         </div>
       </div>
 
@@ -402,24 +420,36 @@ export default function AccountManagement() {
       </div>
 
       <div className={styles.listSection}>
-        <div className={styles.listHeader}>
-          <FontAwesomeIcon icon={faUser} className={styles.listHeaderIcon} />
-          <span>Danh sách tài khoản</span>
-          <span className={styles.listCount}>{filtered.length}</span>
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th className={styles.colIndex}>#</th>
+                <th>Tài khoản</th>
+                <th>Tên đăng nhập</th>
+                <th>Vai trò</th>
+                <th>Đơn vị</th>
+                <th className={styles.colActions}>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              {showSkeleton ? (
+                renderSkeletonRows(pageSize)
+              ) : filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className={styles.emptyRow}>
+                    {search || filterDonVi || filterVaiTro
+                      ? "Không tìm thấy tài khoản"
+                      : "Chưa có tài khoản"}
+                  </td>
+                </tr>
+              ) : (
+                paginated.map(renderRow)
+              )}
+            </tbody>
+          </table>
         </div>
-        <div className={styles.listBody}>
-          {showSkeleton ? (
-            renderSkeletonCards(6)
-          ) : filtered.length === 0 ? (
-            <div className={styles.emptyList}>
-              {search || filterDonVi || filterVaiTro
-                ? "Không tìm thấy tài khoản"
-                : "Chưa có tài khoản"}
-            </div>
-          ) : (
-            paginated.map(renderCard)
-          )}
-        </div>
+
         {!showSkeleton && filtered.length > 0 && (
           <Pagination
             currentPage={safePage}
@@ -429,168 +459,175 @@ export default function AccountManagement() {
         )}
       </div>
 
-      {editingId && (
-        <div className={styles.overlay} onClick={() => void handleCancelEdit()}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <p className={styles.modalTitle}>
-                Chỉnh sửa tài khoản
-                {editingAccount ? ` — ${editingAccount.tenTaiKhoan}` : ""}
-              </p>
-              <button
-                type="button"
-                className={styles.modalCloseBtn}
-                onClick={() => void handleCancelEdit()}
-                aria-label="Đóng"
-              >
-                <FontAwesomeIcon icon={faXmark} />
-              </button>
-            </div>
+      {editingId &&
+        createPortal(
+          <div
+            className={styles.overlay}
+            onClick={() => void handleCancelEdit()}
+          >
+            <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.modalHeader}>
+                <p className={styles.modalTitle}>
+                  Chỉnh sửa tài khoản
+                  {editingAccount ? ` — ${editingAccount.tenTaiKhoan}` : ""}
+                </p>
+                <button
+                  type="button"
+                  className={styles.modalCloseBtn}
+                  onClick={() => void handleCancelEdit()}
+                  aria-label="Đóng"
+                >
+                  <FontAwesomeIcon icon={faXmark} />
+                </button>
+              </div>
 
-            <div className={styles.modalBody}>
-              <div className={styles.editFormGrid}>
-                <div className={styles.editFormGroup}>
-                  <label>Tên đăng nhập</label>
-                  <input
-                    className={styles.input}
-                    value={editingAccount?.tenDangNhap ?? ""}
-                    disabled
-                  />
+              <div className={styles.modalBody}>
+                <div className={styles.editFormGrid}>
+                  <div className={styles.editFormGroup}>
+                    <label>Tên đăng nhập</label>
+                    <input
+                      className={styles.input}
+                      value={editingAccount?.tenDangNhap ?? ""}
+                      disabled
+                    />
+                  </div>
+                  <div className={styles.editFormGroup}>
+                    <label>
+                      Tên tài khoản <span className={styles.required}>*</span>
+                    </label>
+                    <input
+                      className={styles.input}
+                      value={editForm.tenTaiKhoan}
+                      onChange={(e) =>
+                        handleEditFieldChange("tenTaiKhoan", e.target.value)
+                      }
+                      placeholder="Tên tài khoản..."
+                    />
+                    {editErrors.tenTaiKhoan && (
+                      <span className={styles.fieldError}>
+                        {editErrors.tenTaiKhoan}
+                      </span>
+                    )}
+                  </div>
+                  <div className={styles.editFormGroup}>
+                    <label>
+                      Đơn vị <span className={styles.required}>*</span>
+                    </label>
+                    <CustomSelect
+                      options={donViOptions}
+                      value={editForm.donVi}
+                      onChange={(val) => handleEditFieldChange("donVi", val)}
+                      placeholder="-- Chọn đơn vị --"
+                    />
+                    {editErrors.donVi && (
+                      <span className={styles.fieldError}>
+                        {editErrors.donVi}
+                      </span>
+                    )}
+                  </div>
+                  <div className={styles.editFormGroup}>
+                    <label>
+                      Vai trò <span className={styles.required}>*</span>
+                    </label>
+                    <CustomSelect
+                      options={roleOptions}
+                      value={editForm.vaiTro}
+                      onChange={(val) => handleEditFieldChange("vaiTro", val)}
+                      placeholder="-- Chọn vai trò --"
+                    />
+                    {editErrors.vaiTro && (
+                      <span className={styles.fieldError}>
+                        {editErrors.vaiTro}
+                      </span>
+                    )}
+                  </div>
                 </div>
+              </div>
+
+              <div className={styles.modalFooter}>
+                <button
+                  type="button"
+                  className={styles.btnCancelEdit}
+                  onClick={() => void handleCancelEdit()}
+                  disabled={saving}
+                >
+                  <FontAwesomeIcon icon={faXmark} />
+                  Hủy
+                </button>
+                <button
+                  type="button"
+                  className={styles.btnSave}
+                  onClick={() => void handleSaveEdit()}
+                  disabled={saving}
+                >
+                  <FontAwesomeIcon icon={faCheck} />
+                  {saving ? "Đang lưu..." : "Lưu thay đổi"}
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
+
+      {resetId &&
+        createPortal(
+          <div className={styles.overlay} onClick={closeResetModal}>
+            <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.modalHeader}>
+                <p className={styles.modalTitle}>Đặt lại mật khẩu</p>
+                <button
+                  type="button"
+                  className={styles.modalCloseBtn}
+                  onClick={closeResetModal}
+                  aria-label="Đóng"
+                >
+                  <FontAwesomeIcon icon={faXmark} />
+                </button>
+              </div>
+              <div className={styles.modalBody}>
                 <div className={styles.editFormGroup}>
                   <label>
-                    Tên tài khoản <span className={styles.required}>*</span>
+                    Mật khẩu mới <span className={styles.required}>*</span>
                   </label>
                   <input
                     className={styles.input}
-                    value={editForm.tenTaiKhoan}
-                    onChange={(e) =>
-                      handleEditFieldChange("tenTaiKhoan", e.target.value)
-                    }
-                    placeholder="Tên tài khoản..."
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => {
+                      setNewPassword(e.target.value);
+                      if (resetError) setResetError("");
+                    }}
+                    placeholder="Nhập mật khẩu mới..."
                   />
-                  {editErrors.tenTaiKhoan && (
-                    <span className={styles.fieldError}>
-                      {editErrors.tenTaiKhoan}
-                    </span>
-                  )}
-                </div>
-                <div className={styles.editFormGroup}>
-                  <label>
-                    Đơn vị <span className={styles.required}>*</span>
-                  </label>
-                  <CustomSelect
-                    options={donViOptions}
-                    value={editForm.donVi}
-                    onChange={(val) => handleEditFieldChange("donVi", val)}
-                    placeholder="-- Chọn đơn vị --"
-                  />
-                  {editErrors.donVi && (
-                    <span className={styles.fieldError}>
-                      {editErrors.donVi}
-                    </span>
-                  )}
-                </div>
-                <div className={styles.editFormGroup}>
-                  <label>
-                    Vai trò <span className={styles.required}>*</span>
-                  </label>
-                  <CustomSelect
-                    options={roleOptions}
-                    value={editForm.vaiTro}
-                    onChange={(val) => handleEditFieldChange("vaiTro", val)}
-                    placeholder="-- Chọn vai trò --"
-                  />
-                  {editErrors.vaiTro && (
-                    <span className={styles.fieldError}>
-                      {editErrors.vaiTro}
-                    </span>
+                  {resetError && (
+                    <span className={styles.fieldError}>{resetError}</span>
                   )}
                 </div>
               </div>
-            </div>
-
-            <div className={styles.modalFooter}>
-              <button
-                type="button"
-                className={styles.btnCancelEdit}
-                onClick={() => void handleCancelEdit()}
-                disabled={saving}
-              >
-                <FontAwesomeIcon icon={faXmark} />
-                Hủy
-              </button>
-              <button
-                type="button"
-                className={styles.btnSave}
-                onClick={() => void handleSaveEdit()}
-                disabled={saving}
-              >
-                <FontAwesomeIcon icon={faCheck} />
-                {saving ? "Đang lưu..." : "Lưu thay đổi"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {resetId && (
-        <div className={styles.overlay} onClick={closeResetModal}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <p className={styles.modalTitle}>Đặt lại mật khẩu</p>
-              <button
-                type="button"
-                className={styles.modalCloseBtn}
-                onClick={closeResetModal}
-                aria-label="Đóng"
-              >
-                <FontAwesomeIcon icon={faXmark} />
-              </button>
-            </div>
-            <div className={styles.modalBody}>
-              <div className={styles.editFormGroup}>
-                <label>
-                  Mật khẩu mới <span className={styles.required}>*</span>
-                </label>
-                <input
-                  className={styles.input}
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => {
-                    setNewPassword(e.target.value);
-                    if (resetError) setResetError("");
-                  }}
-                  placeholder="Nhập mật khẩu mới..."
-                />
-                {resetError && (
-                  <span className={styles.fieldError}>{resetError}</span>
-                )}
+              <div className={styles.modalFooter}>
+                <button
+                  type="button"
+                  className={styles.btnCancelEdit}
+                  onClick={closeResetModal}
+                  disabled={resetting}
+                >
+                  <FontAwesomeIcon icon={faXmark} />
+                  Hủy
+                </button>
+                <button
+                  type="button"
+                  className={styles.btnSave}
+                  onClick={() => void handleResetSubmit()}
+                  disabled={resetting}
+                >
+                  <FontAwesomeIcon icon={faCheck} />
+                  {resetting ? "Đang lưu..." : "Đặt lại"}
+                </button>
               </div>
             </div>
-            <div className={styles.modalFooter}>
-              <button
-                type="button"
-                className={styles.btnCancelEdit}
-                onClick={closeResetModal}
-                disabled={resetting}
-              >
-                <FontAwesomeIcon icon={faXmark} />
-                Hủy
-              </button>
-              <button
-                type="button"
-                className={styles.btnSave}
-                onClick={() => void handleResetSubmit()}
-                disabled={resetting}
-              >
-                <FontAwesomeIcon icon={faCheck} />
-                {resetting ? "Đang lưu..." : "Đặt lại"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
 
       <ConfirmDialog
         isOpen={isOpen}
