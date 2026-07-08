@@ -28,6 +28,7 @@ export interface Account {
   vaiTro: Role;
   donVi?: DonVi;
   matKhau: string;
+  khoa: boolean;
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;

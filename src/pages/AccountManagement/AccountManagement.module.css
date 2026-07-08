@@ -263,7 +263,7 @@
 }
 
 .colActions {
-  width: 140px;
+  width: 160px;
   text-align: right;
 }
 
@@ -348,6 +348,65 @@
 .btnDelete:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.statusActive {  
+  display: inline-block;  
+  padding: 3px 10px;  
+  border-radius: 20px;  
+  background: var(--primary-a10);  
+  color: var(--primary-color);  
+  font-size: 13px;  
+  font-weight: 600;  
+  white-space: nowrap;  
+}  
+  
+.statusLocked {  
+  display: inline-block;  
+  padding: 3px 10px;  
+  border-radius: 20px;  
+  background: var(--btn-refuse-bg);  
+  color: var(--btn-refuse-fg);  
+  font-size: 13px;  
+  font-weight: 600;  
+  white-space: nowrap;  
+}  
+  
+.btnLock,  
+.btnUnlock {  
+  width: 32px;  
+  height: 32px;  
+  border-radius: 8px;  
+  border: 1px solid var(--login-border);  
+  background: transparent;  
+  color: var(--login-text-muted);  
+  font-size: 14px;  
+  cursor: pointer;  
+  display: inline-flex;  
+  align-items: center;  
+  justify-content: center;  
+  transition:  
+    background 0.12s,  
+    color 0.12s,  
+    border-color 0.12s;  
+}  
+  
+.btnLock:hover:not(:disabled) {  
+  background: var(--btn-refuse-bg);  
+  color: var(--btn-refuse-fg);  
+  border-color: var(--btn-refuse-border);  
+}  
+  
+.btnUnlock:hover:not(:disabled) {  
+  background: var(--primary-a10);  
+  color: var(--primary-color);  
+  border-color: var(--primary-color);  
+}  
+  
+.btnLock:disabled,  
+.btnUnlock:disabled {  
+  opacity: 0.5;  
+  cursor: not-allowed;  
 }
 
 .emptyRow {

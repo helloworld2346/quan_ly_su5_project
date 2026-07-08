@@ -7,6 +7,8 @@ import {
   faCheck,
   faXmark,
   faPlus,
+  faLock,
+  faLockOpen,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./AccountManagement.module.css";
 import { accountService } from "../../services/account/accountService";
@@ -116,6 +118,7 @@ export default function AccountManagement() {
   const [resetting, setResetting] = useState(false);
 
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [lockingId, setLockingId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -406,6 +409,41 @@ export default function AccountManagement() {
     [confirm, showSuccess, showError],
   );
 
+  const handleToggleLock = useCallback(
+    async (acc: Account) => {
+      const willLock = !acc.khoa;
+      const confirmed = await confirm({
+        title: willLock ? "Xác nhận khóa" : "Xác nhận mở khóa",
+        message: willLock
+          ? `Khóa tài khoản "${acc.tenTaiKhoan}" (${acc.tenDangNhap})? Người dùng sẽ không đăng nhập được.`
+          : `Mở khóa tài khoản "${acc.tenTaiKhoan}" (${acc.tenDangNhap})?`,
+        confirmText: willLock ? "Khóa" : "Mở khóa",
+        cancelText: "Hủy",
+        type: willLock ? "danger" : "info",
+      });
+      if (!confirmed) return;
+
+      setLockingId(acc.idTaiKhoan);
+      try {
+        const res = willLock
+          ? await accountService.lockAccount(acc.idTaiKhoan)
+          : await accountService.unlockAccount(acc.idTaiKhoan);
+        if (!res.success) throw new Error(res.message);
+        setAccounts((prev) =>
+          prev.map((a) => (a.idTaiKhoan === acc.idTaiKhoan ? res.Result : a)),
+        );
+        showSuccess(willLock ? "Đã khóa tài khoản" : "Đã mở khóa tài khoản");
+      } catch {
+        showError(
+          willLock ? "Không thể khóa tài khoản" : "Không thể mở khóa tài khoản",
+        );
+      } finally {
+        setLockingId(null);
+      }
+    },
+    [confirm, showSuccess, showError],
+  );
+
   const editingAccount = useMemo(
     () => accounts.find((a) => a.idTaiKhoan === editingId),
     [accounts, editingId],
@@ -430,6 +468,13 @@ export default function AccountManagement() {
           </span>
         </td>
         <td className={styles.muted}>{acc.donVi?.tenDonvi ?? "—"}</td>
+        <td>
+          <span
+            className={acc.khoa ? styles.statusLocked : styles.statusActive}
+          >
+            {acc.khoa ? "Đã khóa" : "Hoạt động"}
+          </span>
+        </td>
         <td className={styles.colActions}>
           <div className={styles.rowActions}>
             <button
@@ -447,6 +492,15 @@ export default function AccountManagement() {
               title="Reset mật khẩu"
             >
               <FontAwesomeIcon icon={faKey} />
+            </button>
+            <button
+              type="button"
+              className={acc.khoa ? styles.btnUnlock : styles.btnLock}
+              onClick={() => void handleToggleLock(acc)}
+              disabled={lockingId === acc.idTaiKhoan}
+              title={acc.khoa ? "Mở khóa" : "Khóa"}
+            >
+              <FontAwesomeIcon icon={acc.khoa ? faLockOpen : faLock} />
             </button>
             <button
               type="button"
@@ -547,6 +601,7 @@ export default function AccountManagement() {
                 <th>Tên đăng nhập</th>
                 <th>Vai trò</th>
                 <th>Đơn vị</th>
+                <th>Trạng thái</th>
                 <th className={styles.colActions}>Thao tác</th>
               </tr>
             </thead>
@@ -555,7 +610,7 @@ export default function AccountManagement() {
                 renderSkeletonRows(pageSize)
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className={styles.emptyRow}>
+                  <td colSpan={7} className={styles.emptyRow}>
                     {search || filterDonVi || filterVaiTro
                       ? "Không tìm thấy tài khoản"
                       : "Chưa có tài khoản"}
