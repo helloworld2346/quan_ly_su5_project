@@ -72,68 +72,81 @@ export default function PoliticalDashboard() {
 
     const isToday = selectedDay.getTime() === today.getTime();
 
-    useEffect(() => {
-        let ignore = false;
-
-        async function fetchDashboard() {
-            try {
+  useEffect(() => {
+    let ignore = false;
+    let intervalId: ReturnType<typeof setInterval> | null = null;
+    async function fetchDashboard(isSilent = false) {
+      
+        if (document.hidden) return;
+        try {
+            
+            if (!isSilent) {
                 setLoading(true);
-                const dateParam = toDateParam(selectedDate);
+            }
+            
+            const dateParam = toDateParam(selectedDate);
 
-                const dashboardPromise =
-                    politicalDashboardService.getThongKeCtDangCt(dateParam);
+            const dashboardPromise =
+                politicalDashboardService.getThongKeCtDangCt(dateParam);
 
-                const workPromise = maDonViCurrent
-                    ? politicalWorkService.getByDonViCha(maDonViCurrent, dateParam)
-                    : Promise.resolve(null);
+            const workPromise = maDonViCurrent
+                ? politicalWorkService.getByDonViCha(maDonViCurrent, dateParam)
+                : Promise.resolve(null);
 
-                const [dashboard, workResponse] = await Promise.all([
-                    dashboardPromise,
-                    workPromise,
-                ]);
+            const [dashboard, workResponse] = await Promise.all([
+                dashboardPromise,
+                workPromise,
+            ]);
 
-                if (ignore) return;
+            if (ignore) return;
 
-                setDashboardData(dashboard);
+            setDashboardData(dashboard);
 
-                if (workResponse?.success && workResponse.Result) {
-                    setWorkRows(
-                      workResponse.Result.map((item: PoliticalWorkItem) => {
-                        const row = mapItemToRow(item);
-                        return {
-                          maDonVi: String(
-                            row.donVi || item.donVi?.maDonVi || "",
-                          ).trim(),
-                          tenDonViText: String(
-                            row.tenDonVi || item.donVi?.tenDonvi || "",
-                          ).trim(),
-                          kienNghi: row.kienNghi || "",
-                          noiDungDotXuat: row.noiDungDotXuat || "",
-                        };
-                      }),
-                    );
-                } else {
-                    setWorkRows([]);
-                }
-            } catch (error) {
-                console.error("Không thể tải thống kê CTĐ, CTCT", error);
-                if (!ignore) {
-                    setDashboardData(null);
-                    setWorkRows([]);
-                }
-            } finally {
-                if (!ignore) {
-                    setLoading(false);
-                }
+            if (workResponse?.success && workResponse.Result) {
+                setWorkRows(
+                  workResponse.Result.map((item: PoliticalWorkItem) => {
+                    const row = mapItemToRow(item);
+                    return {
+                      maDonVi: String(row.donVi || item.donVi?.maDonVi || "").trim(),
+                      tenDonViText: String(row.tenDonVi || item.donVi?.tenDonvi || "").trim(),
+                      kienNghi: row.kienNghi || "",
+                      noiDungDotXuat: row.noiDungDotXuat || "",
+                    };
+                  }),
+                );
+            } else {
+                setWorkRows([]);
+            }
+        } catch (error) {
+            console.error("Không thể tải thống kê CTĐ, CTCT", error);
+            if (!ignore) {
+                setDashboardData(null);
+                setWorkRows([]);
+            }
+        } finally {
+            if (!ignore) {
+                setLoading(false);
             }
         }
+    }
 
-        fetchDashboard();
+    fetchDashboard(false);
+    const todayStr = toDateParam(new Date());
+    const selectedStr = toDateParam(selectedDate);
 
-        return () => {
-            ignore = true;
-        };
-    }, [selectedDate, maDonViCurrent]);
+    if (todayStr === selectedStr) {
+        intervalId = setInterval(() => {
+            fetchDashboard(true); 
+        }, 60000);
+    }
+
+    return () => {
+        ignore = true;
+        if (intervalId) {
+            clearInterval(intervalId);
+        }
+    };
+}, [selectedDate, maDonViCurrent]);
 
     const overview = dashboardData ?? {
         tongDonVi: 0,
@@ -194,6 +207,8 @@ export default function PoliticalDashboard() {
                   proposals: proposalsCount,
                   incidents: incidentsCount,
                   totalIssues: proposalsCount + incidentsCount,
+
+                  updateAt: (unit as any).updateAt || (unit as any).updatedAt || "",
                 };
               },
             );
@@ -212,14 +227,12 @@ export default function PoliticalDashboard() {
                 return nameLower.includes("phòng");
             }
             if (filter === "regiment") {
-
                 return nameLower.includes("trung đoàn") || nameLower.includes("sư đoàn") || nameLower.includes("e ") || nameLower.startsWith("e");
             }
             if (filter === "battalion") {
                 return nameLower.includes("tiểu đoàn") || nameLower.includes("d ") || nameLower.startsWith("d");
             }
             if (filter === "company") {
-
                 return nameLower.includes("đại đội") || nameLower.includes("c ") || nameLower.startsWith("c");
             }
             return true;
@@ -296,7 +309,7 @@ export default function PoliticalDashboard() {
                     >
                         <div className="political-donut-center">
                             <strong>{overview.tongDonVi}</strong>
-                            <span>đơn vị</span>
+                            <span>Đơn vị</span>
                             <small>({overview.tongDonVi > 0 ? "100%" : "0%"})</small>
                         </div>
                     </div>
@@ -315,7 +328,7 @@ export default function PoliticalDashboard() {
                             <p>Có kiến nghị, đề xuất</p>
                             <strong>{overview.donViCoKienNghi}</strong>
                             <div className="political-kpi-meta">
-                                <span>đơn vị</span>
+                                <span>Đơn vị</span>
                                 <b>{percent(overview.donViCoKienNghi)}%</b>
                             </div>
                             <hr />
@@ -331,7 +344,7 @@ export default function PoliticalDashboard() {
                             <p>Có vụ việc đột xuất</p>
                             <strong>{overview.donViCoDotXuat}</strong>
                             <div className="political-kpi-meta">
-                                <span>đơn vị</span>
+                                <span>Đơn vị</span>
                                 <b>{percent(overview.donViCoDotXuat)}%</b>
                             </div>
                             <hr />
@@ -378,14 +391,15 @@ export default function PoliticalDashboard() {
                     const pGreen = totalIssues ? Math.round((unit.proposals / totalIssues) * 100) : 0;
 
                     let centerValue = totalIssues;
-                    let centerLabel = "vấn đề";
+                    
+                    let centerLabel = "Báo cáo"; 
 
                     if (activeKey === "proposals") {
                         centerValue = unit.proposals;
-                        centerLabel = "kiến nghị";
+                        centerLabel = "Kiến nghị";
                     } else if (activeKey === "incidents") {
                         centerValue = unit.incidents;
-                        centerLabel = "đột xuất";
+                        centerLabel = "Đột xuất";
                     }
 
                     return (
@@ -462,7 +476,9 @@ export default function PoliticalDashboard() {
                                 </ul>
                             </div>
 
-                            <p className="political-updated">Chi tiết vấn đề: {unit.totalIssues}</p>
+                            <p className="political-updated">
+                                Thời gian nộp: {unit.updateAt ? unit.updateAt : "Chưa có báo cáo"}
+                            </p>
                         </article>
                     );
                 })}

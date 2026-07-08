@@ -17,6 +17,9 @@ import RefuseDialog from "../../components/ui/RefuseDialog/RefuseDialog";
 import CreateReport from "./CreateReport";
 import PoliticalWorkDetailModal from "./PoliticalWorkDetailModal";
 import styles from "./PoliticalWorkReport.module.css";
+import CaTrucInfoCard from "../../components/ui/CaTrucInfoCard/CaTrucInfoCard";
+import { dutyService } from "../../services/duty/dutyService";
+import type { CaTrucDetail } from "../../types/duty";
 
 import { useAuth } from "../../context/useAuth";
 import { useToast } from "../../context/useToast";
@@ -70,6 +73,8 @@ export default function PoliticalWorkReport() {
   const [detailRow, setDetailRow] = useState<PoliticalWorkRow | null>(null);
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+  const [caTrucInfo, setCaTrucInfo] = useState<CaTrucDetail | null>(null);
+  
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const { account } = useAuth();
@@ -126,6 +131,34 @@ export default function PoliticalWorkReport() {
       commanderReport,
       hasChildren,
     );
+
+  useEffect(() => {
+    let ignore = false;
+
+    const fetchCaTruc = async () => {
+      try {
+        const res = await dutyService.getCaTrucByDate(reportDate);
+
+        if (ignore) return;
+
+        if (res.success && res.Result) {
+          setCaTrucInfo(res.Result);
+        } else {
+          setCaTrucInfo(null);
+        }
+      } catch {
+        if (!ignore) {
+          setCaTrucInfo(null);
+        }
+      }
+    };
+
+    void fetchCaTruc();
+
+    return () => {
+      ignore = true;
+    };
+  }, [reportDate]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -545,6 +578,16 @@ export default function PoliticalWorkReport() {
           </div>
         </div>
       </section>
+
+      {caTrucInfo && (
+        <CaTrucInfoCard
+          ngaytruc={caTrucInfo.ngaytruc ?? ""}
+          matkhau={caTrucInfo.matkhau ?? ""}
+          ghichu={caTrucInfo.ghichu ?? undefined}
+          trucChiHuy={caTrucInfo.trucChiHuy ?? undefined}
+          trucBanTacChien={caTrucInfo.trucBanTacChien ?? undefined}
+        />
+      )}
 
       <CreateReport
         key={editingRow?.idCongtac ?? "new"}
