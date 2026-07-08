@@ -81,6 +81,10 @@ export interface UpdateDonViRequest {
   quanSoHsqBs: number;
   quanSoSiQuan: number;
   quanSoQncn: number;
+  tenDonvi: string;
+  kyhieuDonvi: string;
+  capDonVi: string;
+  donViCha: string | null;
   createdAt: string;
   updatedAt: string;
   isDeleted: boolean;

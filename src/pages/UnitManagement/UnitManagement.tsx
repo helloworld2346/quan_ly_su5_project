@@ -75,6 +75,10 @@ function validateCreate(f: CreateForm): CreateErrors {
 }
 
 type EditForm = {
+  tenDonvi: string;
+  kyhieuDonvi: string;
+  capDonVi: string;
+  donViCha: string;
   quanSoTong: string;
   quanSoHsqBs: string;
   quanSoSiQuan: string;
@@ -82,6 +86,10 @@ type EditForm = {
 };
 
 const EMPTY_EDIT: EditForm = {
+  tenDonvi: "",
+  kyhieuDonvi: "",
+  capDonVi: "",
+  donViCha: "",
   quanSoTong: "0",
   quanSoHsqBs: "0",
   quanSoSiQuan: "0",
@@ -249,21 +257,28 @@ export default function UnitManagement() {
     }
   }, [createForm, showError, showSuccess]);
 
-  // ----- Edit (quân số) -----
   const editingUnit = useMemo(
     () => units.find((u) => u.maDonVi === editingId),
     [units, editingId],
   );
 
-  const handleStartEdit = useCallback((u: DonVi) => {
-    setEditingId(u.maDonVi);
-    setEditForm({
-      quanSoTong: String(u.quanSoTong),
-      quanSoHsqBs: String(u.quanSoHsqBs),
-      quanSoSiQuan: String(u.quanSoSiQuan),
-      quanSoQncn: String(u.quanSoQncn),
-    });
-  }, []);
+  const handleStartEdit = useCallback(
+    (u: DonVi) => {
+      setEditingId(u.maDonVi);
+      const parent = units.find((x) => x.tenDonvi === u.donViCha);
+      setEditForm({
+        tenDonvi: u.tenDonvi,
+        kyhieuDonvi: u.kyhieuDonvi,
+        capDonVi: u.capDonVi ?? "",
+        donViCha: parent ? parent.maDonVi : "",
+        quanSoTong: String(u.quanSoTong),
+        quanSoHsqBs: String(u.quanSoHsqBs),
+        quanSoSiQuan: String(u.quanSoSiQuan),
+        quanSoQncn: String(u.quanSoQncn),
+      });
+    },
+    [units],
+  );
 
   const closeEditModal = useCallback(() => {
     setEditingId(null);
@@ -288,6 +303,10 @@ export default function UnitManagement() {
     setSaving(true);
     try {
       const payload: UpdateDonViRequest = {
+        tenDonvi: editForm.tenDonvi.trim(),
+        kyhieuDonvi: editForm.kyhieuDonvi.trim(),
+        capDonVi: editForm.capDonVi,
+        donViCha: editForm.donViCha,
         quanSoTong: toInt(editForm.quanSoTong),
         quanSoHsqBs: toInt(editForm.quanSoHsqBs),
         quanSoSiQuan: toInt(editForm.quanSoSiQuan),
@@ -641,6 +660,46 @@ export default function UnitManagement() {
 
               <div className={styles.modalBody}>
                 <div className={styles.editFormGrid}>
+                  <div className={styles.editFormGroup}>
+                    <label>Tên đơn vị</label>
+                    <input
+                      className={styles.input}
+                      value={editForm.tenDonvi}
+                      onChange={(e) =>
+                        handleEditFieldChange("tenDonvi", e.target.value)
+                      }
+                    />
+                  </div>
+                  <div className={styles.editFormGroup}>
+                    <label>Ký hiệu</label>
+                    <input
+                      className={styles.input}
+                      value={editForm.kyhieuDonvi}
+                      onChange={(e) =>
+                        handleEditFieldChange("kyhieuDonvi", e.target.value)
+                      }
+                    />
+                  </div>
+                  <div className={styles.editFormGroup}>
+                    <label>Cấp đơn vị</label>
+                    <CustomSelect
+                      options={CAP_OPTIONS}
+                      value={editForm.capDonVi}
+                      onChange={(val) => handleEditFieldChange("capDonVi", val)}
+                      placeholder="-- Chọn cấp --"
+                    />
+                  </div>
+                  <div className={styles.editFormGroup}>
+                    <label>Đơn vị cha</label>
+                    <CustomSelect
+                      options={parentOptions.filter(
+                        (o) => o.value !== editingId,
+                      )}
+                      value={editForm.donViCha}
+                      onChange={(val) => handleEditFieldChange("donViCha", val)}
+                      placeholder="-- Không có (đơn vị gốc) --"
+                    />
+                  </div>
                   <div className={styles.editFormGroup}>
                     <label>Quân số tổng</label>
                     <input
