@@ -116,3 +116,14 @@ export interface CreateDonViResponse {
   message: string;
   Result: DonVi;
 }
+export interface CreateRoleRequest {
+  tenVaiTro: string;
+  tenChucnang: string[];
+}
+
+export interface CreateRoleResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  Result: Role;
+}

@@ -1,5 +1,11 @@
 import api from "../api";
-import type { RoleResponse, Role, RoleByIdResponse } from "../../types/account";
+import type {
+  RoleResponse,
+  Role,
+  RoleByIdResponse,
+  CreateRoleRequest,
+  CreateRoleResponse,
+} from "../../types/account";
 
 export const roleService = {
   getRoles: async (): Promise<Role[]> => {
@@ -10,5 +16,10 @@ export const roleService = {
   getRoleById: async (id: string): Promise<Role> => {
     const response = await api.get<RoleByIdResponse>(`/vaitro/${id}`);
     return response.data.Result;
+  },
+
+  createRole: async (data: CreateRoleRequest): Promise<CreateRoleResponse> => {
+    const response = await api.post<CreateRoleResponse>("/vaitro", data);
+    return response.data;
   },
 };
