@@ -11,6 +11,7 @@ export type NavItemId =
   | "duty-shifts"
   | "duty-create"
   | "account-management"
+  | "unit-management"
   | "settings";
 
 export type NavItem = {
@@ -47,6 +48,10 @@ const CreateDutyShift = lazy(
 
 const AccountManagement = lazy(
   () => import("../pages/AccountManagement/AccountManagement"),
+);
+
+const UnitManagement = lazy(
+  () => import("../pages/UnitManagement/UnitManagement"),
 );
 
 const Settings = lazy(() => import("../pages/Settings/Settings"));
@@ -159,6 +164,15 @@ export const ADMIN_NAV_GROUP = {
       component: AccountManagement,
       allowedRoles: ["Quản Trị Viên"],
     },
+    {
+      id: "unit-management" as const,
+      label: "Quản lý đơn vị",
+      path: "/unit-management",
+      loadingTitle: "Đang tải quản lý đơn vị",
+      loadingSubtitle: "Đang tải dữ liệu…",
+      component: UnitManagement,
+      allowedRoles: ["Quản Trị Viên"],
+    },
   ],
 };
 
@@ -188,6 +202,7 @@ export const NAV_PAGE_TITLES: Record<NavItemId, string> = {
   "duty-shifts": "Quản lý ca trực",
   "duty-create": "Tạo ca trực",
   "account-management": "Quản lý tài khoản",
+  "unit-management": "Quản lý đơn vị",
   settings: "Cài đặt",
 };
 

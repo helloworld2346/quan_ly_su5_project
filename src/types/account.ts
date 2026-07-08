@@ -93,3 +93,22 @@ export interface UpdateDonViResponse {
   message: string;
   Result: DonVi;
 }
+
+export interface CreateDonViRequest {
+  tenDonvi: string;
+  kyhieuDonvi: string;
+  quanSoTong: number;
+  quanSoHsqBs: number;
+  quanSoSiQuan: number;
+  quanSoQncn: number;
+  donViCha: string;
+  capDonVi: string;
+  donViCon: string[];
+}
+
+export interface CreateDonViResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  Result: DonVi;
+}
