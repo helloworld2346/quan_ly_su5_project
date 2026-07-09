@@ -75,8 +75,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const mapped = (apiNotifs.Result ?? []).map(mapApiNotification);
             notificationStorage.set(mapped);
             setNotifications(mapped);
-          } catch {
-            ///////
+          } catch (e) {
+            if (import.meta.env.DEV) {
+              console.error("Failed to fetch notifications:", e);
+            }
           }
         }
       }
@@ -102,8 +104,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
           if (msg.type === "FORCE_LOGOUT") {
             setShowForceLogout(true);
+            WebSocketLink.disconnect();
             setTimeout(() => {
-              localStorage.clear();
+              storage.removeToken();
+              storage.clearNavState();
               window.location.href = "/login";
             }, 2500);
             return;

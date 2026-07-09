@@ -39,7 +39,9 @@ function TopBarActions({ isDark, onToggleTheme }: TopBarActionsProps) {
           setAccount(response.Result);
         }
       } catch (error) {
-        console.error("Failed to fetch account:", error);
+        if (import.meta.env.DEV) {
+          console.error("Failed to fetch account:", error);
+        }
       }
     };
 

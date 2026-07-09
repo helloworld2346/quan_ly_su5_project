@@ -338,7 +338,7 @@ export default function DailyTroopReport() {
   };
 
   const handleExportWord = () => {
-    console.log("Xuất file Word");
+    // TODO: chức năng xuất Word chưa được triển khai
   };
 
   const handleExportExcel = async () => {

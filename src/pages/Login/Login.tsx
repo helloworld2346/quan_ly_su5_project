@@ -79,7 +79,6 @@ export default function Login({ onSuccess }: Props) {
       } else {
         setError(getErrorMessage(errObj));
       }
-      console.error("Login error:", errObj);
     } finally {
       setLoading(false);
     }

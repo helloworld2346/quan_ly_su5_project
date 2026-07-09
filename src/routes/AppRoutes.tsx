@@ -41,9 +41,13 @@ export default function AppRoutes({
           path={path}
           element={
             <RequireAuth isAuthenticated={isAuthenticated}>
-              <RequireRole allowedRoles={allowedRoles ?? []}>
+              {allowedRoles ? (
+                <RequireRole allowedRoles={allowedRoles ?? []}>
+                  <Dashboard onLogout={onLogout} />
+                </RequireRole>
+              ) : (
                 <Dashboard onLogout={onLogout} />
-              </RequireRole>
+              )}
             </RequireAuth>
           }
         />
