@@ -29,31 +29,13 @@
   border-left: 4px solid var(--primary-color);  
 }  
   
-.pageTitle {  
+.pageHeaderLeft h2 {  
   font-size: 24px;  
   font-weight: 800;  
   color: var(--login-text);  
   margin: 0;  
   letter-spacing: -0.4px;  
   line-height: 1.2;  
-}  
-  
-.toolbar {  
-  display: flex;  
-  align-items: center;  
-  gap: 16px;  
-  flex-shrink: 0;  
-}  
-  
-.filterGroup {  
-  display: flex;  
-  gap: 12px;  
-  flex-shrink: 0;  
-  min-width: 360px;  
-}  
-  
-.filterGroup > * {  
-  flex: 1;  
 }  
   
 .btnAddAccount {  
@@ -90,48 +72,21 @@
   cursor: not-allowed;  
 }  
   
-.btnClearFilter {  
-  display: inline-flex;  
-  align-items: center;  
-  gap: 6px;  
-  height: 40px;  
-  padding: 0 14px;  
-  border: 1.5px solid var(--login-border);  
-  border-radius: 8px;  
-  background: var(--surface-card);  
-  color: var(--login-text);  
-  font-size: 14px;  
-  font-weight: 600;  
-  white-space: nowrap;  
-  cursor: pointer;  
-  flex: 0 0 auto;  
-  transition:  
-    border-color 0.15s,  
-    color 0.15s,  
-    background 0.15s;  
-}  
-  
-.btnClearFilter:hover {  
-  border-color: var(--primary-color);  
-  color: var(--primary-color);  
-  background: var(--primary-a06);  
-}  
-  
-.listSection {  
-  background: var(--surface-card);  
-  border: 1px solid var(--login-border);  
-  border-radius: 14px;  
-  overflow: hidden;  
+.toolbar {  
   display: flex;  
-  flex-direction: column;  
-  flex: 1;  
-  min-height: 0;  
+  align-items: center;  
+  gap: 16px;  
+  flex-shrink: 0;  
 }  
   
 .tableWrapper {  
   flex: 1;  
   min-height: 0;  
-  overflow: auto;  
+  overflow-y: auto;  
+  overflow-x: auto;  
+  border: 1.5px solid var(--login-border);  
+  border-radius: 14px;  
+  background: var(--surface-card);  
 }  
   
 .table {  
@@ -181,22 +136,18 @@
   color: var(--login-text-muted);  
 }  
   
-.colActions {  
-  width: 100px;  
+.empty {  
   text-align: center;  
-}  
-  
-.userName {  
-  font-weight: 600;  
-  color: var(--login-text);  
-}  
-  
-.muted {  
   color: var(--login-text-muted);  
+  font-style: italic;  
+  padding: 40px 16px;  
 }  
   
 .roleBadge {  
-  display: inline-block;  
+  display: inline-flex;  
+  align-items: center;  
+  gap: 6px;  
+  margin: 2px;  
   padding: 3px 10px;  
   border-radius: 20px;  
   background: var(--primary-a10);  
@@ -206,45 +157,23 @@
   white-space: nowrap;  
 }  
   
-.rowActions {  
-  display: flex;  
-  justify-content: center;
-  gap: 6px;  
-}
-  
-.btnEdit {  
-  width: 32px;  
-  height: 32px;  
-  border-radius: 8px;  
-  border: 1px solid var(--login-border);  
-  background: transparent;  
-  color: var(--login-text-muted);  
-  font-size: 14px;  
-  cursor: pointer;  
+.roleBadge button {  
   display: inline-flex;  
   align-items: center;  
   justify-content: center;  
-  transition:  
-    background 0.12s,  
-    color 0.12s,  
-    border-color 0.12s;  
-}  
-  
-.btnEdit:hover {  
-  background: var(--primary-a10);  
+  width: 16px;  
+  height: 16px;  
+  border: none;  
+  border-radius: 50%;  
+  background: var(--primary-a15);  
   color: var(--primary-color);  
-  border-color: var(--primary-color);  
+  font-size: 10px;  
+  cursor: pointer;  
+  transition: background 0.12s;  
 }  
   
-.emptyRow {  
-  text-align: center;  
-  color: var(--login-text-muted);  
-  font-style: italic;  
-  padding: 32px 16px;  
-}  
-  
-.tbodyAnimate {  
-  animation: fadeSlideIn 0.25s ease;  
+.roleBadge button:hover {  
+  background: var(--primary-a30);  
 }  
   
 .overlay {  
@@ -270,7 +199,7 @@
   border: 1px solid var(--modal-border);  
   border-radius: 12px;  
   width: 95%;  
-  max-width: 1000px;  
+  max-width: 560px;  
   max-height: 92vh;  
   display: flex;  
   flex-direction: column;  
@@ -287,7 +216,7 @@
   border-top: 3px solid var(--primary-color);  
 }  
   
-.modalTitle {  
+.modalHeader h3 {  
   font-size: 15px;  
   font-weight: 700;  
   color: var(--primary-color);  
@@ -296,7 +225,7 @@
   margin: 0;  
 }  
   
-.modalCloseBtn {  
+.btnCloseModal {  
   display: inline-flex;  
   align-items: center;  
   justify-content: center;  
@@ -313,7 +242,7 @@
     color 0.15s;  
 }  
   
-.modalCloseBtn:hover {  
+.btnCloseModal:hover {  
   background: var(--table-row-even);  
   color: var(--login-text);  
 }  
@@ -321,6 +250,9 @@
 .modalBody {  
   padding: 24px;  
   overflow-y: auto;  
+  display: flex;  
+  flex-direction: column;  
+  gap: 16px;  
 }  
   
 .modalFooter {  
@@ -331,30 +263,16 @@
   border-top: 1px solid var(--login-border);  
 }  
   
-.editFormGrid {  
-  display: grid;  
-  grid-template-columns: 1fr 1fr;  
-  gap: 16px 20px;  
-}  
-  
-.editFormGroup {  
+.field {  
   display: flex;  
   flex-direction: column;  
+  gap: 6px;  
 }  
   
-.editFormGroup > * + * {  
-  margin-top: 6px;  
-}  
-  
-.editFormGroup label {  
+.field > span {  
   font-size: 14px;  
   font-weight: 600;  
   color: var(--login-text);  
-}  
-  
-.required {  
-  color: var(--dialog-danger-icon);  
-  margin-left: 2px;  
 }  
   
 .input {  
@@ -375,15 +293,11 @@
   box-shadow: 0 0 0 3px var(--modal-input-focus-shadow);  
 }  
   
-.input:disabled {  
-  opacity: 0.6;  
-  cursor: not-allowed;  
-}  
-  
-.fieldError {  
-  margin-top: 6px;  
-  font-size: 13px;  
-  color: var(--dialog-danger-icon);  
+.tagList {  
+  display: flex;  
+  flex-wrap: wrap;  
+  gap: 8px;  
+  min-height: 20px;  
 }  
   
 .btnSave {  
@@ -437,7 +351,10 @@
   cursor: not-allowed;  
 }  
   
-/* ===== Animation / responsive ===== */  
+.tbodyAnimate {  
+  animation: fadeSlideIn 0.25s ease;  
+}  
+  
 @keyframes fadeSlideIn {  
   from {  
     opacity: 0;  
@@ -461,9 +378,6 @@
     overflow: visible;  
     padding: 16px;  
   }  
-  .editFormGrid {  
-    grid-template-columns: 1fr;  
-  }  
   .overlay {  
     left: 0;  
     width: 100vw;  
@@ -471,11 +385,6 @@
   .toolbar {  
     flex-direction: column;  
     align-items: stretch;  
-  }  
-  .filterGroup {  
-    min-width: 0;  
-    width: 100%;  
-    flex-wrap: wrap;  
   }  
   .pageHeader {  
     flex-direction: column;  
@@ -486,4 +395,91 @@
     width: 100%;  
     justify-content: center;  
   }  
+}
+.chucnangCheckList {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 10px;  
+  max-height: 240px;  
+  overflow-y: auto;  
+}  
+  
+.chucnangCheckItem {  
+  display: inline-flex;  
+  align-items: center;  
+  gap: 8px;  
+  padding: 8px 12px;  
+  border: 1.5px solid var(--login-border);  
+  border-radius: 8px;  
+  background: var(--surface-card);  
+  font-size: 14px;  
+  color: var(--login-text);  
+  cursor: pointer;  
+  transition:  
+    background 0.12s,  
+    border-color 0.12s;  
+}  
+  
+.chucnangCheckItem:hover {  
+  background: var(--primary-a06);  
+  border-color: var(--primary-color);  
+}  
+  
+.chucnangCheckItem.checked {  
+  background: var(--primary-a10);  
+  border-color: var(--primary-color);  
+  color: var(--primary-color);  
+  font-weight: 600;  
+}  
+  
+.chucnangCheckItem input {  
+  accent-color: var(--primary-color);  
+  cursor: pointer;  
+}
+
+.colActions {  
+  width: 120px;  
+  text-align: center;  
+}  
+  
+.rowActions {  
+  display: flex;  
+  justify-content: flex-start;  
+  gap: 6px;  
+}  
+  
+.btnEdit,  
+.btnDelete {  
+  width: 32px;  
+  height: 32px;  
+  border-radius: 8px;  
+  border: 1px solid var(--login-border);  
+  background: transparent;  
+  color: var(--login-text-muted);  
+  font-size: 14px;  
+  cursor: pointer;  
+  display: inline-flex;  
+  align-items: center;  
+  justify-content: center;  
+  transition:  
+    background 0.12s,  
+    color 0.12s,  
+    border-color 0.12s;  
+}  
+  
+.btnEdit:hover {  
+  background: var(--primary-a10);  
+  color: var(--primary-color);  
+  border-color: var(--primary-color);  
+}  
+  
+.btnDelete:hover:not(:disabled) {  
+  background: var(--btn-refuse-bg);  
+  color: var(--btn-refuse-fg);  
+  border-color: var(--btn-refuse-border);  
+}  
+  
+.btnDelete:disabled {  
+  opacity: 0.5;  
+  cursor: not-allowed;  
 }

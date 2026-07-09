@@ -12,6 +12,7 @@ export type NavItemId =
   | "duty-create"
   | "account-management"
   | "unit-management"
+  | "role-management"
   | "settings";
 
 export type NavItem = {
@@ -52,6 +53,10 @@ const AccountManagement = lazy(
 
 const UnitManagement = lazy(
   () => import("../pages/UnitManagement/UnitManagement"),
+);
+
+const RoleManagement = lazy(
+  () => import("../pages/RoleManagement/RoleManagement"),
 );
 
 const Settings = lazy(() => import("../pages/Settings/Settings"));
@@ -173,6 +178,15 @@ export const ADMIN_NAV_GROUP = {
       component: UnitManagement,
       allowedRoles: ["Quản Trị Viên"],
     },
+    {
+      id: "role-management" as const,
+      label: "Quản lý vai trò",
+      path: "/role-management",
+      loadingTitle: "Đang tải quản lý vai trò",
+      loadingSubtitle: "Đang tải dữ liệu…",
+      component: RoleManagement,
+      allowedRoles: ["Quản Trị Viên"],
+    },
   ],
 };
 
@@ -191,6 +205,21 @@ export const SETTINGS_NAV: NavItem = {
   ],
 };
 
+export const CHUC_NANG_OPTIONS: { value: NavItemId; label: string }[] = [
+  { value: "executive", label: "Tổng hợp ngày" },
+  { value: "executive-political-work", label: "Tổng hợp CTĐ, CTCT" },
+  { value: "report-troop", label: "Thống kê quân số" },
+  { value: "report-political-work", label: "Hoạt động CTĐ, CTCT" },
+  { value: "duty-personnel", label: "Quản lý trực ban" },
+  { value: "duty-shifts", label: "Quản lý ca trực" },
+  { value: "duty-create", label: "Tạo ca trực" },
+  { value: "account-management", label: "Quản lý tài khoản" },
+  { value: "settings", label: "Cài đặt" },
+];
+
+export const getChucNangLabel = (key: string): string =>
+  CHUC_NANG_OPTIONS.find((o) => o.value === key)?.label ?? key;
+
 export const NAV_PAGE_TITLES: Record<NavItemId, string> = {
   executive: "Tổng hợp ngày",
   "executive-political-work":
@@ -203,6 +232,7 @@ export const NAV_PAGE_TITLES: Record<NavItemId, string> = {
   "duty-create": "Tạo ca trực",
   "account-management": "Quản lý tài khoản",
   "unit-management": "Quản lý đơn vị",
+  "role-management": "Quản lý vai trò",
   settings: "Cài đặt",
 };
 
@@ -305,11 +335,23 @@ export function canAccessDutyGroup(
 export function getNavItemsByRole(
   userRole: string | null,
   capDonVi: string | null = null,
+  tenChucnang: string[] | null = null,
 ): NavItem[] {
   if (!userRole) return [];
 
   const normalizedRole = normalizeRoleName(userRole);
   const canAccessDuty = canAccessDutyGroup(userRole, capDonVi);
+
+  if (normalizedRole === "Quản Trị Viên") {
+    return ALL_NAV_ITEMS;
+  }
+
+  if (tenChucnang && tenChucnang.length > 0) {
+    return ALL_NAV_ITEMS.filter((item) => {
+      if (item.id === "settings") return true;
+      return tenChucnang.includes(item.id);
+    });
+  }
 
   const isCoreNav = (item: NavItem) =>
     item.id === "executive" ||
@@ -320,11 +362,7 @@ export function getNavItemsByRole(
   const isExecutiveItem = (item: NavItem) =>
     item.id === "executive" || item.id === "executive-political-work";
 
-  if (normalizedRole === "Quáº£n Trá»‹ ViÃªn") {
-    return ALL_NAV_ITEMS;
-  }
-
-  if (normalizedRole === "Trá»±c ban tÃ¡c chiáº¿n") {
+  if (normalizedRole === "Trực ban tác chiến") {
     return ALL_NAV_ITEMS.filter((item) => {
       if (isExecutiveItem(item)) return capDonVi === "SU_DOAN";
       return isCoreNav(item) || (item.id.startsWith("duty-") && canAccessDuty);
@@ -332,8 +370,8 @@ export function getNavItemsByRole(
   }
 
   if (
-    normalizedRole === "Trá»±c chá»‰ huy" ||
-    normalizedRole === "Trá»±c ban ná»™i vá»¥"
+    normalizedRole === "Trực chỉ huy" ||
+    normalizedRole === "Trực ban nội vụ"
   ) {
     return ALL_NAV_ITEMS.filter(
       (item) => item.id.startsWith("report-") || item.id === "settings",

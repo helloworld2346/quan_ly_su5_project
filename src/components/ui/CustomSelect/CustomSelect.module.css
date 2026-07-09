@@ -98,3 +98,13 @@
 .tableVariant .dropdown {  
   min-width: 180px;  
 }
+
+.trigger:disabled {  
+  opacity: 0.55;  
+  cursor: not-allowed;  
+  background-color: var(--surface-muted);  
+}  
+  
+.trigger:disabled:hover {  
+  border-color: var(--modal-input-border);  
+}
