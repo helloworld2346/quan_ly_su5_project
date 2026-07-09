@@ -387,16 +387,7 @@ export default function AccountManagement() {
     async (acc: Account) => {
       const confirmed = await confirm({
         title: "Xác nhận xóa",
-        message: `Bạn có chắc chắn muốn {hasActiveFilter && (
-            <button
-              type="button"
-              className={styles.btnClearFilter}
-              onClick={handleClearFilter}
-            >
-              <FontAwesomeIcon icon={faXmark} />
-              Xóa lọc
-            </button>
-          )}tài khoản "${acc.tenTaiKhoan}" (${acc.tenDangNhap})?`,
+        message: `Bạn có chắc chắn muốn xóa tài khoản "${acc.tenTaiKhoan}" (${acc.tenDangNhap})?`,
         confirmText: "Xóa",
         cancelText: "Hủy",
         type: "danger",
