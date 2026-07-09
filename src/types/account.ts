@@ -127,3 +127,22 @@ export interface CreateRoleResponse {
   message: string;
   Result: Role;
 }
+
+export interface UpdateRoleRequest {
+  tenVaiTro: string;
+  tenChucnang: string[];
+}
+
+export interface UpdateRoleResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  Result: Role;
+}
+
+export interface DeleteRoleResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  Result: string;
+}

@@ -436,3 +436,50 @@
   accent-color: var(--primary-color);  
   cursor: pointer;  
 }
+
+.colActions {  
+  width: 120px;  
+  text-align: right;  
+}  
+  
+.rowActions {  
+  display: flex;  
+  justify-content: flex-end;  
+  gap: 6px;  
+}  
+  
+.btnEdit,  
+.btnDelete {  
+  width: 32px;  
+  height: 32px;  
+  border-radius: 8px;  
+  border: 1px solid var(--login-border);  
+  background: transparent;  
+  color: var(--login-text-muted);  
+  font-size: 14px;  
+  cursor: pointer;  
+  display: inline-flex;  
+  align-items: center;  
+  justify-content: center;  
+  transition:  
+    background 0.12s,  
+    color 0.12s,  
+    border-color 0.12s;  
+}  
+  
+.btnEdit:hover {  
+  background: var(--primary-a10);  
+  color: var(--primary-color);  
+  border-color: var(--primary-color);  
+}  
+  
+.btnDelete:hover:not(:disabled) {  
+  background: var(--btn-refuse-bg);  
+  color: var(--btn-refuse-fg);  
+  border-color: var(--btn-refuse-border);  
+}  
+  
+.btnDelete:disabled {  
+  opacity: 0.5;  
+  cursor: not-allowed;  
+}

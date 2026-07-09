@@ -1,13 +1,21 @@
 import { useState, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faXmark, faPlus } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCheck,
+  faXmark,
+  faPlus,
+  faPenToSquare,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons";
 import styles from "./RoleManagement.module.css";
 import { roleService } from "../../services/role/roleService";
-import type { Role } from "../../types/account";
+import type { Role, UpdateRoleRequest } from "../../types/account";
 import { useToast } from "../../context/useToast";
 import SearchBar from "../../components/ui/SearchBar/SearchBar";
 import Pagination from "../../components/ui/Pagination/Pagination";
+import ConfirmDialog from "../../components/ui/ConfirmDialog/ConfirmDialog";
+import { useConfirmDialog } from "../../components/ui/ConfirmDialog/useConfirmDialog";
 import { CHUC_NANG_OPTIONS, getChucNangLabel } from "../../types/navigation";
 
 export default function RoleManagement() {
@@ -22,6 +30,11 @@ export default function RoleManagement() {
   const [saving, setSaving] = useState(false);
   const [tenVaiTro, setTenVaiTro] = useState("");
   const [chucNangList, setChucNangList] = useState<string[]>([]);
+
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const { confirm, isOpen, options, onConfirm, onCancel } = useConfirmDialog();
 
   useEffect(() => {
     const fetchRoles = async () => {
@@ -51,9 +64,22 @@ export default function RoleManagement() {
   );
 
   const openCreate = () => {
+    setEditingId(null);
     setTenVaiTro("");
     setChucNangList([]);
     setCreating(true);
+  };
+
+  const openEdit = (r: Role) => {
+    setEditingId(r.idVaiTro);
+    setTenVaiTro(r.tenVaiTro ?? "");
+    setChucNangList(r.tenChucnang ?? []);
+    setCreating(true);
+  };
+
+  const closeModal = () => {
+    setCreating(false);
+    setEditingId(null);
   };
 
   const toggleChucNang = (value: string) => {
@@ -62,28 +88,72 @@ export default function RoleManagement() {
     );
   };
 
-  const handleCreate = async () => {
+  const handleSave = async () => {
     if (!tenVaiTro.trim()) {
       showError("Vui lòng nhập tên vai trò");
       return;
     }
     setSaving(true);
     try {
-      const res = await roleService.createRole({
-        tenVaiTro: tenVaiTro.trim(),
-        tenChucnang: chucNangList,
-      });
-      if (!res.success) {
-        showError(res.message || "Không thể tạo vai trò");
-        return;
+      if (editingId) {
+        const payload: UpdateRoleRequest = {
+          tenVaiTro: tenVaiTro.trim(),
+          tenChucnang: chucNangList,
+        };
+        const res = await roleService.updateRole(editingId, payload);
+        if (!res.success) {
+          showError(res.message || "Không thể cập nhật vai trò");
+          return;
+        }
+        setRoles((prev) =>
+          prev.map((r) => (r.idVaiTro === editingId ? res.Result : r)),
+        );
+        showSuccess("Đã cập nhật vai trò");
+      } else {
+        const res = await roleService.createRole({
+          tenVaiTro: tenVaiTro.trim(),
+          tenChucnang: chucNangList,
+        });
+        if (!res.success) {
+          showError(res.message || "Không thể tạo vai trò");
+          return;
+        }
+        setRoles((prev) => [...prev, res.Result]);
+        showSuccess("Đã tạo vai trò");
       }
-      setRoles((prev) => [...prev, res.Result]);
-      showSuccess("Đã tạo vai trò");
-      setCreating(false);
+      closeModal();
     } catch {
-      showError("Không thể tạo vai trò");
+      showError(
+        editingId ? "Không thể cập nhật vai trò" : "Không thể tạo vai trò",
+      );
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDelete = async (r: Role) => {
+    if (!r.idVaiTro) return;
+    const confirmed = await confirm({
+      title: "Xác nhận xóa",
+      message: `Bạn có chắc chắn muốn xóa vai trò "${r.tenVaiTro}"?`,
+      confirmText: "Xóa",
+      cancelText: "Hủy",
+      type: "danger",
+    });
+    if (!confirmed) return;
+    setDeletingId(r.idVaiTro);
+    try {
+      const res = await roleService.deleteRole(r.idVaiTro);
+      if (!res.success) {
+        showError(res.message || "Không thể xóa vai trò");
+        return;
+      }
+      setRoles((prev) => prev.filter((x) => x.idVaiTro !== r.idVaiTro));
+      showSuccess("Đã xóa vai trò");
+    } catch {
+      showError("Không thể xóa vai trò");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -121,18 +191,19 @@ export default function RoleManagement() {
               <th className={styles.colIndex}>STT</th>
               <th>Tên vai trò</th>
               <th>Chức năng</th>
+              <th className={styles.colActions}>Thao tác</th>
             </tr>
           </thead>
           <tbody key={safePage} className={styles.tbodyAnimate}>
             {loading ? (
               <tr>
-                <td colSpan={3} className={styles.empty}>
+                <td colSpan={4} className={styles.empty}>
                   Đang tải…
                 </td>
               </tr>
             ) : paginated.length === 0 ? (
               <tr>
-                <td colSpan={3} className={styles.empty}>
+                <td colSpan={4} className={styles.empty}>
                   {search ? "Không tìm thấy vai trò" : "Chưa có vai trò"}
                 </td>
               </tr>
@@ -152,6 +223,27 @@ export default function RoleManagement() {
                         ))
                       : "—"}
                   </td>
+                  <td className={styles.colActions}>
+                    <div className={styles.rowActions}>
+                      <button
+                        type="button"
+                        className={styles.btnEdit}
+                        onClick={() => openEdit(r)}
+                        title="Sửa"
+                      >
+                        <FontAwesomeIcon icon={faPenToSquare} />
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.btnDelete}
+                        onClick={() => void handleDelete(r)}
+                        disabled={deletingId === r.idVaiTro}
+                        title="Xóa"
+                      >
+                        <FontAwesomeIcon icon={faTrash} />
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))
             )}
@@ -169,14 +261,14 @@ export default function RoleManagement() {
 
       {creating &&
         createPortal(
-          <div className={styles.overlay} onClick={() => setCreating(false)}>
+          <div className={styles.overlay} onClick={closeModal}>
             <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
               <div className={styles.modalHeader}>
-                <h3>Thêm vai trò</h3>
+                <h3>{editingId ? "Sửa vai trò" : "Thêm vai trò"}</h3>
                 <button
                   type="button"
                   className={styles.btnCloseModal}
-                  onClick={() => setCreating(false)}
+                  onClick={closeModal}
                 >
                   <FontAwesomeIcon icon={faXmark} />
                 </button>
@@ -217,7 +309,7 @@ export default function RoleManagement() {
                 <button
                   type="button"
                   className={styles.btnCancelEdit}
-                  onClick={() => setCreating(false)}
+                  onClick={closeModal}
                   disabled={saving}
                 >
                   Hủy
@@ -225,17 +317,32 @@ export default function RoleManagement() {
                 <button
                   type="button"
                   className={styles.btnSave}
-                  onClick={() => void handleCreate()}
+                  onClick={() => void handleSave()}
                   disabled={saving}
                 >
                   <FontAwesomeIcon icon={faCheck} />
-                  {saving ? "Đang lưu..." : "Tạo vai trò"}
+                  {saving
+                    ? "Đang lưu..."
+                    : editingId
+                      ? "Lưu thay đổi"
+                      : "Tạo vai trò"}
                 </button>
               </div>
             </div>
           </div>,
           document.body,
         )}
+
+      <ConfirmDialog
+        isOpen={isOpen}
+        title={options.title}
+        message={options.message}
+        confirmText={options.confirmText}
+        cancelText={options.cancelText}
+        type={options.type}
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+      />
     </div>
   );
 }

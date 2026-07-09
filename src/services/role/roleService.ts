@@ -5,6 +5,9 @@ import type {
   RoleByIdResponse,
   CreateRoleRequest,
   CreateRoleResponse,
+  UpdateRoleRequest,
+  UpdateRoleResponse,
+  DeleteRoleResponse,
 } from "../../types/account";
 
 export const roleService = {
@@ -20,6 +23,19 @@ export const roleService = {
 
   createRole: async (data: CreateRoleRequest): Promise<CreateRoleResponse> => {
     const response = await api.post<CreateRoleResponse>("/vaitro", data);
+    return response.data;
+  },
+
+  updateRole: async (
+    id: string,
+    data: UpdateRoleRequest,
+  ): Promise<UpdateRoleResponse> => {
+    const response = await api.put<UpdateRoleResponse>(`/vaitro/${id}`, data);
+    return response.data;
+  },
+
+  deleteRole: async (id: string): Promise<DeleteRoleResponse> => {
+    const response = await api.delete<DeleteRoleResponse>(`/vaitro/${id}`);
     return response.data;
   },
 };
