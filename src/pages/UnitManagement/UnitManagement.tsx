@@ -698,6 +698,7 @@ export default function UnitManagement() {
                       value={editForm.donViCha}
                       onChange={(val) => handleEditFieldChange("donViCha", val)}
                       placeholder="-- Không có (đơn vị gốc) --"
+                      disabled
                     />
                   </div>
                   <div className={styles.editFormGroup}>

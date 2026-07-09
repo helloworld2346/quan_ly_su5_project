@@ -15,6 +15,7 @@ export interface CustomSelectProps {
   onChange: (value: string) => void;
   variant?: "default" | "table";
   placeholder?: string;
+  disabled?: boolean;
 }
 
 interface DropdownPos {
@@ -35,6 +36,7 @@ export default function CustomSelect({
   onChange,
   variant = "default",
   placeholder = "Chọn...",
+  disabled = false,
 }: CustomSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
@@ -223,19 +225,26 @@ export default function CustomSelect({
     >
       <button
         type="button"
-        className={`${styles.trigger} ${
-          isOpen ? styles.triggerOpen : ""
-        }`}
-        onClick={() => (isOpen ? closeDropdown() : openDropdown())}
-        onKeyDown={handleKeyDown}
+        disabled={disabled}
+        className={`${styles.trigger} ${isOpen ? styles.triggerOpen : ""}`}
+        onClick={() => {
+          if (disabled) return;
+          if (isOpen) {
+            closeDropdown();
+          } else {
+            openDropdown();
+          }
+        }}
+        onKeyDown={(e) => {
+          if (disabled) return;
+          handleKeyDown(e);
+        }}
       >
         <span className={styles.triggerLabel}>{selectedLabel}</span>
 
         <FontAwesomeIcon
           icon={faChevronDown}
-          className={`${styles.chevron} ${
-            isOpen ? styles.chevronOpen : ""
-          }`}
+          className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ""}`}
           size="xs"
         />
       </button>
