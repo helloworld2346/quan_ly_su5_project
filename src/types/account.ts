@@ -28,6 +28,7 @@ export interface Account {
   vaiTro: Role;
   donVi?: DonVi;
   matKhau: string;
+  khoa: boolean;
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
@@ -80,6 +81,10 @@ export interface UpdateDonViRequest {
   quanSoHsqBs: number;
   quanSoSiQuan: number;
   quanSoQncn: number;
+  tenDonvi: string;
+  kyhieuDonvi: string;
+  capDonVi: string;
+  donViCha: string | null;
   createdAt: string;
   updatedAt: string;
   isDeleted: boolean;
@@ -87,6 +92,25 @@ export interface UpdateDonViRequest {
 }
 
 export interface UpdateDonViResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  Result: DonVi;
+}
+
+export interface CreateDonViRequest {
+  tenDonvi: string;
+  kyhieuDonvi: string;
+  quanSoTong: number;
+  quanSoHsqBs: number;
+  quanSoSiQuan: number;
+  quanSoQncn: number;
+  donViCha: string;
+  capDonVi: string;
+  donViCon: string[];
+}
+
+export interface CreateDonViResponse {
   success: boolean;
   code: number;
   message: string;

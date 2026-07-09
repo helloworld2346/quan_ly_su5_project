@@ -18,11 +18,6 @@ import {
   type PoliticalDashboardUnit,
 } from "../../services/politicalDashboard/politicalDashboardService";  
 
-import { useAuth } from "../../context/useAuth";
-import { politicalWorkService } from "../../services/politicalWork/politicalWorkService";
-import { mapItemToRow } from "../PoliticalWorkReport/utils/politicalWorkUtils";
-import type { PoliticalWorkItem } from "../../types/politicalWork";
-
 type UnitType = "department" | "regiment" | "battalion" | "company";
 type FilterKey = "all" | UnitType;
 
@@ -52,18 +47,6 @@ export default function PoliticalDashboard() {
 
     const dateInputRef = useRef<HTMLInputElement>(null);
 
-    const { account } = useAuth();
-    const maDonViCurrent = account?.donVi?.maDonVi;
-
-    const [workRows, setWorkRows] = useState<
-        {
-            maDonVi: string;
-            tenDonViText: string;
-            kienNghi: string;
-            noiDungDotXuat: string;
-        }[]
-    >([]);
-
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -72,81 +55,57 @@ export default function PoliticalDashboard() {
 
     const isToday = selectedDay.getTime() === today.getTime();
 
-  useEffect(() => {
-    let ignore = false;
-    let intervalId: ReturnType<typeof setInterval> | null = null;
-    async function fetchDashboard(isSilent = false) {
-      
+    useEffect(() => {
+      let ignore = false;
+      let intervalId: ReturnType<typeof setInterval> | null = null;
+
+      async function fetchDashboard(isSilent = false) {
         if (document.hidden) return;
+
         try {
-            
-            if (!isSilent) {
-                setLoading(true);
-            }
-            
-            const dateParam = toDateParam(selectedDate);
+          if (!isSilent) {
+            setLoading(true);
+          }
 
-            const dashboardPromise =
-                politicalDashboardService.getThongKeCtDangCt(dateParam);
+          const dateParam = toDateParam(selectedDate);
+          const dashboard = await politicalDashboardService.getThongKeCtDangCt(
+            dateParam,
+          );
 
-            const workPromise = maDonViCurrent
-                ? politicalWorkService.getByDonViCha(maDonViCurrent, dateParam)
-                : Promise.resolve(null);
+          if (ignore) return;
 
-            const [dashboard, workResponse] = await Promise.all([
-                dashboardPromise,
-                workPromise,
-            ]);
-
-            if (ignore) return;
-
-            setDashboardData(dashboard);
-
-            if (workResponse?.success && workResponse.Result) {
-                setWorkRows(
-                  workResponse.Result.map((item: PoliticalWorkItem) => {
-                    const row = mapItemToRow(item);
-                    return {
-                      maDonVi: String(row.donVi || item.donVi?.maDonVi || "").trim(),
-                      tenDonViText: String(row.tenDonVi || item.donVi?.tenDonvi || "").trim(),
-                      kienNghi: row.kienNghi || "",
-                      noiDungDotXuat: row.noiDungDotXuat || "",
-                    };
-                  }),
-                );
-            } else {
-                setWorkRows([]);
-            }
+          setDashboardData(dashboard);
         } catch (error) {
-            console.error("Không thể tải thống kê CTĐ, CTCT", error);
-            if (!ignore) {
-                setDashboardData(null);
-                setWorkRows([]);
-            }
+          console.error("Không thể tải thống kê CTĐ, CTCT", error);
+
+          if (!ignore) {
+            setDashboardData(null);
+          }
         } finally {
-            if (!ignore) {
-                setLoading(false);
-            }
+          if (!ignore) {
+            setLoading(false);
+          }
         }
-    }
+      }
 
-    fetchDashboard(false);
-    const todayStr = toDateParam(new Date());
-    const selectedStr = toDateParam(selectedDate);
+      fetchDashboard(false);
 
-    if (todayStr === selectedStr) {
+      const todayStr = toDateParam(new Date());
+      const selectedStr = toDateParam(selectedDate);
+
+      if (todayStr === selectedStr) {
         intervalId = setInterval(() => {
-            fetchDashboard(true); 
+          fetchDashboard(true);
         }, 60000);
-    }
+      }
 
-    return () => {
+      return () => {
         ignore = true;
         if (intervalId) {
-            clearInterval(intervalId);
+          clearInterval(intervalId);
         }
-    };
-}, [selectedDate, maDonViCurrent]);
+      };
+    }, [selectedDate]);
 
     const overview = dashboardData ?? {
         tongDonVi: 0,
@@ -155,67 +114,22 @@ export default function PoliticalDashboard() {
         danhSachDonVi: [],
     };
 
-    const unitReports = useMemo(
-        () => {
-            return overview.danhSachDonVi.map(
-              (unit: PoliticalDashboardUnit) => {
-                const unitIdStr = String(unit.idDonVi || "").trim();
-                const unitNameStr = String(unit.tenDonVi || "").trim();
+    const unitReports = useMemo(() => {
+      return overview.danhSachDonVi.map((unit: PoliticalDashboardUnit) => {
+        const proposalsCount = Number(unit.soKienNghi) || 0;
+        const incidentsCount = Number(unit.soDotXuat) || 0;
 
-                const matchedWorkRows = workRows.filter((row) => {
-                  const rowMa = String(row.maDonVi || "").trim();
-                  const rowTen = String(row.tenDonViText || "").trim();
-                  const matchId = rowMa === unitIdStr;
-                  const matchSpecialSD5 =
-                    (unitIdStr === "GS003" && rowMa === "SD5") ||
-                    (unitIdStr === "SD5" && rowMa === "GS003");
-                  const matchName =
-                    unitNameStr &&
-                    rowTen &&
-                    (rowTen.includes(unitNameStr) ||
-                      unitNameStr.includes(rowTen));
-
-                  return matchId || matchSpecialSD5 || matchName;
-                });
-
-                const hasContent = (text: string) => {
-                  if (!text) return false;
-                  const cleanText = text.trim().toLowerCase();
-                  return (
-                    cleanText.length > 0 &&
-                    cleanText !== "không" &&
-                    cleanText !== "không có" &&
-                    cleanText !== "0"
-                  );
-                };
-
-                const proposalsCount = matchedWorkRows.length
-                  ? matchedWorkRows.filter((row) => hasContent(row.kienNghi))
-                      .length
-                  : Number(unit.soKienNghi) || 0;
-
-                const incidentsCount = matchedWorkRows.length
-                  ? matchedWorkRows.filter((row) =>
-                      hasContent(row.noiDungDotXuat),
-                    ).length
-                  : Number(unit.soDotXuat) || 0;
-
-                return {
-                  id: unit.idDonVi,
-                  name: unit.tenDonVi || "Đơn vị trực thuộc",
-                  status: unit.mucDo || "Tốt",
-                  proposals: proposalsCount,
-                  incidents: incidentsCount,
-                  totalIssues: proposalsCount + incidentsCount,
-
-                  updateAt: (unit as any).updateAt || (unit as any).updatedAt || "",
-                };
-              },
-            );
-        },
-        [overview.danhSachDonVi, workRows],
-    );
-
+        return {
+          id: unit.idDonVi,
+          name: unit.tenDonVi || "Đơn vị trực thuộc",
+          status: unit.mucDo || "Tốt",
+          proposals: proposalsCount,
+          incidents: incidentsCount,
+          totalIssues: proposalsCount + incidentsCount,
+          updateAt: unit.updateAt || unit.updatedAt || "",
+        };
+      });
+    }, [overview.danhSachDonVi]);
 
     const visibleUnits = useMemo(() => {
         if (filter === "all") return unitReports;
@@ -391,7 +305,6 @@ export default function PoliticalDashboard() {
                     const pGreen = totalIssues ? Math.round((unit.proposals / totalIssues) * 100) : 0;
 
                     let centerValue = totalIssues;
-                    
                     let centerLabel = "Báo cáo"; 
 
                     if (activeKey === "proposals") {

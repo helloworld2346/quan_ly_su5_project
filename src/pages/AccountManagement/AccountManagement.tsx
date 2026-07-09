@@ -7,6 +7,8 @@ import {
   faCheck,
   faXmark,
   faPlus,
+  faLock,
+  faLockOpen,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./AccountManagement.module.css";
 import { accountService } from "../../services/account/accountService";
@@ -94,7 +96,6 @@ export default function AccountManagement() {
   const showSkeleton = useMinLoading(loadingList);
 
   const [search, setSearch] = useState("");
-  const [filterDonVi, setFilterDonVi] = useState("");
   const [filterVaiTro, setFilterVaiTro] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -116,6 +117,7 @@ export default function AccountManagement() {
   const [resetting, setResetting] = useState(false);
 
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [lockingId, setLockingId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -142,6 +144,14 @@ export default function AccountManagement() {
     [donViList],
   );
 
+  const hasActiveFilter = search.trim() !== "" || filterVaiTro !== "";
+
+  const handleClearFilter = useCallback(() => {
+    setSearch("");
+    setFilterVaiTro("");
+    setCurrentPage(1);
+  }, []);
+
   const roleOptions = useMemo(
     () =>
       roleList.map((r) => ({
@@ -149,11 +159,6 @@ export default function AccountManagement() {
         label: r.tenVaiTro ?? "",
       })),
     [roleList],
-  );
-
-  const filterDonViOptions = useMemo(
-    () => [{ value: "", label: "Tất cả đơn vị" }, ...donViOptions],
-    [donViOptions],
   );
 
   const filterVaiTroOptions = useMemo(
@@ -170,11 +175,10 @@ export default function AccountManagement() {
           a.tenDangNhap.toLowerCase().includes(q);
         if (!hit) return false;
       }
-      if (filterDonVi && a.donVi?.maDonVi !== filterDonVi) return false;
       if (filterVaiTro && a.vaiTro?.idVaiTro !== filterVaiTro) return false;
       return true;
     });
-  }, [accounts, search, filterDonVi, filterVaiTro]);
+  }, [accounts, search, filterVaiTro]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const safePage = Math.min(currentPage, totalPages);
@@ -383,7 +387,16 @@ export default function AccountManagement() {
     async (acc: Account) => {
       const confirmed = await confirm({
         title: "Xác nhận xóa",
-        message: `Bạn có chắc chắn muốn xóa tài khoản "${acc.tenTaiKhoan}" (${acc.tenDangNhap})?`,
+        message: `Bạn có chắc chắn muốn {hasActiveFilter && (
+            <button
+              type="button"
+              className={styles.btnClearFilter}
+              onClick={handleClearFilter}
+            >
+              <FontAwesomeIcon icon={faXmark} />
+              Xóa lọc
+            </button>
+          )}tài khoản "${acc.tenTaiKhoan}" (${acc.tenDangNhap})?`,
         confirmText: "Xóa",
         cancelText: "Hủy",
         type: "danger",
@@ -401,6 +414,41 @@ export default function AccountManagement() {
         showError("Không thể xóa tài khoản");
       } finally {
         setDeletingId(null);
+      }
+    },
+    [confirm, showSuccess, showError],
+  );
+
+  const handleToggleLock = useCallback(
+    async (acc: Account) => {
+      const willLock = !acc.khoa;
+      const confirmed = await confirm({
+        title: willLock ? "Xác nhận khóa" : "Xác nhận mở khóa",
+        message: willLock
+          ? `Khóa tài khoản "${acc.tenTaiKhoan}" (${acc.tenDangNhap})? Người dùng sẽ không đăng nhập được.`
+          : `Mở khóa tài khoản "${acc.tenTaiKhoan}" (${acc.tenDangNhap})?`,
+        confirmText: willLock ? "Khóa" : "Mở khóa",
+        cancelText: "Hủy",
+        type: willLock ? "danger" : "info",
+      });
+      if (!confirmed) return;
+
+      setLockingId(acc.idTaiKhoan);
+      try {
+        const res = willLock
+          ? await accountService.lockAccount(acc.idTaiKhoan)
+          : await accountService.unlockAccount(acc.idTaiKhoan);
+        if (!res.success) throw new Error(res.message);
+        setAccounts((prev) =>
+          prev.map((a) => (a.idTaiKhoan === acc.idTaiKhoan ? res.Result : a)),
+        );
+        showSuccess(willLock ? "Đã khóa tài khoản" : "Đã mở khóa tài khoản");
+      } catch {
+        showError(
+          willLock ? "Không thể khóa tài khoản" : "Không thể mở khóa tài khoản",
+        );
+      } finally {
+        setLockingId(null);
       }
     },
     [confirm, showSuccess, showError],
@@ -430,6 +478,13 @@ export default function AccountManagement() {
           </span>
         </td>
         <td className={styles.muted}>{acc.donVi?.tenDonvi ?? "—"}</td>
+        <td>
+          <span
+            className={acc.khoa ? styles.statusLocked : styles.statusActive}
+          >
+            {acc.khoa ? "Đã khóa" : "Hoạt động"}
+          </span>
+        </td>
         <td className={styles.colActions}>
           <div className={styles.rowActions}>
             <button
@@ -447,6 +502,15 @@ export default function AccountManagement() {
               title="Reset mật khẩu"
             >
               <FontAwesomeIcon icon={faKey} />
+            </button>
+            <button
+              type="button"
+              className={acc.khoa ? styles.btnUnlock : styles.btnLock}
+              onClick={() => void handleToggleLock(acc)}
+              disabled={lockingId === acc.idTaiKhoan}
+              title={acc.khoa ? "Mở khóa" : "Khóa"}
+            >
+              <FontAwesomeIcon icon={acc.khoa ? faLockOpen : faLock} />
             </button>
             <button
               type="button"
@@ -517,15 +581,6 @@ export default function AccountManagement() {
         />
         <div className={styles.filterGroup}>
           <CustomSelect
-            options={filterDonViOptions}
-            value={filterDonVi}
-            onChange={(v) => {
-              setFilterDonVi(v);
-              setCurrentPage(1);
-            }}
-            placeholder="Tất cả đơn vị"
-          />
-          <CustomSelect
             options={filterVaiTroOptions}
             value={filterVaiTro}
             onChange={(v) => {
@@ -534,6 +589,16 @@ export default function AccountManagement() {
             }}
             placeholder="Tất cả vai trò"
           />
+          {hasActiveFilter && (
+            <button
+              type="button"
+              className={styles.btnClearFilter}
+              onClick={handleClearFilter}
+            >
+              <FontAwesomeIcon icon={faXmark} />
+              Xóa lọc
+            </button>
+          )}
         </div>
       </div>
 
@@ -547,16 +612,18 @@ export default function AccountManagement() {
                 <th>Tên đăng nhập</th>
                 <th>Vai trò</th>
                 <th>Đơn vị</th>
+                <th>Trạng thái</th>
                 <th className={styles.colActions}>Thao tác</th>
               </tr>
             </thead>
             <tbody key={safePage} className={styles.tbodyAnimate}>
+              {" "}
               {showSkeleton ? (
                 renderSkeletonRows(pageSize)
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className={styles.emptyRow}>
-                    {search || filterDonVi || filterVaiTro
+                  <td colSpan={7} className={styles.emptyRow}>
+                    {search || filterVaiTro
                       ? "Không tìm thấy tài khoản"
                       : "Chưa có tài khoản"}
                   </td>

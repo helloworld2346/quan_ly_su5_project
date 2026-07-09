@@ -11,6 +11,7 @@ export type NavItemId =
   | "duty-shifts"
   | "duty-create"
   | "account-management"
+  | "unit-management"
   | "settings";
 
 export type NavItem = {
@@ -47,6 +48,10 @@ const CreateDutyShift = lazy(
 
 const AccountManagement = lazy(
   () => import("../pages/AccountManagement/AccountManagement"),
+);
+
+const UnitManagement = lazy(
+  () => import("../pages/UnitManagement/UnitManagement"),
 );
 
 const Settings = lazy(() => import("../pages/Settings/Settings"));
@@ -159,6 +164,15 @@ export const ADMIN_NAV_GROUP = {
       component: AccountManagement,
       allowedRoles: ["Quản Trị Viên"],
     },
+    {
+      id: "unit-management" as const,
+      label: "Quản lý đơn vị",
+      path: "/unit-management",
+      loadingTitle: "Đang tải quản lý đơn vị",
+      loadingSubtitle: "Đang tải dữ liệu…",
+      component: UnitManagement,
+      allowedRoles: ["Quản Trị Viên"],
+    },
   ],
 };
 
@@ -188,6 +202,7 @@ export const NAV_PAGE_TITLES: Record<NavItemId, string> = {
   "duty-shifts": "Quản lý ca trực",
   "duty-create": "Tạo ca trực",
   "account-management": "Quản lý tài khoản",
+  "unit-management": "Quản lý đơn vị",
   settings: "Cài đặt",
 };
 
@@ -305,11 +320,11 @@ export function getNavItemsByRole(
   const isExecutiveItem = (item: NavItem) =>
     item.id === "executive" || item.id === "executive-political-work";
 
-  if (normalizedRole === "Quản Trị Viên") {
+  if (normalizedRole === "Quáº£n Trá»‹ ViÃªn") {
     return ALL_NAV_ITEMS;
   }
 
-  if (normalizedRole === "Trực ban tác chiến") {
+  if (normalizedRole === "Trá»±c ban tÃ¡c chiáº¿n") {
     return ALL_NAV_ITEMS.filter((item) => {
       if (isExecutiveItem(item)) return capDonVi === "SU_DOAN";
       return isCoreNav(item) || (item.id.startsWith("duty-") && canAccessDuty);
@@ -317,8 +332,8 @@ export function getNavItemsByRole(
   }
 
   if (
-    normalizedRole === "Trực chỉ huy" ||
-    normalizedRole === "Trực ban nội vụ"
+    normalizedRole === "Trá»±c chá»‰ huy" ||
+    normalizedRole === "Trá»±c ban ná»™i vá»¥"
   ) {
     return ALL_NAV_ITEMS.filter(
       (item) => item.id.startsWith("report-") || item.id === "settings",

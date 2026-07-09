@@ -1,8 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { normalizeRoleName } from "../utils/reportUtils";
-import { canAccessDutyGroup } from "../types/navigation";  
-
+import { canAccessDutyGroup } from "../types/navigation"; 
 
 type Props = {
   children: React.ReactNode;
@@ -23,6 +22,7 @@ export default function RequireRole({ children, allowedRoles }: Props) {
 
   const userRole = account.vaiTro?.tenVaiTro;
   const normalizedRole = normalizeRoleName(account?.vaiTro?.tenVaiTro?? undefined);
+
   if (
     normalizedRole === "Trực ban nội vụ" &&
     donVi !== null &&
@@ -55,7 +55,6 @@ export default function RequireRole({ children, allowedRoles }: Props) {
       />
     );
   }
-
 
   return <>{children}</>;
 }

@@ -46,4 +46,14 @@ export const accountService = {
   resetPassword: async (id: string, matKhauMoi: string): Promise<void> => {
     await api.put(`/account/${id}/reset-password`, { matKhauMoi });
   },
+  
+  lockAccount: async (id: string): Promise<AccountResponse> => {  
+    const response = await api.put<AccountResponse>(`/account/${id}/lock`);  
+    return response.data;  
+  },  
+  
+  unlockAccount: async (id: string): Promise<AccountResponse> => {  
+    const response = await api.put<AccountResponse>(`/account/${id}/unlock`);  
+    return response.data;  
+  },  
 };

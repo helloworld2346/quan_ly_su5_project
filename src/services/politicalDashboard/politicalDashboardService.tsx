@@ -7,6 +7,8 @@ export interface PoliticalDashboardUnit {
   soDotXuat: number;
   tongVanDe: number;
   mucDo: string;
+  updateAt?: string;
+  updatedAt?: string;
 }
 
 export interface PoliticalDashboardResult {
