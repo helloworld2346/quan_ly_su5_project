@@ -59,9 +59,13 @@ export default function Sidebar({
 
   const capDonVi = donVi?.capDonVi ?? account?.donVi?.capDonVi ?? null;
 
-  const allowedNavItems = getNavItemsByRole(userRole, capDonVi).filter(
-    (item) => !hiddenSidebarIds.includes(item.id),
-  );
+  const tenChucnang = account?.vaiTro?.tenChucnang ?? null;
+
+  const allowedNavItems = getNavItemsByRole(
+    userRole,
+    capDonVi,
+    tenChucnang,
+  ).filter((item) => !hiddenSidebarIds.includes(item.id));
 
   const executiveActive = EXECUTIVE_NAV_GROUP.items.some(
     (item) =>

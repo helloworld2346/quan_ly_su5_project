@@ -335,11 +335,23 @@ export function canAccessDutyGroup(
 export function getNavItemsByRole(
   userRole: string | null,
   capDonVi: string | null = null,
+  tenChucnang: string[] | null = null,
 ): NavItem[] {
   if (!userRole) return [];
 
   const normalizedRole = normalizeRoleName(userRole);
   const canAccessDuty = canAccessDutyGroup(userRole, capDonVi);
+
+  if (normalizedRole === "Quản Trị Viên") {
+    return ALL_NAV_ITEMS;
+  }
+
+  if (tenChucnang && tenChucnang.length > 0) {
+    return ALL_NAV_ITEMS.filter((item) => {
+      if (item.id === "settings") return true;
+      return tenChucnang.includes(item.id);
+    });
+  }
 
   const isCoreNav = (item: NavItem) =>
     item.id === "executive" ||
@@ -349,10 +361,6 @@ export function getNavItemsByRole(
 
   const isExecutiveItem = (item: NavItem) =>
     item.id === "executive" || item.id === "executive-political-work";
-
-  if (normalizedRole === "Quản Trị Viên") {
-    return ALL_NAV_ITEMS;
-  }
 
   if (normalizedRole === "Trực ban tác chiến") {
     return ALL_NAV_ITEMS.filter((item) => {

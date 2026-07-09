@@ -1,8 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { normalizeRoleName } from "../utils/reportUtils";
-import { canAccessDutyGroup } from "../types/navigation";  
-
+import { canAccessDutyGroup, getIdByPath } from "../types/navigation";
 
 type Props = {
   children: React.ReactNode;
@@ -22,7 +21,11 @@ export default function RequireRole({ children, allowedRoles }: Props) {
   }
 
   const userRole = account.vaiTro?.tenVaiTro;
-  const normalizedRole = normalizeRoleName(account?.vaiTro?.tenVaiTro?? undefined);
+  const normalizedRole = normalizeRoleName(
+    account?.vaiTro?.tenVaiTro ?? undefined,
+  );
+  const tenChucnang = account.vaiTro?.tenChucnang ?? [];
+
   if (
     normalizedRole === "Trực ban nội vụ" &&
     donVi !== null &&
@@ -30,8 +33,32 @@ export default function RequireRole({ children, allowedRoles }: Props) {
     location.pathname !== "/settings"
   ) {
     return <Navigate to="/settings" replace />;
-  }  
-  
+  }
+
+  const capDonVi = donVi?.capDonVi ?? account?.donVi?.capDonVi ?? null;
+  const isDutyRoute = location.pathname.startsWith("/duty/");
+
+  if (normalizedRole === "Quản Trị Viên") {
+    if (isDutyRoute && !canAccessDutyGroup(userRole, capDonVi)) {
+      return <Navigate to="/dashboard" replace />;
+    }
+    return <>{children}</>;
+  }
+
+  if (tenChucnang.length > 0) {
+    const currentId = getIdByPath(location.pathname);
+
+    if (!tenChucnang.includes(currentId)) {
+      return <Navigate to="/settings" replace />;
+    }
+
+    if (isDutyRoute && !canAccessDutyGroup(userRole, capDonVi)) {
+      return <Navigate to="/settings" replace />;
+    }
+
+    return <>{children}</>;
+  }
+
   if (!userRole || !allowedRoles.includes(normalizedRole)) {
     if (
       normalizedRole === "Trực ban tác chiến" ||
@@ -41,9 +68,6 @@ export default function RequireRole({ children, allowedRoles }: Props) {
     }
     return <Navigate to="/settings" replace />;
   }
-
-  const capDonVi = donVi?.capDonVi ?? account?.donVi?.capDonVi ?? null;
-  const isDutyRoute = location.pathname.startsWith("/duty/");
 
   if (isDutyRoute && !canAccessDutyGroup(userRole, capDonVi)) {
     return (
@@ -55,7 +79,6 @@ export default function RequireRole({ children, allowedRoles }: Props) {
       />
     );
   }
-
 
   return <>{children}</>;
 }
