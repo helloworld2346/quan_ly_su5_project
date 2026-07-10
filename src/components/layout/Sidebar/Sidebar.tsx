@@ -126,6 +126,7 @@ export default function Sidebar({
     setTooltip(null);
   };
 
+<<<<<<< HEAD
  const handleNavigate = (id: NavItemId) => {
   const requiresQuota =
     id !== SETTINGS_NAV.id &&
@@ -139,6 +140,20 @@ export default function Sidebar({
 
   onNavigate(id);
 };
+=======
+  const QUOTA_EXEMPT_IDS: NavItemId[] = [
+    SETTINGS_NAV.id,
+    "report-political-work",
+  ];
+
+  const handleNavigate = (id: NavItemId) => {
+    if (!isPoliticalOffice && !QUOTA_EXEMPT_IDS.includes(id) && !hasQuota) {
+      setShowQuotaDialog(true);
+      return;
+    }
+    onNavigate(id);
+  };
+>>>>>>> f7a33c549f4913869fefc5711633e98c53b72657
 
   const handleQuotaConfirm = () => {
     setShowQuotaDialog(false);

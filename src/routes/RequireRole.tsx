@@ -50,14 +50,16 @@ export default function RequireRole({ children, allowedRoles = [] }: Props) {
     return <>{children}</>;
   }
 
+  const EXEMPT_QUAN_SO_PATHS = ["/settings", "/political-work-report"];
+
   if (
-    normalizedRole === "Trực ban nội vụ" &&
+    normalizedRole !== "Quản Trị Viên" &&
     donVi !== null &&
     donVi.quanSoTong === 0 &&
-    location.pathname !== "/settings"
+    !EXEMPT_QUAN_SO_PATHS.includes(location.pathname)
   ) {
     return <Navigate to="/settings" replace />;
-  }  
+  }
   
   if (!userRole || !allowedRoles.includes(normalizedRole)) {
     if (
