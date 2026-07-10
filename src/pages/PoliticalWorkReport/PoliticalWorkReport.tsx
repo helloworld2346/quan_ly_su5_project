@@ -62,6 +62,32 @@ function StatusBadge({
   );
 }
 
+function buildConsolidatedPoliticalWork(rows: PoliticalWorkRow[]) {
+  const validRows = rows.filter((r) => !r.notSubmitted && isApprovedStatus(r.status));
+
+  return {
+    tinhHinh: validRows
+      .map((r) => `${r.kyhieuDonVi || r.tenDonVi}: ${r.tinhHinh}`)
+      .filter(Boolean)
+      .join("\n"),
+
+    noiDungDotXuat: validRows
+      .filter((r) => r.noiDungDotXuat)
+      .map((r) => `${r.kyhieuDonVi || r.tenDonVi}: ${r.noiDungDotXuat}`)
+      .join("\n"),
+
+    ketQua: validRows
+      .map((r) => `${r.kyhieuDonVi || r.tenDonVi}: ${r.ketQua}`)
+      .filter(Boolean)
+      .join("\n"),
+
+    kienNghi: validRows
+      .filter((r) => r.kienNghi)
+      .map((r) => `${r.kyhieuDonVi || r.tenDonVi}: ${r.kienNghi}`)
+      .join("\n"),
+  };
+}
+
 export default function PoliticalWorkReport() {
   const [query, setQuery] = useState("");
   const [reportDate, setReportDate] = useState(todayIsoDate());
@@ -70,6 +96,8 @@ export default function PoliticalWorkReport() {
   const [detailRow, setDetailRow] = useState<PoliticalWorkRow | null>(null);
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+  const [consolidating, setConsolidating] = useState(false);
+  
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const { account } = useAuth();
@@ -81,7 +109,6 @@ export default function PoliticalWorkReport() {
   const normalizedRole = normalizeRoleName(userRole ?? undefined);
   const isTacChien = normalizedRole === "Trực ban tác chiến";
   const isNoiVu = normalizedRole === "Trực ban nội vụ";
-  const hasChildren = (account?.donVi?.donViCon?.length ?? 0) > 0;
 
   const isParentUnit =
     (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
@@ -96,6 +123,8 @@ export default function PoliticalWorkReport() {
       showError,
       reportDate,
     });
+
+  const hasChildren = childUnits.length > 0;
 
   const showSkeleton = useMinLoading(loading);
 
@@ -159,6 +188,38 @@ export default function PoliticalWorkReport() {
       });
     });
   }, [isParentUnit, childUnits, reportData]);
+
+  const approvedChildRows = useMemo(() => {
+    return childRows.filter((r) => !r.notSubmitted && isApprovedStatus(r.status));
+  }, [childRows]);
+
+  const totalRequiredCount = childUnits.length;
+  const canConsolidate = isParentUnit && !parentReportData && approvedChildRows.length > 0;
+
+  const isPastDate = reportDate < todayIsoDate();
+  const hasOwnReport = Boolean(ownReport && !ownReport.notSubmitted);
+
+  const handleAddReport = () => {
+    if (isPastDate) {
+      showError("Không thể tạo báo cáo cho ngày trong quá khứ!");
+      return;
+    }
+
+    if (hasOwnReport) {
+      showError("Ngày này đã tồn tại báo cáo!");
+      return;
+    }
+
+    setEditingRow(null);
+    setConsolidating(false);
+    setIsCreateReportOpen(true);
+  };
+
+  const handleConsolidate = () => {
+    setEditingRow(null);
+    setConsolidating(true);
+    setIsCreateReportOpen(true);
+  };
 
   const parentRow = useMemo<PoliticalWorkRow>(() => {
     return parentReportData
@@ -374,6 +435,7 @@ export default function PoliticalWorkReport() {
                     className={styles["political-menu-item"]}
                     onClick={() => {
                       setEditingRow(row);
+                      setConsolidating(false);
                       setIsCreateReportOpen(true);
                       setActiveMenuId(null);
                     }}
@@ -399,10 +461,7 @@ export default function PoliticalWorkReport() {
         onQueryChange={setQuery}
         reportDate={reportDate}
         onReportDateChange={setReportDate}
-        onAddReport={() => {
-          setEditingRow(null);
-          setIsCreateReportOpen(true);
-        }}
+        onAddReport={!hasOwnReport ? handleAddReport : undefined}
         onApprove={
           canApprove
             ? () => handleApproveReport(commanderReport!.idCongtac)
@@ -419,7 +478,17 @@ export default function PoliticalWorkReport() {
         onRecall={
           canRecall ? () => handleRecallReport(ownReport!.idCongtac) : undefined
         }
-        hasReport={Boolean(ownReport)}
+        hasReport={hasOwnReport}
+        isPastDate={isPastDate}
+        onConsolidate={isParentUnit ? handleConsolidate : undefined}
+        consolidateDisabled={!canConsolidate}
+        consolidateLabel={
+          parentReportData
+            ? "Đã tổng hợp"
+            : approvedChildRows.length < totalRequiredCount
+              ? `Chưa đủ (${approvedChildRows.length}/${totalRequiredCount} đơn vị)`
+              : "Tổng hợp"
+        }
       />
 
       <div className={styles["political-stats-grid"]}>
@@ -546,14 +615,90 @@ export default function PoliticalWorkReport() {
         </div>
       </section>
 
+      {ownReport && !ownReport.notSubmitted && (
+        <section className={styles["political-duty-section"]}>
+          <div className={styles["political-duty-card"]}>
+            <div className={styles["political-duty-header"]}>
+              <h2 className={styles["political-duty-title"]}>
+                THÔNG TIN CA TRỰC
+              </h2>
+              <div className={styles["political-duty-date"]}>
+                {(() => {
+                  if (!reportDate) return "";
+                  const dateParts = reportDate.split("-");
+                  if (dateParts.length !== 3) return reportDate;
+                  const dateObj = new Date(Number(dateParts[0]), Number(dateParts[1]) - 1, Number(dateParts[2]));
+                  const days = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+                  return `${days[dateObj.getDay()]} - ${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+                })()}
+              </div>
+            </div>
+
+            <div className={styles["political-duty-grid"]}>
+              {(() => {
+                const info = parseTrucNguoi(ownReport.trucBanNoiVu);
+                return (
+                  <div className={styles["political-duty-box"]}>
+                    <div className={styles["political-duty-label"]}>
+                      Trực Ban Nội Vụ
+                    </div>
+                    <div className={styles["political-duty-name"]}>
+                      {info.capBac ? `${info.capBac} - ${info.hoTen}` : info.hoTen || "—"}
+                    </div>
+                    <div className={styles["political-duty-position"]}>
+                      {info.chucVu || "—"}
+                    </div>
+                    <div className={styles["political-duty-phone"]}>
+                      {info.soDienThoai || "—"}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {(() => {
+                const info = parseTrucNguoi(ownReport.trucBanCtDangCt);
+                return (
+                  <div className={styles["political-duty-box"]}>
+                    <div className={styles["political-duty-label"]}>
+                      Trực CTĐ, CTCT
+                    </div>
+                    <div className={styles["political-duty-name"]}>
+                      {info.capBac ? `${info.capBac} - ${info.hoTen}` : info.hoTen || "—"}
+                    </div>
+                    <div className={styles["political-duty-position"]}>
+                      {info.chucVu || "—"}
+                    </div>
+                    <div className={styles["political-duty-phone"]}>
+                      {info.soDienThoai || "—"}
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        </section>
+      )}
+
       <CreateReport
-        key={editingRow?.idCongtac ?? "new"}
+        key={editingRow?.idCongtac ?? (consolidating ? "consolidated" : "new")}
         open={isCreateReportOpen}
         onClose={() => {
           setIsCreateReportOpen(false);
           setEditingRow(null);
+          setConsolidating(false);
         }}
-        initialData={editingRow}
+        initialData={
+          consolidating
+            ? {
+                ...createEmptyPoliticalWorkRow({
+                  maDonVi: maDonViCurrent ?? "",
+                  tenDonVi: account?.donVi?.tenDonvi ?? "",
+                  kyhieuDonVi: account?.donVi?.kyhieuDonvi,
+                }),
+                ...buildConsolidatedPoliticalWork(approvedChildRows),
+              }
+            : editingRow
+        }
         maDonViCurrent={maDonViCurrent ?? ""}
         onSubmit={async (payload) => {
           try {
@@ -565,11 +710,12 @@ export default function PoliticalWorkReport() {
               showSuccess("Cập nhật báo cáo (nháp) thành công");
             } else {
               await politicalWorkService.createReport(payload);
-              showSuccess("Lưu báo cáo nháp thành công");
+              showSuccess(consolidating ? "Tổng hợp và lưu báo cáo thành công" : "Lưu báo cáo nháp thành công");
             }
             await fetchReports();
             setIsCreateReportOpen(false);
             setEditingRow(null);
+            setConsolidating(false);
           } catch (error) {
             handleApiError(error, {
               showError,

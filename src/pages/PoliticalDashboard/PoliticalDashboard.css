@@ -199,14 +199,16 @@
   color: #fff;
 }
 
+/* THAY ĐỔI: Tăng kích thước ô và khoảng cách giữa các ô */
 .political-unit-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); /* Tự động lấp đầy với chiều rộng tối thiểu 320px */
+  gap: 20px;
 }
 
+/* THAY ĐỔI: Tăng padding giúp ô rộng rãi và thông thoáng hơn */
 .political-unit-card {
-  padding: 16px;
+  padding: 20px;
   transition: box-shadow 0.2s, border-color 0.2s;
 }
 
@@ -259,14 +261,15 @@
 }
 
 .political-unit-body {
-  gap: 16px;
+  gap: 16px; 
   margin-top: 20px;
 }
 
+/* THAY ĐỔI: Tăng kích thước vòng tròn donut từ 84px lên 96px để cân xứng với ô to */
 .political-small-donut {
   position: relative;
-  width: 96px;
-  height: 96px;
+  width: 96px; 
+  height: 96px; 
   flex: 0 0 auto;
   border-radius: 50%;
   background: conic-gradient(
@@ -313,9 +316,10 @@
   );
 }
 
+/* THAY ĐỔI: Tăng lõi trắng bên trong vòng tròn từ 52px lên 60px */
 .political-donut-inner-content {
-  width: 58px;
-  height: 58px;
+  width: 60px; 
+  height: 60px; 
   border-radius: 50%;
   background: var(--surface-card);
   display: flex;
@@ -326,8 +330,9 @@
   pointer-events: none;
 }
 
+/* THAY ĐỔI: Tăng kích thước chữ số ở tâm vòng tròn từ 24px lên 26px */
 .political-donut-inner-content strong {
-  font-size: 24px;
+  font-size: 26px;
   color: var(--login-text);
   line-height: 1;
   transition: color 0.2s ease;
@@ -361,17 +366,24 @@
   opacity: 0.35;
 }
 
+/* THAY ĐỔI: Tăng kích thước chữ của phần chú thích lên 13px và giãn khoảng cách (gap) lên 8px */
 .political-unit-body li {
   display: grid;
-  grid-template-columns: 10px 1fr 20px 42px;
+  grid-template-columns: 10px 1fr auto auto; 
   align-items: center;
-  gap: 7px;
-  font-size: 12px;
+  gap: 8px; 
+  font-size: 13px;
   color: var(--login-text);
   cursor: pointer;
-  padding: 4px 6px;
+  padding: 4px 4px; 
   border-radius: 4px;
   transition: background 0.15s, opacity 0.15s;
+}
+
+.political-unit-body li span:not(.dot) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; 
 }
 
 .political-unit-body li + li {
@@ -412,8 +424,6 @@
   margin: 18px 0 0;
   font-size: 12px;
 }
-
-
 
 .political-datebar {
   display: flex;
@@ -517,8 +527,7 @@
 
 @media (max-width: 1100px) {
   .political-summary-card,
-  .political-kpi-grid,
-  .political-unit-grid {
+  .political-kpi-grid {
     grid-template-columns: 1fr 1fr;
   }
   .political-kpi {

@@ -167,7 +167,6 @@
 
 .textEllipsisContainer {
   display: -webkit-box;
-  
   -webkit-box-orient: vertical;  
   overflow: hidden;
   text-overflow: ellipsis;
@@ -355,6 +354,7 @@
   color: var(--login-text-muted);
 }
 
+/* Responsive Media Queries */
 @media (max-width: 1100px) {
   .political-stats-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -379,4 +379,97 @@
   .political-stats-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.political-duty-section {
+  margin-top: 24px;
+}
+
+.political-duty-card {
+  background-color: var(--surface-card);
+  border: 1px solid var(--login-border);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04); 
+}
+
+.political-duty-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.political-duty-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--login-text);
+  margin: 0 0 6px 0;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.political-duty-date {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0d8b58; 
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.political-duty-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .political-duty-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.political-duty-box {
+  background-color: var(--table-row-odd); 
+  border: 1px solid var(--login-border);
+  border-left: 4px solid #0d8b58;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.25s ease-in-out;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.political-duty-box:hover {
+  border-color: #0d8b58;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(13, 139, 88, 0.1);
+}
+
+.political-duty-label {
+  font-size: 13px;           
+  font-weight: 800;            
+  color: #047246;            
+  letter-spacing: 0.8px;       
+  margin-bottom: 12px;
+  text-transform: uppercase;  
+  opacity: 1;                  
+}
+
+.political-duty-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--login-text);
+  margin-bottom: 6px;
+  letter-spacing: 0.2px;
+}
+
+.political-duty-position {
+  font-size: 13px;
+  color: var(--login-text-muted);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.political-duty-phone {
+  font-size: 13px;
+  color: var(--login-text-muted);
+  font-weight: 500;
 }
