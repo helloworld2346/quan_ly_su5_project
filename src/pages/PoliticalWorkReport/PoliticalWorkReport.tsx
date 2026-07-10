@@ -37,6 +37,7 @@ import Skeleton from "../../components/ui/Skeleton/Skeleton";
 import { useMinLoading } from "../../hooks/useMinLoading";
 
 import { isApprovedStatus } from "../../utils/reportStatus";
+import { isPoliticalOfficeAccount } from "../../types/navigation";
 
 function StatusBadge({
   active,
@@ -103,22 +104,36 @@ export default function PoliticalWorkReport() {
   const { account } = useAuth();
   const { showError, showSuccess } = useToast();
 
-  const maDonViCurrent = account?.donVi?.maDonVi;
+  const submitMaDonVi = account?.donVi?.maDonVi;
   const capDonVi = account?.donVi?.capDonVi;
   const userRole = account?.vaiTro?.tenVaiTro;
   const normalizedRole = normalizeRoleName(userRole ?? undefined);
   const isTacChien = normalizedRole === "Trực ban tác chiến";
   const isNoiVu = normalizedRole === "Trực ban nội vụ";
 
+  const isPoliticalOffice = isPoliticalOfficeAccount({
+    username: account?.tenDangNhap,
+    unitName: account?.donVi?.tenDonvi,
+    unitSymbol: account?.donVi?.kyhieuDonvi,
+  });
+
+  /**
+   * viewMaDonVi: dùng để xem danh sách báo cáo cấp dưới.
+   * submitMaDonVi: dùng để tạo/sửa báo cáo của chính tài khoản đang đăng nhập.
+   */
+  const viewMaDonVi = isPoliticalOffice ? "GS003" : submitMaDonVi;
+
   const isParentUnit =
+    isPoliticalOffice ||
     (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
     (isNoiVu && capDonVi === "TIEU_DOAN");
 
-  const shouldHideConsolidatedSections = isTacChien && capDonVi === "SU_DOAN";
+  const shouldHideConsolidatedSections =
+    isPoliticalOffice || (isTacChien && capDonVi === "SU_DOAN");
 
   const { reportData, parentReportData, childUnits, loading, fetchReports } =
     usePoliticalWorkData({
-      maDonViCurrent,
+      maDonViCurrent: viewMaDonVi,
       isParentUnit,
       showError,
       reportDate,
@@ -128,11 +143,11 @@ export default function PoliticalWorkReport() {
 
   const showSkeleton = useMinLoading(loading);
 
+  // Xác định báo cáo của chính tài khoản đăng nhập (Bỏ hoàn toàn fallback reportData[0])
   const ownReport =
-    parentReportData ??
-    reportData.find((r) => r.donVi === maDonViCurrent) ??
-    reportData[0] ??
-    null;
+    reportData.find((r) => r.donVi === submitMaDonVi) ??
+    (!isPoliticalOffice ? parentReportData : null);
+
   const commanderReport =
     reportData.find((r) => r.status === "Chờ_Duyệt") ?? null;
 
@@ -197,7 +212,11 @@ export default function PoliticalWorkReport() {
   const canConsolidate = isParentUnit && !parentReportData && approvedChildRows.length > 0;
 
   const isPastDate = reportDate < todayIsoDate();
-  const hasOwnReport = Boolean(ownReport && !ownReport.notSubmitted);
+  
+  // Xác định chính xác trạng thái đã nộp báo cáo của tài khoản hiện tại
+  const hasOwnReport = Boolean(
+    ownReport && !ownReport.notSubmitted && ownReport.donVi === submitMaDonVi,
+  );
 
   const handleAddReport = () => {
     if (isPastDate) {
@@ -225,11 +244,11 @@ export default function PoliticalWorkReport() {
     return parentReportData
       ? { ...parentReportData, notSubmitted: false }
       : createEmptyPoliticalWorkRow({
-          maDonVi: maDonViCurrent ?? "",
+          maDonVi: viewMaDonVi ?? "",
           tenDonVi: account?.donVi?.tenDonvi ?? "",
           kyhieuDonVi: account?.donVi?.kyhieuDonvi,
         });
-  }, [parentReportData, maDonViCurrent, account]);
+  }, [parentReportData, viewMaDonVi, account]);
 
   const flatRows = useMemo<PoliticalWorkRow[]>(() => {
     if (!isParentUnit) return reportData;
@@ -343,7 +362,7 @@ export default function PoliticalWorkReport() {
         <td
           className={`${styles["political-ctd-cell"]} ${styles["political-nowrap"]}`}
         >
-          —
+          | —
         </td>
         <td>
           <ReportStatusBadge status="Chưa_Nộp" />
@@ -461,7 +480,7 @@ export default function PoliticalWorkReport() {
         onQueryChange={setQuery}
         reportDate={reportDate}
         onReportDateChange={setReportDate}
-        onAddReport={!hasOwnReport ? handleAddReport : undefined}
+        onAddReport={!hasOwnReport && !isPastDate ? handleAddReport : undefined}
         onApprove={
           canApprove
             ? () => handleApproveReport(commanderReport!.idCongtac)
@@ -615,7 +634,7 @@ export default function PoliticalWorkReport() {
         </div>
       </section>
 
-      {ownReport && !ownReport.notSubmitted && (
+      {ownReport && !ownReport.notSubmitted && ownReport.donVi === submitMaDonVi && (
         <section className={styles["political-duty-section"]}>
           <div className={styles["political-duty-card"]}>
             <div className={styles["political-duty-header"]}>
@@ -691,15 +710,15 @@ export default function PoliticalWorkReport() {
           consolidating
             ? {
                 ...createEmptyPoliticalWorkRow({
-                  maDonVi: maDonViCurrent ?? "",
-                  tenDonVi: account?.donVi?.tenDonvi ?? "",
-                  kyhieuDonVi: account?.donVi?.kyhieuDonvi,
+                  maDonVi: viewMaDonVi ?? "",
+                  tenDonVi: "Sư đoàn 5",
+                  kyhieuDonVi: "SD5",
                 }),
                 ...buildConsolidatedPoliticalWork(approvedChildRows),
               }
             : editingRow
         }
-        maDonViCurrent={maDonViCurrent ?? ""}
+        maDonViCurrent={submitMaDonVi ?? ""}
         onSubmit={async (payload) => {
           try {
             if (editingRow) {

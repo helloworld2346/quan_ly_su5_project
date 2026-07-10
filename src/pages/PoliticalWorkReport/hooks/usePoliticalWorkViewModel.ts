@@ -17,7 +17,6 @@ type Args = {
 
 export function usePoliticalWorkViewModel({
   query,
-  account,
   isParentUnit,
   maDonViCurrent,
   reportData,
