@@ -1,0 +1,388 @@
+.page {  
+  height: calc(100vh - 112px);  
+  display: flex;  
+  flex-direction: column;  
+  overflow: hidden;  
+  max-width: 1200px;  
+  margin: 0 auto;  
+  width: 100%;  
+  padding: 24px 0 0;  
+}  
+  
+.page > * + * {  
+  margin-top: 20px;  
+}  
+  
+.pageHeader {  
+  display: flex;  
+  align-items: center;  
+  justify-content: space-between;  
+  padding: 0 0 20px;  
+  flex-shrink: 0;  
+  border-bottom: 1.5px solid var(--login-border);  
+}  
+  
+.pageHeaderLeft {  
+  display: flex;  
+  align-items: center;  
+  padding-left: 16px;  
+  border-left: 4px solid var(--primary-color);  
+}  
+  
+.pageTitle {  
+  font-size: 24px;  
+  font-weight: 800;  
+  color: var(--login-text);  
+  margin: 0;  
+  letter-spacing: -0.4px;  
+  line-height: 1.2;  
+}  
+  
+/* ===== Toolbar / filter ===== */  
+.toolbar {  
+  display: flex;  
+  align-items: center;  
+  gap: 16px;  
+  flex-shrink: 0;  
+}  
+  
+.filterGroup {  
+  display: flex;  
+  gap: 12px;  
+  flex-shrink: 0;  
+  min-width: 360px;  
+}  
+  
+.filterGroup > * {  
+  flex: 1;  
+}  
+  
+.clearBtn {  
+  display: inline-flex;  
+  align-items: center;  
+  gap: 6px;  
+  height: 40px;  
+  padding: 0 14px;  
+  border: 1.5px solid var(--login-border);  
+  border-radius: 8px;  
+  background: var(--surface-card);  
+  color: var(--login-text);  
+  font-size: 14px;  
+  font-weight: 600;  
+  white-space: nowrap;  
+  cursor: pointer;  
+  flex: 0 0 auto;  
+  transition:  
+    border-color 0.15s,  
+    color 0.15s,  
+    background 0.15s;  
+}  
+  
+.clearBtn:hover {  
+  border-color: var(--primary-color);  
+  color: var(--primary-color);  
+  background: var(--primary-a06);  
+}  
+  
+.tableWrapper {  
+  flex: 1;  
+  min-height: 0;  
+  overflow-y: auto;  
+  overflow-x: auto;  
+  border: 1.5px solid var(--login-border);  
+  border-radius: 14px;  
+  background: var(--surface-card);  
+}  
+  
+.table {  
+  width: 100%;  
+  /* QUAN TRỌNG: đảm bảo tổng width các cột luôn đủ chỗ,  
+     tránh cột Mô tả bị co về 0 và tràn đè cột khác */  
+  min-width: 1040px;  
+  border-collapse: collapse;  
+  font-size: 14px;  
+  table-layout: fixed;  
+}  
+  
+/* ===== Sticky header ===== */  
+.table thead th {  
+  position: sticky;  
+  top: 0;  
+  z-index: 2;  
+  background: var(--table-row-odd);  
+  color: var(--login-text-muted);  
+  font-weight: 700;  
+  font-size: 12px;  
+  text-transform: uppercase;  
+  letter-spacing: 0.4px;  
+  text-align: left;  
+  padding: 12px 16px;  
+  border-bottom: 1.5px solid var(--login-border);  
+  white-space: nowrap;  
+  box-shadow: 0 1px 0 var(--login-border);  
+}  
+  
+.table tbody td {  
+  padding: 12px 16px;  
+  border-bottom: 1px solid var(--login-border);  
+  color: var(--login-text);  
+  vertical-align: middle;  
+}  
+  
+.table tbody tr:last-child td {  
+  border-bottom: none;  
+}  
+  
+.row {  
+  transition: background 0.15s;  
+}  
+  
+.row:hover {  
+  background: var(--primary-a06);  
+}  
+  
+.colStt {  
+  width: 56px;  
+  text-align: center;  
+  color: var(--login-text-muted);  
+}  
+  
+.colAccount {  
+  width: 180px;  
+}  
+  
+.colAction {  
+  width: 140px;  
+}  
+  
+.colTime {  
+  width: 170px;  
+  white-space: nowrap;  
+}  
+  
+.colObject {  
+  width: 140px;  
+}  
+  
+.colDesc {  
+  width: auto;  
+  white-space: normal;  
+  word-break: break-word;  
+}  
+  
+.colStatus {  
+  width: 130px;  
+}  
+  
+.userName {  
+  color: var(--login-text);  
+  display: block;  
+}  
+  
+.muted {  
+  color: var(--login-text-muted);  
+}  
+  
+.emptyRow {  
+  text-align: center;  
+  padding: 40px 16px;  
+  color: var(--login-text-muted);  
+  font-size: 14px;  
+}  
+  
+.badge {  
+  display: inline-flex;  
+  align-items: center;  
+  gap: 6px;  
+  padding: 3px 10px;  
+  border-radius: 20px;  
+  font-size: 13px;  
+  font-weight: 600;  
+  white-space: nowrap;  
+  border: 0.5px solid currentColor;  
+}  
+  
+/* Chấm tròn CHỈ áp cho badge hành động, KHÔNG áp cho trạng thái */  
+.badgeLogin::before,  
+.badgeLogout::before,  
+.badgeCreate::before,  
+.badgeUpdate::before,  
+.badgeDelete::before,  
+.badgeApprove::before,  
+.badgeReject::before,  
+.badgeLock::before,  
+.badgeUnlock::before,  
+.badgeNeutral::before {  
+  content: "";  
+  width: 6px;  
+  height: 6px;  
+  border-radius: 50%;  
+  background: currentColor;  
+  flex-shrink: 0;  
+}  
+  
+.badgeLogin {  
+  background: var(--badge-login-bg);  
+  color: var(--badge-login-fg);  
+}  
+  
+.badgeLogout {  
+  background: var(--badge-logout-bg);  
+  color: var(--badge-logout-fg);  
+}  
+  
+.badgeCreate {  
+  background: var(--badge-create-bg);  
+  color: var(--badge-create-fg);  
+}  
+  
+.badgeUpdate {  
+  background: var(--badge-update-bg);  
+  color: var(--badge-update-fg);  
+}  
+  
+.badgeDelete {  
+  background: var(--badge-delete-bg);  
+  color: var(--badge-delete-fg);  
+}  
+  
+.badgeApprove {  
+  background: var(--badge-approve-bg);  
+  color: var(--badge-approve-fg);  
+}  
+  
+.badgeReject {  
+  background: var(--badge-reject-bg);  
+  color: var(--badge-reject-fg);  
+}  
+  
+.badgeLock {  
+  background: var(--badge-lock-bg);  
+  color: var(--badge-lock-fg);  
+}  
+  
+.badgeUnlock {  
+  background: var(--badge-unlock-bg);  
+  color: var(--badge-unlock-fg);  
+}  
+  
+.badgeNeutral {  
+  background: var(--badge-neutral-bg);  
+  color: var(--badge-neutral-fg);  
+}  
+  
+.badgeSuccess {  
+  background: var(--badge-success-bg);  
+  color: var(--badge-success-fg);  
+}  
+  
+.badgeDanger {  
+  background: var(--badge-danger-bg);  
+  color: var(--badge-danger-fg);  
+}  
+  
+.tbodyAnimate {  
+  animation: fadeSlideIn 0.25s ease;  
+}  
+  
+.dateCell {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 2px;  
+}  
+  
+.dateMain {  
+  color: var(--login-text);  
+  white-space: nowrap;  
+}  
+  
+.dateSub {  
+  font-size: 13px;  
+  color: var(--login-text-muted);  
+  white-space: nowrap;  
+}  
+  
+@keyframes fadeSlideIn {  
+  from {  
+    opacity: 0;  
+    transform: translateY(6px);  
+  }  
+  to {  
+    opacity: 1;  
+    transform: translateY(0);  
+  }  
+}  
+  
+@media (prefers-reduced-motion: reduce) {  
+  .tbodyAnimate {  
+    animation: none;  
+  }  
+}  
+  
+/* ===== Responsive ===== */  
+@media (max-width: 1024px) {  
+  .page {  
+    max-width: 100%;  
+    padding: 20px 12px 0;  
+  }  
+  .filterGroup {  
+    min-width: 320px;  
+  }  
+}  
+  
+@media (max-width: 768px) {  
+  .page {  
+    height: auto;  
+    overflow: visible;  
+    padding: 16px;  
+  }  
+  
+  .pageTitle {  
+    font-size: 20px;  
+  }  
+  
+  .toolbar {  
+    flex-direction: column;  
+    align-items: stretch;  
+  }  
+  
+  .filterGroup {  
+    min-width: 0;  
+    width: 100%;  
+    flex-wrap: wrap;  
+  }  
+  
+  /* Bảng cao cố định + cuộn dọc để header vẫn sticky trên mobile */  
+  .tableWrapper {  
+    max-height: 70vh;  
+  }  
+}  
+  
+@media (max-width: 480px) {  
+  .page {  
+    padding: 12px;  
+  }  
+  
+  .filterGroup {  
+    flex-direction: column;  
+  }  
+  
+  .filterGroup > * {  
+    flex: none;  
+    width: 100%;  
+  }  
+  
+  .clearBtn {  
+    width: 100%;  
+    justify-content: center;  
+  }  
+  
+  .table {  
+    font-size: 13px;  
+  }  
+  
+  .table thead th,  
+  .table tbody td {  
+    padding: 10px 12px;  
+  }  
+}

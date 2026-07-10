@@ -33,3 +33,24 @@ export function shiftDay(date: Date, delta: number): Date {
 export function toDateParam(date: Date): string {
   return date.toISOString().split("T")[0];
 }
+
+export function formatDatePart(dateStr: string): string {  
+  if (!dateStr) return "—";  
+  const d = new Date(dateStr);  
+  if (Number.isNaN(d.getTime())) return "—";  
+  return d.toLocaleDateString("vi-VN", {  
+    day: "2-digit",  
+    month: "short",  
+    year: "numeric",  
+  });  
+}  
+  
+export function formatTimePart(dateStr: string): string {  
+  if (!dateStr) return "";  
+  const d = new Date(dateStr);  
+  if (Number.isNaN(d.getTime())) return "";  
+  const hh = String(d.getHours()).padStart(2, "0");  
+  const mm = String(d.getMinutes()).padStart(2, "0");  
+  const ss = String(d.getSeconds()).padStart(2, "0");  
+  return `${hh}:${mm}:${ss}`;  
+}

@@ -13,6 +13,7 @@ export type NavItemId =
   | "account-management"
   | "unit-management"
   | "role-management"
+  | "audit-log"
   | "settings";
 
 export type NavItem = {
@@ -58,6 +59,8 @@ const UnitManagement = lazy(
 const RoleManagement = lazy(
   () => import("../pages/RoleManagement/RoleManagement"),
 );
+
+const AuditLog = lazy(() => import("../pages/AuditLog/AuditLog"));
 
 const Settings = lazy(() => import("../pages/Settings/Settings"));
 
@@ -187,6 +190,15 @@ export const ADMIN_NAV_GROUP = {
       component: RoleManagement,
       allowedRoles: ["Quản Trị Viên"],
     },
+    {
+      id: "audit-log" as const,
+      label: "Nhật ký hệ thống",
+      path: "/audit-log",
+      loadingTitle: "Đang tải nhật ký hệ thống",
+      loadingSubtitle: "Đang tải dữ liệu…",
+      component: AuditLog,
+      allowedRoles: ["Quản Trị Viên"],
+    },
   ],
 };
 
@@ -233,6 +245,7 @@ export const NAV_PAGE_TITLES: Record<NavItemId, string> = {
   "account-management": "Quản lý tài khoản",
   "unit-management": "Quản lý đơn vị",
   "role-management": "Quản lý vai trò",
+  "audit-log": "Nhật ký hệ thống",
   settings: "Cài đặt",
 };
 

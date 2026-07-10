@@ -227,6 +227,32 @@
 /* :root (light) */  
 --surface-muted: #e9edf2;
 --skeleton-shine: rgba(255, 255, 255, 0.65);  
+
+/* --- AUDIT LOG BADGES (Light Mode) --- */  
+  /* Hành động */  
+  --badge-login-bg: rgba(59, 130, 246, 0.12);  
+  --badge-login-fg: #1d4ed8;  
+  --badge-logout-bg: rgba(107, 114, 128, 0.12);  
+  --badge-logout-fg: #4b5563;  
+  --badge-create-bg: rgba(34, 197, 94, 0.12);  
+  --badge-create-fg: #15803d;  
+  --badge-update-bg: rgba(234, 179, 8, 0.16);  
+  --badge-update-fg: #a16207;  
+  --badge-delete-bg: rgba(239, 68, 68, 0.12);  
+  --badge-delete-fg: #b91c1c;  
+  --badge-approve-bg: rgba(6, 182, 212, 0.14);  
+  --badge-approve-fg: #0e7490;  
+  --badge-reject-bg: rgba(236, 72, 153, 0.12);  
+  --badge-reject-fg: #be185d;  
+  --badge-lock-bg: rgba(249, 115, 22, 0.14);  
+  --badge-lock-fg: #c2410c;  
+  --badge-unlock-bg: rgba(168, 85, 247, 0.12);  
+  --badge-unlock-fg: #7e22ce;  
+  /* Trạng thái */  
+  --badge-success-bg: rgba(34, 197, 94, 0.12);  
+  --badge-success-fg: #15803d;  
+  --badge-fail-bg: rgba(239, 68, 68, 0.12);  
+  --badge-fail-fg: #b91c1c;
 }
 
 /* ==========================================================================  
@@ -426,4 +452,28 @@
 
 --surface-muted: #2a2f3a;  
 --skeleton-shine: rgba(255, 255, 255, 0.08);
+
+/* --- AUDIT LOG BADGES (Dark Mode) --- */  
+  --badge-login-bg: rgba(96, 165, 250, 0.15);  
+  --badge-login-fg: #60a5fa;  
+  --badge-logout-bg: rgba(148, 163, 184, 0.15);  
+  --badge-logout-fg: #cbd5e1;  
+  --badge-create-bg: rgba(74, 222, 128, 0.15);  
+  --badge-create-fg: #4ade80;  
+  --badge-update-bg: rgba(250, 204, 21, 0.15);  
+  --badge-update-fg: #facc15;  
+  --badge-delete-bg: rgba(248, 113, 113, 0.15);  
+  --badge-delete-fg: #f87171;  
+  --badge-approve-bg: rgba(34, 211, 238, 0.15);  
+  --badge-approve-fg: #22d3ee;  
+  --badge-reject-bg: rgba(244, 114, 182, 0.15);  
+  --badge-reject-fg: #f472b6;  
+  --badge-lock-bg: rgba(251, 146, 60, 0.15);  
+  --badge-lock-fg: #fb923c;  
+  --badge-unlock-bg: rgba(192, 132, 252, 0.15);  
+  --badge-unlock-fg: #c084fc;  
+  --badge-success-bg: rgba(74, 222, 128, 0.15);  
+  --badge-success-fg: #4ade80;  
+  --badge-fail-bg: rgba(248, 113, 113, 0.15);  
+  --badge-fail-fg: #f87171;
 }
