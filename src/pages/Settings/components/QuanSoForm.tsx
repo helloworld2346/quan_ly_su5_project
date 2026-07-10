@@ -4,11 +4,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUsers,
   faTriangleExclamation,
+  faLayerGroup,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { donviService } from "../../../services/unit/unitService";
 import { useToast } from "../../../context/useToast";
 import { useAuth } from "../../../context/useAuth";
+import { normalizeRoleName } from "../../../utils/reportUtils";
 import type { DonVi } from "../../../types/account";
 
 import NumberStepper from "../../../components/ui/NumberStepper/NumberStepper";
@@ -19,17 +21,52 @@ import styles from "../Settings.module.css";
 
 type Props = {
   donVi: DonVi;
+  childUnits?: DonVi[];
   onUpdated: (unit: DonVi) => void;
 };
 
-export default function QuanSoForm({ donVi, onUpdated }: Props) {
+export default function QuanSoForm({
+  donVi,
+  childUnits = [],
+  onUpdated,
+}: Props) {
   const { showError, showSuccess } = useToast();
-  const { refreshAccount } = useAuth();
+  const { refreshAccount, account } = useAuth();
   const { confirm, isOpen, options, onConfirm, onCancel } = useConfirmDialog();
 
-  const [quanSoSiQuan, setQuanSoSiQuan] = useState(donVi.quanSoSiQuan);
-  const [quanSoQncn, setQuanSoQncn] = useState(donVi.quanSoQncn);
-  const [quanSoHsqBs, setQuanSoHsqBs] = useState(donVi.quanSoHsqBs);
+  const normalizedRole = normalizeRoleName(
+    account?.vaiTro?.tenVaiTro ?? undefined,
+  );
+  const isDivisionTacChien =
+    normalizedRole === "Trực ban tác chiến" && donVi.capDonVi === "SU_DOAN";
+  const hasChildren = childUnits.length > 0;
+
+  const isAggregatedOnly = hasChildren && !isDivisionTacChien;
+
+  const childAgg = useMemo(() => {
+    return childUnits.reduce(
+      (acc, c) => ({
+        siQuan: acc.siQuan + c.quanSoSiQuan,
+        qncn: acc.qncn + c.quanSoQncn,
+        hsqBs: acc.hsqBs + c.quanSoHsqBs,
+      }),
+      {
+        siQuan: donVi.quanSoSiQuan,
+        qncn: donVi.quanSoQncn,
+        hsqBs: donVi.quanSoHsqBs,
+      },
+    );
+  }, [childUnits, donVi.quanSoSiQuan, donVi.quanSoQncn, donVi.quanSoHsqBs]);
+  
+  const childAggTong = childAgg.siQuan + childAgg.qncn + childAgg.hsqBs;
+
+  const initSiQuan = isAggregatedOnly ? childAgg.siQuan : donVi.quanSoSiQuan;
+  const initQncn = isAggregatedOnly ? childAgg.qncn : donVi.quanSoQncn;
+  const initHsqBs = isAggregatedOnly ? childAgg.hsqBs : donVi.quanSoHsqBs;
+
+  const [quanSoSiQuan, setQuanSoSiQuan] = useState(initSiQuan);
+  const [quanSoQncn, setQuanSoQncn] = useState(initQncn);
+  const [quanSoHsqBs, setQuanSoHsqBs] = useState(initHsqBs);
   const [saving, setSaving] = useState(false);
 
   const quanSoTong = useMemo(
@@ -43,9 +80,9 @@ export default function QuanSoForm({ donVi, onUpdated }: Props) {
     quanSoHsqBs !== donVi.quanSoHsqBs;
 
   const resetChanges = () => {
-    setQuanSoSiQuan(donVi.quanSoSiQuan);
-    setQuanSoQncn(donVi.quanSoQncn);
-    setQuanSoHsqBs(donVi.quanSoHsqBs);
+    setQuanSoSiQuan(initSiQuan);
+    setQuanSoQncn(initQncn);
+    setQuanSoHsqBs(initHsqBs);
   };
 
   const handleUpdateDonVi = async (e: React.FormEvent) => {
@@ -82,9 +119,7 @@ export default function QuanSoForm({ donVi, onUpdated }: Props) {
         setQuanSoSiQuan(response.Result.quanSoSiQuan);
         setQuanSoQncn(response.Result.quanSoQncn);
         setQuanSoHsqBs(response.Result.quanSoHsqBs);
-
         await refreshAccount();
-
         showSuccess("Cập nhật quân số biên chế thành công");
       } else {
         showError(response.message || "Cập nhật thất bại");
@@ -99,73 +134,124 @@ export default function QuanSoForm({ donVi, onUpdated }: Props) {
     }
   };
 
+  const inputsDisabled = isAggregatedOnly;
+
   return (
-    <div className={styles.cardSection}>
-      <div className={styles.cardHeader}>
-        <FontAwesomeIcon icon={faUsers} className={styles.cardHeaderIcon} />
-        <h2 className={styles.cardTitle}>
-          Quân số biên chế — {donVi.tenDonvi}
-        </h2>
+    <>
+      <div className={styles.cardSection}>
+        <div className={styles.cardHeader}>
+          <FontAwesomeIcon icon={faUsers} className={styles.cardHeaderIcon} />
+          <h2 className={styles.cardTitle}>
+            {isDivisionTacChien
+              ? `Quân số biên chế CH/f — ${donVi.tenDonvi}`
+              : `Quân số biên chế — ${donVi.tenDonvi}`}
+          </h2>
+        </div>
+
+        {quanSoTong === 0 && !isAggregatedOnly && (
+          <div className={styles.warningBanner}>
+            <FontAwesomeIcon
+              icon={faTriangleExclamation}
+              className={styles.warningIcon}
+            />
+            <div>
+              <strong>Chưa nhập quân số biên chế.</strong> Vui lòng nhập quân số
+              bên dưới để có thể sử dụng các tính năng báo cáo.
+            </div>
+          </div>
+        )}
+
+        <form className={styles.form} onSubmit={handleUpdateDonVi}>
+          <div className={styles.statGrid}>
+            <NumberStepper
+              label="Quân số Sĩ quan"
+              value={quanSoSiQuan}
+              onChange={setQuanSoSiQuan}
+              disabled={inputsDisabled}
+              required
+            />
+            <NumberStepper
+              label="Quân số QNCN"
+              value={quanSoQncn}
+              onChange={setQuanSoQncn}
+              disabled={inputsDisabled}
+              required
+            />
+            <NumberStepper
+              label="Quân số HSQ-BS"
+              value={quanSoHsqBs}
+              onChange={setQuanSoHsqBs}
+              disabled={inputsDisabled}
+              required
+            />
+
+            <div className={styles.totalCard}>
+              <span className={styles.totalLabel}>Tổng quân số biên chế</span>
+              <span className={styles.totalValue}>{quanSoTong}</span>
+            </div>
+          </div>
+
+          {!isAggregatedOnly && (
+            <div className={styles.formActions}>
+              <button
+                type="button"
+                className={styles.resetBtn}
+                onClick={resetChanges}
+                disabled={!hasUnsavedChanges || saving}
+              >
+                Hoàn tác
+              </button>
+              <button
+                type="submit"
+                className={styles.saveBtn}
+                disabled={saving || !hasUnsavedChanges}
+              >
+                {saving ? "Đang lưu..." : "Lưu thay đổi"}
+              </button>
+            </div>
+          )}
+        </form>
       </div>
 
-      {quanSoTong === 0 && (
-        <div className={styles.warningBanner}>
-          <FontAwesomeIcon
-            icon={faTriangleExclamation}
-            className={styles.warningIcon}
-          />
-          <div>
-            <strong>Chưa nhập quân số biên chế.</strong> Vui lòng nhập quân số
-            bên dưới để có thể sử dụng các tính năng báo cáo.
+      {isDivisionTacChien && hasChildren && (
+        <div className={styles.cardSection}>
+          <div className={styles.cardHeader}>
+            <FontAwesomeIcon
+              icon={faLayerGroup}
+              className={styles.cardHeaderIcon}
+            />
+            <h2 className={styles.cardTitle}>
+              Quân số cộng dồn từ các đơn vị trực thuộc
+            </h2>
+          </div>
+
+          <div className={styles.statGrid}>
+            <NumberStepper
+              label="Quân số Sĩ quan"
+              value={childAgg.siQuan}
+              onChange={() => {}}
+              disabled
+            />
+            <NumberStepper
+              label="Quân số QNCN"
+              value={childAgg.qncn}
+              onChange={() => {}}
+              disabled
+            />
+            <NumberStepper
+              label="Quân số HSQ-BS"
+              value={childAgg.hsqBs}
+              onChange={() => {}}
+              disabled
+            />
+
+            <div className={styles.totalCard}>
+              <span className={styles.totalLabel}>Tổng cộng dồn</span>
+              <span className={styles.totalValue}>{childAggTong}</span>
+            </div>
           </div>
         </div>
       )}
-
-      <form className={styles.form} onSubmit={handleUpdateDonVi}>
-        <div className={styles.statGrid}>
-          <NumberStepper
-            label="Quân số Sĩ quan"
-            value={quanSoSiQuan}
-            onChange={setQuanSoSiQuan}
-            required
-          />
-          <NumberStepper
-            label="Quân số QNCN"
-            value={quanSoQncn}
-            onChange={setQuanSoQncn}
-            required
-          />
-          <NumberStepper
-            label="Quân số HSQ-BS"
-            value={quanSoHsqBs}
-            onChange={setQuanSoHsqBs}
-            required
-          />
-
-          <div className={styles.totalCard}>
-            <span className={styles.totalLabel}>Tổng quân số biên chế</span>
-            <span className={styles.totalValue}>{quanSoTong}</span>
-          </div>
-        </div>
-
-        <div className={styles.formActions}>
-          <button
-            type="button"
-            className={styles.resetBtn}
-            onClick={resetChanges}
-            disabled={!hasUnsavedChanges || saving}
-          >
-            Hoàn tác
-          </button>
-          <button
-            type="submit"
-            className={styles.saveBtn}
-            disabled={saving || !hasUnsavedChanges}
-          >
-            {saving ? "Đang lưu..." : "Lưu thay đổi"}
-          </button>
-        </div>
-      </form>
 
       <ConfirmDialog
         isOpen={isOpen}
@@ -177,6 +263,6 @@ export default function QuanSoForm({ donVi, onUpdated }: Props) {
         onConfirm={onConfirm}
         onCancel={onCancel}
       />
-    </div>
+    </>
   );
 }

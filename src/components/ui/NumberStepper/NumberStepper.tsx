@@ -8,6 +8,7 @@ type Props = {
   onChange: (value: number) => void;
   min?: number;
   required?: boolean;
+  disabled?: boolean;
 };
 
 export default function NumberStepper({
@@ -16,6 +17,7 @@ export default function NumberStepper({
   onChange,
   min = 0,
   required = false,
+  disabled = false,
 }: Props) {
   const [text, setText] = useState(String(value));
   const [prevValue, setPrevValue] = useState(value);
@@ -34,11 +36,14 @@ export default function NumberStepper({
   return (
     <div className={styles.statCard}>
       <span className={styles.statLabel}>{label}</span>
-      <div className={styles.numberInput}>
+      <div
+        className={`${styles.numberInput} ${disabled ? styles.disabled : ""}`}
+      >
         <button
           type="button"
           className={`${styles.numberInputBtn} ${styles.numberInputBtnLeft}`}
           onClick={() => commit(value - 1)}
+          disabled={disabled}
         >
           −
         </button>
@@ -47,6 +52,7 @@ export default function NumberStepper({
           inputMode="numeric"
           pattern="[0-9]*"
           value={text}
+          disabled={disabled}
           onChange={(e) => {
             const raw = e.target.value.replace(/[^0-9]/g, "");
             setText(raw);
@@ -61,6 +67,7 @@ export default function NumberStepper({
           type="button"
           className={`${styles.numberInputBtn} ${styles.numberInputBtnRight}`}
           onClick={() => commit(value + 1)}
+          disabled={disabled}
         >
           +
         </button>
