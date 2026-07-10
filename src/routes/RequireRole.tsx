@@ -33,10 +33,11 @@ export default function RequireRole({ children, allowedRoles = [] }: Props) {
   });
 
   const politicalOfficeAllowedPaths = [
-    "/political-dashboard",
-    "/political-work-report",
-    "/settings",
-  ];
+  "/political-dashboard",
+  "/daily-report",
+  "/political-work-report",
+  "/settings",
+];
 
   if (
     isPoliticalOffice &&

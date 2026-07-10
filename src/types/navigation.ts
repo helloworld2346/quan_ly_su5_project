@@ -354,6 +354,7 @@ export function getPoliticalOfficeNavItems(): NavItem[] {
   return ALL_NAV_ITEMS.filter(
     (item) =>
       item.id === "executive-political-work" ||
+      item.id === "report-troop" ||
       item.id === "report-political-work" ||
       item.id === "settings",
   );

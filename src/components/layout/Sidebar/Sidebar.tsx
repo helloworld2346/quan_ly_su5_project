@@ -126,14 +126,19 @@ export default function Sidebar({
     setTooltip(null);
   };
 
-  const handleNavigate = (id: NavItemId) => {
-    if (!isPoliticalOffice && id !== SETTINGS_NAV.id && !hasQuota) {
-      setShowQuotaDialog(true);
-      return;
-    }
+ const handleNavigate = (id: NavItemId) => {
+  const requiresQuota =
+    id !== SETTINGS_NAV.id &&
+    !(isPoliticalOffice && id === "executive-political-work") &&
+    !(isPoliticalOffice && id === "report-political-work");
 
-    onNavigate(id);
-  };
+  if (requiresQuota && !hasQuota) {
+    setShowQuotaDialog(true);
+    return;
+  }
+
+  onNavigate(id);
+};
 
   const handleQuotaConfirm = () => {
     setShowQuotaDialog(false);
