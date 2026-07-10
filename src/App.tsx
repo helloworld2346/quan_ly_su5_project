@@ -49,7 +49,9 @@ function AppContent() {
         await authService.logout(token);
       }
     } catch (error) {
-      console.error("Logout failed:", error);
+      if (import.meta.env.DEV) {
+        console.error("Logout failed:", error);
+      }
     } finally {
       storage.removeToken();
       storage.clearNavState();

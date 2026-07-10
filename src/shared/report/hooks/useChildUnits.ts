@@ -26,7 +26,9 @@ export function useChildUnits(
           isParentUnit ? getDirectChildUnits(allUnits, maDonViCurrent) : [],
         );
       } catch (err) {
-        console.error("Không thể tải thông tin đơn vị:", err);
+        if (import.meta.env.DEV) {
+          console.error("Không thể tải thông tin đơn vị:", err);
+        }
         setChildUnits([]);
         setCurrentUnit(null);
       }

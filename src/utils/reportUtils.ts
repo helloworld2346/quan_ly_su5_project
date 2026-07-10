@@ -64,7 +64,9 @@ export function mapItemToRow(item: ReportItemInput): ReportRow {
   try {
     vang = JSON.parse(item.thongTinVang) as VangChiTiet;
   } catch (e) {
-    console.error("Error parsing thongTinVang:", e);
+    if (import.meta.env.DEV) {
+      console.error("Error parsing thongTinVang:", e);
+    }
   }
 
   try {
@@ -72,7 +74,9 @@ export function mapItemToRow(item: ReportItemInput): ReportRow {
       chiTietVangList = JSON.parse(item.chiTietVang) as ChiTietVangQuanNhan[];
     }
   } catch (e) {
-    console.error("Error parsing chiTietVang:", e);
+    if (import.meta.env.DEV) {
+      console.error("Error parsing chiTietVang:", e);
+    }
   }
 
   return {

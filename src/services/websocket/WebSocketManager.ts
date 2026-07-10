@@ -12,8 +12,8 @@ export class WebSocketManager {
   private manuallyClosed = false;
   private options: WebSocketOptions;
 
-    constructor(options: WebSocketOptions) {
-      this.options = options; 
+  constructor(options: WebSocketOptions) {
+    this.options = options;
   }
 
   connect() {
@@ -63,7 +63,9 @@ export class WebSocketManager {
     };
 
     this.socket.onerror = (error) => {
-      console.error("WebSocket Error", error);
+      if (import.meta.env.DEV) {
+        console.error("WebSocket Error", error);
+      }
     };
   }
 

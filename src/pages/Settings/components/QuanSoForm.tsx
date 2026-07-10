@@ -67,6 +67,10 @@ export default function QuanSoForm({ donVi, onUpdated }: Props) {
         quanSoHsqBs,
         quanSoSiQuan,
         quanSoQncn,
+        tenDonvi: donVi.tenDonvi,
+        kyhieuDonvi: donVi.kyhieuDonvi,
+        capDonVi: donVi.capDonVi ?? "",
+        donViCha: donVi.donViCha,
         createdAt: donVi.createdAt,
         updatedAt: new Date().toISOString(),
         isDeleted: donVi.isDeleted,
@@ -87,7 +91,9 @@ export default function QuanSoForm({ donVi, onUpdated }: Props) {
       }
     } catch (err) {
       showError("Có lỗi xảy ra khi cập nhật đơn vị");
-      console.error("Failed to update unit:", err);
+      if (import.meta.env.DEV) {
+        console.error("Failed to update unit:", err);
+      }
     } finally {
       setSaving(false);
     }

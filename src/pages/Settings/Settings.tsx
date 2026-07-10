@@ -43,7 +43,9 @@ export default function Settings() {
         }
       } catch (err) {
         setError("Có lỗi xảy ra khi tải thông tin");
-        console.error("Failed to fetch data:", err);
+        if (import.meta.env.DEV) {
+          console.error("Failed to fetch data:", err);
+        }
       } finally {
         setLoading(false);
       }

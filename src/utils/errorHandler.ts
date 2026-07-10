@@ -63,7 +63,7 @@ export function handleApiError(
     return true;
   }
 
-  if (logError) {
+  if (logError && import.meta.env.DEV) {
     console.error(error);
   }
 

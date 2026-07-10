@@ -5,10 +5,10 @@ import { getIdByPath } from "../types/navigation";
 
 type Props = {
   children: React.ReactNode;
-  allowedRoles: string[];
-};
+  allowedRoles?: string[];
+};  
 
-export default function RequireRole({ children, allowedRoles }: Props) {
+export default function RequireRole({ children, allowedRoles = [] }: Props) {
   const { account, donVi, loading } = useAuth();
   const location = useLocation();
 
