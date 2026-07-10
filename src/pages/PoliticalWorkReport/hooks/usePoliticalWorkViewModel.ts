@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import type { Account } from "../../../types/account";
+import type { Account, DonVi } from "../../../types/account";
 import type { PoliticalWorkRow } from "../../../types/politicalWork";
 import { isApprovedStatus } from "../../../utils/reportStatus";
 import { createEmptyPoliticalWorkRow } from "../utils/politicalWorkUtils";
@@ -12,7 +12,7 @@ type Args = {
   maDonViCurrent?: string;
   reportData: PoliticalWorkRow[];
   parentReportData: PoliticalWorkRow | null;
-  childUnits: any[];
+  childUnits: DonVi[];
 };
 
 export function usePoliticalWorkViewModel({
