@@ -1,7 +1,10 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { normalizeRoleName } from "../utils/reportUtils";
-import { canAccessDutyGroup } from "../types/navigation"; 
+import {
+  canAccessDutyGroup,
+  isPoliticalOfficeAccount,
+} from "../types/navigation"; 
 
 type Props = {
   children: React.ReactNode;
@@ -22,6 +25,29 @@ export default function RequireRole({ children, allowedRoles = [] }: Props) {
 
   const userRole = account.vaiTro?.tenVaiTro;
   const normalizedRole = normalizeRoleName(account?.vaiTro?.tenVaiTro?? undefined);
+
+  const isPoliticalOffice = isPoliticalOfficeAccount({
+    username: account.tenDangNhap,
+    unitName: donVi?.tenDonvi ?? account.donVi?.tenDonvi,
+    unitSymbol: donVi?.kyhieuDonvi ?? account.donVi?.kyhieuDonvi,
+  });
+
+  const politicalOfficeAllowedPaths = [
+    "/political-dashboard",
+    "/political-work-report",
+    "/settings",
+  ];
+
+  if (
+    isPoliticalOffice &&
+    !politicalOfficeAllowedPaths.includes(location.pathname)
+  ) {
+    return <Navigate to="/political-dashboard" replace />;
+  }
+
+  if (isPoliticalOffice) {
+    return <>{children}</>;
+  }
 
   if (
     normalizedRole === "Trực ban nội vụ" &&
