@@ -2,16 +2,16 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { normalizeRoleName } from "../utils/reportUtils";
 import {
-  canAccessDutyGroup,
   isPoliticalOfficeAccount,
-} from "../types/navigation"; 
+  getIdByPath,
+} from "../types/navigation";
 
 type Props = {
   children: React.ReactNode;
   allowedRoles?: string[];
-};  
+};
 
-export default function RequireRole({ children, allowedRoles = [] }: Props) {
+export default function RequireRole({ children }: Props) {
   const { account, donVi, loading } = useAuth();
   const location = useLocation();
 
@@ -23,8 +23,10 @@ export default function RequireRole({ children, allowedRoles = [] }: Props) {
     return <Navigate to="/login" replace />;
   }
 
-  const userRole = account.vaiTro?.tenVaiTro;
-  const normalizedRole = normalizeRoleName(account?.vaiTro?.tenVaiTro?? undefined);
+  const normalizedRole = normalizeRoleName(
+    account?.vaiTro?.tenVaiTro ?? undefined,
+  );
+  const tenChucnang = account.vaiTro?.tenChucnang ?? null;
 
   const isPoliticalOffice = isPoliticalOfficeAccount({
     username: account.tenDangNhap,
@@ -33,11 +35,11 @@ export default function RequireRole({ children, allowedRoles = [] }: Props) {
   });
 
   const politicalOfficeAllowedPaths = [
-  "/political-dashboard",
-  "/daily-report",
-  "/political-work-report",
-  "/settings",
-];
+    "/political-dashboard",
+    "/daily-report",
+    "/political-work-report",
+    "/settings",
+  ];
 
   if (
     isPoliticalOffice &&
@@ -60,29 +62,22 @@ export default function RequireRole({ children, allowedRoles = [] }: Props) {
   ) {
     return <Navigate to="/settings" replace />;
   }
-  
-  if (!userRole || !allowedRoles.includes(normalizedRole)) {
-    if (
-      normalizedRole === "Trực ban tác chiến" ||
-      normalizedRole === "Quản Trị Viên"
-    ) {
-      return <Navigate to="/dashboard" replace />;
-    }
-    return <Navigate to="/settings" replace />;
+
+  if (normalizedRole === "Quản Trị Viên") {
+    return <>{children}</>;
   }
 
-  const capDonVi = donVi?.capDonVi ?? account?.donVi?.capDonVi ?? null;
-  const isDutyRoute = location.pathname.startsWith("/duty/");
+  const currentNavId = getIdByPath(location.pathname);
 
-  if (isDutyRoute && !canAccessDutyGroup(userRole, capDonVi)) {
-    return (
-      <Navigate
-        to={
-          normalizedRole === "Trực ban tác chiến" ? "/dashboard" : "/settings"
-        }
-        replace
-      />
-    );
+  if (currentNavId !== "settings") {
+    const hasChucNang =
+      !!tenChucnang &&
+      tenChucnang.length > 0 &&
+      tenChucnang.includes(currentNavId);
+
+    if (!hasChucNang) {
+      return <Navigate to="/settings" replace />;
+    }
   }
 
   return <>{children}</>;

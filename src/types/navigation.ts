@@ -226,6 +226,9 @@ export const CHUC_NANG_OPTIONS: { value: NavItemId; label: string }[] = [
   { value: "duty-shifts", label: "Quản lý ca trực" },
   { value: "duty-create", label: "Tạo ca trực" },
   { value: "account-management", label: "Quản lý tài khoản" },
+  { value: "unit-management", label: "Quản lý đơn vị" },
+  { value: "role-management", label: "Quản lý vai trò" },
+  { value: "audit-log", label: "Nhật ký hệ thống" },
   { value: "settings", label: "Cài đặt" },
 ];
 
