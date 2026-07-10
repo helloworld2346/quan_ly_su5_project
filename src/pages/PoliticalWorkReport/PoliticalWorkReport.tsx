@@ -37,7 +37,6 @@ import Skeleton from "../../components/ui/Skeleton/Skeleton";
 import { useMinLoading } from "../../hooks/useMinLoading";
 
 import { isApprovedStatus } from "../../utils/reportStatus";
-import { isPoliticalOfficeAccount } from "../../types/navigation";
 
 function StatusBadge({
   active,
@@ -64,7 +63,9 @@ function StatusBadge({
 }
 
 function buildConsolidatedPoliticalWork(rows: PoliticalWorkRow[]) {
-  const validRows = rows.filter((r) => !r.notSubmitted && isApprovedStatus(r.status));
+  const validRows = rows.filter(
+    (r) => !r.notSubmitted && isApprovedStatus(r.status),
+  );
 
   return {
     tinhHinh: validRows
@@ -98,42 +99,28 @@ export default function PoliticalWorkReport() {
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const [consolidating, setConsolidating] = useState(false);
-  
+
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const { account } = useAuth();
   const { showError, showSuccess } = useToast();
 
-  const submitMaDonVi = account?.donVi?.maDonVi;
+  const maDonViCurrent = account?.donVi?.maDonVi;
   const capDonVi = account?.donVi?.capDonVi;
   const userRole = account?.vaiTro?.tenVaiTro;
   const normalizedRole = normalizeRoleName(userRole ?? undefined);
   const isTacChien = normalizedRole === "Trực ban tác chiến";
   const isNoiVu = normalizedRole === "Trực ban nội vụ";
 
-  const isPoliticalOffice = isPoliticalOfficeAccount({
-    username: account?.tenDangNhap,
-    unitName: account?.donVi?.tenDonvi,
-    unitSymbol: account?.donVi?.kyhieuDonvi,
-  });
-
-  /**
-   * viewMaDonVi: dùng để xem danh sách báo cáo cấp dưới.
-   * submitMaDonVi: dùng để tạo/sửa báo cáo của chính tài khoản đang đăng nhập.
-   */
-  const viewMaDonVi = isPoliticalOffice ? "GS003" : submitMaDonVi;
-
   const isParentUnit =
-    isPoliticalOffice ||
     (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
     (isNoiVu && capDonVi === "TIEU_DOAN");
 
-  const shouldHideConsolidatedSections =
-    isPoliticalOffice || (isTacChien && capDonVi === "SU_DOAN");
+  const shouldHideConsolidatedSections = isTacChien && capDonVi === "SU_DOAN";
 
   const { reportData, parentReportData, childUnits, loading, fetchReports } =
     usePoliticalWorkData({
-      maDonViCurrent: viewMaDonVi,
+      maDonViCurrent,
       isParentUnit,
       showError,
       reportDate,
@@ -143,10 +130,11 @@ export default function PoliticalWorkReport() {
 
   const showSkeleton = useMinLoading(loading);
 
-  // Xác định báo cáo của chính tài khoản đăng nhập (Bỏ hoàn toàn fallback reportData[0])
   const ownReport =
-    reportData.find((r) => r.donVi === submitMaDonVi) ??
-    (!isPoliticalOffice ? parentReportData : null);
+    parentReportData ??
+    reportData.find((r) => r.donVi === maDonViCurrent) ??
+    reportData[0] ??
+    null;
 
   const commanderReport =
     reportData.find((r) => r.status === "Chờ_Duyệt") ?? null;
@@ -205,18 +193,18 @@ export default function PoliticalWorkReport() {
   }, [isParentUnit, childUnits, reportData]);
 
   const approvedChildRows = useMemo(() => {
-    return childRows.filter((r) => !r.notSubmitted && isApprovedStatus(r.status));
+    return childRows.filter(
+      (r) => !r.notSubmitted && isApprovedStatus(r.status),
+    );
   }, [childRows]);
 
   const totalRequiredCount = childUnits.length;
-  const canConsolidate = isParentUnit && !parentReportData && approvedChildRows.length > 0;
+  const canConsolidate =
+    isParentUnit && !parentReportData && approvedChildRows.length > 0;
 
   const isPastDate = reportDate < todayIsoDate();
-  
-  // Xác định chính xác trạng thái đã nộp báo cáo của tài khoản hiện tại
-  const hasOwnReport = Boolean(
-    ownReport && !ownReport.notSubmitted && ownReport.donVi === submitMaDonVi,
-  );
+
+  const hasOwnReport = Boolean(ownReport && !ownReport.notSubmitted);
 
   const handleAddReport = () => {
     if (isPastDate) {
@@ -244,11 +232,11 @@ export default function PoliticalWorkReport() {
     return parentReportData
       ? { ...parentReportData, notSubmitted: false }
       : createEmptyPoliticalWorkRow({
-          maDonVi: viewMaDonVi ?? "",
+          maDonVi: maDonViCurrent ?? "",
           tenDonVi: account?.donVi?.tenDonvi ?? "",
           kyhieuDonVi: account?.donVi?.kyhieuDonvi,
         });
-  }, [parentReportData, viewMaDonVi, account]);
+  }, [parentReportData, maDonViCurrent, account]);
 
   const flatRows = useMemo<PoliticalWorkRow[]>(() => {
     if (!isParentUnit) return reportData;
@@ -362,7 +350,7 @@ export default function PoliticalWorkReport() {
         <td
           className={`${styles["political-ctd-cell"]} ${styles["political-nowrap"]}`}
         >
-          | —
+          —
         </td>
         <td>
           <ReportStatusBadge status="Chưa_Nộp" />
@@ -480,7 +468,7 @@ export default function PoliticalWorkReport() {
         onQueryChange={setQuery}
         reportDate={reportDate}
         onReportDateChange={setReportDate}
-        onAddReport={!hasOwnReport && !isPastDate ? handleAddReport : undefined}
+        onAddReport={!hasOwnReport ? handleAddReport : undefined}
         onApprove={
           canApprove
             ? () => handleApproveReport(commanderReport!.idCongtac)
@@ -634,7 +622,7 @@ export default function PoliticalWorkReport() {
         </div>
       </section>
 
-      {ownReport && !ownReport.notSubmitted && ownReport.donVi === submitMaDonVi && (
+      {ownReport && !ownReport.notSubmitted && (
         <section className={styles["political-duty-section"]}>
           <div className={styles["political-duty-card"]}>
             <div className={styles["political-duty-header"]}>
@@ -646,8 +634,20 @@ export default function PoliticalWorkReport() {
                   if (!reportDate) return "";
                   const dateParts = reportDate.split("-");
                   if (dateParts.length !== 3) return reportDate;
-                  const dateObj = new Date(Number(dateParts[0]), Number(dateParts[1]) - 1, Number(dateParts[2]));
-                  const days = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+                  const dateObj = new Date(
+                    Number(dateParts[0]),
+                    Number(dateParts[1]) - 1,
+                    Number(dateParts[2]),
+                  );
+                  const days = [
+                    "Chủ Nhật",
+                    "Thứ Hai",
+                    "Thứ Ba",
+                    "Thứ Tư",
+                    "Thứ Năm",
+                    "Thứ Sáu",
+                    "Thứ Bảy",
+                  ];
                   return `${days[dateObj.getDay()]} - ${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
                 })()}
               </div>
@@ -662,7 +662,9 @@ export default function PoliticalWorkReport() {
                       Trực Ban Nội Vụ
                     </div>
                     <div className={styles["political-duty-name"]}>
-                      {info.capBac ? `${info.capBac} - ${info.hoTen}` : info.hoTen || "—"}
+                      {info.capBac
+                        ? `${info.capBac} - ${info.hoTen}`
+                        : info.hoTen || "—"}
                     </div>
                     <div className={styles["political-duty-position"]}>
                       {info.chucVu || "—"}
@@ -682,7 +684,9 @@ export default function PoliticalWorkReport() {
                       Trực CTĐ, CTCT
                     </div>
                     <div className={styles["political-duty-name"]}>
-                      {info.capBac ? `${info.capBac} - ${info.hoTen}` : info.hoTen || "—"}
+                      {info.capBac
+                        ? `${info.capBac} - ${info.hoTen}`
+                        : info.hoTen || "—"}
                     </div>
                     <div className={styles["political-duty-position"]}>
                       {info.chucVu || "—"}
@@ -710,15 +714,15 @@ export default function PoliticalWorkReport() {
           consolidating
             ? {
                 ...createEmptyPoliticalWorkRow({
-                  maDonVi: viewMaDonVi ?? "",
-                  tenDonVi: "Sư đoàn 5",
-                  kyhieuDonVi: "SD5",
+                  maDonVi: maDonViCurrent ?? "",
+                  tenDonVi: account?.donVi?.tenDonvi ?? "",
+                  kyhieuDonVi: account?.donVi?.kyhieuDonvi,
                 }),
                 ...buildConsolidatedPoliticalWork(approvedChildRows),
               }
             : editingRow
         }
-        maDonViCurrent={submitMaDonVi ?? ""}
+        maDonViCurrent={maDonViCurrent ?? ""}
         onSubmit={async (payload) => {
           try {
             if (editingRow) {
@@ -729,7 +733,11 @@ export default function PoliticalWorkReport() {
               showSuccess("Cập nhật báo cáo (nháp) thành công");
             } else {
               await politicalWorkService.createReport(payload);
-              showSuccess(consolidating ? "Tổng hợp và lưu báo cáo thành công" : "Lưu báo cáo nháp thành công");
+              showSuccess(
+                consolidating
+                  ? "Tổng hợp và lưu báo cáo thành công"
+                  : "Lưu báo cáo nháp thành công",
+              );
             }
             await fetchReports();
             setIsCreateReportOpen(false);

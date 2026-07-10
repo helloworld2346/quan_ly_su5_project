@@ -42,7 +42,7 @@ export const politicalWorkService = {
   ): Promise<PoliticalWorkSingleResponse> => {
     const response = await api.get<PoliticalWorkSingleResponse>(
       `/ctdangct/search/DonVi/${idDonVi}`,
-      { params: { ngayLoc } },
+      { params: { ngayLoc }, skipErrorToast: true },
     );
     return response.data;
   },

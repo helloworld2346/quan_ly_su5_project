@@ -346,51 +346,14 @@ export function canAccessDutyGroup(
   if (normalizedRole !== "Trực ban tác chiến") return false;
 
   return capDonVi === "SU_DOAN";
-}
-
-export function isPoliticalOfficeAccount(args: {
-  username?: string | null;
-  unitName?: string | null;
-  unitSymbol?: string | null;
-}): boolean {
-  const username = (args.username ?? "").toLowerCase().replace(/^@+/, "");
-  const unitName = (args.unitName ?? "").toLowerCase();
-  const unitSymbol = (args.unitSymbol ?? "").toLowerCase();
-
-  return (
-    username === "pct_f5" ||
-    username.startsWith("pct_") ||
-    unitName.includes("phòng chính trị") ||
-    unitName.includes("phong chinh tri") ||
-    unitSymbol.includes("pct")
-  );
-}
-
-export function getPoliticalOfficeNavItems(): NavItem[] {
-  return ALL_NAV_ITEMS.filter(
-    (item) =>
-      item.id === "executive-political-work" ||
-      item.id === "report-troop" ||
-      item.id === "report-political-work" ||
-      item.id === "settings",
-  );
-}
+} 
 
 export function getNavItemsByRole(
   userRole: string | null,
   capDonVi: string | null = null,
   tenChucnang: string[] | null = null,
-  accountInfo?: {
-    username?: string | null;
-    unitName?: string | null;
-    unitSymbol?: string | null;
-  },
 ): NavItem[] {
   if (!userRole) return [];
-
-  if (isPoliticalOfficeAccount(accountInfo ?? {})) {
-    return getPoliticalOfficeNavItems();
-  }
 
   const normalizedRole = normalizeRoleName(userRole);
   const canAccessDuty = canAccessDutyGroup(userRole, capDonVi);

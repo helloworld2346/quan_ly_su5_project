@@ -58,14 +58,18 @@ export function usePoliticalWorkData({
           setParentReportData(null);
         }
       } else {
-        const res = await politicalWorkService.getByDonVi(
-          maDonViCurrent,
-          reportDate,
-        );
         setParentReportData(null);
-        if (res.success && res.Result) {
-          setReportData([mapItemToRow(res.Result)]);
-        } else {
+        try {
+          const res = await politicalWorkService.getByDonVi(
+            maDonViCurrent,
+            reportDate,
+          );
+          if (res.success && res.Result) {
+            setReportData([mapItemToRow(res.Result)]);
+          } else {
+            setReportData([]);
+          }
+        } catch {
           setReportData([]);
         }
       }

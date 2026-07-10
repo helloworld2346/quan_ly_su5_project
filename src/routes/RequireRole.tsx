@@ -2,7 +2,6 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { normalizeRoleName } from "../utils/reportUtils";
 import {
-  isPoliticalOfficeAccount,
   getIdByPath,
 } from "../types/navigation";
 
@@ -27,30 +26,6 @@ export default function RequireRole({ children }: Props) {
     account?.vaiTro?.tenVaiTro ?? undefined,
   );
   const tenChucnang = account.vaiTro?.tenChucnang ?? null;
-
-  const isPoliticalOffice = isPoliticalOfficeAccount({
-    username: account.tenDangNhap,
-    unitName: donVi?.tenDonvi ?? account.donVi?.tenDonvi,
-    unitSymbol: donVi?.kyhieuDonvi ?? account.donVi?.kyhieuDonvi,
-  });
-
-  const politicalOfficeAllowedPaths = [
-    "/political-dashboard",
-    "/daily-report",
-    "/political-work-report",
-    "/settings",
-  ];
-
-  if (
-    isPoliticalOffice &&
-    !politicalOfficeAllowedPaths.includes(location.pathname)
-  ) {
-    return <Navigate to="/political-dashboard" replace />;
-  }
-
-  if (isPoliticalOffice) {
-    return <>{children}</>;
-  }
 
   const EXEMPT_QUAN_SO_PATHS = ["/settings", "/political-work-report"];
 

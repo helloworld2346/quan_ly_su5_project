@@ -1,6 +1,12 @@
 import axios from "axios";
 import { storage } from "../utils/storage";
 
+declare module "axios" {  
+  export interface AxiosRequestConfig {  
+    skipErrorToast?: boolean;  
+  }  
+}
+
 const baseURL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
 const api = axios.create({
@@ -38,7 +44,8 @@ function setupInterceptors(instance: typeof api) {
       if (
         toastErrorHandler &&
         error.response?.status !== 401 &&
-        error.response?.status !== 404
+        error.response?.status !== 404 &&
+        !error.config?.skipErrorToast
       ) {
         const message =
           error.response?.data?.message || error.message || "Có lỗi xảy ra";

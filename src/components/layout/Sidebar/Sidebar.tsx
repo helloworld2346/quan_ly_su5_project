@@ -19,7 +19,6 @@ import {
   getNavItemsByRole,
   getNavGroupLabelByRole,
   EXECUTIVE_NAV_GROUP,
-  isPoliticalOfficeAccount,
 } from "../../../types/navigation";
 import NavGroup from "./NavGroup";
 import { useNavGroupState } from "./useNavGroupState";
@@ -62,19 +61,10 @@ export default function Sidebar({
 
   const tenChucnang = account?.vaiTro?.tenChucnang ?? null;
 
-  const politicalOfficeInfo = {
-    username: account?.tenDangNhap,
-    unitName: donVi?.tenDonvi ?? account?.donVi?.tenDonvi,
-    unitSymbol: donVi?.kyhieuDonvi ?? account?.donVi?.kyhieuDonvi,
-  };
-
-  const isPoliticalOffice = isPoliticalOfficeAccount(politicalOfficeInfo);
-
   const allowedNavItems = getNavItemsByRole(
     userRole,
     capDonVi,
     tenChucnang,
-    politicalOfficeInfo,
   ).filter((item) => !hiddenSidebarIds.includes(item.id));
 
   const executiveActive = EXECUTIVE_NAV_GROUP.items.some(
@@ -132,7 +122,7 @@ export default function Sidebar({
   ];
 
   const handleNavigate = (id: NavItemId) => {
-    if (!isPoliticalOffice && !QUOTA_EXEMPT_IDS.includes(id) && !hasQuota) {
+    if (!QUOTA_EXEMPT_IDS.includes(id) && !hasQuota) {
       setShowQuotaDialog(true);
       return;
     }
