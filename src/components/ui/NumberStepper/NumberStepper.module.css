@@ -85,3 +85,19 @@
 .numberInputBtnRight {  
   border-left: 1px solid var(--login-border);  
 }
+
+.numberInput.disabled {  
+  opacity: 0.55;  
+  background: var(--surface-muted);  
+}  
+  
+.numberInput.disabled input {  
+  cursor: not-allowed;  
+  color: var(--primary-muted65);  
+}  
+  
+.numberInputBtn:disabled {  
+  opacity: 0.5;  
+  cursor: not-allowed;  
+  pointer-events: none;  
+}
