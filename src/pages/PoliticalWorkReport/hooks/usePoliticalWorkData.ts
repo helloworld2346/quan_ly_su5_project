@@ -12,11 +12,13 @@ export function usePoliticalWorkData({
   isParentUnit,
   reportDate,
   showError,
+  submitMaDonVi,
 }: {
   maDonViCurrent: string | undefined;
   isParentUnit: boolean;
   reportDate: string;
   showError: (msg: string) => void;
+  submitMaDonVi?: string;
 }) {
   const [reportData, setReportData] = useState<PoliticalWorkRow[]>([]);
   const [parentReportData, setParentReportData] =
@@ -44,9 +46,11 @@ export function usePoliticalWorkData({
         } else {
           setReportData([]);
         }
+
+        const ownMaDonVi = submitMaDonVi ?? maDonViCurrent;
         try {
           const ownRes = await politicalWorkService.getByDonVi(
-            maDonViCurrent,
+            ownMaDonVi,
             reportDate,
           );
           if (ownRes.success && ownRes.Result) {
@@ -82,7 +86,7 @@ export function usePoliticalWorkData({
     } finally {
       setLoading(false);
     }
-  }, [maDonViCurrent, isParentUnit, reportDate]);
+  }, [maDonViCurrent, isParentUnit, reportDate, submitMaDonVi]);
 
   useInitialFetch(fetchReports);
   useReportDataChangedListener(fetchReports);

@@ -105,25 +105,38 @@ export default function PoliticalWorkReport() {
   const { account } = useAuth();
   const { showError, showSuccess } = useToast();
 
-  const maDonViCurrent = account?.donVi?.maDonVi;
+  const submitMaDonVi = account?.donVi?.maDonVi;
   const capDonVi = account?.donVi?.capDonVi;
   const userRole = account?.vaiTro?.tenVaiTro;
   const normalizedRole = normalizeRoleName(userRole ?? undefined);
   const isTacChien = normalizedRole === "Trực ban tác chiến";
   const isNoiVu = normalizedRole === "Trực ban nội vụ";
 
+  const isPoliticalOffice =
+    (account?.tenDangNhap ?? "")
+      .toLowerCase()
+      .replace(/^@+/, "")
+      .startsWith("pct_") ||
+    (account?.donVi?.kyhieuDonvi ?? "").toLowerCase().includes("pct") ||
+    (account?.donVi?.tenDonvi ?? "").toLowerCase().includes("phòng chính trị");
+
+  const viewMaDonVi = isPoliticalOffice ? "GS003" : submitMaDonVi;
+
   const isParentUnit =
+    isPoliticalOffice ||
     (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
     (isNoiVu && capDonVi === "TIEU_DOAN");
 
-  const shouldHideConsolidatedSections = isTacChien && capDonVi === "SU_DOAN";
+  const shouldHideConsolidatedSections =
+    isPoliticalOffice || (isTacChien && capDonVi === "SU_DOAN");
 
   const { reportData, parentReportData, childUnits, loading, fetchReports } =
     usePoliticalWorkData({
-      maDonViCurrent,
+      maDonViCurrent: viewMaDonVi,
       isParentUnit,
       showError,
       reportDate,
+      submitMaDonVi: isPoliticalOffice ? submitMaDonVi : undefined,
     });
 
   const hasChildren = childUnits.length > 0;
@@ -132,7 +145,7 @@ export default function PoliticalWorkReport() {
 
   const ownReport =
     parentReportData ??
-    reportData.find((r) => r.donVi === maDonViCurrent) ??
+    reportData.find((r) => r.donVi === submitMaDonVi) ??
     reportData[0] ??
     null;
 
@@ -181,16 +194,18 @@ export default function PoliticalWorkReport() {
 
   const childRows = useMemo<PoliticalWorkRow[]>(() => {
     if (!isParentUnit) return [];
-    return (childUnits ?? []).map((unit) => {
-      const matched = reportData.find((r) => r.donVi === unit.maDonVi);
-      if (matched) return { ...matched, notSubmitted: false };
-      return createEmptyPoliticalWorkRow({
-        maDonVi: unit.maDonVi,
-        tenDonVi: unit.tenDonvi,
-        kyhieuDonVi: unit.kyhieuDonvi,
+    return (childUnits ?? [])
+      .filter((unit) => !isPoliticalOffice || unit.maDonVi !== submitMaDonVi)
+      .map((unit) => {
+        const matched = reportData.find((r) => r.donVi === unit.maDonVi);
+        if (matched) return { ...matched, notSubmitted: false };
+        return createEmptyPoliticalWorkRow({
+          maDonVi: unit.maDonVi,
+          tenDonVi: unit.tenDonvi,
+          kyhieuDonVi: unit.kyhieuDonvi,
+        });
       });
-    });
-  }, [isParentUnit, childUnits, reportData]);
+  }, [isParentUnit, childUnits, reportData, isPoliticalOffice, submitMaDonVi]);
 
   const approvedChildRows = useMemo(() => {
     return childRows.filter(
@@ -232,11 +247,11 @@ export default function PoliticalWorkReport() {
     return parentReportData
       ? { ...parentReportData, notSubmitted: false }
       : createEmptyPoliticalWorkRow({
-          maDonVi: maDonViCurrent ?? "",
+          maDonVi: submitMaDonVi ?? "",
           tenDonVi: account?.donVi?.tenDonvi ?? "",
           kyhieuDonVi: account?.donVi?.kyhieuDonvi,
         });
-  }, [parentReportData, maDonViCurrent, account]);
+  }, [parentReportData, submitMaDonVi, account]);
 
   const flatRows = useMemo<PoliticalWorkRow[]>(() => {
     if (!isParentUnit) return reportData;
@@ -714,7 +729,7 @@ export default function PoliticalWorkReport() {
           consolidating
             ? {
                 ...createEmptyPoliticalWorkRow({
-                  maDonVi: maDonViCurrent ?? "",
+                  maDonVi: submitMaDonVi ?? "",
                   tenDonVi: account?.donVi?.tenDonvi ?? "",
                   kyhieuDonVi: account?.donVi?.kyhieuDonvi,
                 }),
@@ -722,7 +737,7 @@ export default function PoliticalWorkReport() {
               }
             : editingRow
         }
-        maDonViCurrent={maDonViCurrent ?? ""}
+        maDonViCurrent={submitMaDonVi ?? ""}
         onSubmit={async (payload) => {
           try {
             if (editingRow) {

@@ -58,6 +58,17 @@ export const politicalWorkService = {
     return response.data;
   },
 
+  getChildrenForPolitical: async (
+    idDonVi: string,
+    ngayLoc: string,
+  ): Promise<PoliticalWorkListResponse> => {
+    const response = await api.get<PoliticalWorkListResponse>(
+      `/ctdangct/search/donViCha/${idDonVi}/children`,
+      { params: { ngayLoc } },
+    );
+    return response.data;
+  },
+
   getApprovedByDonVi: async (
     idDonVi: string,
     ngayLoc: string,
