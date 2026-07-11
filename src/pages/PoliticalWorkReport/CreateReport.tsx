@@ -214,63 +214,7 @@ export default function CreateReport({
       }
       footer={footer}
     >
-      <section className={styles["report-section"]}>
-        <h3
-          className={`${styles["section-title"]} ${styles["section-title--green"]}`}
-        >
-          Trực ban nội vụ
-        </h3>
-        <div className={styles["report-grid-4col"]}>
-          <div className={styles["form-group"]}>
-            <label>
-              Họ và tên <span className={styles["required-mark"]}>*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="Nhập họ và tên..."
-              value={formData.reporterName}
-              onChange={(e) => handleChange("reporterName", e.target.value)}
-            />
-          </div>
-
-          <div className={styles["form-group"]}>
-            <label>
-              Cấp bậc <span className={styles["required-mark"]}>*</span>
-            </label>
-            <CustomSelect
-              options={RANK_OPTIONS}
-              value={formData.reporterRank}
-              onChange={(v) => handleChange("reporterRank", v)}
-              placeholder="Chọn cấp bậc"
-            />
-          </div>
-
-          <div className={styles["form-group"]}>
-            <label>
-              Chức vụ <span className={styles["required-mark"]}>*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="Nhập chức vụ..."
-              value={formData.reporterPosition}
-              onChange={(e) => handleChange("reporterPosition", e.target.value)}
-            />
-          </div>
-          <div className={styles["form-group"]}>
-            <label>Số điện thoại</label>
-            <input
-              type="text"
-              placeholder="Nhập số điện thoại..."
-              value={formData.reporterPhone}
-              onChange={(e) => {
-                const val = e.target.value.replace(/[^\d+\-\s]/g, "");
-                handleChange("reporterPhone", val);
-              }}
-            />
-          </div>
-        </div>
-      </section>
-
+      {/* PHẦN 1: TRỰC CÔNG TÁC ĐẢNG, CÔNG TÁC CHÍNH TRỊ (ĐÃ ĐƯA LÊN TRÊN) */}
       <section className={styles["report-section"]}>
         <h3
           className={`${styles["section-title"]} ${styles["section-title--green"]}`}
@@ -322,6 +266,64 @@ export default function CreateReport({
               onChange={(e) => {
                 const val = e.target.value.replace(/[^\d+\-\s]/g, "");
                 handleChange("ctdPhone", val);
+              }}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* PHẦN 2: TRỰC BAN NỘI VỤ (ĐÃ ĐƯA XUỐNG DƯỚI) */}
+      <section className={styles["report-section"]}>
+        <h3
+          className={`${styles["section-title"]} ${styles["section-title--green"]}`}
+        >
+          Trực ban nội vụ
+        </h3>
+        <div className={styles["report-grid-4col"]}>
+          <div className={styles["form-group"]}>
+            <label>
+              Họ và tên <span className={styles["required-mark"]}>*</span>
+            </label>
+            <input
+              type="text"
+              placeholder="Nhập họ và tên..."
+              value={formData.reporterName}
+              onChange={(e) => handleChange("reporterName", e.target.value)}
+            />
+          </div>
+
+          <div className={styles["form-group"]}>
+            <label>
+              Cấp bậc <span className={styles["required-mark"]}>*</span>
+            </label>
+            <CustomSelect
+              options={RANK_OPTIONS}
+              value={formData.reporterRank}
+              onChange={(v) => handleChange("reporterRank", v)}
+              placeholder="Chọn cấp bậc"
+            />
+          </div>
+
+          <div className={styles["form-group"]}>
+            <label>
+              Chức vụ <span className={styles["required-mark"]}>*</span>
+            </label>
+            <input
+              type="text"
+              placeholder="Nhập chức vụ..."
+              value={formData.reporterPosition}
+              onChange={(e) => handleChange("reporterPosition", e.target.value)}
+            />
+          </div>
+          <div className={styles["form-group"]}>
+            <label>Số điện thoại</label>
+            <input
+              type="text"
+              placeholder="Nhập số điện thoại..."
+              value={formData.reporterPhone}
+              onChange={(e) => {
+                const val = e.target.value.replace(/[^\d+\-\s]/g, "");
+                handleChange("reporterPhone", val);
               }}
             />
           </div>
