@@ -13,17 +13,21 @@ export function usePoliticalWorkData({
   reportDate,
   showError,
   submitMaDonVi,
+  fetchPctDuty,
 }: {
   maDonViCurrent: string | undefined;
   isParentUnit: boolean;
   reportDate: string;
   showError: (msg: string) => void;
   submitMaDonVi?: string;
+  fetchPctDuty?: boolean;
 }) {
   const [reportData, setReportData] = useState<PoliticalWorkRow[]>([]);
   const [parentReportData, setParentReportData] =
     useState<PoliticalWorkRow | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const [dutyReport, setDutyReport] = useState<PoliticalWorkRow | null>(null);
 
   const { childUnits } = useChildUnits(maDonViCurrent, isParentUnit);
 
@@ -61,6 +65,32 @@ export function usePoliticalWorkData({
         } catch {
           setParentReportData(null);
         }
+        if (fetchPctDuty) {
+          const pctUnit = childUnits.find(
+            (u) =>
+              (u.kyhieuDonvi ?? "").toLowerCase().includes("pct") ||
+              (u.tenDonvi ?? "").toLowerCase().includes("chính trị"),
+          );
+          if (pctUnit) {
+            try {
+              const pctRes = await politicalWorkService.getByDonVi(
+                pctUnit.maDonVi,
+                reportDate,
+              );
+              setDutyReport(
+                pctRes.success && pctRes.Result
+                  ? mapItemToRow(pctRes.Result)
+                  : null,
+              );
+            } catch {
+              setDutyReport(null);
+            }
+          } else {
+            setDutyReport(null);
+          }
+        } else {
+          setDutyReport(null);
+        }
       } else {
         setParentReportData(null);
         try {
@@ -86,7 +116,14 @@ export function usePoliticalWorkData({
     } finally {
       setLoading(false);
     }
-  }, [maDonViCurrent, isParentUnit, reportDate, submitMaDonVi]);
+  }, [
+    maDonViCurrent,
+    isParentUnit,
+    reportDate,
+    submitMaDonVi,
+    childUnits,
+    fetchPctDuty,
+  ]);
 
   useInitialFetch(fetchReports);
   useReportDataChangedListener(fetchReports);
@@ -97,5 +134,6 @@ export function usePoliticalWorkData({
     childUnits,
     loading,
     fetchReports,
+    dutyReport,
   };
 }

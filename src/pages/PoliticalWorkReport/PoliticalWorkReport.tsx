@@ -129,17 +129,24 @@ export default function PoliticalWorkReport() {
     (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
     (isNoiVu && capDonVi === "TIEU_DOAN");
 
-  const shouldHideConsolidatedSections =  
+  const shouldHideConsolidatedSections =
     isAdmin || isPoliticalOffice || (isTacChien && capDonVi === "SU_DOAN");
 
-  const { reportData, parentReportData, childUnits, loading, fetchReports } =
-    usePoliticalWorkData({
-      maDonViCurrent: viewMaDonVi,
-      isParentUnit,
-      showError,
-      reportDate,
-      submitMaDonVi: isPoliticalOffice ? submitMaDonVi : undefined,
-    });
+  const {
+    reportData,
+    parentReportData,
+    childUnits,
+    loading,
+    fetchReports,
+    dutyReport,
+  } = usePoliticalWorkData({
+    maDonViCurrent: viewMaDonVi,
+    isParentUnit,
+    showError,
+    reportDate,
+    submitMaDonVi: isPoliticalOffice ? submitMaDonVi : undefined,
+    fetchPctDuty: isAdmin || (isTacChien && capDonVi === "SU_DOAN"),
+  });
 
   const hasChildren = childUnits.length > 0;
 
@@ -150,6 +157,9 @@ export default function PoliticalWorkReport() {
     reportData.find((r) => r.donVi === submitMaDonVi) ??
     reportData[0] ??
     null;
+
+  const dutyReportForDisplay =
+    isAdmin || (isTacChien && capDonVi === "SU_DOAN") ? dutyReport : ownReport;
 
   const commanderReport =
     reportData.find((r) => r.status === "Chờ_Duyệt") ?? null;
@@ -641,7 +651,7 @@ export default function PoliticalWorkReport() {
         </div>
       </section>
 
-      {ownReport && !ownReport.notSubmitted && (
+      {dutyReportForDisplay && !dutyReportForDisplay.notSubmitted && (
         <section className={styles["political-duty-section"]}>
           <div className={styles["political-duty-card"]}>
             <div className={styles["political-duty-header"]}>
@@ -674,7 +684,7 @@ export default function PoliticalWorkReport() {
 
             <div className={styles["political-duty-grid"]}>
               {(() => {
-                const info = parseTrucNguoi(ownReport.trucBanNoiVu);
+                const info = parseTrucNguoi(dutyReportForDisplay.trucBanNoiVu);
                 return (
                   <div className={styles["political-duty-box"]}>
                     <div className={styles["political-duty-label"]}>
@@ -696,7 +706,9 @@ export default function PoliticalWorkReport() {
               })()}
 
               {(() => {
-                const info = parseTrucNguoi(ownReport.trucBanCtDangCt);
+                const info = parseTrucNguoi(
+                  dutyReportForDisplay.trucBanCtDangCt,
+                );
                 return (
                   <div className={styles["political-duty-box"]}>
                     <div className={styles["political-duty-label"]}>
