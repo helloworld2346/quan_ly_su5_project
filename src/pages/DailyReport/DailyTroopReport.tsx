@@ -138,6 +138,7 @@ export default function DailyTroopReport() {
     currentEditingDetail,
     nhiemVuEntries,
     shouldHideConsolidatedSections,
+    showTotalRow,
     totalRequiredCount,
   } = useDailyTroopReportViewModel({
     query,
@@ -476,6 +477,7 @@ export default function DailyTroopReport() {
         consolidatedData={consolidatedData}
         canConsolidateUnit={isParentUnit}
         shouldHideConsolidatedSections={shouldHideConsolidatedSections}
+        showTotalRow={showTotalRow}
         sharedRowProps={sharedRowProps}
         activeMenuUnit={activeMenuUnit}
         menuPosition={menuPosition}

@@ -129,7 +129,7 @@ export default function PoliticalWorkReport() {
     (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
     (isNoiVu && capDonVi === "TIEU_DOAN");
 
-  const shouldHideConsolidatedSections =
+  const shouldHideConsolidatedSections =  
     isAdmin || isPoliticalOffice || (isTacChien && capDonVi === "SU_DOAN");
 
   const { reportData, parentReportData, childUnits, loading, fetchReports } =

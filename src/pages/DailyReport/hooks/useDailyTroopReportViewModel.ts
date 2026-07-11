@@ -304,9 +304,11 @@ export function useDailyTroopReportViewModel(
     shouldHideDraftAndUnsubmitted,
   ]);
 
-const shouldHideConsolidatedSections =
-  isAdmin || (isTacChien && capDonVi === "SU_DOAN");
-  
+  const shouldHideConsolidatedSections =
+    isAdmin || (isTacChien && capDonVi === "SU_DOAN");
+
+  const showTotalRow = isParentUnit;
+
   return {
     isParentUnit,
     isChiHuyLeaf,
@@ -323,6 +325,7 @@ const shouldHideConsolidatedSections =
     currentEditingDetail,
     nhiemVuEntries,
     shouldHideConsolidatedSections,
+    showTotalRow,
     totalRequiredCount: childUnits.length,
     consolidatedData,
   };

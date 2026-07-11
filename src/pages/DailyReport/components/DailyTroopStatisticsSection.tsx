@@ -34,6 +34,7 @@ type Props = {
   consolidatedData: ConsolidatedData | null;
   canConsolidateUnit: boolean;
   shouldHideConsolidatedSections: boolean;
+  showTotalRow: boolean;
   sharedRowProps: SharedRowProps;
   activeMenuUnit: string | null;
   menuPosition: { top: number; left: number };
@@ -49,6 +50,7 @@ export default function DailyTroopStatisticsSection({
   consolidatedData,
   canConsolidateUnit,
   shouldHideConsolidatedSections,
+  showTotalRow,
   sharedRowProps,
   activeMenuUnit,
   menuPosition,
@@ -129,7 +131,7 @@ export default function DailyTroopStatisticsSection({
                       />
                     ))}
 
-                    {!shouldHideConsolidatedSections &&
+                    {showTotalRow &&
                       displayRows.some((r) => !r.notSubmitted) && (
                         <ReportTotalRow
                           displayTotals={displayTotals}
