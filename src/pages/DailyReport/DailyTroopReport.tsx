@@ -80,6 +80,7 @@ export default function DailyTroopReport() {
   const isChiHuy = normalizedRole === "Trực chỉ huy";
   const isTacChien = normalizedRole === "Trực ban tác chiến";
   const isNoiVu = normalizedRole === "Trực ban nội vụ";
+  const isAdmin = normalizedRole === "Quản Trị Viên";
 
   const {
     reportData,
@@ -93,6 +94,7 @@ export default function DailyTroopReport() {
   } = useReportData({
     maDonViCurrent,
     isParentUnit:
+      isAdmin ||
       (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
       (isNoiVu && capDonVi === "TIEU_DOAN"),
     isTacChien,
@@ -144,6 +146,7 @@ export default function DailyTroopReport() {
     isChiHuy,
     isTacChien,
     isNoiVu,
+    isAdmin,
     capDonVi,
     maDonViCurrent,
     reportData,
