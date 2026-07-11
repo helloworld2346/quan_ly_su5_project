@@ -204,7 +204,7 @@
   --focus-ring-width: 3px;
   
   /* --- PRIMARY ALPHA (thay cho color-mix, Chrome ≤84) --- */  
-  --primary-a04: rgba(31, 92, 63, 0.04);  
+  --primary-a04: rgba(31, 92, 63, 0.04); 
   --primary-a05: rgba(31, 92, 63, 0.05);  
   --primary-a06: rgba(31, 92, 63, 0.06);  
   --primary-a07: rgba(31, 92, 63, 0.07);  
@@ -218,7 +218,7 @@
   --primary-muted65: #2e5d46;
 
   /* --- TABLE HEADER TONES (Light Mode) --- */  
---table-header-brown:  #8a5a2b;  /* nâu đất */  
+--table-header-brown:  #959027;  /* nâu đất */  
 --table-header-terra:  #a25438;  /* gạch nung */  
 --table-header-olive:  #6f7a2e;  /* xanh ô-liu */  
 --table-header-wine:   #8a3a52;  /* rượu vang */  

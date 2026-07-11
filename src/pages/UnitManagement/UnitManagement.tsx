@@ -144,12 +144,6 @@ export default function UnitManagement() {
     [units],
   );
 
-  const unitNameMap = useMemo(() => {
-    const map = new Map<string, DonVi>();
-    units.forEach((u) => map.set(u.maDonVi, u));
-    return map;
-  }, [units]);
-
   const filterCapOptions = useMemo(
     () => [{ value: "", label: "Tất cả cấp" }, ...CAP_OPTIONS],
     [],
