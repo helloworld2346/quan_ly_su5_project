@@ -504,7 +504,9 @@ export default function PoliticalWorkReport() {
         }
         hasReport={hasOwnReport}
         isPastDate={isPastDate}
-        onConsolidate={isParentUnit ? handleConsolidate : undefined}
+        onConsolidate={
+          isParentUnit && !isPoliticalOffice ? handleConsolidate : undefined
+        }
         consolidateDisabled={!canConsolidate}
         consolidateLabel={
           parentReportData
