@@ -111,6 +111,7 @@ export default function PoliticalWorkReport() {
   const normalizedRole = normalizeRoleName(userRole ?? undefined);
   const isTacChien = normalizedRole === "Trực ban tác chiến";
   const isNoiVu = normalizedRole === "Trực ban nội vụ";
+  const isAdmin = normalizedRole === "Quản Trị Viên";
 
   const isPoliticalOffice =
     (account?.tenDangNhap ?? "")
@@ -123,12 +124,13 @@ export default function PoliticalWorkReport() {
   const viewMaDonVi = isPoliticalOffice ? "GS003" : submitMaDonVi;
 
   const isParentUnit =
+    isAdmin ||
     isPoliticalOffice ||
     (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
     (isNoiVu && capDonVi === "TIEU_DOAN");
 
-  const shouldHideConsolidatedSections =
-    isPoliticalOffice || (isTacChien && capDonVi === "SU_DOAN");
+  const shouldHideConsolidatedSections =  
+    isAdmin || isPoliticalOffice || (isTacChien && capDonVi === "SU_DOAN");
 
   const { reportData, parentReportData, childUnits, loading, fetchReports } =
     usePoliticalWorkData({
@@ -502,7 +504,9 @@ export default function PoliticalWorkReport() {
         }
         hasReport={hasOwnReport}
         isPastDate={isPastDate}
-        onConsolidate={isParentUnit ? handleConsolidate : undefined}
+        onConsolidate={
+          isParentUnit && !isPoliticalOffice ? handleConsolidate : undefined
+        }
         consolidateDisabled={!canConsolidate}
         consolidateLabel={
           parentReportData

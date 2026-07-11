@@ -38,6 +38,7 @@ export type UseDailyTroopReportViewModelArgs = {
   isChiHuy: boolean;
   isTacChien: boolean;
   isNoiVu: boolean;
+  isAdmin: boolean;
   capDonVi?: string | null;
   maDonViCurrent?: string;
   reportData: ReportRow[];
@@ -86,6 +87,7 @@ export function useDailyTroopReportViewModel(
     isChiHuy,
     isTacChien,
     isNoiVu,
+    isAdmin,
     capDonVi,
     maDonViCurrent,
     reportData,
@@ -101,6 +103,7 @@ export function useDailyTroopReportViewModel(
   } = args;
 
   const isParentUnit =
+    isAdmin ||
     (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
     (isNoiVu && capDonVi === "TIEU_DOAN");
 
@@ -301,7 +304,10 @@ export function useDailyTroopReportViewModel(
     shouldHideDraftAndUnsubmitted,
   ]);
 
-  const shouldHideConsolidatedSections = isTacChien && capDonVi === "SU_DOAN";
+  const shouldHideConsolidatedSections =
+    isAdmin || (isTacChien && capDonVi === "SU_DOAN");
+
+  const showTotalRow = isParentUnit;
 
   return {
     isParentUnit,
@@ -319,6 +325,7 @@ export function useDailyTroopReportViewModel(
     currentEditingDetail,
     nhiemVuEntries,
     shouldHideConsolidatedSections,
+    showTotalRow,
     totalRequiredCount: childUnits.length,
     consolidatedData,
   };
