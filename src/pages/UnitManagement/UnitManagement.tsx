@@ -144,6 +144,12 @@ export default function UnitManagement() {
     [units],
   );
 
+  const unitNameMap = useMemo(() => {
+    const map = new Map<string, DonVi>();
+    units.forEach((u) => map.set(u.maDonVi, u));
+    return map;
+  }, [units]);
+
   const filterCapOptions = useMemo(
     () => [{ value: "", label: "Tất cả cấp" }, ...CAP_OPTIONS],
     [],
@@ -340,6 +346,7 @@ export default function UnitManagement() {
 
   const renderRow = (u: DonVi, index: number) => {
     const stt = (safePage - 1) * pageSize + index + 1;
+
     return (
       <tr key={u.maDonVi} className={styles.row}>
         <td className={styles.colIndex}>{stt}</td>
@@ -351,6 +358,13 @@ export default function UnitManagement() {
           <span className={styles.roleBadge}>{capLabel(u.capDonVi)}</span>
         </td>
         <td className={styles.muted}>{u.quanSoTong}</td>
+        <td>
+          {u.donViCha ? (
+            <span className={styles.childChip}>{u.donViCha}</span>
+          ) : (
+            <span className={styles.muted}>—</span>
+          )}
+        </td>
         <td className={styles.colActions}>
           <div className={styles.rowActions}>
             <button
@@ -384,6 +398,9 @@ export default function UnitManagement() {
         </td>
         <td>
           <Skeleton width={40} height={12} />
+        </td>
+        <td>
+          <Skeleton width={120} height={12} />
         </td>
         <td className={styles.colActions}>
           <Skeleton width={32} height={28} />
@@ -449,6 +466,7 @@ export default function UnitManagement() {
                 <th>Ký hiệu</th>
                 <th>Cấp</th>
                 <th>Quân số</th>
+                <th>Trực thuộc đơn vị</th>
                 <th className={styles.colActions}>Thao tác</th>
               </tr>
             </thead>
@@ -457,7 +475,7 @@ export default function UnitManagement() {
                 renderSkeletonRows(pageSize)
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className={styles.emptyRow}>
+                  <td colSpan={7} className={styles.emptyRow}>
                     {hasFilter ? "Không tìm thấy đơn vị" : "Chưa có đơn vị"}
                   </td>
                 </tr>

@@ -437,7 +437,25 @@
   cursor: not-allowed;  
 }  
   
-/* ===== Animation / responsive ===== */  
+.childUnits {  
+  display: flex;  
+  flex-wrap: wrap;  
+  gap: 6px;  
+  max-width: 320px;  
+}  
+  
+.childChip {  
+  display: inline-block;  
+  padding: 2px 10px;  
+  border-radius: 20px;  
+  background: var(--primary-a06);  
+  color: var(--login-text);  
+  border: 1px solid var(--login-border);  
+  font-size: 12px;  
+  font-weight: 500;  
+  white-space: nowrap;  
+}
+
 @keyframes fadeSlideIn {  
   from {  
     opacity: 0;  
