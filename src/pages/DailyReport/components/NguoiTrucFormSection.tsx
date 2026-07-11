@@ -7,6 +7,7 @@ type Props = {
   value: TrucNguoiInfo;
   onChange: (val: TrucNguoiInfo) => void;
   capBacOptions: string[];
+  disabled?: boolean;
 };
 
 export default function TrucNguoiFormSection({
@@ -14,6 +15,7 @@ export default function TrucNguoiFormSection({
   value,
   onChange,
   capBacOptions,
+  disabled = false,
 }: Props) {
   return (
     <>
@@ -35,6 +37,7 @@ export default function TrucNguoiFormSection({
             }
             placeholder="Nhập họ và tên..."
             required
+            disabled={disabled}
           />
         </div>
 
@@ -47,6 +50,7 @@ export default function TrucNguoiFormSection({
             value={value.capbacNguoitruc}
             onChange={(val) => onChange({ ...value, capbacNguoitruc: val })}
             placeholder="Chọn cấp bậc"
+            disabled={disabled}
           />
         </div>
 
@@ -63,6 +67,7 @@ export default function TrucNguoiFormSection({
             }
             placeholder="Nhập chức vụ..."
             required
+            disabled={disabled}
           />
         </div>
 
@@ -77,6 +82,7 @@ export default function TrucNguoiFormSection({
               onChange({ ...value, sodienthoai: val });
             }}
             placeholder="Nhập số điện thoại..."
+            disabled={disabled}
           />
         </div>
       </div>

@@ -25,6 +25,7 @@ import {
 import TrucNguoiFormSection from "./components/NguoiTrucFormSection";
 import AbsentRowsTable from "./components/AbsentRowsTable";
 import { generateId } from "../../utils/uuid";
+import { useAuth } from "../../context/useAuth";
 
 interface CreateReportModalProps {
   isOpen: boolean;
@@ -53,6 +54,10 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   reportDate,
   initialDetailData,
 }) => {
+  const { account } = useAuth();
+  const capDonVi = account?.donVi?.capDonVi;
+  const isDaiDoi = capDonVi === "DAI_DOI";
+
   const { showWarning } = useToast();
   const [step, setStep] = useState(1);
   const [detailData, setDetailData] = useState<DetailStepData | null>(null);
@@ -75,7 +80,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
         if (res.Result) setNhiemVuInitialData(res.Result);
       })
       .catch(() => {
-        // Không block nếu chưa có nhiemvungay
+      
       });
   }, [initialData?.idDonBaoCao]);
 
@@ -167,15 +172,17 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
     ) {
       return "Điền đầy đủ Trực chỉ huy trước khi tiếp tục.";
     }
-
-    if (
-      !trucBanTacChien.tenNguoitruc.trim() ||
-      !trucBanTacChien.capbacNguoitruc.trim() ||
-      !trucBanTacChien.chucvuNguoitruc.trim()
-    ) {
-      return `Điền đầy đủ ${
-        isTacChien ? "Trực ban tác chiến" : "Trực ban nội vụ"
-      } trước khi tiếp tục.`;
+    
+    if (!isDaiDoi) {
+      if (
+        !trucBanTacChien.tenNguoitruc.trim() ||
+        !trucBanTacChien.capbacNguoitruc.trim() ||
+        !trucBanTacChien.chucvuNguoitruc.trim()
+      ) {
+        return `Điền đầy đủ ${
+          isTacChien ? "Trực ban tác chiến" : "Trực ban nội vụ"
+        } trước khi tiếp tục.`;
+      }
     }
 
     const invalidIndex = absentRows.findIndex(
@@ -477,6 +484,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                     ? CAP_BAC_TAC_CHIEN_SU_DOAN
                     : CAP_BAC_TAC_CHIEN_DEFAULT
                 }
+                disabled={isDaiDoi}
               />
 
               <hr className={styles.divider} />
