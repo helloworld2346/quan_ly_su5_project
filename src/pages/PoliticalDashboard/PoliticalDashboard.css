@@ -316,7 +316,6 @@
   );
 }
 
-/* THAY ĐỔI: Tăng lõi trắng bên trong vòng tròn từ 52px lên 60px */
 .political-donut-inner-content {
   width: 60px; 
   height: 60px; 
@@ -330,7 +329,6 @@
   pointer-events: none;
 }
 
-/* THAY ĐỔI: Tăng kích thước chữ số ở tâm vòng tròn từ 24px lên 26px */
 .political-donut-inner-content strong {
   font-size: 26px;
   color: var(--login-text);
@@ -366,10 +364,10 @@
   opacity: 0.35;
 }
 
-/* THAY ĐỔI: Tăng kích thước chữ của phần chú thích lên 13px và giãn khoảng cách (gap) lên 8px */
+
 .political-unit-body li {
   display: grid;
-  grid-template-columns: 10px 1fr auto auto; 
+  grid-template-columns: 10px 1fr 40px 50px;
   align-items: center;
   gap: 8px; 
   font-size: 13px;
@@ -418,6 +416,20 @@
 .political-unit-body small {
   color: var(--login-text-muted);
   text-align: right;
+}
+
+.political-unit-body b {
+  text-align: right;
+  font-weight: 700;
+  width: 30px;
+  font-variant-numeric: tabular-nums; 
+}
+
+.political-unit-body small {
+  color: var(--login-text-muted);
+  text-align: right;
+  width: 50px;
+  font-variant-numeric: tabular-nums; 
 }
 
 .political-updated {
