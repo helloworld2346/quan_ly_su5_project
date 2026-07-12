@@ -7,7 +7,7 @@ type Props = {
   value: TrucNguoiInfo;
   onChange: (val: TrucNguoiInfo) => void;
   capBacOptions: string[];
-  chucVuOptions?: string[]; // Thêm prop danh sách chức vụ
+  chucVuOptions?: string[];
   disabled?: boolean;
 };
 
@@ -16,7 +16,7 @@ export default function TrucNguoiFormSection({
   value,
   onChange,
   capBacOptions,
-  chucVuOptions, // Nhận prop chucVuOptions
+  chucVuOptions,
   disabled = false,
 }: Props) {
   return (
@@ -60,9 +60,9 @@ export default function TrucNguoiFormSection({
           <label className={styles.label}>
             Chức vụ <span className={styles.required}>*</span>
           </label>
-          {chucVuOptions ? (
+          {(chucVuOptions?.length ?? 0) > 0 ? (
             <CustomSelect
-              options={chucVuOptions.map((cv) => ({ value: cv, label: cv }))}
+              options={chucVuOptions!.map((cv) => ({ value: cv, label: cv }))}
               value={value.chucvuNguoitruc}
               onChange={(val) => onChange({ ...value, chucvuNguoitruc: val })}
               placeholder="Chọn chức vụ"

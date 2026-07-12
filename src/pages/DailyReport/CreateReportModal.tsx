@@ -27,7 +27,6 @@ import AbsentRowsTable from "./components/AbsentRowsTable";
 import { generateId } from "../../utils/uuid";
 import { useAuth } from "../../context/useAuth";
 
-// --- CONSTANTS CHỨC VỤ ---
 const CHUC_VU_CHI_HUY_DAI_DOI = [
   "Đại đội trưởng",
   "Phó đại đội trưởng",
@@ -44,20 +43,21 @@ const CHUC_VU_CHI_HUY_TIEU_DOAN = [
 
 const CHUC_VU_CHI_HUY_TRUNG_DOAN = [
   "Trung đoàn trưởng",
-  "Phó trung đoàn trưởng -TMT",
+  "Phó trung đoàn trưởng - Tham mưu trưởng",
   "Phó trung đoàn trưởng",
 ];
 
-const getChucVuOptions = (capDonVi?: string) => {
+const getChucVuOptions = (capDonVi?: string, isTrungDoanBo?: boolean) => {
+  if (capDonVi === "TRUNG_DOAN") {
+    return isTrungDoanBo ? [] : CHUC_VU_CHI_HUY_TRUNG_DOAN;
+  }
   switch (capDonVi) {
     case "DAI_DOI":
       return CHUC_VU_CHI_HUY_DAI_DOI;
     case "TIEU_DOAN":
       return CHUC_VU_CHI_HUY_TIEU_DOAN;
-    case "TRUNG_DOAN":
-      return CHUC_VU_CHI_HUY_TRUNG_DOAN;
     default:
-      return undefined; // Các phòng/ban không có dropdown
+      return [];
   }
 };
 
@@ -92,6 +92,12 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   const capDonVi = account?.donVi?.capDonVi;
   const isDaiDoi = capDonVi === "DAI_DOI";
 
+  const unitName = (account?.donVi?.tenDonvi ?? "").toLowerCase();
+  const unitSymbol = (account?.donVi?.kyhieuDonvi ?? "").toLowerCase();
+  const isTrungDoanBo = ["e bộ", "ebộ", "ebo"].some(
+    (k) => unitName.includes(k) || unitSymbol.includes(k),
+  );
+
   const { showWarning } = useToast();
   const [step, setStep] = useState(1);
   const [detailData, setDetailData] = useState<DetailStepData | null>(null);
@@ -113,9 +119,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       .then((res) => {
         if (res.Result) setNhiemVuInitialData(res.Result);
       })
-      .catch(() => {
-      
-      });
+      .catch(() => {});
   }, [initialData?.idDonBaoCao]);
 
   const detailFromInitialData = useMemo<DetailStepData | null>(() => {
@@ -206,7 +210,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
     ) {
       return "Điền đầy đủ Trực chỉ huy trước khi tiếp tục.";
     }
-    
+
     if (!isDaiDoi) {
       if (
         !trucBanTacChien.tenNguoitruc.trim() ||
@@ -498,15 +502,18 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
 
               <hr className={styles.divider} />
 
-            <TrucNguoiFormSection
-  title="Trực chỉ huy"
-  value={trucChiHuy}
-  onChange={setTrucChiHuy}
-  capBacOptions={
-    isTacChien ? CAP_BAC_CHI_HUY_SU_DOAN : CAP_BAC_CHI_HUY_DEFAULT
-  }
-  chucVuOptions={getChucVuOptions(capDonVi ?? undefined)} 
-/>
+              <TrucNguoiFormSection
+                title="Trực chỉ huy"
+                value={trucChiHuy}
+                onChange={setTrucChiHuy}
+                capBacOptions={
+                  isTacChien ? CAP_BAC_CHI_HUY_SU_DOAN : CAP_BAC_CHI_HUY_DEFAULT
+                }
+                chucVuOptions={getChucVuOptions(
+                  capDonVi ?? undefined,
+                  isTrungDoanBo,
+                )}  
+              />
               <hr className={styles.divider} />
 
               <TrucNguoiFormSection

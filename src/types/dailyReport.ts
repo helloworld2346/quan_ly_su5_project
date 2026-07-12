@@ -49,7 +49,7 @@ export interface AbsentRow {
   chucVu: string;
   lyDoVang: keyof VangChiTiet;
   ghiChu: string;
-  tenDonVi: string;
+  tenDonVi?: string;
 }
 
 export type ReportItemInput = {

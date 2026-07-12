@@ -62,7 +62,6 @@ export default function DailyTroopReport() {
   const [editNhiemVuId, setEditNhiemVuId] = useState<string | null>(null);
 
   const [nhiemVuData, setNhiemVuData] = useState<NhiemVuNgay | null>(null);
-  console.log(nhiemVuData);
   const [nhiemVuList, setNhiemVuList] = useState<
     Array<{
       maDonVi: string;
