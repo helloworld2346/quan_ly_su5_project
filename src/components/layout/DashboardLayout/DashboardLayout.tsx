@@ -13,7 +13,10 @@ import { accountService } from "../../../services/account/accountService";
 import type { Account } from "../../../types/account";
 import { useTheme, ThemeToggle } from "../../../theme";
 
-import {getAvatarInitials} from "../../../utils/avatar"
+import { getAvatarInitials } from "../../../utils/avatar";
+
+import ReportStatusBadge from "../../ui/ReportStatusBadge/ReportStatusBadge";
+import { useTopBarReportStatus } from "./useTopBarReportStatus";
 
 type Props = {
   activeId: NavItemId;
@@ -30,6 +33,7 @@ type TopBarActionsProps = {
 
 function TopBarActions({ isDark, onToggleTheme }: TopBarActionsProps) {
   const [account, setAccount] = useState<Account | null>(null);
+  const reportStatus = useTopBarReportStatus();
 
   useEffect(() => {
     const fetchAccount = async () => {
@@ -48,9 +52,9 @@ function TopBarActions({ isDark, onToggleTheme }: TopBarActionsProps) {
     fetchAccount();
   }, []);
 
-const getAvatarText = () => {
-  return getAvatarInitials(account);
-};
+  const getAvatarText = () => {
+    return getAvatarInitials(account);
+  };
 
   const getDisplayName = () => {
     if (!account) return "Quản trị viên";
@@ -59,6 +63,13 @@ const getAvatarText = () => {
 
   return (
     <div className={styles.topBarRight}>
+      {reportStatus && (
+        <span className={styles.reportStatusWrap}>
+          <span className={styles.reportStatusLabel}>Báo cáo thống kê quân số hôm nay:</span>
+          <ReportStatusBadge status={reportStatus} />
+        </span>
+      )}
+
       <ThemeToggle
         isDark={isDark}
         onToggle={onToggleTheme}

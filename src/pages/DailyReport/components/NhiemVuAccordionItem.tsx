@@ -16,17 +16,28 @@ function Badge({
   return <span className={className}>{children}</span>;
 }
 
+type Accent = "success" | "danger" | "warning" | "neutral";
+
+const accentClass: Record<Accent, string> = {
+  success: styles.nhiemVuDetailItemAccentSuccess,
+  danger: styles.nhiemVuDetailItemAccentDanger,
+  warning: styles.nhiemVuDetailItemAccentWarning,
+  neutral: styles.nhiemVuDetailItemAccentNeutral,
+};
+
 function DetailItem({
   label,
   badge,
   detail,
+  accent = "neutral",
 }: {
   label: string;
   badge: React.ReactNode;
   detail?: string;
+  accent?: Accent;
 }) {
   return (
-    <div className={styles.nhiemVuDetailItem}>
+    <div className={`${styles.nhiemVuDetailItem} ${accentClass[accent]}`}>
       <div className={styles.nhiemVuDetailItemHeader}>
         <span className={styles.nhiemVuDetailLabel}>{label}</span>
         {badge}
@@ -49,6 +60,7 @@ export default function NhiemVuAccordionItem({ label, data }: Props) {
     <div className={styles.nhiemVuDetailGrid}>
       <DetailItem
         label="Nhiệm vụ các phân đội đóng quân canh phòng và các phân đội khác"
+        accent={data.securityStatus === "safe" ? "success" : "danger"}
         badge={
           <Badge
             className={`${styles.nhiemVuDetailBadge} ${
@@ -66,6 +78,7 @@ export default function NhiemVuAccordionItem({ label, data }: Props) {
 
       <DetailItem
         label="Những việc đột xuất xảy ra"
+        accent={data.incidentStatus === "yes" ? "warning" : "success"}
         badge={
           <Badge
             className={`${styles.nhiemVuDetailBadge} ${
@@ -84,6 +97,7 @@ export default function NhiemVuAccordionItem({ label, data }: Props) {
 
       <DetailItem
         label="Ưu điểm"
+        accent={data.advantageStatus === "yes" ? "success" : "neutral"}
         badge={
           <Badge
             className={`${styles.nhiemVuDetailBadge} ${
@@ -100,6 +114,7 @@ export default function NhiemVuAccordionItem({ label, data }: Props) {
 
       <DetailItem
         label="Khuyết điểm"
+        accent={data.disadvantageStatus === "yes" ? "danger" : "success"}
         badge={
           <Badge
             className={`${styles.nhiemVuDetailBadge} ${
@@ -116,6 +131,7 @@ export default function NhiemVuAccordionItem({ label, data }: Props) {
 
       <DetailItem
         label="Những việc cần tiếp tục giải quyết"
+        accent={data.pendingStatus === "yes" ? "warning" : "success"}
         badge={
           <Badge
             className={`${styles.nhiemVuDetailBadge} ${

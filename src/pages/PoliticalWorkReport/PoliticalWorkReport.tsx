@@ -78,8 +78,15 @@ export default function PoliticalWorkReport() {
   const [editingRow, setEditingRow] = useState<PoliticalWorkRow | null>(null);
   const [detailRow, setDetailRow] = useState<PoliticalWorkRow | null>(null);
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
-  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+  const [menuPosition, setMenuPosition] = useState<{
+    top?: number;
+    bottom?: number;
+    left: number;
+  }>({ top: 0, left: 0 });
+
   const [consolidating, setConsolidating] = useState(false);
+
+  const [activeTab, setActiveTab] = useState<"child" | "consolidated">("child");
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
@@ -113,6 +120,9 @@ export default function PoliticalWorkReport() {
   const shouldHideConsolidatedSections =
     isAdmin || isPoliticalOffice || (isTacChien && capDonVi === "SU_DOAN");
 
+  const isTacChienSuDoan = isTacChien && capDonVi === "SU_DOAN";
+  const canAddOwnReport = isTacChienSuDoan || isAdmin;
+
   const {
     reportData,
     parentReportData,
@@ -133,19 +143,20 @@ export default function PoliticalWorkReport() {
 
   const showSkeleton = useMinLoading(loading);
 
-const ownReport = reportData.find((r) => r.donVi === submitMaDonVi) ?? null;
+  const ownReport = reportData.find((r) => r.donVi === submitMaDonVi) ?? null;
 
-const reportForSubmit = isParentUnit && parentReportData ? parentReportData : ownReport;
+  const reportForSubmit =
+    isParentUnit && parentReportData ? parentReportData : ownReport;
 
-const dutyReportForDisplay =
-  isAdmin || (isTacChien && capDonVi === "SU_DOAN")
-    ? dutyReport
-    : isParentUnit && parentReportData
-      ? parentReportData
-      : ownReport;
+  const dutyReportForDisplay =
+    isAdmin || (isTacChien && capDonVi === "SU_DOAN")
+      ? dutyReport
+      : isParentUnit && parentReportData
+        ? parentReportData
+        : ownReport;
 
-const commanderReport =
-  reportData.find((r) => r.status === "Chờ_Duyệt") ?? null;
+  const commanderReport =
+    reportData.find((r) => r.status === "Chờ_Duyệt") ?? null;
 
   const {
     showRefuseDialog,
@@ -158,14 +169,14 @@ const commanderReport =
     handleRefuseCancel,
   } = usePoliticalWorkActions({ showSuccess, showError, fetchReports });
 
-const { canApprove, canRefuse, canSubmit, canRecall } =
-  usePoliticalWorkPermissions(
-    userRole,
-    capDonVi,
-    reportForSubmit,
-    commanderReport,
-    hasChildren,
-  );
+  const { canApprove, canRefuse, canSubmit, canRecall } =
+    usePoliticalWorkPermissions(
+      userRole,
+      capDonVi,
+      reportForSubmit,
+      commanderReport,
+      hasChildren,
+    );
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -214,7 +225,9 @@ const { canApprove, canRefuse, canSubmit, canRecall } =
 
   const isPastDate = reportDate < todayIsoDate();
 
-  const hasOwnReport = Boolean(ownReport && !ownReport.notSubmitted);
+  const hasOwnReport = canAddOwnReport
+    ? Boolean(dutyReport && !dutyReport.notSubmitted)
+    : Boolean(ownReport && !ownReport.notSubmitted);
 
   const handleAddReport = () => {
     if (isPastDate) {
@@ -410,10 +423,19 @@ const { canApprove, canRefuse, canSubmit, canRecall } =
                 return;
               }
               const rect = event.currentTarget.getBoundingClientRect();
-              setMenuPosition({
-                top: rect.bottom + window.scrollY + 4,
-                left: rect.right + window.scrollX - 220,
-              });
+              const menuHeight = 110;
+              const spaceBelow = window.innerHeight - rect.bottom;
+              if (spaceBelow < menuHeight) {
+                setMenuPosition({
+                  bottom: window.innerHeight - rect.top + 4,
+                  left: rect.right - 220,
+                });
+              } else {
+                setMenuPosition({
+                  top: rect.bottom + 4,
+                  left: rect.right - 220,
+                });
+              }
               setActiveMenuId(row.idCongtac);
             }}
           >
@@ -427,8 +449,9 @@ const { canApprove, canRefuse, canSubmit, canRecall } =
                 className={styles["political-dropdown-menu"]}
                 role="menu"
                 style={{
-                  position: "absolute",
-                  top: `${menuPosition.top}px`,
+                  ...(menuPosition.top !== undefined
+                    ? { top: `${menuPosition.top}px` }
+                    : { bottom: `${menuPosition.bottom}px` }),
                   left: `${menuPosition.left}px`,
                   zIndex: 9999,
                 }}
@@ -473,42 +496,50 @@ const { canApprove, canRefuse, canSubmit, canRecall } =
       className={styles["political-report"]}
       aria-labelledby="political-report-heading"
     >
-<ReportToolbar
-  query={query}
-  onQueryChange={setQuery}
-  reportDate={reportDate}
-  onReportDateChange={setReportDate}
-  onAddReport={!isParentUnit && !hasOwnReport ? handleAddReport : undefined}
-  onApprove={
-    canApprove
-      ? () => handleApproveReport(commanderReport!.idCongtac)
-      : undefined
-  }
-  onRefuse={
-    canRefuse
-      ? () => handleRefuseReportClick(commanderReport!)
-      : undefined
-  }
-  onSubmit={
-    canSubmit ? () => handleSubmitReport(reportForSubmit!.idCongtac) : undefined
-  }
-  onRecall={
-    canRecall ? () => handleRecallReport(reportForSubmit!.idCongtac) : undefined
-  }
-  hasReport={hasOwnReport}
-  isPastDate={isPastDate}
-  onConsolidate={
-    isParentUnit && !isPoliticalOffice ? handleConsolidate : undefined
-  }
-  consolidateDisabled={!canConsolidate}
-  consolidateLabel={
-    parentReportData
-      ? "Đã tổng hợp"
-      : approvedChildRows.length < totalRequiredCount
-        ? `Chưa đủ (${approvedChildRows.length}/${totalRequiredCount} đơn vị)`
-        : "Tổng hợp"
-  }
-/>
+      <ReportToolbar
+        query={query}
+        onQueryChange={setQuery}
+        reportDate={reportDate}
+        onReportDateChange={setReportDate}
+        onAddReport={
+          (!isParentUnit || canAddOwnReport) && !hasOwnReport
+            ? handleAddReport
+            : undefined
+        }
+        onApprove={
+          canApprove
+            ? () => handleApproveReport(commanderReport!.idCongtac)
+            : undefined
+        }
+        onRefuse={
+          canRefuse
+            ? () => handleRefuseReportClick(commanderReport!)
+            : undefined
+        }
+        onSubmit={
+          canSubmit
+            ? () => handleSubmitReport(reportForSubmit!.idCongtac)
+            : undefined
+        }
+        onRecall={
+          canRecall
+            ? () => handleRecallReport(reportForSubmit!.idCongtac)
+            : undefined
+        }
+        hasReport={hasOwnReport}
+        isPastDate={isPastDate}
+        onConsolidate={
+          isParentUnit && !isPoliticalOffice ? handleConsolidate : undefined
+        }
+        consolidateDisabled={!canConsolidate}
+        consolidateLabel={
+          parentReportData
+            ? "Đã tổng hợp"
+            : approvedChildRows.length < totalRequiredCount
+              ? `Chưa đủ (${approvedChildRows.length}/${totalRequiredCount} đơn vị)`
+              : "Tổng hợp"
+        }
+      />
 
       <div className={styles["political-stats-grid"]}>
         <StatCard
@@ -560,6 +591,35 @@ const { canApprove, canRefuse, canSubmit, canRecall } =
                 </div>
               </div>
             </div>
+
+            {showTwoSections && (
+              <div className={styles["political-tabs"]} role="tablist">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === "child"}
+                  className={`${styles["political-tab"]} ${
+                    activeTab === "child" ? styles["political-tab--active"] : ""
+                  }`}
+                  onClick={() => setActiveTab("child")}
+                >
+                  Báo cáo đơn vị
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === "consolidated"}
+                  className={`${styles["political-tab"]} ${
+                    activeTab === "consolidated"
+                      ? styles["political-tab--active"]
+                      : ""
+                  }`}
+                  onClick={() => setActiveTab("consolidated")}
+                >
+                  Báo cáo tổng hợp
+                </button>
+              </div>
+            )}
           </div>
 
           <div className={styles["political-table-shell"]}>
@@ -582,36 +642,28 @@ const { canApprove, canRefuse, canSubmit, canRecall } =
                 {showSkeleton ? (
                   renderSkeletonRows()
                 ) : showTwoSections ? (
-                  <>
-                    <tr className={styles["political-separator-row"]}>
-                      <td colSpan={9}>Báo cáo các đơn vị</td>
+                  activeTab === "child" ? (
+                    <>
+                      {filteredChildRows.map(renderRow)}
+
+                      {filteredChildRows.length === 0 && (
+                        <tr>
+                          <td
+                            className={styles["political-empty-cell"]}
+                            colSpan={9}
+                          >
+                            Không tìm thấy báo cáo phù hợp.
+                          </td>
+                        </tr>
+                      )}
+                    </>
+                  ) : parentReportData ? (
+                    renderRow(parentRow)
+                  ) : (
+                    <tr className={styles["political-no-consolidated-row"]}>
+                      <td colSpan={9}>Chưa có báo cáo tổng hợp</td>
                     </tr>
-
-                    {filteredChildRows.map(renderRow)}
-
-                    {filteredChildRows.length === 0 && (
-                      <tr>
-                        <td
-                          className={styles["political-empty-cell"]}
-                          colSpan={9}
-                        >
-                          Không tìm thấy báo cáo phù hợp.
-                        </td>
-                      </tr>
-                    )}
-
-                    <tr className={styles["political-separator-row"]}>
-                      <td colSpan={9}>Báo cáo tổng hợp</td>
-                    </tr>
-
-                    {parentReportData ? (
-                      renderRow(parentRow)
-                    ) : (
-                      <tr className={styles["political-no-consolidated-row"]}>
-                        <td colSpan={9}>Chưa có báo cáo tổng hợp</td>
-                      </tr>
-                    )}
-                  </>
+                  )
                 ) : (
                   <>
                     {filteredFlatRows.map(renderRow)}
@@ -667,11 +719,13 @@ const { canApprove, canRefuse, canSubmit, canRecall } =
 
             <div className={styles["political-duty-grid"]}>
               {(() => {
-                const info = parseTrucNguoi(dutyReportForDisplay.trucBanNoiVu);
+                const info = parseTrucNguoi(
+                  dutyReportForDisplay.trucBanCtDangCt,
+                );
                 return (
                   <div className={styles["political-duty-box"]}>
                     <div className={styles["political-duty-label"]}>
-                      Trực Ban Nội Vụ
+                      Trực CTĐ, CTCT
                     </div>
                     <div className={styles["political-duty-name"]}>
                       {info.capBac
@@ -689,13 +743,11 @@ const { canApprove, canRefuse, canSubmit, canRecall } =
               })()}
 
               {(() => {
-                const info = parseTrucNguoi(
-                  dutyReportForDisplay.trucBanCtDangCt,
-                );
+                const info = parseTrucNguoi(dutyReportForDisplay.trucBanNoiVu);
                 return (
                   <div className={styles["political-duty-box"]}>
                     <div className={styles["political-duty-label"]}>
-                      Trực CTĐ, CTCT
+                      Trực Ban Nội Vụ
                     </div>
                     <div className={styles["political-duty-name"]}>
                       {info.capBac

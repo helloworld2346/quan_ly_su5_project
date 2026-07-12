@@ -1,12 +1,11 @@
-.page {
-  height: calc(100vh - 112px);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
-  padding: 24px 0 0;
+.page {  
+  min-height: calc(100vh - 112px);  
+  display: flex;  
+  flex-direction: column;  
+  max-width: 1200px;  
+  margin: 0 auto;  
+  width: 100%;  
+  padding: 24px 0 0;  
 }
 
 .page > * + * {
@@ -198,13 +197,10 @@
   padding: 32px;
 }
 
-.listsGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
+.listsGrid {  
+  display: grid;  
+  grid-template-columns: 1fr 1fr;  
+  gap: 24px;  
 }
 
 .listSection {
@@ -250,12 +246,12 @@
   text-align: center;
 }
 
-.listBody {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
+.listBody {  
+  display: flex;  
+  flex-direction: column;  
+  min-height: 220px;  
+  max-height: 360px;  
+  overflow-y: auto;  
 }
 
 .emptyList {

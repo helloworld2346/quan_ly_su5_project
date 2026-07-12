@@ -230,17 +230,13 @@ export function useDailyTroopReportViewModel(
     if (isParentUnit) {
       const ownReportRow = parentReportData ?? null;
 
-      // Chỉ thêm entry của đơn vị cha khi không có parentReportData (giống hàng "Tổng")
-      // Khi có parentReportData (D2-E4), chỉ hiển thị các đơn vị con
-      if (!parentReportData) {
-        entries.push({
-          id: maDonViCurrent ?? "own",
-          title: account?.donVi?.kyhieuDonvi || "",
-          subtitle: maDonViCurrent ?? "",
-          data: nhiemVuData ? buildNhiemVuSummary(nhiemVuData) : null,
-          reportStatusLabel: getNhiemVuReportStatusLabel(ownReportRow),
-        });
-      }
+      entries.push({
+        id: maDonViCurrent ?? "own",
+        title: account?.donVi?.tenDonvi || account?.donVi?.kyhieuDonvi || "",
+        subtitle: maDonViCurrent ?? "",
+        data: nhiemVuData ? buildNhiemVuSummary(nhiemVuData) : null,
+        reportStatusLabel: getNhiemVuReportStatusLabel(ownReportRow),
+      });
 
       childUnits.forEach((unit) => {
         const matched = nhiemVuList.find((item) => {
@@ -257,7 +253,7 @@ export function useDailyTroopReportViewModel(
 
         entries.push({
           id: unit.maDonVi,
-          title: unit.kyhieuDonvi || unit.maDonVi,
+          title: unit.tenDonvi || unit.kyhieuDonvi || unit.maDonVi,
           subtitle: "",
           data: matched ? buildNhiemVuSummary(matched.data) : null,
           reportStatusLabel: getNhiemVuReportStatusLabel(childReportRow),
@@ -283,7 +279,7 @@ export function useDailyTroopReportViewModel(
       [
         {
           id: maDonViCurrent ?? "own",
-          title: account?.donVi?.kyhieuDonvi || "",
+          title: account?.donVi?.tenDonvi || account?.donVi?.kyhieuDonvi || "",
           subtitle: maDonViCurrent ?? "",
           data: buildNhiemVuSummary(nhiemVuData),
           reportStatusLabel: getNhiemVuReportStatusLabel(ownReportRow),

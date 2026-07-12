@@ -11,6 +11,8 @@ import type { Notification } from "../components/ui/NotificationBell/Notificatio
 import type { ApiNotification } from "../types/notification";
 import { useToast } from "./useToast";
 import { generateId } from "../utils/uuid";
+import { normalizeRoleName } from "../utils/reportUtils";
+import { getDirectChildUnits } from "../shared/report/utils/reportUnitTree";
 
 function mapApiNotification(n: ApiNotification): Notification {
   return {
@@ -62,7 +64,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const donViData = allDonVi.find(
             (dv) => dv.maDonVi === accountResponse.Result.donVi?.maDonVi,
           );
-          setDonVi(donViData || null);
+
+          if (donViData) {
+            const childUnits = getDirectChildUnits(allDonVi, donViData.maDonVi);
+            const normalizedRole = normalizeRoleName(
+              result.vaiTro?.tenVaiTro ?? undefined,
+            );
+            const isDivisionTacChien =
+              normalizedRole === "Trực ban tác chiến" &&
+              donViData.capDonVi === "SU_DOAN";
+            const isAggregatedOnly =
+              childUnits.length > 0 && !isDivisionTacChien;
+
+            if (isAggregatedOnly) {
+              const agg = childUnits.reduce(
+                (acc, c) => ({
+                  siQuan: acc.siQuan + c.quanSoSiQuan,
+                  qncn: acc.qncn + c.quanSoQncn,
+                  hsqBs: acc.hsqBs + c.quanSoHsqBs,
+                }),
+                {
+                  siQuan: donViData.quanSoSiQuan,
+                  qncn: donViData.quanSoQncn,
+                  hsqBs: donViData.quanSoHsqBs,
+                },
+              );
+              setDonVi({
+                ...donViData,
+                quanSoSiQuan: agg.siQuan,
+                quanSoQncn: agg.qncn,
+                quanSoHsqBs: agg.hsqBs,
+                quanSoTong: agg.siQuan + agg.qncn + agg.hsqBs,
+              });
+            } else {
+              setDonVi(donViData);
+            }
+          } else {
+            setDonVi(null);
+          }
         }
 
         const notifId = accountResponse.Result.donVi?.maDonVi;
