@@ -227,3 +227,17 @@
   font-size: 13px;  
   line-height: 1.5;  
 }
+
+.form-group input[type="text"]:disabled,
+.form-group textarea:disabled,
+.incident-box textarea:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background-color: var(--surface-muted);
+}
+
+.form-group input[type="text"]:disabled:hover,
+.form-group textarea:disabled:hover,
+.incident-box textarea:disabled:hover {
+  border-color: var(--modal-input-border);
+}

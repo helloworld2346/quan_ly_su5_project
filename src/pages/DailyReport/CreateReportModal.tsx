@@ -48,14 +48,33 @@ const CHUC_VU_CHI_HUY_TRUNG_DOAN = [
   "Phó trung đoàn trưởng",
 ];
 
-const getChucVuOptions = (capDonVi?: string) => {
+const CHUC_VU_CTD_DAI_DOI = [
+  "Chính trị viên",
+  "Chính trị viên phó",
+  "Đại đội trưởng",
+  "Phó đại đội trưởng",
+];
+
+const CHUC_VU_CTD_TIEU_DOAN = [
+  "Chính trị viên",
+  "Chính trị viên phó",
+  "Tiểu đoàn trưởng",
+  "Phó tiểu đoàn trưởng",
+];
+
+const CHUC_VU_CTD_TRUNG_DOAN = [
+  "Chính ủy",
+  "Phó chính ủy",
+];
+
+const getChucVuOptions = (capDonVi?: string, type: "chiHuy" | "ctd" = "chiHuy") => {
   switch (capDonVi) {
     case "DAI_DOI":
-      return CHUC_VU_CHI_HUY_DAI_DOI;
+      return type === "chiHuy" ? CHUC_VU_CHI_HUY_DAI_DOI : CHUC_VU_CTD_DAI_DOI;
     case "TIEU_DOAN":
-      return CHUC_VU_CHI_HUY_TIEU_DOAN;
+      return type === "chiHuy" ? CHUC_VU_CHI_HUY_TIEU_DOAN : CHUC_VU_CTD_TIEU_DOAN;
     case "TRUNG_DOAN":
-      return CHUC_VU_CHI_HUY_TRUNG_DOAN;
+      return type === "chiHuy" ? CHUC_VU_CHI_HUY_TRUNG_DOAN : CHUC_VU_CTD_TRUNG_DOAN;
     default:
       return undefined; // Các phòng/ban không có dropdown
   }
@@ -262,7 +281,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
     return "";
   };
 
-  const handleAddRow = () => {
+const handleAddRow = () => {
     const newRow: AbsentRow = {
       id: generateId(),
       hoTen: "",
@@ -270,6 +289,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       chucVu: "",
       lyDoVang: "" as keyof VangChiTiet,
       ghiChu: "",
+      tenDonVi: "", 
     };
     setAbsentRows((prev) => [...prev, newRow]);
   };
@@ -498,15 +518,16 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
 
               <hr className={styles.divider} />
 
-            <TrucNguoiFormSection
-  title="Trực chỉ huy"
-  value={trucChiHuy}
-  onChange={setTrucChiHuy}
-  capBacOptions={
-    isTacChien ? CAP_BAC_CHI_HUY_SU_DOAN : CAP_BAC_CHI_HUY_DEFAULT
-  }
-  chucVuOptions={getChucVuOptions(capDonVi ?? undefined)} 
-/>
+              <TrucNguoiFormSection
+                title="Trực chỉ huy"
+                value={trucChiHuy}
+                onChange={setTrucChiHuy}
+                capBacOptions={
+                  isTacChien ? CAP_BAC_CHI_HUY_SU_DOAN : CAP_BAC_CHI_HUY_DEFAULT
+                }
+                chucVuOptions={getChucVuOptions(capDonVi ?? undefined, "chiHuy")} 
+              />
+
               <hr className={styles.divider} />
 
               <TrucNguoiFormSection
@@ -518,6 +539,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                     ? CAP_BAC_TAC_CHIEN_SU_DOAN
                     : CAP_BAC_TAC_CHIEN_DEFAULT
                 }
+                chucVuOptions={getChucVuOptions(capDonVi ?? undefined, "ctd")}
                 disabled={isDaiDoi}
               />
 
