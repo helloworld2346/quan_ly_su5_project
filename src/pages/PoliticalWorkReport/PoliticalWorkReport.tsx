@@ -97,7 +97,11 @@ export default function PoliticalWorkReport() {
   const [editingRow, setEditingRow] = useState<PoliticalWorkRow | null>(null);
   const [detailRow, setDetailRow] = useState<PoliticalWorkRow | null>(null);
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
-  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+  const [menuPosition, setMenuPosition] = useState<{
+    top?: number;
+    bottom?: number;
+    left: number;
+  }>({ top: 0, left: 0 });
   const [consolidating, setConsolidating] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -152,19 +156,20 @@ export default function PoliticalWorkReport() {
 
   const showSkeleton = useMinLoading(loading);
 
-const ownReport = reportData.find((r) => r.donVi === submitMaDonVi) ?? null;
+  const ownReport = reportData.find((r) => r.donVi === submitMaDonVi) ?? null;
 
-const reportForSubmit = isParentUnit && parentReportData ? parentReportData : ownReport;
+  const reportForSubmit =
+    isParentUnit && parentReportData ? parentReportData : ownReport;
 
-const dutyReportForDisplay =
-  isAdmin || (isTacChien && capDonVi === "SU_DOAN")
-    ? dutyReport
-    : isParentUnit && parentReportData
-      ? parentReportData
-      : ownReport;
+  const dutyReportForDisplay =
+    isAdmin || (isTacChien && capDonVi === "SU_DOAN")
+      ? dutyReport
+      : isParentUnit && parentReportData
+        ? parentReportData
+        : ownReport;
 
-const commanderReport =
-  reportData.find((r) => r.status === "Chờ_Duyệt") ?? null;
+  const commanderReport =
+    reportData.find((r) => r.status === "Chờ_Duyệt") ?? null;
 
   const {
     showRefuseDialog,
@@ -177,14 +182,14 @@ const commanderReport =
     handleRefuseCancel,
   } = usePoliticalWorkActions({ showSuccess, showError, fetchReports });
 
-const { canApprove, canRefuse, canSubmit, canRecall } =
-  usePoliticalWorkPermissions(
-    userRole,
-    capDonVi,
-    reportForSubmit,
-    commanderReport,
-    hasChildren,
-  );
+  const { canApprove, canRefuse, canSubmit, canRecall } =
+    usePoliticalWorkPermissions(
+      userRole,
+      capDonVi,
+      reportForSubmit,
+      commanderReport,
+      hasChildren,
+    );
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -429,10 +434,19 @@ const { canApprove, canRefuse, canSubmit, canRecall } =
                 return;
               }
               const rect = event.currentTarget.getBoundingClientRect();
-              setMenuPosition({
-                top: rect.bottom + window.scrollY + 4,
-                left: rect.right + window.scrollX - 220,
-              });
+              const menuHeight = 110;
+              const spaceBelow = window.innerHeight - rect.bottom;
+              if (spaceBelow < menuHeight) {
+                setMenuPosition({
+                  bottom: window.innerHeight - rect.top + 4,
+                  left: rect.right - 220,
+                });
+              } else {
+                setMenuPosition({
+                  top: rect.bottom + 4,
+                  left: rect.right - 220,
+                });
+              }
               setActiveMenuId(row.idCongtac);
             }}
           >
@@ -446,8 +460,9 @@ const { canApprove, canRefuse, canSubmit, canRecall } =
                 className={styles["political-dropdown-menu"]}
                 role="menu"
                 style={{
-                  position: "absolute",
-                  top: `${menuPosition.top}px`,
+                  ...(menuPosition.top !== undefined
+                    ? { top: `${menuPosition.top}px` }
+                    : { bottom: `${menuPosition.bottom}px` }),
                   left: `${menuPosition.left}px`,
                   zIndex: 9999,
                 }}
@@ -492,42 +507,48 @@ const { canApprove, canRefuse, canSubmit, canRecall } =
       className={styles["political-report"]}
       aria-labelledby="political-report-heading"
     >
-<ReportToolbar
-  query={query}
-  onQueryChange={setQuery}
-  reportDate={reportDate}
-  onReportDateChange={setReportDate}
-  onAddReport={!isParentUnit && !hasOwnReport ? handleAddReport : undefined}
-  onApprove={
-    canApprove
-      ? () => handleApproveReport(commanderReport!.idCongtac)
-      : undefined
-  }
-  onRefuse={
-    canRefuse
-      ? () => handleRefuseReportClick(commanderReport!)
-      : undefined
-  }
-  onSubmit={
-    canSubmit ? () => handleSubmitReport(reportForSubmit!.idCongtac) : undefined
-  }
-  onRecall={
-    canRecall ? () => handleRecallReport(reportForSubmit!.idCongtac) : undefined
-  }
-  hasReport={hasOwnReport}
-  isPastDate={isPastDate}
-  onConsolidate={
-    isParentUnit && !isPoliticalOffice ? handleConsolidate : undefined
-  }
-  consolidateDisabled={!canConsolidate}
-  consolidateLabel={
-    parentReportData
-      ? "Đã tổng hợp"
-      : approvedChildRows.length < totalRequiredCount
-        ? `Chưa đủ (${approvedChildRows.length}/${totalRequiredCount} đơn vị)`
-        : "Tổng hợp"
-  }
-/>
+      <ReportToolbar
+        query={query}
+        onQueryChange={setQuery}
+        reportDate={reportDate}
+        onReportDateChange={setReportDate}
+        onAddReport={
+          !isParentUnit && !hasOwnReport ? handleAddReport : undefined
+        }
+        onApprove={
+          canApprove
+            ? () => handleApproveReport(commanderReport!.idCongtac)
+            : undefined
+        }
+        onRefuse={
+          canRefuse
+            ? () => handleRefuseReportClick(commanderReport!)
+            : undefined
+        }
+        onSubmit={
+          canSubmit
+            ? () => handleSubmitReport(reportForSubmit!.idCongtac)
+            : undefined
+        }
+        onRecall={
+          canRecall
+            ? () => handleRecallReport(reportForSubmit!.idCongtac)
+            : undefined
+        }
+        hasReport={hasOwnReport}
+        isPastDate={isPastDate}
+        onConsolidate={
+          isParentUnit && !isPoliticalOffice ? handleConsolidate : undefined
+        }
+        consolidateDisabled={!canConsolidate}
+        consolidateLabel={
+          parentReportData
+            ? "Đã tổng hợp"
+            : approvedChildRows.length < totalRequiredCount
+              ? `Chưa đủ (${approvedChildRows.length}/${totalRequiredCount} đơn vị)`
+              : "Tổng hợp"
+        }
+      />
 
       <div className={styles["political-stats-grid"]}>
         <StatCard
