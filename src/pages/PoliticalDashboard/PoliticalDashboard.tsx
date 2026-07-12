@@ -56,10 +56,6 @@ export default function PoliticalDashboard() {
   const isToday = selectedDay.getTime() === today.getTime();
 
   useEffect(() => {
-    setSelectedDate(new Date());
-  }, []);
-
-  useEffect(() => {
     let ignore = false;
     let intervalId: ReturnType<typeof setInterval> | null = null;
 
