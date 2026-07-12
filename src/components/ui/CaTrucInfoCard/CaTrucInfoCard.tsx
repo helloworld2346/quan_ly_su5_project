@@ -13,6 +13,7 @@ interface Props {
   ghichu?: string;
   trucChiHuy?: NguoiTrucInfo;
   trucBanTacChien?: NguoiTrucInfo;
+  labelSecond?: string; 
 }
 
 export default function CaTrucInfoCard({
@@ -21,6 +22,7 @@ export default function CaTrucInfoCard({
   ghichu,
   trucChiHuy,
   trucBanTacChien,
+  labelSecond = "Trực ban tác chiến",
 }: Props) {
   return (
     <div className={styles.caTrucSection}>
@@ -38,10 +40,10 @@ export default function CaTrucInfoCard({
           : ""}
       </div>
       <div className={styles.caTrucBody}>
-        {[
-          { label: "Trực chỉ huy", data: trucChiHuy },
-          { label: "Trực ban tác chiến", data: trucBanTacChien },
-        ].map(({ label, data }) => (
+      {[
+  { label: "Trực chỉ huy", data: trucChiHuy },
+  { label: labelSecond, data: trucBanTacChien },
+].map(({ label, data }) => (
           <div key={label} className={styles.caTrucCard}>
             <span className={styles.caTrucRole}>{label}</span>
             {data ? (

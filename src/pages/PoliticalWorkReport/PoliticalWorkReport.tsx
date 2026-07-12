@@ -152,17 +152,19 @@ export default function PoliticalWorkReport() {
 
   const showSkeleton = useMinLoading(loading);
 
-  const ownReport =
-    parentReportData ??
-    reportData.find((r) => r.donVi === submitMaDonVi) ??
-    reportData[0] ??
-    null;
+const ownReport = reportData.find((r) => r.donVi === submitMaDonVi) ?? null;
 
-  const dutyReportForDisplay =
-    isAdmin || (isTacChien && capDonVi === "SU_DOAN") ? dutyReport : ownReport;
+const reportForSubmit = isParentUnit && parentReportData ? parentReportData : ownReport;
 
-  const commanderReport =
-    reportData.find((r) => r.status === "Chờ_Duyệt") ?? null;
+const dutyReportForDisplay =
+  isAdmin || (isTacChien && capDonVi === "SU_DOAN")
+    ? dutyReport
+    : isParentUnit && parentReportData
+      ? parentReportData
+      : ownReport;
+
+const commanderReport =
+  reportData.find((r) => r.status === "Chờ_Duyệt") ?? null;
 
   const {
     showRefuseDialog,
@@ -175,14 +177,14 @@ export default function PoliticalWorkReport() {
     handleRefuseCancel,
   } = usePoliticalWorkActions({ showSuccess, showError, fetchReports });
 
-  const { canApprove, canRefuse, canSubmit, canRecall } =
-    usePoliticalWorkPermissions(
-      userRole,
-      capDonVi,
-      ownReport,
-      commanderReport,
-      hasChildren,
-    );
+const { canApprove, canRefuse, canSubmit, canRecall } =
+  usePoliticalWorkPermissions(
+    userRole,
+    capDonVi,
+    reportForSubmit,
+    commanderReport,
+    hasChildren,
+  );
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -490,42 +492,42 @@ export default function PoliticalWorkReport() {
       className={styles["political-report"]}
       aria-labelledby="political-report-heading"
     >
-      <ReportToolbar
-        query={query}
-        onQueryChange={setQuery}
-        reportDate={reportDate}
-        onReportDateChange={setReportDate}
-        onAddReport={!hasOwnReport ? handleAddReport : undefined}
-        onApprove={
-          canApprove
-            ? () => handleApproveReport(commanderReport!.idCongtac)
-            : undefined
-        }
-        onRefuse={
-          canRefuse
-            ? () => handleRefuseReportClick(commanderReport!)
-            : undefined
-        }
-        onSubmit={
-          canSubmit ? () => handleSubmitReport(ownReport!.idCongtac) : undefined
-        }
-        onRecall={
-          canRecall ? () => handleRecallReport(ownReport!.idCongtac) : undefined
-        }
-        hasReport={hasOwnReport}
-        isPastDate={isPastDate}
-        onConsolidate={
-          isParentUnit && !isPoliticalOffice ? handleConsolidate : undefined
-        }
-        consolidateDisabled={!canConsolidate}
-        consolidateLabel={
-          parentReportData
-            ? "Đã tổng hợp"
-            : approvedChildRows.length < totalRequiredCount
-              ? `Chưa đủ (${approvedChildRows.length}/${totalRequiredCount} đơn vị)`
-              : "Tổng hợp"
-        }
-      />
+<ReportToolbar
+  query={query}
+  onQueryChange={setQuery}
+  reportDate={reportDate}
+  onReportDateChange={setReportDate}
+  onAddReport={!isParentUnit && !hasOwnReport ? handleAddReport : undefined}
+  onApprove={
+    canApprove
+      ? () => handleApproveReport(commanderReport!.idCongtac)
+      : undefined
+  }
+  onRefuse={
+    canRefuse
+      ? () => handleRefuseReportClick(commanderReport!)
+      : undefined
+  }
+  onSubmit={
+    canSubmit ? () => handleSubmitReport(reportForSubmit!.idCongtac) : undefined
+  }
+  onRecall={
+    canRecall ? () => handleRecallReport(reportForSubmit!.idCongtac) : undefined
+  }
+  hasReport={hasOwnReport}
+  isPastDate={isPastDate}
+  onConsolidate={
+    isParentUnit && !isPoliticalOffice ? handleConsolidate : undefined
+  }
+  consolidateDisabled={!canConsolidate}
+  consolidateLabel={
+    parentReportData
+      ? "Đã tổng hợp"
+      : approvedChildRows.length < totalRequiredCount
+        ? `Chưa đủ (${approvedChildRows.length}/${totalRequiredCount} đơn vị)`
+        : "Tổng hợp"
+  }
+/>
 
       <div className={styles["political-stats-grid"]}>
         <StatCard
