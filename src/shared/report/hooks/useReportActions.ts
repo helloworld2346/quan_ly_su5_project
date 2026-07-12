@@ -8,6 +8,10 @@ export interface ReportActionService {
   refuseReport: (id: string, payload: { ghiChu: string }) => Promise<unknown>;
 }
 
+function notifyReportDataChanged() {
+  window.dispatchEvent(new CustomEvent("report-data-changed"));
+}
+
 export function useReportActions<TRow>({
   service,
   getId,
@@ -32,6 +36,7 @@ export function useReportActions<TRow>({
       await service.approveReport(reportId);
       showSuccess("Phê duyệt báo cáo thành công");
       fetchReports();
+      notifyReportDataChanged();
     } catch (error) {
       handleApiError(error, {
         showError,
@@ -51,6 +56,7 @@ export function useReportActions<TRow>({
       });
     } finally {
       fetchReports();
+      notifyReportDataChanged();
     }
   };
 
@@ -65,6 +71,7 @@ export function useReportActions<TRow>({
       });
     } finally {
       fetchReports();
+      notifyReportDataChanged();
     }
   };
 
@@ -83,6 +90,7 @@ export function useReportActions<TRow>({
       setRefuseReportId(null);
       setRefuseUnitName("");
       fetchReports();
+      notifyReportDataChanged();
     } catch (error) {
       handleApiError(error, {
         showError,
