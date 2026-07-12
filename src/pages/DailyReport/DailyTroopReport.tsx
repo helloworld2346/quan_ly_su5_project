@@ -531,10 +531,6 @@ export default function DailyTroopReport() {
             name: m.hoTen,
             rank: m.capBac,
             position: m.chucVu,
-            unitName:
-              selectedReportRow === parentReportData
-                ? selectedReportRow.kyhieuDonVi || selectedReportRow.tenDonVi
-                : undefined,
             reason: m.lyDoVang,
           }))}
           onClose={() => setSelectedReportRow(null)}
@@ -542,7 +538,6 @@ export default function DailyTroopReport() {
           trucBanTacChien={selectedReportRow.rawItem.trucBanTacChien}
           status={selectedReportRow.status}
           isChiHuy={isChiHuy}
-          showUnitColumn={selectedReportRow === parentReportData}
         />
       )}
 
