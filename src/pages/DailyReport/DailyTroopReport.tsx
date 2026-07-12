@@ -50,7 +50,11 @@ export default function DailyTroopReport() {
   );
   const [showConsolidateModal, setShowConsolidateModal] = useState(false);
   const [activeMenuUnit, setActiveMenuUnit] = useState<string | null>(null);
-  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+  const [menuPosition, setMenuPosition] = useState<{
+    top?: number;
+    bottom?: number;
+    left: number;
+  }>({ top: 0, left: 0 });
   const [showConsolidatedDetail, setShowConsolidatedDetail] = useState(false);
   const [editNhiemVuData, setEditNhiemVuData] = useState<DetailStepData | null>(
     null,
@@ -185,10 +189,19 @@ export default function DailyTroopReport() {
     const rect = event.currentTarget.getBoundingClientRect();
     const menuHeight = 120;
     const spaceBelow = window.innerHeight - rect.bottom;
-    const top =
-      spaceBelow < menuHeight ? rect.top - menuHeight - 4 : rect.bottom + 4;
 
-    setMenuPosition({ top, left: rect.right - 230 });
+    if (spaceBelow < menuHeight) {
+      setMenuPosition({
+        bottom: window.innerHeight - rect.top + 4,
+        left: rect.right - 230,
+      });
+    } else {
+      setMenuPosition({
+        top: rect.bottom + 4,
+        left: rect.right - 230,
+      });
+    }
+
     setActiveMenuUnit(menuKey);
   };
 
@@ -493,21 +506,21 @@ export default function DailyTroopReport() {
         openNhiemVuId={openNhiemVuId}
         setOpenNhiemVuId={setOpenNhiemVuId}
       />
-      
-{caTrucInfo && (
-  <CaTrucInfoCard
-    ngaytruc={caTrucInfo.ngaytruc ?? ""}
-    matkhau={caTrucInfo.matkhau ?? ""}
-    ghichu={caTrucInfo.ghichu}
-    trucChiHuy={trucInfoFromReport?.trucChiHuy ?? undefined}
-    trucBanTacChien={trucInfoFromReport?.trucBanTacChien ?? undefined}
-    labelSecond={
-      capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN"
-        ? "Trực ban tác chiến"
-        : "Trực ban nội vụ"
-    }
-  />
-)}
+
+      {caTrucInfo && (
+        <CaTrucInfoCard
+          ngaytruc={caTrucInfo.ngaytruc ?? ""}
+          matkhau={caTrucInfo.matkhau ?? ""}
+          ghichu={caTrucInfo.ghichu}
+          trucChiHuy={trucInfoFromReport?.trucChiHuy ?? undefined}
+          trucBanTacChien={trucInfoFromReport?.trucBanTacChien ?? undefined}
+          labelSecond={
+            capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN"
+              ? "Trực ban tác chiến"
+              : "Trực ban nội vụ"
+          }
+        />
+      )}
 
       {selectedReportRow && (
         <TroopDetailModal

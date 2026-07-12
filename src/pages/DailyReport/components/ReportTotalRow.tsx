@@ -28,7 +28,7 @@ type Props = {
   isParentUnit: boolean;
   hasConsolidatedData: boolean;
   activeMenuUnit: string | null;
-  menuPosition: { top: number; left: number };
+  menuPosition: { top?: number; bottom?: number; left: number };
   dropdownRef: React.RefObject<HTMLDivElement | null>;
   onToggleMenu: (e: React.MouseEvent<HTMLButtonElement>, key: string) => void;
   onViewConsolidatedDetail: () => void;
@@ -84,7 +84,9 @@ export default function ReportTotalRow({
                   className={styles.dropdownMenu}
                   role="menu"
                   style={{
-                    top: `${menuPosition.top}px`,
+                    ...(menuPosition.top !== undefined
+                      ? { top: `${menuPosition.top}px` }
+                      : { bottom: `${menuPosition.bottom}px` }),
                     left: `${menuPosition.left}px`,
                   }}
                   onClick={(e) => e.stopPropagation()}

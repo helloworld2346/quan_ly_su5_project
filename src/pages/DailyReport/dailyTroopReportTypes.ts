@@ -46,7 +46,7 @@ export type SharedRowProps = {
   isChiHuyLeaf: boolean;
   maDonViCurrent: string | undefined;
   activeMenuUnit: string | null;
-  menuPosition: { top: number; left: number };
+  menuPosition: { top?: number; bottom?: number; left: number };
   dropdownRef: RefObject<HTMLDivElement | null>;
   onToggleMenu: (e: MouseEvent<HTMLButtonElement>, key: string) => void;
   onViewDetail: (row: ReportRow) => void;

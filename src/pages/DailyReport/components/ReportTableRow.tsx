@@ -18,7 +18,7 @@ type Props = {
   isChiHuyLeaf: boolean;
   maDonViCurrent: string | undefined;
   activeMenuUnit: string | null;
-  menuPosition: { top: number; left: number };
+  menuPosition: { top?: number; bottom?: number; left: number };
   dropdownRef: React.RefObject<HTMLDivElement | null>;
   onToggleMenu: (e: React.MouseEvent<HTMLButtonElement>, key: string) => void;
   onViewDetail: (row: ReportRow) => void;
@@ -149,7 +149,9 @@ export default function ReportTableRow({
                 className={styles.dropdownMenu}
                 role="menu"
                 style={{
-                  top: `${menuPosition.top}px`,
+                  ...(menuPosition.top !== undefined
+                    ? { top: `${menuPosition.top}px` }
+                    : { bottom: `${menuPosition.bottom}px` }),
                   left: `${menuPosition.left}px`,
                 }}
                 onClick={(e) => e.stopPropagation()}
