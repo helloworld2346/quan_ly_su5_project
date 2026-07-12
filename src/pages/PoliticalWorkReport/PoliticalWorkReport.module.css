@@ -378,6 +378,44 @@
   color: var(--login-text-muted);
 }
 
+.political-tabs {  
+  display: inline-flex;  
+  align-items: center;  
+  padding: 4px;  
+  border-radius: 10px;  
+  background: var(--primary-a10);  
+  border: 1px solid var(--login-border);  
+}  
+  
+.political-tabs > * + * {  
+  margin-left: 4px;  
+}  
+  
+.political-tab {  
+  border: none;  
+  background: transparent;  
+  cursor: pointer;  
+  padding: 6px 14px;  
+  border-radius: 8px;  
+  font-size: 13px;  
+  font-weight: 600;  
+  color: var(--login-text-muted);  
+  white-space: nowrap;  
+  transition:  
+    background 0.15s ease,  
+    color 0.15s ease;  
+}  
+  
+.political-tab:hover {  
+  color: var(--login-text);  
+}  
+  
+.political-tab--active {  
+  background: var(--surface-card);  
+  color: var(--primary-color);  
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);  
+}
+
 @keyframes politicalDropdownFadeIn {  
   from {  
     opacity: 0;  

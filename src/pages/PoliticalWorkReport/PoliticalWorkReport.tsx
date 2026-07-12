@@ -102,7 +102,10 @@ export default function PoliticalWorkReport() {
     bottom?: number;
     left: number;
   }>({ top: 0, left: 0 });
+
   const [consolidating, setConsolidating] = useState(false);
+
+  const [activeTab, setActiveTab] = useState<"child" | "consolidated">("child");
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
@@ -607,6 +610,35 @@ export default function PoliticalWorkReport() {
                 </div>
               </div>
             </div>
+
+            {showTwoSections && (
+              <div className={styles["political-tabs"]} role="tablist">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === "child"}
+                  className={`${styles["political-tab"]} ${
+                    activeTab === "child" ? styles["political-tab--active"] : ""
+                  }`}
+                  onClick={() => setActiveTab("child")}
+                >
+                  Báo cáo đơn vị
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === "consolidated"}
+                  className={`${styles["political-tab"]} ${
+                    activeTab === "consolidated"
+                      ? styles["political-tab--active"]
+                      : ""
+                  }`}
+                  onClick={() => setActiveTab("consolidated")}
+                >
+                  Báo cáo tổng hợp
+                </button>
+              </div>
+            )}
           </div>
 
           <div className={styles["political-table-shell"]}>
@@ -629,36 +661,28 @@ export default function PoliticalWorkReport() {
                 {showSkeleton ? (
                   renderSkeletonRows()
                 ) : showTwoSections ? (
-                  <>
-                    <tr className={styles["political-separator-row"]}>
-                      <td colSpan={9}>Báo cáo các đơn vị</td>
+                  activeTab === "child" ? (
+                    <>
+                      {filteredChildRows.map(renderRow)}
+
+                      {filteredChildRows.length === 0 && (
+                        <tr>
+                          <td
+                            className={styles["political-empty-cell"]}
+                            colSpan={9}
+                          >
+                            Không tìm thấy báo cáo phù hợp.
+                          </td>
+                        </tr>
+                      )}
+                    </>
+                  ) : parentReportData ? (
+                    renderRow(parentRow)
+                  ) : (
+                    <tr className={styles["political-no-consolidated-row"]}>
+                      <td colSpan={9}>Chưa có báo cáo tổng hợp</td>
                     </tr>
-
-                    {filteredChildRows.map(renderRow)}
-
-                    {filteredChildRows.length === 0 && (
-                      <tr>
-                        <td
-                          className={styles["political-empty-cell"]}
-                          colSpan={9}
-                        >
-                          Không tìm thấy báo cáo phù hợp.
-                        </td>
-                      </tr>
-                    )}
-
-                    <tr className={styles["political-separator-row"]}>
-                      <td colSpan={9}>Báo cáo tổng hợp</td>
-                    </tr>
-
-                    {parentReportData ? (
-                      renderRow(parentRow)
-                    ) : (
-                      <tr className={styles["political-no-consolidated-row"]}>
-                        <td colSpan={9}>Chưa có báo cáo tổng hợp</td>
-                      </tr>
-                    )}
-                  </>
+                  )
                 ) : (
                   <>
                     {filteredFlatRows.map(renderRow)}
