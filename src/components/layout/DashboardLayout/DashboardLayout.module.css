@@ -150,6 +150,22 @@
   margin-left: 12px;
 }
 
+.reportStatusWrap {
+  display: flex;
+  align-items: center;
+}
+
+.reportStatusWrap > * + * {
+  margin-left: 8px;
+}
+
+.reportStatusLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--login-text-muted);
+  white-space: nowrap;
+}
+
 .iconButton {
   width: 34px;
   height: 34px;
@@ -236,8 +252,10 @@
   .content {
     padding: 16px;
   }
-
   .userName {
+    display: none;
+  }
+  .reportStatusLabel {
     display: none;
   }
 }
