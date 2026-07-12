@@ -11,8 +11,6 @@ import type {
   SearchChildrenResponse,
   SearchByRangeResponse,
 } from "../../types/dailyReport";
-import type { DonVi } from "../../types/account";
-
 export interface NhiemVuNgay {
   idNhiemvuNgay: string;
   nhiemVuPhandoi: string;
@@ -20,7 +18,6 @@ export interface NhiemVuNgay {
   noiDungUuDiem: string;
   noiDungKhuyetDiem: string;
   noiDungCanGiaiQuyet: string;
-  donviResponse:DonVi
 }
 
 export interface NhiemVuNgayResponse {

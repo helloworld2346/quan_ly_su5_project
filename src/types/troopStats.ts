@@ -20,9 +20,9 @@ export interface TroopMember {
   id: string;
   name: string;
   rank: string;
-  position: string; 
-  unit?: string;  
-  reason: string; 
+  position: string;
+  reason: string;
+  unitName?: string;
 }
 
 export const ATTENDANCE_META: Record<

@@ -135,16 +135,16 @@ export function useReportData({
     const quanSoHienDien = quanSoTong - quanSoVang;
     const thongTinVang: VangChiTiet = sumVang(submittedReports);
         const absentRows: AbsentRow[] = submittedReports.flatMap((r) =>
-      r.chiTietVangList.map((m) => ({
-        id: generateId(),
-        hoTen: m.hoTen,
-        capBac: m.capBac,
-        chucVu: m.chucVu,
-        lyDoVang: m.lyDoVang as keyof VangChiTiet,
-        ghiChu: m.ghiChu,
-        donVi: r.kyhieuDonVi || r.tenDonVi,
-      })),
-    );
+          r.chiTietVangList.map((m) => ({
+            id: generateId(),
+            hoTen: m.hoTen,
+            capBac: m.capBac,
+            chucVu: m.chucVu,
+            lyDoVang: m.lyDoVang as keyof VangChiTiet,
+            ghiChu: m.ghiChu,
+            tenDonVi: r.tenDonVi,
+          })),
+        );
     return {
       quanSoTong,
       quanSoVang,

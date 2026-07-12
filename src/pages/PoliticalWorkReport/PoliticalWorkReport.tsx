@@ -62,7 +62,7 @@ function StatusBadge({
   );
 }
 
-function buildConsolidatedPoliticalWork(_rows: PoliticalWorkRow[]) {
+function buildConsolidatedPoliticalWork() {
   return {
     tinhHinh: "",
     noiDungDotXuat: "",
@@ -784,7 +784,7 @@ export default function PoliticalWorkReport() {
                   tenDonVi: account?.donVi?.tenDonvi ?? "",
                   kyhieuDonVi: account?.donVi?.kyhieuDonvi,
                 }),
-                ...buildConsolidatedPoliticalWork(approvedChildRows),
+                ...buildConsolidatedPoliticalWork(),
               }
             : editingRow
         }
