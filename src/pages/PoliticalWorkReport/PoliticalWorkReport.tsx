@@ -136,6 +136,9 @@ export default function PoliticalWorkReport() {
   const shouldHideConsolidatedSections =
     isAdmin || isPoliticalOffice || (isTacChien && capDonVi === "SU_DOAN");
 
+  const isTacChienSuDoan = isTacChien && capDonVi === "SU_DOAN";
+  const canAddOwnReport = isTacChienSuDoan || isAdmin;
+
   const {
     reportData,
     parentReportData,
@@ -238,7 +241,9 @@ export default function PoliticalWorkReport() {
 
   const isPastDate = reportDate < todayIsoDate();
 
-  const hasOwnReport = Boolean(ownReport && !ownReport.notSubmitted);
+  const hasOwnReport = canAddOwnReport
+    ? Boolean(dutyReport && !dutyReport.notSubmitted)
+    : Boolean(ownReport && !ownReport.notSubmitted);
 
   const handleAddReport = () => {
     if (isPastDate) {
@@ -513,7 +518,9 @@ export default function PoliticalWorkReport() {
         reportDate={reportDate}
         onReportDateChange={setReportDate}
         onAddReport={
-          !isParentUnit && !hasOwnReport ? handleAddReport : undefined
+          (!isParentUnit || canAddOwnReport) && !hasOwnReport
+            ? handleAddReport
+            : undefined
         }
         onApprove={
           canApprove
