@@ -117,24 +117,41 @@ label {
 
 /* ── Focus ring ── */  
   
+/* Fallback cho Chrome < 84 (không hỗ trợ :focus-visible) */  
 :focus {  
-  outline: none;  
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);  
+  outline-offset: var(--focus-ring-offset);  
+  border-radius: 6px;  
 }  
   
+/* Trình duyệt mới: bỏ outline mặc định của :focus, chỉ hiện khi :focus-visible */  
 :focus-visible {  
   outline: var(--focus-ring-width) solid var(--focus-ring-color);  
   outline-offset: var(--focus-ring-offset);  
   border-radius: 6px;  
 }  
-
+  
+/* Trình duyệt hỗ trợ :focus-visible thì tắt outline của :focus thường */  
+:focus:not(:focus-visible) {  
+  outline: none;  
+}  
+  
+input:focus,  
+textarea:focus,  
+select:focus {  
+  outline: none;  
+  box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);  
+}  
+  
+input:focus:not(:focus-visible),  
+textarea:focus:not(:focus-visible),  
+select:focus:not(:focus-visible) {  
+  box-shadow: none;  
+}  
+  
 input:focus-visible,  
 textarea:focus-visible,  
 select:focus-visible {  
   outline: none;  
   box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);  
-}
-
-html.theme-switching,  
-html.theme-switching * {  
-  transition: none !important;  
 }

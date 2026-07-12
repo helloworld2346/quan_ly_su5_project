@@ -203,14 +203,20 @@
   width: 100%;  
   display: flex;  
   flex-direction: column;  
-  gap: 12px;  
 }  
+  
+.footer-inner > * + * {  
+  margin-top: 12px;  
+}
   
 .footer-actions {  
   display: flex;  
   justify-content: flex-end;  
-  gap: 12px;  
 }  
+  
+.footer-actions > * + * {  
+  margin-left: 12px;  
+}
   
 .validation-error {  
   padding: 10px 14px;  

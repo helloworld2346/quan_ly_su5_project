@@ -2,7 +2,6 @@
   min-height: 84px;  
   display: flex;  
   align-items: center;  
-  gap: 16px;  
   padding: 16px 20px;  
   background: var(--surface-card);  
   border: 1px solid var(--login-border);  
@@ -13,6 +12,9 @@
     border-color 0.2s,  
     background 0.25s ease;  
 }  
+.card > * + * {  
+  margin-left: 16px;  
+}
   
 .card:hover {  
   border-color: var(--login-border);  

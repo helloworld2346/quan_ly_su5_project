@@ -192,9 +192,13 @@
   outline: none;  
 }  
   
-.segment:focus-visible {  
+.segment:focus {  
   filter: drop-shadow(0 0 4px rgba(31, 92, 63, 0.5));  
 }  
+  
+.segment:focus-visible {  
+  filter: drop-shadow(0 0 4px rgba(31, 92, 63, 0.5));  
+} 
   
 .centerLabel {  
   position: absolute;  

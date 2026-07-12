@@ -1,12 +1,12 @@
 .subHeaderArea {
   display: flex;
   align-items: center;
-  gap: 8px;
   font-size: 14px;
   font-weight: 600;
   color: var(--on-surface-muted);
   margin-top: 4px;
 }
+.subHeaderArea > * + * { margin-left: 8px; }
 
 .statusWrap {
   display: inline-flex;
@@ -27,8 +27,8 @@
   flex: 1;
   display: flex;
   align-items: flex-start;
-  gap: 14px;
 }
+.trucSection > * + * { margin-left: 14px; }
 
 .trucIconBox {
   background-color: var(--btn-excel-border); 
@@ -46,8 +46,8 @@
 .trucInfo {
   display: flex;
   flex-direction: column;
-  gap: 4px;
 }
+.trucInfo > * + * { margin-top: 4px; }
 
 .trucRole {
   font-size: 12px;
@@ -67,8 +67,8 @@
 .trucDetailsList {
   display: flex;
   flex-direction: column;
-  gap: 3px;
 }
+.trucDetailsList > * + * { margin-top: 3px; }
 
 .trucDetailItem {
   font-size: 13.5px;
@@ -102,8 +102,8 @@
 
 .timelineItem {
   display: flex;
-  gap: 16px;
 }
+.timelineItem > * + * { margin-left: 16px; }
 
 .timelineLeft {
   display: flex;

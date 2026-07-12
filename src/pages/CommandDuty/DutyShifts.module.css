@@ -139,9 +139,11 @@
 .tableSkeleton {  
   display: flex;  
   flex-direction: column;  
-  gap: 10px;  
   padding: 16px;  
 }  
+.tableSkeleton > * + * {  
+  margin-top: 10px;  
+}
   
 .tableSkeletonRow {  
   display: grid;  
@@ -444,10 +446,12 @@
 .modalFooter {  
   display: flex;  
   justify-content: flex-end;  
-  gap: 10px;  
   padding: 18px 28px;  
   border-top: 1px solid var(--login-border);  
 }  
+.modalFooter > * + * {  
+  margin-left: 10px;  
+}
   
 .editGrid {  
   display: grid;  
@@ -500,8 +504,10 @@
 .passwordRow {  
   display: flex;  
   align-items: stretch;  
-  gap: 10px;  
 }  
+.passwordRow > * + * {  
+  margin-left: 10px;  
+}
   
 .passwordRow .editInput {  
   flex: 1;  

@@ -471,9 +471,11 @@
 .modalFooter {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
   padding: 16px 24px;
   border-top: 1px solid var(--login-border);
+}
+.modalFooter > * + * {  
+  margin-left: 10px;  
 }
 
 .editFormGrid {
@@ -616,19 +618,23 @@
 .personCardSkeleton {  
   display: flex;  
   align-items: center;  
-  gap: 12px;  
   padding: 12px 14px;  
   border: 1px solid var(--login-border);  
   border-radius: 12px;  
   background: var(--surface-card);  
   margin-bottom: 10px;  
 }  
+.personCardSkeleton > * + * {  
+  margin-left: 12px;  
+}
   
 .personCardSkeletonInfo {  
   display: flex;  
   flex-direction: column;  
-  gap: 8px;  
   flex: 1;  
+}
+.personCardSkeletonInfo > * + * {  
+  margin-top: 8px;  
 }
 
 .fieldError {  

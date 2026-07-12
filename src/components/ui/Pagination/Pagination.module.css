@@ -2,10 +2,12 @@
   display: flex;  
   align-items: center;  
   justify-content: center;  
-  gap: 6px;  
   padding: 12px 0;  
   flex-shrink: 0;  
 }  
+.pagination > * + * {  
+  margin-left: 6px;  
+}
   
 .pageBtn {  
   min-width: 34px;  

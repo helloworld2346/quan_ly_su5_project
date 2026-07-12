@@ -718,9 +718,11 @@
 .chartSkeleton {  
   display: flex;  
   flex-direction: column;  
-  gap: 16px;  
   padding: 20px 0;  
 }  
+.chartSkeleton > * + * {  
+  margin-top: 16px;  
+}
   
 .chartSkeletonRow {  
   display: grid;  

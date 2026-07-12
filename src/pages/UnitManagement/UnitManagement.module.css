@@ -41,16 +41,16 @@
 .toolbar {  
   display: flex;  
   align-items: center;  
-  gap: 16px;  
   flex-shrink: 0;  
 }  
+.toolbar > * + * { margin-left: 0; margin-top: 12px; }
   
 .filterGroup {  
   display: flex;  
-  gap: 12px;  
   flex-shrink: 0;  
   min-width: 360px;  
 }  
+.filterGroup > * + * { margin-left: 12px; }
   
 .filterGroup > * {  
   flex: 1;  
@@ -59,7 +59,6 @@
 .btnAddAccount {  
   display: inline-flex;  
   align-items: center;  
-  gap: 8px;  
   height: 40px;  
   padding: 0 18px;  
   background: var(--primary-color);  
@@ -76,6 +75,7 @@
     opacity 0.15s,  
     transform 0.12s;  
 }  
+.btnAddAccount > * + * { margin-left: 8px; }
   
 .btnAddAccount:hover:not(:disabled) {  
   opacity: 0.88;  
@@ -93,7 +93,6 @@
 .btnClearFilter {  
   display: inline-flex;  
   align-items: center;  
-  gap: 6px;  
   height: 40px;  
   padding: 0 14px;  
   border: 1.5px solid var(--login-border);  
@@ -110,6 +109,7 @@
     color 0.15s,  
     background 0.15s;  
 }  
+.btnAddAccount > * + * { margin-left: 8px; }
   
 .btnClearFilter:hover {  
   border-color: var(--primary-color);  
@@ -209,8 +209,8 @@
 .rowActions {  
   display: flex;  
   justify-content: center;
-  gap: 6px;  
 }
+.rowActions > * + * { margin-left: 6px; }
   
 .btnEdit {  
   width: 32px;  
@@ -326,10 +326,10 @@
 .modalFooter {  
   display: flex;  
   justify-content: flex-end;  
-  gap: 10px;  
   padding: 16px 24px;  
   border-top: 1px solid var(--login-border);  
 }  
+.modalFooter > * + * { margin-left: 10px; }
   
 .editFormGrid {  
   display: grid;  
@@ -389,7 +389,6 @@
 .btnSave {  
   display: flex;  
   align-items: center;  
-  gap: 6px;  
   padding: 8px 18px;  
   background: var(--primary-color);  
   color: var(--text-white);  
@@ -400,6 +399,7 @@
   cursor: pointer;  
   transition: opacity 0.15s;  
 }  
+.btnSave > * + * { margin-left: 6px; }
   
 .btnSave:hover:not(:disabled) {  
   opacity: 0.88;  
@@ -413,7 +413,6 @@
 .btnCancelEdit {  
   display: flex;  
   align-items: center;  
-  gap: 6px;  
   padding: 8px 18px;  
   background: transparent;  
   color: var(--login-text-muted);  
@@ -426,6 +425,7 @@
     background 0.12s,  
     color 0.12s;  
 }  
+.btnCancelEdit > * + * { margin-left: 6px; }
   
 .btnCancelEdit:hover:not(:disabled) {  
   background: var(--table-row-even);  
@@ -440,9 +440,9 @@
 .childUnits {  
   display: flex;  
   flex-wrap: wrap;  
-  gap: 6px;  
   max-width: 320px;  
 }  
+.childUnits > * { margin: 0 6px 6px 0; }
   
 .childChip {  
   display: inline-block;  
@@ -498,8 +498,8 @@
   .pageHeader {  
     flex-direction: column;  
     align-items: stretch;  
-    gap: 12px;  
   }  
+  .pageHeader > * + * { margin-top: 12px; }
   .btnAddAccount {  
     width: 100%;  
     justify-content: center;  

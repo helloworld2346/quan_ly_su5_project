@@ -921,7 +921,10 @@
 .tableSkeleton {  
   display: flex;  
   flex-direction: column;  
-  gap: 8px;  
   padding: 16px;  
   background: var(--surface-card);  
+}  
+  
+.tableSkeleton > * + * {  
+  margin-top: 8px;  
 }

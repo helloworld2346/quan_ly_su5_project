@@ -18,7 +18,6 @@
   display: inline-flex;  
 }  
   
-/* ── Khối trực (2 cột + divider) ── */  
 .trucContainer {  
   display: flex;  
   align-items: stretch;  
@@ -113,7 +112,6 @@
   margin: 0 24px;  
 }  
   
-/* ── Summary ── */  
 .summary {  
   display: flex;  
   justify-content: center;  
@@ -152,7 +150,6 @@
   font-weight: 700;  
 }  
   
-/* ── Table ── */  
 .tableWrapper {  
   width: 100%;  
   overflow-x: auto;  
@@ -208,7 +205,6 @@
   font-weight: 600;  
 }  
   
-/* ── Thu hồi ── */  
 .recalledNotice {  
   padding: 48px 24px;  
   text-align: center;  

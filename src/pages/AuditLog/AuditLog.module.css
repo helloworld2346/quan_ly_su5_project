@@ -38,20 +38,20 @@
   line-height: 1.2;  
 }  
   
-/* ===== Toolbar / filter ===== */  
 .toolbar {  
   display: flex;  
   align-items: center;  
-  gap: 16px;  
   flex-shrink: 0;  
 }  
+.toolbar > * + * { margin-left: 16px; }  
   
 .filterGroup {  
   display: flex;  
-  gap: 12px;  
   flex-shrink: 0;  
   min-width: 360px;  
 }  
+.filterGroup > * + * { margin-left: 12px; }  
+
   
 .filterGroup > * {  
   flex: 1;  
@@ -60,7 +60,6 @@
 .clearBtn {  
   display: inline-flex;  
   align-items: center;  
-  gap: 6px;  
   height: 40px;  
   padding: 0 14px;  
   border: 1.5px solid var(--login-border);  
@@ -77,6 +76,9 @@
     color 0.15s,  
     background 0.15s;  
 }  
+
+.clearBtn > * + * { margin-left: 6px; }  
+
   
 .clearBtn:hover {  
   border-color: var(--primary-color);  
@@ -95,16 +97,13 @@
 }  
   
 .table {  
-  width: 100%;  
-  /* QUAN TRỌNG: đảm bảo tổng width các cột luôn đủ chỗ,  
-     tránh cột Mô tả bị co về 0 và tràn đè cột khác */  
+  width: 100%;   
   min-width: 1040px;  
   border-collapse: collapse;  
   font-size: 14px;  
   table-layout: fixed;  
 }  
   
-/* ===== Sticky header ===== */  
 .table thead th {  
   position: sticky;  
   top: 0;  
@@ -193,7 +192,6 @@
 .badge {  
   display: inline-flex;  
   align-items: center;  
-  gap: 6px;  
   padding: 3px 10px;  
   border-radius: 20px;  
   font-size: 13px;  
@@ -219,6 +217,7 @@
   border-radius: 50%;  
   background: currentColor;  
   flex-shrink: 0;  
+  margin-right: 6px;
 }  
   
 .badgeLogin {  
@@ -293,9 +292,9 @@
 .dateCell {  
   display: flex;  
   flex-direction: column;  
-  gap: 2px;  
 }  
-  
+.dateCell > * + * { margin-top: 2px; }
+
 .dateMain {  
   color: var(--login-text);  
   white-space: nowrap;  
