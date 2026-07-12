@@ -1,6 +1,5 @@
-import { useEffect } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import ModalShell from "../../components/ui/ModalShell/ModalShell";
+import ReportStatusBadge from "../../components/ui/ReportStatusBadge/ReportStatusBadge";
 import styles from "./TroopDetailModal.module.css";
 import type { TroopMember } from "../../types/troopStats";
 
@@ -59,120 +58,129 @@ export default function TroopDetailModal({
   const parsedTrucChiHuy = parseTruc(trucBanChiHuy);
   const parsedTrucBanTacChien = parseTruc(trucBanTacChien);
 
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
-  }, [onClose]);
-
   const trucItems = [
     { label: "Trực chỉ huy", data: parsedTrucChiHuy },
     { label: "Trực ban tác chiến", data: parsedTrucBanTacChien },
   ];
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <div className={styles.header}>
-          <div className={styles.headerContent}>
-            <div className={styles.subTitle}>{unit}</div>
-          </div>
-          <button
-            className={styles.closeBtn}
-            onClick={onClose}
-            aria-label="Đóng"
-          >
-            <FontAwesomeIcon icon={faXmark} />
-          </button>
+    <ModalShell
+      variant="plain"
+      size="lg"
+      onClose={onClose}
+      title="Chi tiết quân số vắng"
+      subHeader={
+        <div className={styles.subHeaderArea}>
+          <span className={styles.unitName}>{unit}</span>
+          {status && (
+            <span className={styles.statusWrap}>
+              <ReportStatusBadge status={status} />
+            </span>
+          )}
         </div>
-
-        <div className={styles.body}>
-          {isChiHuy && status === "Nháp" ? (
-            <div className={styles.recalledNotice}>
-              <p>Đơn báo cáo đã được thu hồi, không thể xem tiếp.</p>
-            </div>
-          ) : (
-            <>
-              {(parsedTrucChiHuy || parsedTrucBanTacChien) && (
-                <div className={styles.trucSection}>
-                  <div className={styles.trucTitle}>Thông tin trực đơn vị</div>
-                  <div className={styles.trucGrid}>
-                    {trucItems.map(({ label, data }) => (
-                      <div key={label} className={styles.trucCard}>
-                        <div className={styles.trucCardHeader}>
-                          <span className={styles.trucRole}>{label}</span>
-                        </div>
-                        {data ? (
-                          <div className={styles.trucCardBody}>
-                            <div className={styles.trucName}>
-                              {data.tenNguoitruc || "—"}
-                            </div>
-                            <div className={styles.trucMeta}>
-                              {[data.capbacNguoitruc, data.chucvuNguoitruc]
-                                .filter(Boolean)
-                                .join(" · ")}
-                            </div>
-                            {data.sodienthoai && (
-                              <a className={styles.trucPhone}>
-                                {data.sodienthoai}
-                              </a>
-                            )}
+      }
+    >
+      {isChiHuy && status === "Nháp" ? (
+        <div className={styles.recalledNotice}>
+          <p>Đơn báo cáo đã được thu hồi, không thể xem tiếp.</p>
+        </div>
+      ) : (
+        <>
+          {(parsedTrucChiHuy || parsedTrucBanTacChien) && (
+            <div className={styles.trucContainer}>
+              {trucItems.map(({ label, data }, idx) => (
+                <div key={label} className={styles.trucRowWrap}>
+                  {idx === 1 && <div className={styles.trucDivider}></div>}
+                  <div className={styles.trucSection}>
+                    <div className={styles.trucIconBox}>
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        className={styles.svgIcon}
+                      >
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                      </svg>
+                    </div>
+                    <div className={styles.trucInfo}>
+                      <div className={styles.trucRole}>{label}</div>
+                      <div className={styles.trucName}>
+                        {data?.tenNguoitruc || "—"}
+                      </div>
+                      <div className={styles.trucDetailsList}>
+                        {data?.capbacNguoitruc && (
+                          <div className={styles.trucDetailItem}>
+                            <span className={styles.detailLabel}>Cấp bậc:</span>{" "}
+                            {data.capbacNguoitruc}
                           </div>
-                        ) : (
-                          <div className={styles.trucCardBody}>
-                            <div className={styles.trucEmpty}>
-                              Chưa có thông tin
-                            </div>
+                        )}
+                        {data?.chucvuNguoitruc && (
+                          <div className={styles.trucDetailItem}>
+                            <span className={styles.detailLabel}>Chức vụ:</span>{" "}
+                            {data.chucvuNguoitruc}
+                          </div>
+                        )}
+                        {data?.sodienthoai && (
+                          <div className={styles.trucDetailItem}>
+                            <span className={styles.detailLabel}>Sđt:</span>{" "}
+                            {data.sodienthoai}
+                          </div>
+                        )}
+                        {(!data ||
+                          (!data.capbacNguoitruc &&
+                            !data.chucvuNguoitruc &&
+                            !data.sodienthoai)) && (
+                          <div className={styles.trucDetailEmpty}>
+                            — Chưa có thông tin chi tiết —
                           </div>
                         )}
                       </div>
-                    ))}
+                    </div>
                   </div>
                 </div>
-              )}
-
-              <h2 className={styles.title}>Chi tiết quân số vắng</h2>
-              <div className={styles.summary}>
-                <div className={styles.summaryCard}>
-                  <span>Số quân nhân vắng</span>
-                  <strong>{members.length}</strong>
-                </div>
-              </div>
-
-              {members.length === 0 ? (
-                <p className={styles.empty}>Không có quân nhân vắng.</p>
-              ) : (
-                <div className={styles.tableWrapper}>
-                  <table className={styles.table}>
-                    <thead>
-                      <tr>
-                        <th>STT</th>
-                        <th>Họ và tên</th>
-                        <th>Cấp bậc</th>
-                        <th>Chức vụ</th>
-                        <th>Lý do vắng</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {members.map((m, i) => (
-                        <tr key={m.id || i}>
-                          <td>{i + 1}</td>
-                          <td className={styles.nameCell}>{m.name}</td>
-                          <td>{m.rank}</td>
-                          <td>{m.position}</td>
-                          <td>{LY_DO_VANG_MAP[m.reason] || m.reason}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </>
+              ))}
+            </div>
           )}
-        </div>
-      </div>
-    </div>
+
+          <div className={styles.summary}>
+            <div className={styles.summaryCard}>
+              <span>Số quân nhân vắng</span>
+              <strong>{members.length}</strong>
+            </div>
+          </div>
+
+          {members.length === 0 ? (
+            <p className={styles.empty}>Không có quân nhân vắng.</p>
+          ) : (
+            <div className={styles.tableWrapper}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>STT</th>
+                    <th>Họ và tên</th>
+                    <th>Cấp bậc</th>
+                    <th>Chức vụ</th>
+                    <th>Lý do vắng</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {members.map((m, i) => (
+                    <tr key={m.id || i}>
+                      <td>{i + 1}</td>
+                      <td className={styles.nameCell}>{m.name}</td>
+                      <td>{m.rank}</td>
+                      <td>{m.position}</td>
+                      <td>{LY_DO_VANG_MAP[m.reason] || m.reason}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
+      )}
+    </ModalShell>
   );
 }
