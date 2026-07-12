@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPenToSquare,
@@ -9,6 +9,8 @@ import {
   faPlus,
   faLock,
   faLockOpen,
+  faEllipsisVertical,
+  faSliders,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./AccountManagement.module.css";
 import { accountService } from "../../services/account/accountService";
@@ -118,6 +120,56 @@ export default function AccountManagement() {
 
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [lockingId, setLockingId] = useState<string | null>(null);
+
+  const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
+  const [menuPosition, setMenuPosition] = useState<{
+    top?: number;
+    bottom?: number;
+    left: number;
+  }>({ left: 0 });
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  const handleToggleMenu = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>, id: string) => {
+      e.stopPropagation();
+      if (activeMenuId === id) {
+        setActiveMenuId(null);
+        return;
+      }
+      const rect = e.currentTarget.getBoundingClientRect();
+      const menuHeight = 240;
+      const spaceBelow = window.innerHeight - rect.bottom;
+
+      if (spaceBelow < menuHeight) {
+        setMenuPosition({
+          bottom: window.innerHeight - rect.top + 4,
+          left: rect.right - 230,
+        });
+      } else {
+        setMenuPosition({
+          top: rect.bottom + 4,
+          left: rect.right - 230,
+        });
+      }
+
+      setActiveMenuId(id);
+    },
+    [activeMenuId],
+  );
+
+  useEffect(() => {
+    if (!activeMenuId) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
+        setActiveMenuId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [activeMenuId]);
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -477,41 +529,112 @@ export default function AccountManagement() {
           </span>
         </td>
         <td className={styles.colActions}>
-          <div className={styles.rowActions}>
+          <div className={styles.actionWrapper}>
             <button
               type="button"
-              className={styles.btnEdit}
-              onClick={() => handleStartEdit(acc)}
-              title="Sửa"
+              className={`${styles.ellipsisBtn} ${activeMenuId === acc.idTaiKhoan ? styles.activeEllipsis : ""}`}
+              aria-label="Tùy chọn thao tác"
+              onClick={(e) => handleToggleMenu(e, acc.idTaiKhoan)}
             >
-              <FontAwesomeIcon icon={faPenToSquare} />
+              <FontAwesomeIcon icon={faEllipsisVertical} />
             </button>
-            <button
-              type="button"
-              className={styles.btnEdit}
-              onClick={() => setResetId(acc.idTaiKhoan)}
-              title="Reset mật khẩu"
-            >
-              <FontAwesomeIcon icon={faKey} />
-            </button>
-            <button
-              type="button"
-              className={acc.khoa ? styles.btnUnlock : styles.btnLock}
-              onClick={() => void handleToggleLock(acc)}
-              disabled={lockingId === acc.idTaiKhoan}
-              title={acc.khoa ? "Mở khóa" : "Khóa"}
-            >
-              <FontAwesomeIcon icon={acc.khoa ? faLockOpen : faLock} />
-            </button>
-            <button
-              type="button"
-              className={styles.btnDelete}
-              onClick={() => void handleDelete(acc)}
-              disabled={isDeleting}
-              title="Xóa"
-            >
-              <FontAwesomeIcon icon={faTrash} />
-            </button>
+            {activeMenuId === acc.idTaiKhoan &&
+              createPortal(
+                <div
+                  ref={dropdownRef}
+                  className={styles.dropdownMenu}
+                  role="menu"
+                  style={{
+                    top:
+                      menuPosition.top !== undefined
+                        ? `${menuPosition.top}px`
+                        : undefined,
+                    bottom:
+                      menuPosition.bottom !== undefined
+                        ? `${menuPosition.bottom}px`
+                        : undefined,
+                    left: `${menuPosition.left}px`,
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    type="button"
+                    className={styles.menuItem}
+                    role="menuitem"
+                    onClick={() => {
+                      setActiveMenuId(null);
+                      handleStartEdit(acc);
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      icon={faPenToSquare}
+                      className={styles.menuIcon}
+                    />
+                    Sửa
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.menuItem}
+                    role="menuitem"
+                    onClick={() => {
+                      setActiveMenuId(null);
+                      setResetId(acc.idTaiKhoan);
+                    }}
+                  >
+                    <FontAwesomeIcon icon={faKey} className={styles.menuIcon} />
+                    Reset mật khẩu
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.menuItem}
+                    role="menuitem"
+                    onClick={() => {
+                      setActiveMenuId(null);
+                      // TODO: mở modal gán chức năng cho account
+                      // setChucNangAccountId(acc.idTaiKhoan);
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      icon={faSliders}
+                      className={styles.menuIcon}
+                    />
+                    Đổi chức năng
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.menuItem}
+                    role="menuitem"
+                    disabled={lockingId === acc.idTaiKhoan}
+                    onClick={() => {
+                      setActiveMenuId(null);
+                      void handleToggleLock(acc);
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      icon={acc.khoa ? faLockOpen : faLock}
+                      className={styles.menuIcon}
+                    />
+                    {acc.khoa ? "Mở khóa" : "Khóa"}
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.menuItem} ${styles.menuItemDanger}`}
+                    role="menuitem"
+                    disabled={isDeleting}
+                    onClick={() => {
+                      setActiveMenuId(null);
+                      void handleDelete(acc);
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      icon={faTrash}
+                      className={styles.menuIcon}
+                    />
+                    Xóa
+                  </button>
+                </div>,
+                document.body,
+              )}
           </div>
         </td>
       </tr>
@@ -540,7 +663,7 @@ export default function AccountManagement() {
           <Skeleton width={120} height={12} />
         </td>
         <td className={styles.colActions}>
-          <Skeleton width={96} height={28} />
+          <Skeleton width={32} height={32} radius="50%" />
         </td>
       </tr>
     ));
