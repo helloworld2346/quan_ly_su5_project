@@ -607,18 +607,18 @@
   transform: rotate(180deg);
 }
 
-.nhiemVuAccordionBody {  
-  max-height: 0;  
-  opacity: 0;  
-  overflow: hidden;  
-  transition:  
-    max-height 280ms ease,  
-    opacity 220ms ease;  
-}  
-  
-.nhiemVuAccordionBodyOpen {  
-  max-height: 3000px;  
-  opacity: 1;  
+.nhiemVuAccordionBody {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition:
+    max-height 280ms ease,
+    opacity 220ms ease;
+}
+
+.nhiemVuAccordionBodyOpen {
+  max-height: 3000px;
+  opacity: 1;
 }
 
 .nhiemVuAccordionBodyInner {
@@ -832,6 +832,7 @@
   justify-content: space-between;
   padding: 20px 28px;
   border-bottom: 1px solid var(--modal-border);
+  position: relative;
 }
 
 .nhiemVuModalTitle {
@@ -839,6 +840,8 @@
   font-weight: 700;
   color: var(--login-text);
   margin: 0;
+  flex: 1;
+  text-align: center;
 }
 
 .nhiemVuModalClose {
@@ -848,6 +851,10 @@
   line-height: 1;
   cursor: pointer;
   color: var(--login-text-muted);
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .nhiemVuModalBody {
@@ -893,38 +900,38 @@
   color: var(--login-text);
 }
 
-.daily-stats-grid {  
-  display: grid;  
-  grid-template-columns: repeat(5, minmax(0, 1fr));  
-  gap: 16px;  
-  margin-bottom: 20px;  
-}  
-  
-@media (max-width: 1100px) {  
-  .daily-stats-grid {  
-    grid-template-columns: repeat(3, minmax(0, 1fr));  
-  }  
-}  
-  
-@media (max-width: 720px) {  
-  .daily-stats-grid {  
-    grid-template-columns: repeat(2, minmax(0, 1fr));  
-  }  
-}  
-  
-@media (max-width: 460px) {  
-  .daily-stats-grid {  
-    grid-template-columns: 1fr;  
-  }  
+.daily-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
-.tableSkeleton {  
-  display: flex;  
-  flex-direction: column;  
-  padding: 16px;  
-  background: var(--surface-card);  
-}  
-  
-.tableSkeleton > * + * {  
-  margin-top: 8px;  
+@media (max-width: 1100px) {
+  .daily-stats-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .daily-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 460px) {
+  .daily-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tableSkeleton {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background: var(--surface-card);
+}
+
+.tableSkeleton > * + * {
+  margin-top: 8px;
 }

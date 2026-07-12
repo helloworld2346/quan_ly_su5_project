@@ -233,7 +233,7 @@ export function useDailyTroopReportViewModel(
 
       entries.push({
         id: maDonViCurrent ?? "own",
-        title: account?.donVi?.kyhieuDonvi || "",
+        title: account?.donVi?.tenDonvi || account?.donVi?.kyhieuDonvi || "",
         subtitle: maDonViCurrent ?? "",
         data: nhiemVuData ? buildNhiemVuSummary(nhiemVuData) : null,
         reportStatusLabel: getNhiemVuReportStatusLabel(ownReportRow),
@@ -254,7 +254,7 @@ export function useDailyTroopReportViewModel(
 
         entries.push({
           id: unit.maDonVi,
-          title: unit.kyhieuDonvi || unit.maDonVi,
+          title: unit.tenDonvi || unit.kyhieuDonvi || unit.maDonVi,
           subtitle: "",
           data: matched ? buildNhiemVuSummary(matched.data) : null,
           reportStatusLabel: getNhiemVuReportStatusLabel(childReportRow),
@@ -280,7 +280,7 @@ export function useDailyTroopReportViewModel(
       [
         {
           id: maDonViCurrent ?? "own",
-          title: account?.donVi?.kyhieuDonvi || "",
+          title: account?.donVi?.tenDonvi || account?.donVi?.kyhieuDonvi || "",
           subtitle: maDonViCurrent ?? "",
           data: buildNhiemVuSummary(nhiemVuData),
           reportStatusLabel: getNhiemVuReportStatusLabel(ownReportRow),
