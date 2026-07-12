@@ -738,11 +738,13 @@ export default function PoliticalWorkReport() {
 
             <div className={styles["political-duty-grid"]}>
               {(() => {
-                const info = parseTrucNguoi(dutyReportForDisplay.trucBanNoiVu);
+                const info = parseTrucNguoi(
+                  dutyReportForDisplay.trucBanCtDangCt,
+                );
                 return (
                   <div className={styles["political-duty-box"]}>
                     <div className={styles["political-duty-label"]}>
-                      Trực Ban Nội Vụ
+                      Trực CTĐ, CTCT
                     </div>
                     <div className={styles["political-duty-name"]}>
                       {info.capBac
@@ -760,13 +762,11 @@ export default function PoliticalWorkReport() {
               })()}
 
               {(() => {
-                const info = parseTrucNguoi(
-                  dutyReportForDisplay.trucBanCtDangCt,
-                );
+                const info = parseTrucNguoi(dutyReportForDisplay.trucBanNoiVu);
                 return (
                   <div className={styles["political-duty-box"]}>
                     <div className={styles["political-duty-label"]}>
-                      Trực CTĐ, CTCT
+                      Trực Ban Nội Vụ
                     </div>
                     <div className={styles["political-duty-name"]}>
                       {info.capBac
