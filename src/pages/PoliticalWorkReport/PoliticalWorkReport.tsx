@@ -62,31 +62,12 @@ function StatusBadge({
   );
 }
 
-function buildConsolidatedPoliticalWork(rows: PoliticalWorkRow[]) {
-  const validRows = rows.filter(
-    (r) => !r.notSubmitted && isApprovedStatus(r.status),
-  );
-
+function buildConsolidatedPoliticalWork(_rows: PoliticalWorkRow[]) {
   return {
-    tinhHinh: validRows
-      .map((r) => `${r.kyhieuDonVi || r.tenDonVi}: ${r.tinhHinh}`)
-      .filter(Boolean)
-      .join("\n"),
-
-    noiDungDotXuat: validRows
-      .filter((r) => r.noiDungDotXuat)
-      .map((r) => `${r.kyhieuDonVi || r.tenDonVi}: ${r.noiDungDotXuat}`)
-      .join("\n"),
-
-    ketQua: validRows
-      .map((r) => `${r.kyhieuDonVi || r.tenDonVi}: ${r.ketQua}`)
-      .filter(Boolean)
-      .join("\n"),
-
-    kienNghi: validRows
-      .filter((r) => r.kienNghi)
-      .map((r) => `${r.kyhieuDonVi || r.tenDonVi}: ${r.kienNghi}`)
-      .join("\n"),
+    tinhHinh: "",
+    noiDungDotXuat: "",
+    ketQua: "",
+    kienNghi: "",
   };
 }
 

@@ -27,6 +27,40 @@ import AbsentRowsTable from "./components/AbsentRowsTable";
 import { generateId } from "../../utils/uuid";
 import { useAuth } from "../../context/useAuth";
 
+// --- CONSTANTS CHỨC VỤ ---
+const CHUC_VU_CHI_HUY_DAI_DOI = [
+  "Đại đội trưởng",
+  "Phó đại đội trưởng",
+  "Chính trị viên",
+  "Chính trị viên phó",
+];
+
+const CHUC_VU_CHI_HUY_TIEU_DOAN = [
+  "Tiểu đoàn trưởng",
+  "Phó tiểu đoàn trưởng",
+  "Chính trị viên",
+  "Chính trị viên phó",
+];
+
+const CHUC_VU_CHI_HUY_TRUNG_DOAN = [
+  "Trung đoàn trưởng",
+  "Phó trung đoàn trưởng -TMT",
+  "Phó trung đoàn trưởng",
+];
+
+const getChucVuOptions = (capDonVi?: string) => {
+  switch (capDonVi) {
+    case "DAI_DOI":
+      return CHUC_VU_CHI_HUY_DAI_DOI;
+    case "TIEU_DOAN":
+      return CHUC_VU_CHI_HUY_TIEU_DOAN;
+    case "TRUNG_DOAN":
+      return CHUC_VU_CHI_HUY_TRUNG_DOAN;
+    default:
+      return undefined; // Các phòng/ban không có dropdown
+  }
+};
+
 interface CreateReportModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -464,15 +498,15 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
 
               <hr className={styles.divider} />
 
-              <TrucNguoiFormSection
-                title="Trực chỉ huy"
-                value={trucChiHuy}
-                onChange={setTrucChiHuy}
-                capBacOptions={
-                  isTacChien ? CAP_BAC_CHI_HUY_SU_DOAN : CAP_BAC_CHI_HUY_DEFAULT
-                }
-              />
-
+            <TrucNguoiFormSection
+  title="Trực chỉ huy"
+  value={trucChiHuy}
+  onChange={setTrucChiHuy}
+  capBacOptions={
+    isTacChien ? CAP_BAC_CHI_HUY_SU_DOAN : CAP_BAC_CHI_HUY_DEFAULT
+  }
+  chucVuOptions={getChucVuOptions(capDonVi ?? undefined)} 
+/>
               <hr className={styles.divider} />
 
               <TrucNguoiFormSection

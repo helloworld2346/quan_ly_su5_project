@@ -7,6 +7,7 @@ type Props = {
   value: TrucNguoiInfo;
   onChange: (val: TrucNguoiInfo) => void;
   capBacOptions: string[];
+  chucVuOptions?: string[]; // Thêm prop danh sách chức vụ
   disabled?: boolean;
 };
 
@@ -15,6 +16,7 @@ export default function TrucNguoiFormSection({
   value,
   onChange,
   capBacOptions,
+  chucVuOptions, // Nhận prop chucVuOptions
   disabled = false,
 }: Props) {
   return (
@@ -58,17 +60,27 @@ export default function TrucNguoiFormSection({
           <label className={styles.label}>
             Chức vụ <span className={styles.required}>*</span>
           </label>
-          <input
-            type="text"
-            className={styles.input}
-            value={value.chucvuNguoitruc}
-            onChange={(e) =>
-              onChange({ ...value, chucvuNguoitruc: e.target.value })
-            }
-            placeholder="Nhập chức vụ..."
-            required
-            disabled={disabled}
-          />
+          {chucVuOptions ? (
+            <CustomSelect
+              options={chucVuOptions.map((cv) => ({ value: cv, label: cv }))}
+              value={value.chucvuNguoitruc}
+              onChange={(val) => onChange({ ...value, chucvuNguoitruc: val })}
+              placeholder="Chọn chức vụ"
+              disabled={disabled}
+            />
+          ) : (
+            <input
+              type="text"
+              className={styles.input}
+              value={value.chucvuNguoitruc}
+              onChange={(e) =>
+                onChange({ ...value, chucvuNguoitruc: e.target.value })
+              }
+              placeholder="Nhập chức vụ..."
+              required
+              disabled={disabled}
+            />
+          )}
         </div>
 
         <div className={styles.field}>

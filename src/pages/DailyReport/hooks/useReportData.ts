@@ -63,10 +63,13 @@ export function useReportData({
             reportDate,
           );
           if (parentRes.success && parentRes.Result) {
-            setParentReportData(mapItemToRow(parentRes.Result));
-          } else {
-            setParentReportData(null);
-          }
+  setParentReportData({
+    ...mapItemToRow(parentRes.Result),
+    isConsolidated: true, 
+  });
+} else {
+  setParentReportData(null);
+}
         } catch {
           setParentReportData(null);
         }
@@ -131,7 +134,7 @@ export function useReportData({
     );
     const quanSoHienDien = quanSoTong - quanSoVang;
     const thongTinVang: VangChiTiet = sumVang(submittedReports);
-    const absentRows: AbsentRow[] = submittedReports.flatMap((r) =>
+        const absentRows: AbsentRow[] = submittedReports.flatMap((r) =>
       r.chiTietVangList.map((m) => ({
         id: generateId(),
         hoTen: m.hoTen,
@@ -139,6 +142,7 @@ export function useReportData({
         chucVu: m.chucVu,
         lyDoVang: m.lyDoVang as keyof VangChiTiet,
         ghiChu: m.ghiChu,
+        donVi: r.kyhieuDonVi || r.tenDonVi,
       })),
     );
     return {

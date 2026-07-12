@@ -304,6 +304,7 @@ export interface ChiTietVangQuanNhan {
   capBac: string;
   chucVu: string;
   lyDoVang: string;
+  donvi:String;
   ghiChu: string;
 }
 
@@ -321,6 +322,7 @@ export interface ReportRow {
   ghiChu: string;
   rawItem: CreateReportResponse["Result"];
   notSubmitted?: boolean;
+  isConsolidated?: boolean; 
 }
 
 export type EditModalData = {

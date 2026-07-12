@@ -62,6 +62,7 @@ export default function DailyTroopReport() {
   const [editNhiemVuId, setEditNhiemVuId] = useState<string | null>(null);
 
   const [nhiemVuData, setNhiemVuData] = useState<NhiemVuNgay | null>(null);
+  console.log(nhiemVuData)
   const [nhiemVuList, setNhiemVuList] = useState<
     Array<{
       maDonVi: string;
@@ -276,7 +277,7 @@ export default function DailyTroopReport() {
         const res = await dailyReportService.getNhiemVuNgayByDonBaoCao(
           ownReport.idDonBaoCao,
         );
-        setNhiemVuData(res.Result ?? null);
+               setNhiemVuData((res.Result ?? null) as NhiemVuNgay | null);
       } catch {
         setNhiemVuData(null);
       }
@@ -298,18 +299,19 @@ export default function DailyTroopReport() {
           reportDate,
         );
 
-        const list = (res.Result ?? []).map((item) => ({
-          maDonVi: item.donViResponse.maDonVi,
-          donVi: item.donViResponse.kyhieuDonvi || "",
-          data: {
-            idNhiemvuNgay: item.idNhiemvuNgay,
-            nhiemVuPhandoi: item.nhiemVuPhandoi,
-            noiDungDotXuat: item.noiDungDotXuat,
-            noiDungUuDiem: item.noiDungUuDiem,
-            noiDungKhuyetDiem: item.noiDungKhuyetDiem,
-            noiDungCanGiaiQuyet: item.noiDungCanGiaiQuyet,
-          },
-        }));
+      const list = (res.Result ?? []).map((item) => ({
+  maDonVi: item.donViResponse.maDonVi,
+  donVi: item.donViResponse.kyhieuDonvi || "",
+  data: {
+    idNhiemvuNgay: item.idNhiemvuNgay,
+    nhiemVuPhandoi: item.nhiemVuPhandoi,
+    noiDungDotXuat: item.noiDungDotXuat,
+    noiDungUuDiem: item.noiDungUuDiem,
+    noiDungKhuyetDiem: item.noiDungKhuyetDiem,
+    noiDungCanGiaiQuyet: item.noiDungCanGiaiQuyet,
+    donviResponse: item.donViResponse as any, 
+  },
+}));
 
         if (!cancelled) setNhiemVuList(list);
       } catch {
@@ -522,7 +524,7 @@ export default function DailyTroopReport() {
         />
       )}
 
-      {selectedReportRow && (
+             {selectedReportRow && (
         <TroopDetailModal
           unit={selectedReportRow.kyhieuDonVi || selectedReportRow.tenDonVi}
           members={selectedReportRow.chiTietVangList.map((m) => ({
@@ -530,6 +532,11 @@ export default function DailyTroopReport() {
             name: m.hoTen,
             rank: m.capBac,
             position: m.chucVu,
+            // Nếu là parentReportData (D2-E4), dùng tên đơn vị của report
+                       // Nếu là parentReportData (D2-E4), dùng tên đơn vị của report
+            unit: selectedReportRow === parentReportData 
+              ? selectedReportRow.kyhieuDonVi || selectedReportRow.tenDonVi 
+              : undefined,
             reason: m.lyDoVang,
           }))}
           onClose={() => setSelectedReportRow(null)}
@@ -537,22 +544,25 @@ export default function DailyTroopReport() {
           trucBanTacChien={selectedReportRow.rawItem.trucBanTacChien}
           status={selectedReportRow.status}
           isChiHuy={isChiHuy}
+          isConsolidated={selectedReportRow === parentReportData}
         />
       )}
 
-      {showConsolidatedDetail && consolidatedData && (
-        <TroopDetailModal
-          unit="Tổng hợp tất cả đơn vị"
-          members={consolidatedData.absentRows.map((r) => ({
-            id: r.id,
-            name: r.hoTen,
-            rank: r.capBac,
-            position: r.chucVu,
-            reason: r.lyDoVang,
-          }))}
-          onClose={() => setShowConsolidatedDetail(false)}
-        />
-      )}
+{showConsolidatedDetail && consolidatedData && (
+  <TroopDetailModal
+    unit="Tổng hợp tất cả đơn vị"
+    members={consolidatedData.absentRows.map((r: any) => ({ 
+      id: r.id,
+      name: r.hoTen,
+      rank: r.capBac,
+      position: r.chucVu,
+      unit: r.donVi || r.tenDonVi || "",
+      reason: r.lyDoVang,
+    }))}
+    onClose={() => setShowConsolidatedDetail(false)}
+    isConsolidated={true}
+  />
+)}
 
       {showCreateModal && (
         <CreateReportModal

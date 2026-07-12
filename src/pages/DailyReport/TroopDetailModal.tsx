@@ -44,6 +44,7 @@ type Props = {
   trucBanTacChien?: string;
   status?: string;
   isChiHuy?: boolean;
+  isConsolidated?: boolean;
 };
 
 export default function TroopDetailModal({
@@ -54,6 +55,7 @@ export default function TroopDetailModal({
   trucBanTacChien,
   status,
   isChiHuy,
+  isConsolidated = false, 
 }: Props) {
   const parsedTrucChiHuy = parseTruc(trucBanChiHuy);
   const parsedTrucBanTacChien = parseTruc(trucBanTacChien);
@@ -154,7 +156,7 @@ export default function TroopDetailModal({
           {members.length === 0 ? (
             <p className={styles.empty}>Không có quân nhân vắng.</p>
           ) : (
-            <div className={styles.tableWrapper}>
+                  <div className={styles.tableWrapper}>
               <table className={styles.table}>
                 <thead>
                   <tr>
@@ -162,6 +164,7 @@ export default function TroopDetailModal({
                     <th>Họ và tên</th>
                     <th>Cấp bậc</th>
                     <th>Chức vụ</th>
+                    {isConsolidated && <th>Đơn vị</th>} 
                     <th>Lý do vắng</th>
                   </tr>
                 </thead>
@@ -172,6 +175,7 @@ export default function TroopDetailModal({
                       <td className={styles.nameCell}>{m.name}</td>
                       <td>{m.rank}</td>
                       <td>{m.position}</td>
+                      {isConsolidated && <td>{m.unit || "—"}</td>}
                       <td>{LY_DO_VANG_MAP[m.reason] || m.reason}</td>
                     </tr>
                   ))}

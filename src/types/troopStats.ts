@@ -19,9 +19,10 @@ export type UnitTroopChart = {
 export interface TroopMember {
   id: string;
   name: string;
-  rank: string;    // Cấp bậc
-  position: string; // Chức vụ
-  reason: string;  // Lý do vắng
+  rank: string;
+  position: string; 
+  unit?: string;  
+  reason: string; 
 }
 
 export const ATTENDANCE_META: Record<
