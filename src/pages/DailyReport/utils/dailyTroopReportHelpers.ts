@@ -416,8 +416,8 @@ export function buildTrucInfoFromReport(args: {
 
   if (!currentReport) return null;
 
-  return {
-    trucChiHuy: parseTrucNguoi(currentReport.rawItem.trucBanChiHuy),
-    trucBanTacChien: parseTrucNguoi(currentReport.rawItem.trucBanTacChien),
-  };
+return {
+  trucChiHuy: parseTrucNguoi(currentReport.rawItem.trucBanChiHuy),
+  trucBanTacChien: parseTrucNguoi(currentReport.rawItem.trucBanTacChien),
+};
 }

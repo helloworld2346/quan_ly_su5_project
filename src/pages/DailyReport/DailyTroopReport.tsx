@@ -493,16 +493,21 @@ export default function DailyTroopReport() {
         openNhiemVuId={openNhiemVuId}
         setOpenNhiemVuId={setOpenNhiemVuId}
       />
-
-      {caTrucInfo && (
-        <CaTrucInfoCard
-          ngaytruc={caTrucInfo.ngaytruc ?? ""}
-          matkhau={caTrucInfo.matkhau ?? ""}
-          ghichu={caTrucInfo.ghichu}
-          trucChiHuy={trucInfoFromReport?.trucChiHuy ?? undefined}
-          trucBanTacChien={trucInfoFromReport?.trucBanTacChien ?? undefined}
-        />
-      )}
+      
+{caTrucInfo && (
+  <CaTrucInfoCard
+    ngaytruc={caTrucInfo.ngaytruc ?? ""}
+    matkhau={caTrucInfo.matkhau ?? ""}
+    ghichu={caTrucInfo.ghichu}
+    trucChiHuy={trucInfoFromReport?.trucChiHuy ?? undefined}
+    trucBanTacChien={trucInfoFromReport?.trucBanTacChien ?? undefined}
+    labelSecond={
+      capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN"
+        ? "Trực ban tác chiến"
+        : "Trực ban nội vụ"
+    }
+  />
+)}
 
       {selectedReportRow && (
         <TroopDetailModal
