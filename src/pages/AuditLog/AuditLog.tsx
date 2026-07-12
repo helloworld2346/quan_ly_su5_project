@@ -25,6 +25,7 @@ const HANH_DONG_OPTIONS = [
   { value: "REJECT", label: "Từ chối" },
   { value: "LOCK", label: "Khóa" },
   { value: "UNLOCK", label: "Mở khóa" },
+  { value: "UPDATE_FUNCTION", label: "Cập nhật chức năng" },
 ];
 
 const TRANG_THAI_OPTIONS = [
@@ -43,6 +44,7 @@ const HANH_DONG_LABEL: Record<string, string> = {
   REJECT: "Từ chối",
   LOCK: "Khóa",
   UNLOCK: "Mở khóa",
+  UPDATE_FUNCTION: "Cập nhật chức năng",
 };
 
 const HANH_DONG_BADGE_CLASS: Record<string, string> = {
@@ -55,6 +57,7 @@ const HANH_DONG_BADGE_CLASS: Record<string, string> = {
   REJECT: styles.badgeReject,
   LOCK: styles.badgeLock,
   UNLOCK: styles.badgeUnlock,
+  UPDATE_FUNCTION: styles.badgeUpdateFunction,
 };
 
 const TRANG_THAI_LABEL: Record<string, string> = {

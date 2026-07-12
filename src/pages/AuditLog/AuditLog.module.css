@@ -152,7 +152,7 @@
 }  
   
 .colAction {  
-  width: 140px;  
+  width: 170px;  
 }  
   
 .colTime {  
@@ -165,7 +165,7 @@
 }  
   
 .colDesc {  
-  width: auto;  
+  width: 240px;  
   white-space: normal;  
   word-break: break-word;  
 }  
@@ -202,11 +202,11 @@
   border: 0.5px solid currentColor;  
 }  
   
-/* Chấm tròn CHỈ áp cho badge hành động, KHÔNG áp cho trạng thái */  
 .badgeLogin::before,  
 .badgeLogout::before,  
 .badgeCreate::before,  
 .badgeUpdate::before,  
+.badgeUpdateFunction::before,
 .badgeDelete::before,  
 .badgeApprove::before,  
 .badgeReject::before,  
@@ -240,6 +240,11 @@
   background: var(--badge-update-bg);  
   color: var(--badge-update-fg);  
 }  
+
+.badgeUpdateFunction {  
+  background: var(--badge-updatefunction-bg);  
+  color: var(--badge-updatefunction-fg);  
+}
   
 .badgeDelete {  
   background: var(--badge-delete-bg);  
@@ -319,7 +324,6 @@
   }  
 }  
   
-/* ===== Responsive ===== */  
 @media (max-width: 1024px) {  
   .page {  
     max-width: 100%;  

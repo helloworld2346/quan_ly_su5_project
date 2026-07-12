@@ -248,6 +248,8 @@
   --badge-lock-fg: #c2410c;  
   --badge-unlock-bg: rgba(168, 85, 247, 0.12);  
   --badge-unlock-fg: #7e22ce;  
+  --badge-updatefunction-bg: rgba(99, 102, 241, 0.14);  
+  --badge-updatefunction-fg: #4338ca;
   /* Trạng thái */  
   --badge-success-bg: rgba(34, 197, 94, 0.12);  
   --badge-success-fg: #15803d;  
@@ -476,4 +478,6 @@
   --badge-success-fg: #4ade80;  
   --badge-fail-bg: rgba(248, 113, 113, 0.15);  
   --badge-fail-fg: #f87171;
+  --badge-updatefunction-bg: rgba(129, 140, 248, 0.15);  
+  --badge-updatefunction-fg: #818cf8;
 }
