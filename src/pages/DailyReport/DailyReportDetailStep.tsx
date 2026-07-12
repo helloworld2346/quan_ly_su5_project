@@ -288,14 +288,18 @@ export default function DailyReportDetailStep({
                     checked={disadvantageStatus === "no"}
                     onChange={(e) => {
                       setDisadvantageStatus(e.target.value);
-                      notify({ disadvantageStatus: e.target.value });
+                      setDisadvantageDetail("");
+                      notify({
+                        disadvantageStatus: e.target.value,
+                        disadvantageDetail: "",
+                      });
                     }}
                   />
                   Không
                 </label>
               </div>
 
-              {disadvantageStatus === "yes" || disadvantageStatus === "no" ? (
+              {disadvantageStatus === "yes" && (
                 <div className={styles.expandContent}>
                   <textarea
                     rows={3}
@@ -308,7 +312,7 @@ export default function DailyReportDetailStep({
                     }}
                   />
                 </div>
-              ) : null}
+              )}
             </div>
           </div>
         </div>
