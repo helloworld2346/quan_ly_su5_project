@@ -273,7 +273,7 @@ export default function DutyShifts() {
     <div className={styles.page}>
       <div className={styles.pageHeader}>
         <div className={styles.pageHeaderLeft}>
-          <h1 className={styles.pageTitle}>Quản lý ca trực</h1>
+          <h1 className={styles.pageTitle}>Lịch sử ca trực</h1>
           <span className={styles.pageBadge}>
             {filteredList.length} ca trực
           </span>
