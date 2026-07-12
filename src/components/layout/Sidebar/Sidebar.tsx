@@ -59,7 +59,8 @@ export default function Sidebar({
 
   const capDonVi = donVi?.capDonVi ?? account?.donVi?.capDonVi ?? null;
 
-  const tenChucnang = account?.vaiTro?.tenChucnang ?? null;
+  const tenChucnang =
+    account?.tenChucnang ?? account?.vaiTro?.tenChucnang ?? null;
 
   const allowedNavItems = getNavItemsByRole(
     userRole,

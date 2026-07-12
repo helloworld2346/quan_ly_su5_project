@@ -1,9 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { normalizeRoleName } from "../utils/reportUtils";
-import {
-  getIdByPath,
-} from "../types/navigation";
+import { getIdByPath } from "../types/navigation";
 
 type Props = {
   children: React.ReactNode;
@@ -25,7 +23,12 @@ export default function RequireRole({ children }: Props) {
   const normalizedRole = normalizeRoleName(
     account?.vaiTro?.tenVaiTro ?? undefined,
   );
-  const tenChucnang = account.vaiTro?.tenChucnang ?? null;
+
+  const tenChucnang = (
+    account.tenChucnang ??
+    account.vaiTro?.tenChucnang ??
+    []
+  ).filter((c) => c && c.trim() !== "");
 
   const EXEMPT_QUAN_SO_PATHS = ["/settings", "/political-work-report"];
 

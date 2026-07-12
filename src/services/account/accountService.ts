@@ -3,7 +3,8 @@ import type {
   AccountResponse,
   AccountListResponse,
   UpdateAccountRequest,
-} from "../../types/account";
+  UpdateChucNangRequest,
+} from "../../types/account";  
 
 export interface CreateAccountRequest {
   tenTaiKhoan: string;
@@ -54,6 +55,17 @@ export const accountService = {
 
   unlockAccount: async (id: string): Promise<AccountResponse> => {
     const response = await api.put<AccountResponse>(`/account/${id}/unlock`);
+    return response.data;
+  },
+
+  updateChucNang: async (
+    id: string,
+    data: UpdateChucNangRequest,
+  ): Promise<AccountResponse> => {
+    const response = await api.put<AccountResponse>(
+      `/account/${id}/chucnang`,
+      data,
+    );
     return response.data;
   },
 };

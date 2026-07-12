@@ -612,6 +612,47 @@
   animation: fadeSlideIn 0.25s ease;  
 }  
   
+.chucnangCheckList {  
+  display: grid;  
+  grid-template-columns: repeat(2, minmax(0, 1fr));  
+  gap: 10px 16px;  
+}  
+  
+.chucnangCheckItem {  
+  display: flex;  
+  align-items: center;  
+  padding: 10px 12px;  
+  border: 1px solid var(--login-border);  
+  border-radius: 8px;  
+  font-size: 14px;  
+  font-weight: 500;  
+  color: var(--login-text);  
+  cursor: pointer;  
+  user-select: none;  
+  transition:  
+    border-color 0.15s,  
+    background 0.15s,  
+    color 0.15s;  
+}  
+  
+.chucnangCheckItem > input {  
+  margin-right: 10px;  
+  flex-shrink: 0;  
+  accent-color: var(--primary-color);  
+}  
+  
+.chucnangCheckItem:hover {  
+  border-color: var(--primary-color);  
+  background: var(--primary-a06);  
+}  
+  
+.chucnangCheckItem.checked {  
+  border-color: var(--primary-color);  
+  background: var(--primary-a10);  
+  color: var(--primary-color);  
+  font-weight: 600;  
+}  
+
 @keyframes fadeSlideIn {  
   from {  
     opacity: 0;  
@@ -677,5 +718,8 @@
   .btnAddAccount {  
     width: 100%;  
     justify-content: center;  
+  }  
+    .chucnangCheckList {  
+    grid-template-columns: 1fr;  
   }  
 }

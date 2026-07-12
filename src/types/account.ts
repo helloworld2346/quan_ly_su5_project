@@ -33,6 +33,14 @@ export interface Account {
   updatedAt: string;
   deletedAt: string | null;
   isDeleted: boolean;
+  tenChucnang?: string[];
+  chucNangThem?: string[];
+  chucNangBo?: string[];
+}  
+
+export interface UpdateChucNangRequest {
+  chucNangThem: string[];
+  chucNangBo: string[];
 }
 
 export interface AccountResponse {

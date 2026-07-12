@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, type ReactNode } from "react";
 import { accountService } from "../services/account/accountService";
 import { donviService } from "../services/unit/unitService";
-import { roleService } from "../services/role/roleService";
 import { storage } from "../utils/storage";
 import type { Account, Role, DonVi } from "../types/account";
 import { AuthContext } from "./AuthContext";
@@ -41,22 +40,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const accountResponse = await accountService.getAccount();
 
       if (accountResponse.success) {
-        setAccount(accountResponse.Result);
+        const result = accountResponse.Result;
 
-        if (accountResponse.Result.vaiTro?.idVaiTro) {
-          const roleData = await roleService.getRoleById(
-            accountResponse.Result.vaiTro.idVaiTro,
-          );
-          setAccount((prev) =>
-            prev
-              ? {
-                  ...prev,
-                  vaiTro: roleData,
-                }
-              : null,
-          );
-          setRoles([roleData]);
-        }
+        const accountChucNang = (
+          result.tenChucnang ??
+          result.vaiTro?.tenChucnang ??
+          []
+        ).filter((c) => c && c.trim() !== "");
+
+        setAccount({
+          ...result,
+          vaiTro: {
+            ...result.vaiTro,
+            tenChucnang: accountChucNang,
+          },
+        });
+        setRoles(result.vaiTro ? [result.vaiTro] : []);
 
         if (accountResponse.Result.donVi?.maDonVi) {
           const allDonVi = await donviService.getDonVi();

@@ -32,6 +32,9 @@ import Skeleton from "../../components/ui/Skeleton/Skeleton";
 import { useMinLoading } from "../../hooks/useMinLoading";
 import Pagination from "../../components/ui/Pagination/Pagination";
 import { createPortal } from "react-dom";
+import { CHUC_NANG_OPTIONS } from "../../types/navigation";  
+import type { UpdateChucNangRequest } from "../../types/account";
+
 
 type EditForm = {
   tenTaiKhoan: string;
@@ -156,6 +159,55 @@ export default function AccountManagement() {
     },
     [activeMenuId],
   );
+
+  const [chucNangId, setChucNangId] = useState<string | null>(null);
+  const [chucNangSelected, setChucNangSelected] = useState<string[]>([]);
+  const [savingChucNang, setSavingChucNang] = useState(false);
+
+  const chucNangAccount = useMemo(
+    () => accounts.find((a) => a.idTaiKhoan === chucNangId),
+    [accounts, chucNangId],
+  );
+
+  const openChucNang = useCallback((acc: Account) => {
+    const current = acc.tenChucnang ?? acc.vaiTro?.tenChucnang ?? [];
+    setChucNangSelected(current.filter((c) => c && c.trim() !== ""));
+    setChucNangId(acc.idTaiKhoan);
+  }, []);
+
+  const toggleChucNang = useCallback((value: string) => {
+    setChucNangSelected((prev) =>
+      prev.includes(value) ? prev.filter((x) => x !== value) : [...prev, value],
+    );
+  }, []);
+
+  const handleSaveChucNang = useCallback(async () => {
+    if (!chucNangId || !chucNangAccount) return;
+    const roleBase = (chucNangAccount.vaiTro?.tenChucnang ?? []).filter(
+      (c) => c && c.trim() !== "",
+    );
+    const selected = chucNangSelected.filter((c) => c && c.trim() !== "");
+    const chucNangThem = selected.filter((c) => !roleBase.includes(c));
+    const chucNangBo = roleBase.filter((c) => !selected.includes(c));
+
+    setSavingChucNang(true);
+    try {
+      const payload: UpdateChucNangRequest = { chucNangThem, chucNangBo };
+      const res = await accountService.updateChucNang(chucNangId, payload);
+      if (!res.success) throw new Error(res.message);
+      setAccounts((prev) =>
+        prev.map((a) => (a.idTaiKhoan === chucNangId ? res.Result : a)),
+      );
+      showSuccess("Cập nhật chức năng thành công");
+      setChucNangId(null);
+    } catch (e: unknown) {
+      showError(
+        e instanceof Error ? e.message : "Không thể cập nhật chức năng",
+      );
+    } finally {
+      setSavingChucNang(false);
+    }
+  }, [chucNangId, chucNangAccount, chucNangSelected, showError, showSuccess]);
 
   useEffect(() => {
     if (!activeMenuId) return;
@@ -590,8 +642,7 @@ export default function AccountManagement() {
                     role="menuitem"
                     onClick={() => {
                       setActiveMenuId(null);
-                      // TODO: mở modal gán chức năng cho account
-                      // setChucNangAccountId(acc.idTaiKhoan);
+                      openChucNang(acc);
                     }}
                   >
                     <FontAwesomeIcon
@@ -1057,6 +1108,69 @@ export default function AccountManagement() {
                 >
                   <FontAwesomeIcon icon={faCheck} />
                   {resetting ? "Đang lưu..." : "Đặt lại"}
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
+      {chucNangId &&
+        createPortal(
+          <div className={styles.overlay} onClick={() => setChucNangId(null)}>
+            <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.modalHeader}>
+                <p className={styles.modalTitle}>
+                  Đổi chức năng
+                  {chucNangAccount ? ` — ${chucNangAccount.tenTaiKhoan}` : ""}
+                </p>
+                <button
+                  type="button"
+                  className={styles.modalCloseBtn}
+                  onClick={() => setChucNangId(null)}
+                  aria-label="Đóng"
+                >
+                  <FontAwesomeIcon icon={faXmark} />
+                </button>
+              </div>
+              <div className={styles.modalBody}>
+                <div className={styles.chucnangCheckList}>
+                  {CHUC_NANG_OPTIONS.map((opt) => (
+                    <label
+                      key={opt.value}
+                      className={`${styles.chucnangCheckItem} ${
+                        chucNangSelected.includes(opt.value)
+                          ? styles.checked
+                          : ""
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={chucNangSelected.includes(opt.value)}
+                        onChange={() => toggleChucNang(opt.value)}
+                      />
+                      {opt.label}
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div className={styles.modalFooter}>
+                <button
+                  type="button"
+                  className={styles.btnCancelEdit}
+                  onClick={() => setChucNangId(null)}
+                  disabled={savingChucNang}
+                >
+                  <FontAwesomeIcon icon={faXmark} />
+                  Hủy
+                </button>
+                <button
+                  type="button"
+                  className={styles.btnSave}
+                  onClick={() => void handleSaveChucNang()}
+                  disabled={savingChucNang}
+                >
+                  <FontAwesomeIcon icon={faCheck} />
+                  {savingChucNang ? "Đang lưu..." : "Lưu"}
                 </button>
               </div>
             </div>
