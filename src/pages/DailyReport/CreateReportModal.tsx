@@ -122,6 +122,9 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   const isDonViBo = ["e bộ", "ebộ", "ebo", "d bộ", "dbộ", "dbo"].some(
     (k) => unitName.includes(k) || unitSymbol.includes(k),
   );
+  const isTieuDoanBo = ["d bộ", "dbộ", "dbo"].some(
+    (k) => unitName.includes(k) || unitSymbol.includes(k),
+  );
 
   const { showWarning } = useToast();
   const [step, setStep] = useState(1);
@@ -477,7 +480,6 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                   </span>
                 </div>
               )}
-
               <div className={styles.coreGrid}>
                 <div className={styles.field}>
                   <label className={styles.label}>Ngày báo cáo</label>
@@ -524,9 +526,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                   />
                 </div>
               </div>
-
               <hr className={styles.divider} />
-
               <TrucNguoiFormSection
                 title="Trực chỉ huy"
                 value={trucChiHuy}
@@ -541,7 +541,6 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                 )}
               />
               <hr className={styles.divider} />
-
               <TrucNguoiFormSection
                 title={isTacChien ? "Trực ban tác chiến" : "Trực ban nội vụ"}
                 value={trucBanTacChien}
@@ -556,11 +555,9 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                   isDonViBo,
                   "ctd",
                 )}
-                disabled={isDaiDoi}
+                disabled={isDaiDoi || isTieuDoanBo}
               />
-
               <hr className={styles.divider} />
-
               <div className={styles.sectionHeader}>
                 <h3 className={styles.sectionTitle}>
                   {isConsolidation
@@ -589,7 +586,6 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                   </button>
                 </div>
               </div>
-
               <div className={styles.tableContainer}>
                 <AbsentRowsTable
                   rows={absentRows}
