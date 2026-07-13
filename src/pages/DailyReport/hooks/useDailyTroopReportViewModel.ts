@@ -209,19 +209,20 @@ export function useDailyTroopReportViewModel(
     return null;
   }, [editModalData, reportData, parentReportData]);
 
-  const currentEditingDetail = useMemo<DetailStepData | null>(() => {
-    const raw = (currentEditingReport as { tinhHinhHoatDong?: string } | null)
-      ?.tinhHinhHoatDong;
+const currentEditingDetail = useMemo<DetailStepData | null>(() => {
+  const raw = (currentEditingReport as { tinhHinhHoatDong?: string } | null)
+    ?.tinhHinhHoatDong;
 
-    if (raw) {
-      try {
-        return JSON.parse(raw) as DetailStepData;
-      } catch {
-      }
+  if (raw) {
+    try {
+      return JSON.parse(raw) as DetailStepData;
+    } catch {
+      // JSON không hợp lệ -> bỏ qua, fallback về editNhiemVuData
     }
+  }
 
-    return editNhiemVuData;
-  }, [currentEditingReport, editNhiemVuData]);
+  return editNhiemVuData;
+}, [currentEditingReport, editNhiemVuData]);
 
   const nhiemVuEntries = useMemo<NhiemVuEntry[]>(() => {
     const q = query.trim().toLowerCase();
