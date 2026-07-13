@@ -182,7 +182,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       };
       connectWebSocket();
     } catch (error) {
-      console.error("Failed to fetch auth data:", error);
+      if (import.meta.env.DEV) {
+        console.error("Failed to fetch auth data:", error);
+      }
       storage.removeToken();
       setAccount(null);
     } finally {
