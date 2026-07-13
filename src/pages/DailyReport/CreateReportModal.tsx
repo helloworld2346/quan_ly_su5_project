@@ -48,14 +48,13 @@ const CHUC_VU_CHI_HUY_TRUNG_DOAN = [
 ];
 
 const getChucVuOptions = (capDonVi?: string, isTrungDoanBo?: boolean) => {
-  if (capDonVi === "TRUNG_DOAN") {
-    return isTrungDoanBo ? [] : CHUC_VU_CHI_HUY_TRUNG_DOAN;
-  }
   switch (capDonVi) {
     case "DAI_DOI":
       return CHUC_VU_CHI_HUY_DAI_DOI;
     case "TIEU_DOAN":
-      return CHUC_VU_CHI_HUY_TIEU_DOAN;
+      return isTrungDoanBo ? [] : CHUC_VU_CHI_HUY_TIEU_DOAN;
+    case "TRUNG_DOAN":
+      return isTrungDoanBo ? [] : CHUC_VU_CHI_HUY_TRUNG_DOAN;
     default:
       return [];
   }
@@ -94,7 +93,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
 
   const unitName = (account?.donVi?.tenDonvi ?? "").toLowerCase();
   const unitSymbol = (account?.donVi?.kyhieuDonvi ?? "").toLowerCase();
-  const isTrungDoanBo = ["e bộ", "ebộ", "ebo"].some(
+  const isDonViBo = ["e bộ", "ebộ", "ebo", "d bộ", "dbộ", "dbo"].some(
     (k) => unitName.includes(k) || unitSymbol.includes(k),
   );
 
@@ -511,8 +510,8 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                 }
                 chucVuOptions={getChucVuOptions(
                   capDonVi ?? undefined,
-                  isTrungDoanBo,
-                )}  
+                  isDonViBo,
+                )}
               />
               <hr className={styles.divider} />
 
