@@ -117,11 +117,11 @@ export default function PoliticalWorkReport() {
     (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
     (isNoiVu && capDonVi === "TIEU_DOAN");
 
-  const shouldHideConsolidatedSections =
-    isAdmin || isPoliticalOffice || (isTacChien && capDonVi === "SU_DOAN");
+  // const shouldHideConsolidatedSections =
+  //   isAdmin || isPoliticalOffice || (isTacChien && capDonVi === "SU_DOAN");
 
   const isTacChienSuDoan = isTacChien && capDonVi === "SU_DOAN";
-  const canAddOwnReport = isTacChienSuDoan || isAdmin;
+  const canAddOwnReport = isTacChienSuDoan || isAdmin || isPoliticalOffice;
 
   const {
     reportData,
@@ -225,7 +225,9 @@ export default function PoliticalWorkReport() {
 
   const isPastDate = reportDate < todayIsoDate();
 
-  const hasOwnReport = canAddOwnReport
+const hasOwnReport = isPoliticalOffice
+  ? Boolean(parentReportData)
+  : canAddOwnReport
     ? Boolean(dutyReport && !dutyReport.notSubmitted)
     : Boolean(ownReport && !ownReport.notSubmitted);
 
@@ -287,7 +289,7 @@ export default function PoliticalWorkReport() {
   const filteredChildRows = childRows.filter(matchesQuery);
   const filteredFlatRows = flatRows.filter(matchesQuery);
 
-  const showTwoSections = isParentUnit && !shouldHideConsolidatedSections;
+  const showTwoSections = isParentUnit;
 
   const totalUnits = isParentUnit ? childRows.length : reportData.length;
   const reported = isParentUnit
@@ -502,7 +504,8 @@ export default function PoliticalWorkReport() {
         reportDate={reportDate}
         onReportDateChange={setReportDate}
         onAddReport={
-          (!isParentUnit || canAddOwnReport) && !hasOwnReport
+          (!isParentUnit || canAddOwnReport || isPoliticalOffice) &&
+          !hasOwnReport
             ? handleAddReport
             : undefined
         }

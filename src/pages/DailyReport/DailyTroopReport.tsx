@@ -401,7 +401,11 @@ export default function DailyTroopReport() {
         reportDate={reportDate}
         onReportDateChange={setReportDate}
         onAddReport={canAddReport ? handleAddReport : undefined}
-        onConsolidate={isParentUnit ? handleConsolidate : undefined}
+        onConsolidate={
+          isParentUnit && !shouldHideConsolidatedSections
+            ? handleConsolidate
+            : undefined
+        }
         consolidateDisabled={
           !consolidatedData ||
           consolidatedData.submittedCount === 0 ||
