@@ -53,6 +53,37 @@ const RANK_OPTIONS: SelectOption[] = [
   "Đại tá",
 ].map((r) => ({ value: r, label: r }));
 
+const CHUC_VU_CTD_DAI_DOI: SelectOption[] = [
+  "Đại đội trưởng",
+  "Phó đại đội trưởng",
+  "Chính trị viên",
+  "Chính trị viên phó",
+].map((r) => ({ value: r, label: r }));
+
+const CHUC_VU_CTD_TIEU_DOAN: SelectOption[] = [
+  "Tiểu đoàn trưởng",
+  "Phó tiểu đoàn trưởng",
+  "Chính trị viên",
+  "Chính trị viên phó",
+].map((r) => ({ value: r, label: r }));
+
+const CHUC_VU_CTD_TRUNG_DOAN: SelectOption[] = ["Chính ủy", "Phó chính ủy"].map(
+  (r) => ({ value: r, label: r }),
+);
+
+const getCtdChucVuOptions = (capDonVi?: string): SelectOption[] => {
+  switch (capDonVi) {
+    case "DAI_DOI":
+      return CHUC_VU_CTD_DAI_DOI;
+    case "TIEU_DOAN":
+      return CHUC_VU_CTD_TIEU_DOAN;
+    case "TRUNG_DOAN":
+      return CHUC_VU_CTD_TRUNG_DOAN;
+    default:
+      return [];
+  }
+};
+
 const DEFAULT_FORM_DATA: ReportFormData = {
   reporterName: "",
   reporterRank: "",
@@ -110,7 +141,6 @@ export default function CreateReport({
   const [validationError, setValidationError] = useState("");
 
   const validateForm = (): string => {
-    
     if (!isDaiDoi) {
       if (!formData.reporterName.trim())
         return "Vui lòng nhập họ tên trực ban nội vụ.";
@@ -222,7 +252,6 @@ export default function CreateReport({
       }
       footer={footer}
     >
-
       <section className={styles["report-section"]}>
         <h3
           className={`${styles["section-title"]} ${styles["section-title--green"]}`}
@@ -258,12 +287,22 @@ export default function CreateReport({
             <label>
               Chức vụ <span className={styles["required-mark"]}>*</span>
             </label>
-            <input
-              type="text"
-              placeholder="Nhập chức vụ..."
-              value={formData.ctdPosition}
-              onChange={(e) => handleChange("ctdPosition", e.target.value)}
-            />
+            {/* Sử dụng ?? undefined để clean kiểu dữ liệu của capDonVi */}
+            {getCtdChucVuOptions(capDonVi ?? undefined).length > 0 ? (
+              <CustomSelect
+                options={getCtdChucVuOptions(capDonVi ?? undefined)}
+                value={formData.ctdPosition}
+                onChange={(v) => handleChange("ctdPosition", v)}
+                placeholder="Chọn chức vụ"
+              />
+            ) : (
+              <input
+                type="text"
+                placeholder="Nhập chức vụ..."
+                value={formData.ctdPosition}
+                onChange={(e) => handleChange("ctdPosition", e.target.value)}
+              />
+            )}
           </div>
           <div className={styles["form-group"]}>
             <label>Số điện thoại</label>

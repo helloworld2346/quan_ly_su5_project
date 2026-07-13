@@ -47,14 +47,40 @@ const CHUC_VU_CHI_HUY_TRUNG_DOAN = [
   "Phó trung đoàn trưởng",
 ];
 
-const getChucVuOptions = (capDonVi?: string, isTrungDoanBo?: boolean) => {
+const CHUC_VU_CTD_DAI_DOI = [
+  "Chính trị viên",
+  "Chính trị viên phó",
+  "Đại đội trưởng",
+  "Phó đại đội trưởng",
+];
+
+const CHUC_VU_CTD_TIEU_DOAN = [
+  "Chính trị viên",
+  "Chính trị viên phó",
+  "Tiểu đoàn trưởng",
+  "Phó tiểu đoàn trưởng",
+];
+
+const CHUC_VU_CTD_TRUNG_DOAN = ["Chính ủy", "Phó chính ủy"];
+
+const getChucVuOptions = (
+  capDonVi?: string,
+  isTrungDoanBo?: boolean,
+  type: "chiHuy" | "ctd" = "chiHuy",
+) => {
   switch (capDonVi) {
     case "DAI_DOI":
-      return CHUC_VU_CHI_HUY_DAI_DOI;
+      return type === "chiHuy" ? CHUC_VU_CHI_HUY_DAI_DOI : CHUC_VU_CTD_DAI_DOI;
     case "TIEU_DOAN":
-      return isTrungDoanBo ? [] : CHUC_VU_CHI_HUY_TIEU_DOAN;
+      if (isTrungDoanBo) return [];
+      return type === "chiHuy"
+        ? CHUC_VU_CHI_HUY_TIEU_DOAN
+        : CHUC_VU_CTD_TIEU_DOAN;
     case "TRUNG_DOAN":
-      return isTrungDoanBo ? [] : CHUC_VU_CHI_HUY_TRUNG_DOAN;
+      if (isTrungDoanBo) return [];
+      return type === "chiHuy"
+        ? CHUC_VU_CHI_HUY_TRUNG_DOAN
+        : CHUC_VU_CTD_TRUNG_DOAN;
     default:
       return [];
   }
@@ -511,6 +537,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                 chucVuOptions={getChucVuOptions(
                   capDonVi ?? undefined,
                   isDonViBo,
+                  "chiHuy",
                 )}
               />
               <hr className={styles.divider} />
@@ -524,6 +551,11 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                     ? CAP_BAC_TAC_CHIEN_SU_DOAN
                     : CAP_BAC_TAC_CHIEN_DEFAULT
                 }
+                chucVuOptions={getChucVuOptions(
+                  capDonVi ?? undefined,
+                  isDonViBo,
+                  "ctd",
+                )}
                 disabled={isDaiDoi}
               />
 
