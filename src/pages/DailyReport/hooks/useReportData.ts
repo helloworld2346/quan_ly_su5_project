@@ -20,12 +20,14 @@ export function useReportData({
   maDonViCurrent,
   isParentUnit,
   isTacChien,
+  isChiHuy,
   reportDate,
   showError,
 }: {
   maDonViCurrent: string | undefined;
   isParentUnit: boolean;
   isTacChien: boolean;
+  isChiHuy: boolean;
   reportDate: string;
   showError: (msg: string) => void;
 }) {
@@ -63,13 +65,13 @@ export function useReportData({
             reportDate,
           );
           if (parentRes.success && parentRes.Result) {
-  setParentReportData({
-    ...mapItemToRow(parentRes.Result),
-    isConsolidated: true, 
-  });
-} else {
-  setParentReportData(null);
-}
+            setParentReportData({
+              ...mapItemToRow(parentRes.Result),
+              isConsolidated: true,
+            });
+          } else {
+            setParentReportData(null);
+          }
         } catch {
           setParentReportData(null);
         }
@@ -103,7 +105,7 @@ export function useReportData({
   useReportDataChangedListener(fetchReports);
 
   useEffect(() => {
-    if (!isTacChien) return;
+    if (!isTacChien && !isChiHuy) return;
     const fetchCaTruc = async () => {
       try {
         const res = await dutyService.getCaTrucByDate(reportDate);
@@ -117,7 +119,7 @@ export function useReportData({
       }
     };
     void fetchCaTruc();
-  }, [isTacChien, reportDate]);
+  }, [isTacChien, isChiHuy, reportDate]);
 
   const consolidatedData = useMemo(() => {
     if (!isParentUnit || reportData.length === 0) return null;
@@ -134,17 +136,17 @@ export function useReportData({
     );
     const quanSoHienDien = quanSoTong - quanSoVang;
     const thongTinVang: VangChiTiet = sumVang(submittedReports);
-        const absentRows: AbsentRow[] = submittedReports.flatMap((r) =>
-          r.chiTietVangList.map((m) => ({
-            id: generateId(),
-            hoTen: m.hoTen,
-            capBac: m.capBac,
-            chucVu: m.chucVu,
-            lyDoVang: m.lyDoVang as keyof VangChiTiet,
-            ghiChu: m.ghiChu,
-            tenDonVi: r.tenDonVi,
-          })),
-        );
+    const absentRows: AbsentRow[] = submittedReports.flatMap((r) =>
+      r.chiTietVangList.map((m) => ({
+        id: generateId(),
+        hoTen: m.hoTen,
+        capBac: m.capBac,
+        chucVu: m.chucVu,
+        lyDoVang: m.lyDoVang as keyof VangChiTiet,
+        ghiChu: m.ghiChu,
+        tenDonVi: r.tenDonVi,
+      })),
+    );
     return {
       quanSoTong,
       quanSoVang,

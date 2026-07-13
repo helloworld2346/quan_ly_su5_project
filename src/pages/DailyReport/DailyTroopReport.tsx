@@ -102,6 +102,7 @@ export default function DailyTroopReport() {
       (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
       (isNoiVu && capDonVi === "TIEU_DOAN"),
     isTacChien,
+    isChiHuy,
     reportDate,
     showError,
   });
@@ -335,7 +336,7 @@ export default function DailyTroopReport() {
       return;
     }
 
-    if (isTacChien && !caTrucFromApi) {
+    if ((isTacChien || isChiHuyLeaf) && !caTrucFromApi) {
       showError(
         "Chưa có ca trực cho ngày này. Vui lòng tạo ca trực trước khi tạo báo cáo!",
       );
