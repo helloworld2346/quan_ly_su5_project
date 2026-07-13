@@ -33,7 +33,15 @@
   
 .passwordInput {  
   padding-right: 50px !important;  
-}  
+  font-family: "Inter", "Segoe UI", Tahoma, Verdana, sans-serif;  
+  font-size: 16px;  
+  letter-spacing: normal;  
+  font-variant-ligatures: none;  
+}
+
+.compact .passwordInput {  
+  font-size: 15px;  
+}
   
 .formGroup input:focus {  
   border-color: var(--primary-color);  
