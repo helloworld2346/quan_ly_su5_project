@@ -143,8 +143,6 @@ export const CAP_BAC_CHI_HUY_DEFAULT = [
   "Đại tá",
 ];
 
-export const CAP_BAC_CHI_HUY_SU_DOAN = ["Trung tá", "Thượng tá", "Đại tá"];
-
 export const CAP_BAC_TAC_CHIEN_DEFAULT = [
   "Thiếu úy",
   "Trung úy",
@@ -154,7 +152,158 @@ export const CAP_BAC_TAC_CHIEN_DEFAULT = [
   "Trung tá",
 ];
 
-export const CAP_BAC_TAC_CHIEN_SU_DOAN = ["Trung tá", "Thượng tá", "Đại tá"];
+export const CAP_BAC_CHI_HUY_DAI_DOI = [
+  "Trung úy",
+  "Thượng úy",
+  "Đại úy",
+  "Thiếu tá",
+];
+
+export const CAP_BAC_TAC_CHIEN_DAI_DOI = [
+  "Thiếu úy",
+  "Trung úy",
+  "Thượng úy",
+  "Đại úy",
+];
+
+export const CAP_BAC_CHI_HUY_TIEU_DOAN = [
+  "Thượng úy",
+  "Đại úy",
+  "Thiếu tá",
+  "Trung tá",
+];
+
+export const CAP_BAC_TAC_CHIEN_TIEU_DOAN = [
+  "Thiếu úy",
+  "Trung úy",
+  "Thượng úy",
+  "Đại úy",
+  "Thiếu tá",
+  "Thiếu úy QNCN",
+  "Trung úy QNCN",
+  "Thượng úy QNCN",
+  "Đại úy QNCN",
+  "Thiếu tá QNCN",
+  "Trung tá QNCN",
+  "Thượng tá QNCN",
+];
+
+export const CAP_BAC_CHI_HUY_TRUNG_DOAN = [
+  "Thiếu tá",
+  "Trung tá",
+  "Thượng tá",
+];
+
+export const CAP_BAC_TAC_CHIEN_TRUNG_DOAN = [
+  "Trung úy",
+  "Thượng úy",
+  "Đại úy",
+  "Thiếu tá",
+  "Trung tá",
+];
+
+export const CAP_BAC_CHI_HUY_SU_DOAN = [
+  "Trung tá",
+  "Thượng tá",
+  "Đại tá",
+];
+
+export const CAP_BAC_TAC_CHIEN_SU_DOAN = [
+  "Trung úy",
+  "Thượng úy",
+  "Đại úy",
+  "Thiếu tá",
+  "Trung tá",
+];
+
+export const getCapBacOptions = (
+  capDonVi?: string,
+  isTacChien?: boolean,
+  isSuDoan?: boolean
+): string[] => {
+  if (isSuDoan) {
+    return isTacChien ? CAP_BAC_TAC_CHIEN_SU_DOAN : CAP_BAC_CHI_HUY_SU_DOAN;
+  }
+
+  switch (capDonVi) {
+    case "DAI_DOI":
+      return isTacChien ? CAP_BAC_TAC_CHIEN_DAI_DOI : CAP_BAC_CHI_HUY_DAI_DOI;
+    case "TIEU_DOAN":
+      return isTacChien ? CAP_BAC_TAC_CHIEN_TIEU_DOAN : CAP_BAC_CHI_HUY_TIEU_DOAN;
+    case "TRUNG_DOAN":
+      return isTacChien ? CAP_BAC_TAC_CHIEN_TRUNG_DOAN : CAP_BAC_CHI_HUY_TRUNG_DOAN;
+    default:
+      return isTacChien ? CAP_BAC_TAC_CHIEN_DEFAULT : CAP_BAC_CHI_HUY_DEFAULT;
+  }
+};
+
+
+export const getCapBacVangOptions = (capDonVi?: string): string[] => {
+  switch (capDonVi) {
+    case "DAI_DOI":
+
+      return [
+        "Binh nhất",
+        "Binh nhì",
+        "Hạ sĩ",
+        "Trung sĩ",
+        "Thượng sĩ",
+        "Thiếu úy",
+        "Trung úy",
+        "Thượng úy",
+        "Đại úy",
+        "Thiếu tá",
+        "Thiếu úy QNCN",
+        "Trung úy QNCN",
+        "Thượng úy QNCN",
+        "Đại úy QNCN",
+      ];
+    case "TIEU_DOAN":
+      return [
+        "Binh nhất",
+        "Binh nhì",
+        "Hạ sĩ",
+        "Trung sĩ",
+        "Thượng sĩ",
+        "Thiếu úy",
+        "Trung úy",
+        "Thượng úy",
+        "Đại úy",
+        "Thiếu tá",
+        "Trung tá",
+        "Thiếu úy QNCN",
+        "Trung úy QNCN",
+        "Thượng úy QNCN",
+        "Đại úy QNCN",
+        "Thiếu tá QNCN",
+      ];
+    case "TRUNG_DOAN":
+    
+      return [
+        "Binh nhất",
+        "Binh nhì",
+        "Hạ sĩ",
+        "Trung sĩ",
+        "Thượng sĩ",
+        "Thiếu úy",
+        "Trung úy",
+        "Thượng úy",
+        "Đại úy",
+        "Thiếu tá",
+        "Trung tá",
+        "Thiếu úy QNCN",
+        "Trung úy QNCN",
+        "Thượng úy QNCN",
+        "Đại úy QNCN",
+        "Thiếu tá QNCN",
+        "Trung tá QNCN",
+      ];
+    case "SU_DOAN":
+    default:
+     
+      return CAP_BAC_OPTIONS;
+  }
+};
 
 export const EMPTY_TRUC: TrucNguoiInfo = {
   tenNguoitruc: "",

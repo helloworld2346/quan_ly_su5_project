@@ -9,9 +9,12 @@ type Props = {
   rows: AbsentRow[];
   onUpdate: (id: string, field: keyof AbsentRow, value: string) => void;
   onRemove: (id: string) => void;
+  capBacOptions?: string[]; 
 };
 
-export default function AbsentRowsTable({ rows, onUpdate, onRemove }: Props) {
+export default function AbsentRowsTable({ rows, onUpdate, onRemove, capBacOptions }: Props) {
+  const rankOptions = capBacOptions && capBacOptions.length > 0 ? capBacOptions : CAP_BAC_OPTIONS;
+
   if (rows.length === 0) {
     return (
       <div className={styles.emptyState}>
@@ -54,7 +57,7 @@ export default function AbsentRowsTable({ rows, onUpdate, onRemove }: Props) {
             </td>
             <td>
               <CustomSelect
-                options={CAP_BAC_OPTIONS.map((cb) => ({
+                options={rankOptions.map((cb) => ({
                   value: cb,
                   label: cb,
                 }))}

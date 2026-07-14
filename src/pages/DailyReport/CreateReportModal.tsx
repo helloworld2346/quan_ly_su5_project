@@ -14,10 +14,8 @@ import { dailyReportService } from "../../services/dailyReport/dailyReportServic
 import { useToast } from "../../context/useToast";
 import ConfirmDialog from "../../components/ui/ConfirmDialog/ConfirmDialog";
 import {
-  CAP_BAC_CHI_HUY_DEFAULT,
-  CAP_BAC_CHI_HUY_SU_DOAN,
-  CAP_BAC_TAC_CHIEN_DEFAULT,
-  CAP_BAC_TAC_CHIEN_SU_DOAN,
+  getCapBacOptions,
+  getCapBacVangOptions,
   EMPTY_TRUC,
   parseTrucNguoi,
   trucFromCaTrucInfo,
@@ -108,6 +106,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   const { account } = useAuth();
   const capDonVi = account?.donVi?.capDonVi;
   const isDaiDoi = capDonVi === "DAI_DOI";
+  const isSuDoan = capDonVi === "SU_DOAN";
 
   const unitName = (account?.donVi?.tenDonvi ?? "").toLowerCase();
   const unitSymbol = (account?.donVi?.kyhieuDonvi ?? "").toLowerCase();
@@ -218,6 +217,17 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   }, [tongQuanSo, quanSoVang]);
 
   const effectiveDetailData = detailData ?? detailFromInitialData;
+  const capBacChiHuyOptions = useMemo(() => {
+    return getCapBacOptions(capDonVi ?? undefined, false, isSuDoan);
+  }, [capDonVi, isSuDoan]);
+
+  const capBacTacChienOptions = useMemo(() => {
+    return getCapBacOptions(capDonVi ?? undefined, true, isSuDoan);
+  }, [capDonVi, isSuDoan]);
+
+  const capBacVangOptions = useMemo(() => {
+    return getCapBacVangOptions(capDonVi ?? undefined);
+  }, [capDonVi]);
 
   const validateStep1 = () => {
     if (
@@ -520,9 +530,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                 title="Trực chỉ huy"
                 value={trucChiHuy}
                 onChange={setTrucChiHuy}
-                capBacOptions={
-                  isTacChien ? CAP_BAC_CHI_HUY_SU_DOAN : CAP_BAC_CHI_HUY_DEFAULT
-                }
+                capBacOptions={capBacChiHuyOptions}
                 chucVuOptions={getChucVuOptions(
                   capDonVi ?? undefined,
                   isDonViBo,
@@ -534,11 +542,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                 title={isTacChien ? "Trực ban tác chiến" : "Trực ban nội vụ"}
                 value={trucBanTacChien}
                 onChange={setTrucBanTacChien}
-                capBacOptions={
-                  isTacChien
-                    ? CAP_BAC_TAC_CHIEN_SU_DOAN
-                    : CAP_BAC_TAC_CHIEN_DEFAULT
-                }
+                capBacOptions={capBacTacChienOptions}
                 chucVuOptions={getChucVuOptions(
                   capDonVi ?? undefined,
                   isDonViBo,
@@ -580,6 +584,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                   rows={absentRows}
                   onUpdate={handleUpdateRow}
                   onRemove={handleRemoveRow}
+                  capBacOptions={capBacVangOptions}
                 />
               </div>
             </div>
