@@ -54,13 +54,6 @@ const CHUC_VU_CTD_DAI_DOI = [
   "Phó đại đội trưởng",
 ];
 
-const CHUC_VU_CTD_TIEU_DOAN = [
-  "Chính trị viên",
-  "Chính trị viên phó",
-  "Tiểu đoàn trưởng",
-  "Phó tiểu đoàn trưởng",
-];
-
 const CHUC_VU_CTD_TRUNG_DOAN = ["Chính ủy", "Phó chính ủy"];
 
 const getChucVuOptions = (
@@ -73,9 +66,8 @@ const getChucVuOptions = (
       return type === "chiHuy" ? CHUC_VU_CHI_HUY_DAI_DOI : CHUC_VU_CTD_DAI_DOI;
     case "TIEU_DOAN":
       if (isTrungDoanBo) return [];
-      return type === "chiHuy"
-        ? CHUC_VU_CHI_HUY_TIEU_DOAN
-        : CHUC_VU_CTD_TIEU_DOAN;
+      if (type === "ctd") return [];
+      return CHUC_VU_CHI_HUY_TIEU_DOAN;
     case "TRUNG_DOAN":
       if (isTrungDoanBo) return [];
       return type === "chiHuy"

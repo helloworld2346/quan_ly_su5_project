@@ -120,21 +120,29 @@ export default function CustomSelect({
   useEffect(() => {
     if (!isOpen) return;
 
+    const handleScroll = (e: Event) => {
+      // Không đóng nếu cuộn bên trong chính dropdown
+      const target = e.target as Node;
+      const dropdownRoot = document.querySelector(`.${styles.dropdown}`);
+      if (dropdownRoot && dropdownRoot.contains(target)) return;
+
+      closeDropdown();
+    };
+
     const update = () => {
       if (!wrapperRef.current) return;
-
       const rect = wrapperRef.current.getBoundingClientRect();
       setDropdownPos(calcPos(rect));
     };
 
-    window.addEventListener("scroll", update, true);
+    window.addEventListener("scroll", handleScroll, true);
     window.addEventListener("resize", update);
 
     return () => {
-      window.removeEventListener("scroll", update, true);
+      window.removeEventListener("scroll", handleScroll, true);
       window.removeEventListener("resize", update);
     };
-  }, [isOpen, calcPos]);
+  }, [isOpen, calcPos, closeDropdown]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!isOpen) {

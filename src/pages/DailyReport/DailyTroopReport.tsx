@@ -216,14 +216,23 @@ export default function DailyTroopReport() {
       }
     }
 
+    function handleScrollClose() {
+      setActiveMenuUnit(null);
+    }
+
     if (activeMenuUnit) {
       document.addEventListener("mousedown", handleGlobalClose);
-      window.addEventListener("scroll", handleGlobalClose, { passive: true });
+      window.addEventListener("scroll", handleScrollClose, {
+        passive: true,
+        capture: true,
+      });
     }
 
     return () => {
       document.removeEventListener("mousedown", handleGlobalClose);
-      window.removeEventListener("scroll", handleGlobalClose);
+      window.removeEventListener("scroll", handleScrollClose, {
+        capture: true,
+      });
     };
   }, [activeMenuUnit]);
 
