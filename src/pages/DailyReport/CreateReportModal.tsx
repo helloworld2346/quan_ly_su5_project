@@ -122,9 +122,6 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   const isDonViBo = ["e bộ", "ebộ", "ebo", "d bộ", "dbộ", "dbo"].some(
     (k) => unitName.includes(k) || unitSymbol.includes(k),
   );
-  const isTieuDoanBo = ["d bộ", "dbộ", "dbo"].some(
-    (k) => unitName.includes(k) || unitSymbol.includes(k),
-  );
 
   const { showWarning } = useToast();
   const [step, setStep] = useState(1);
@@ -239,7 +236,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       return "Điền đầy đủ Trực chỉ huy trước khi tiếp tục.";
     }
 
-    if (!isDaiDoi && !isTieuDoanBo) {
+    if (!isDaiDoi) {
       if (
         !trucBanTacChien.tenNguoitruc.trim() ||
         !trucBanTacChien.capbacNguoitruc.trim() ||
@@ -555,7 +552,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                   isDonViBo,
                   "ctd",
                 )}
-                disabled={isDaiDoi || isTieuDoanBo}
+                disabled={isDaiDoi}
               />
               <hr className={styles.divider} />
               <div className={styles.sectionHeader}>
