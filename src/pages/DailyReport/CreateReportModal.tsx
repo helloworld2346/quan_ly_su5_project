@@ -239,7 +239,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       return "Điền đầy đủ Trực chỉ huy trước khi tiếp tục.";
     }
 
-    if (!isDaiDoi) {
+    if (!isDaiDoi && !isTieuDoanBo) {
       if (
         !trucBanTacChien.tenNguoitruc.trim() ||
         !trucBanTacChien.capbacNguoitruc.trim() ||

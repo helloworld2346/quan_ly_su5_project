@@ -19,8 +19,6 @@ export type { ReportRow };
 export function useReportData({
   maDonViCurrent,
   isParentUnit,
-  isTacChien,
-  isChiHuy,
   reportDate,
   showError,
 }: {
