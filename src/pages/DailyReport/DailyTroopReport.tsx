@@ -336,10 +336,15 @@ export default function DailyTroopReport() {
       return;
     }
 
-    if ((isTacChien || isChiHuyLeaf) && !caTrucFromApi) {
+    if (isTacChien && !caTrucFromApi) {
       showError(
         "Chưa có ca trực cho ngày này. Vui lòng tạo ca trực trước khi tạo báo cáo!",
       );
+      return;
+    }
+
+    if (!isTacChien && !caTrucFromApi) {
+      showError("Trực ban tác chiến chưa tạo ca trực, vui lòng quay lại sau!");
       return;
     }
 

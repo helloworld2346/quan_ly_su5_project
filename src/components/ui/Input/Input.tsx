@@ -57,7 +57,11 @@ export default function Input({
           type={currentInputType}
           placeholder={placeholder}
           autoComplete={isPasswordType ? "current-password" : "username"}
-          className={isPasswordType ? styles.passwordInput : ""}
+          className={
+            isPasswordType
+              ? `${styles.passwordInput}${showPassword ? "" : ` ${styles.passwordMasked}`}`
+              : ""
+          }
           value={value}
           onChange={onChange}
           disabled={disabled}

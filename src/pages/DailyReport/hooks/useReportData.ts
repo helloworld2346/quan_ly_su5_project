@@ -105,7 +105,6 @@ export function useReportData({
   useReportDataChangedListener(fetchReports);
 
   useEffect(() => {
-    if (!isTacChien && !isChiHuy) return;
     const fetchCaTruc = async () => {
       try {
         const res = await dutyService.getCaTrucByDate(reportDate);
@@ -119,7 +118,7 @@ export function useReportData({
       }
     };
     void fetchCaTruc();
-  }, [isTacChien, isChiHuy, reportDate]);
+  }, [reportDate]);
 
   const consolidatedData = useMemo(() => {
     if (!isParentUnit || reportData.length === 0) return null;
