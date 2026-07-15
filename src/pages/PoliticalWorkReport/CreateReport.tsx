@@ -11,6 +11,7 @@ import type {
 } from "../../types/politicalWork";
 import { parseTrucNguoi, stringifyTrucNguoi } from "./utils/trucNguoi";
 import { useAuth } from "../../context/useAuth";
+import { getCapBacOptions } from "../../utils/reportUtils";
 
 interface CreateReportProps {
   open: boolean;
@@ -41,17 +42,6 @@ const MAX_ACTIVITY = 1500;
 const MAX_RESULT = 1000;
 const MAX_INCIDENT = 1000;
 const MAX_PROPOSAL = 1000;
-
-const RANK_OPTIONS: SelectOption[] = [
-  "Thiếu úy",
-  "Trung úy",
-  "Thượng úy",
-  "Đại úy",
-  "Thiếu tá",
-  "Trung tá",
-  "Thượng tá",
-  "Đại tá",
-].map((r) => ({ value: r, label: r }));
 
 const CHUC_VU_CTD_DAI_DOI: SelectOption[] = [
   "Đại đội trưởng",
@@ -111,6 +101,12 @@ export default function CreateReport({
   const { account } = useAuth();
   const capDonVi = account?.donVi?.capDonVi;
   const isDaiDoi = capDonVi === "DAI_DOI";
+
+  const isSuDoan = capDonVi === "SU_DOAN";
+
+
+  const ctdRankOptions: SelectOption[] = getCapBacOptions(capDonVi ?? undefined, false, isSuDoan).map(r => ({ value: r, label: r }));
+  const reporterRankOptions: SelectOption[] = getCapBacOptions(capDonVi ?? undefined, true, isSuDoan).map(r => ({ value: r, label: r }));
 
   const [formData, setFormData] = useState<ReportFormData>(() => {
     if (initialData) {
@@ -276,7 +272,7 @@ export default function CreateReport({
               Cấp bậc <span className={styles["required-mark"]}>*</span>
             </label>
             <CustomSelect
-              options={RANK_OPTIONS}
+              options={ctdRankOptions}
               value={formData.ctdRank}
               onChange={(v) => handleChange("ctdRank", v)}
               placeholder="Chọn cấp bậc"
@@ -344,7 +340,7 @@ export default function CreateReport({
               Cấp bậc <span className={styles["required-mark"]}>*</span>
             </label>
             <CustomSelect
-              options={RANK_OPTIONS}
+              options={reporterRankOptions}
               value={formData.reporterRank}
               onChange={(v) => handleChange("reporterRank", v)}
               placeholder="Chọn cấp bậc"
