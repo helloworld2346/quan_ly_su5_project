@@ -179,7 +179,6 @@ export default function UnitManagement() {
     setCurrentPage(1);
   };
 
-  // ----- Create -----
   const openCreateModal = useCallback(() => {
     setCreateForm({ ...EMPTY_CREATE });
     setCreateErrors({});

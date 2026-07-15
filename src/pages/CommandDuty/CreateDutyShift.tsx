@@ -55,7 +55,6 @@ export default function CreateDutyShift() {
   const [ghiChu, setGhiChu] = useState("");
 
   const [errors, setErrors] = useState<FieldErrors>({});
-  // Khởi tạo "checking" nếu đã có ngày mặc định (today), để effect chạy kiểm tra ngay khi mount
   const [dateStatus, setDateStatus] = useState<DateStatus>(
     today ? "checking" : "idle",
   );
@@ -82,9 +81,6 @@ export default function CreateDutyShift() {
     void load();
   }, [showError]);
 
-  // Chỉ giữ phần gọi API có debounce trong effect.
-  // Các trạng thái tức thời (idle/checking) được set ở onChange + giá trị khởi tạo useState,
-  // nên KHÔNG còn setState đồng bộ trong thân effect (tránh lỗi react-hooks/set-state-in-effect).
   useEffect(() => {
     if (!ngayTruc) return;
 

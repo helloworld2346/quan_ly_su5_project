@@ -70,7 +70,6 @@ function sortDonVi(
       const suffixB = Object.entries(COMPANY_SORT_SUFFIX).find(([k]) =>
         nameB.includes(k),
       );
-      // có số → lên trước; không số (sửa chữa/kho) → xuống sau
       if (!suffixA && suffixB) return -1;
       if (suffixA && !suffixB) return 1;
       if (suffixA && suffixB) return suffixA[1] - suffixB[1];
