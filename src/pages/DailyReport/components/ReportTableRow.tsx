@@ -8,6 +8,8 @@ import {
 import ReportStatusBadge from "../../../components/ui/ReportStatusBadge/ReportStatusBadge";
 import styles from "../DailyTroopReport.module.css";
 import type { ReportRow } from "../../../types/dailyReport";
+import { normalizeUnitName } from "../../../utils/reportUtils";
+
 
 type Props = {
   row: ReportRow;
@@ -57,7 +59,7 @@ export default function ReportTableRow({
             .join(" ") || undefined
         }
       >
-        <td className={styles.unitCell}>{row.kyhieuDonVi || row.tenDonVi}</td>
+       <td className={styles.unitCell}>{normalizeUnitName(row.kyhieuDonVi || row.tenDonVi)}</td>
         {Array.from({ length: 17 }).map((_, i) => (
           <td key={i}>—</td>
         ))}
@@ -110,7 +112,7 @@ export default function ReportTableRow({
           .join(" ") || undefined
       }
     >
-      <td className={styles.unitCell}>{row.kyhieuDonVi || row.tenDonVi}</td>
+     <td className={styles.unitCell}>{normalizeUnitName(row.kyhieuDonVi || row.tenDonVi)}</td>
       <td>{row.quanSoTong}</td>
       <td>{row.quanSoHienDien}</td>
       <td>{row.quanSoVang}</td>
