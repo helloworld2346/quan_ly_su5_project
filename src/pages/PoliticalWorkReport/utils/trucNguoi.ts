@@ -1,4 +1,3 @@
-// Thông tin người trực (nội vụ / CTĐ-CTCT)
 export interface TrucNguoi {
   hoTen: string;
   capBac: string;
@@ -13,8 +12,6 @@ const EMPTY_TRUC_NGUOI: TrucNguoi = {
   soDienThoai: "",
 };
 
-// Parse chuỗi trucBan (JSON {hoTen,capBac,chucVu,soDienThoai}).
-// Tương thích ngược: dữ liệu cũ là tên trần -> coi nguyên chuỗi là hoTen.
 export function parseTrucNguoi(raw: string | undefined | null): TrucNguoi {
   if (!raw) return { ...EMPTY_TRUC_NGUOI };
   try {

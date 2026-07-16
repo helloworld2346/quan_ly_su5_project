@@ -93,10 +93,8 @@ export default function DutyPersonnel() {
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
 
-  // Search state
   const [search, setSearch] = useState("");
 
-  // Edit state
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editType, setEditType] = useState<DutyType | null>(null);
   const [editForm, setEditForm] = useState<TrucNguoiPayload>({ ...EMPTY_FORM });
@@ -140,7 +138,6 @@ export default function DutyPersonnel() {
 
   const handleFieldChange = (field: keyof TrucNguoiPayload, val: string) => {
     setForm((prev) => ({ ...prev, [field]: val }));
-    // Xóa lỗi inline của field ngay khi người dùng sửa
     if (field in formErrors) {
       setFormErrors((prev) => ({ ...prev, [field]: undefined }));
     }
@@ -208,7 +205,6 @@ export default function DutyPersonnel() {
     [editForm, editInitial],
   );
 
-  // Đóng modal: nếu có thay đổi chưa lưu thì xác nhận trước
   const handleCancelEdit = useCallback(async () => {
     if (editHasChanges) {
       const confirmed = await confirm({
