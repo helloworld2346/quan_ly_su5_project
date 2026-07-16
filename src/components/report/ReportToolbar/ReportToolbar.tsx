@@ -13,6 +13,7 @@ import {
 
 import styles from "./ReportToolbar.module.css";
 import SearchBar from "../../ui/SearchBar/SearchBar";
+import DateInputVi from "../../ui/DateInputVi/DateInputVi";
 
 type Props = {
   query: string;
@@ -75,13 +76,11 @@ export default function ReportToolbar({
       />
 
       <div className={styles.dateWrap}>
-        <input
+        <DateInputVi
           id={dateId}
-          type="date"
-          className={styles.dateInput}
           value={reportDate}
           max={maxDate}
-          onChange={(e) => onReportDateChange(e.target.value)}
+          onChange={onReportDateChange}
         />
       </div>
 
