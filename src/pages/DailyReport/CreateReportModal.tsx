@@ -24,6 +24,8 @@ import TrucNguoiFormSection from "./components/NguoiTrucFormSection";
 import AbsentRowsTable from "./components/AbsentRowsTable";
 import { generateId } from "../../utils/uuid";
 import { useAuth } from "../../context/useAuth";
+import DateInputVi from "../../components/ui/DateInputVi/DateInputVi";
+
 
 const CHUC_VU_CHI_HUY_DAI_DOI = [
   "Đại đội trưởng",
@@ -482,13 +484,11 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
               <div className={styles.coreGrid}>
                 <div className={styles.field}>
                   <label className={styles.label}>Ngày báo cáo</label>
-                  <input
-                    type="date"
+                  <DateInputVi
                     className={styles.input}
                     value={ngayBaoCao}
-                    readOnly
                     disabled
-                    required
+                    onChange={() => {}}
                   />
                 </div>
 

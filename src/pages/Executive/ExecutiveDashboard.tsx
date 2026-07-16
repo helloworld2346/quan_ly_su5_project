@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faFilter,
@@ -6,7 +6,6 @@ import {
   faExclamationTriangle,
   faChevronLeft,
   faChevronRight,
-  faCalendarAlt,
 } from "@fortawesome/free-solid-svg-icons";
 
 import PieChart from "../../components/charts/PieChart/PieChart";
@@ -21,6 +20,8 @@ import {
 } from "../../services/troopStats";
 import { formatFullDate, shiftDay, toDateParam } from "../../utils/date";
 import styles from "./ExecutiveDashboard.module.css";
+import DateInputVi from "../../components/ui/DateInputVi/DateInputVi";
+
 
 type FilterKey = "all" | SubordinateUnitType;
 
@@ -115,7 +116,6 @@ export default function ExecutiveDashboard() {
   const [data, setData] = useState<ThongKeQuanSoResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const dateInputRef = useRef<HTMLInputElement>(null);
 
   const showSkeleton = useMinLoading(loading);
 
@@ -258,29 +258,12 @@ export default function ExecutiveDashboard() {
             <FontAwesomeIcon icon={faChevronRight} />
           </button>
         </div>
-        <div
-          className={styles.datePicker}
-          onClick={() => dateInputRef.current?.showPicker()}
-        >
-          <FontAwesomeIcon
-            icon={faCalendarAlt}
-            className={styles.datePickerIcon}
-          />
-          <input
-            ref={dateInputRef}
-            type="date"
-            className={styles.datePickerInput}
+        <div className={styles.datePicker}>
+          <DateInputVi
             value={toDateParam(selectedDate)}
-            onChange={(e) => {
-              if (e.target.value) setSelectedDate(new Date(e.target.value));
+            onChange={(iso) => {
+              if (iso) setSelectedDate(new Date(iso + "T00:00:00"));
             }}
-          />
-          <span className={styles.datePickerPlaceholder}>Chọn ngày</span>
-          <span style={{ flex: 1 }} />
-          <FontAwesomeIcon
-            icon={faChevronRight}
-            className={styles.datePickerArrow}
-            style={{ transform: "rotate(90deg)" }}
           />
         </div>
       </div>

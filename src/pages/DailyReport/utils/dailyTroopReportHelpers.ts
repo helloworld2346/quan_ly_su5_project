@@ -103,11 +103,15 @@ export function totalsToExportCells(t: DisplayTotals): (string | number)[] {
   ];
 }
 
-export function isPastDateForReport(reportDate: string): boolean {
-  const selectedDate = new Date(`${reportDate}T00:00:00`);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return selectedDate < today;
+// export function isPastDateForReport(reportDate: string): boolean {
+//   const selectedDate = new Date(`${reportDate}T00:00:00`);
+//   const today = new Date();
+//   today.setHours(0, 0, 0, 0);
+//   return selectedDate < today;
+// }
+
+export function isPastDateForReport(): boolean {
+  return false;
 }
 
 export function hasReportForDate(args: {
@@ -118,7 +122,7 @@ export function hasReportForDate(args: {
   reportData: ReportRow[];
 }): boolean {
   const {
-    reportDate,
+    // reportDate,
     maDonViCurrent,
     isParentUnit,
     parentReportData,
@@ -127,11 +131,15 @@ export function hasReportForDate(args: {
 
   if (!maDonViCurrent) return false;
 
-  const selectedDate = new Date(reportDate);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  // const selectedDate = new Date(reportDate);
+  // const today = new Date();
+  // today.setHours(0, 0, 0, 0);
 
-  if (selectedDate < today) return true;
+  // if (selectedDate < today) return true;
+  // if (isParentUnit) return parentReportData !== null;
+
+  // return reportData.some((report) => report.donVi === maDonViCurrent);
+
   if (isParentUnit) return parentReportData !== null;
 
   return reportData.some((report) => report.donVi === maDonViCurrent);
@@ -416,8 +424,8 @@ export function buildTrucInfoFromReport(args: {
 
   if (!currentReport) return null;
 
-return {
-  trucChiHuy: parseTrucNguoi(currentReport.rawItem.trucBanChiHuy),
-  trucBanTacChien: parseTrucNguoi(currentReport.rawItem.trucBanTacChien),
-};
+  return {
+    trucChiHuy: parseTrucNguoi(currentReport.rawItem.trucBanChiHuy),
+    trucBanTacChien: parseTrucNguoi(currentReport.rawItem.trucBanTacChien),
+  };
 }

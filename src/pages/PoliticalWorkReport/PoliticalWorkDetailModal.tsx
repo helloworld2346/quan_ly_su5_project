@@ -41,6 +41,52 @@ export default function PoliticalWorkDetailModal({ row, onClose }: Props) {
               strokeWidth="2"
               className={styles.svgIcon}
             >
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </div>
+          <div className={styles.trucInfo}>
+            <div className={styles.trucRole}>Trực CTĐ, CTCT</div>
+            <div className={styles.trucName}>{ctd.hoTen || "—"}</div>
+
+            <div className={styles.trucDetailsList}>
+              {ctd.capBac && (
+                <div className={styles.trucDetailItem}>
+                  <span className={styles.detailLabel}>Cấp bậc:</span>{" "}
+                  {ctd.capBac}
+                </div>
+              )}
+              {ctd.chucVu && (
+                <div className={styles.trucDetailItem}>
+                  <span className={styles.detailLabel}>Chức vụ:</span>{" "}
+                  {ctd.chucVu}
+                </div>
+              )}
+              {ctd.soDienThoai && (
+                <div className={styles.trucDetailItem}>
+                  <span className={styles.detailLabel}>Sđt:</span>{" "}
+                  {ctd.soDienThoai}
+                </div>
+              )}
+              {!ctd.capBac && !ctd.chucVu && !ctd.soDienThoai && (
+                <div className={styles.trucDetailEmpty}>
+                  — Chưa có thông tin chi tiết —
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.trucDivider}></div>
+        <div className={styles.trucSection}>
+          <div className={styles.trucIconBox}>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className={styles.svgIcon}
+            >
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
               <line x1="16" y1="2" x2="16" y2="6" />
               <line x1="8" y1="2" x2="8" y2="6" />
@@ -78,54 +124,8 @@ export default function PoliticalWorkDetailModal({ row, onClose }: Props) {
             </div>
           </div>
         </div>
-
-        <div className={styles.trucDivider}></div>
-        <div className={styles.trucSection}>
-          <div className={styles.trucIconBox}>
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              className={styles.svgIcon}
-            >
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
-            </svg>
-          </div>
-          <div className={styles.trucInfo}>
-            <div className={styles.trucRole}>Trực CTĐ, CTCT</div>
-            <div className={styles.trucName}>{ctd.hoTen || "—"}</div>
-
-            <div className={styles.trucDetailsList}>
-              {ctd.capBac && (
-                <div className={styles.trucDetailItem}>
-                  <span className={styles.detailLabel}>Cấp bậc:</span>{" "}
-                  {ctd.capBac}
-                </div>
-              )}
-              {ctd.chucVu && (
-                <div className={styles.trucDetailItem}>
-                  <span className={styles.detailLabel}>Chức vụ:</span>{" "}
-                  {ctd.chucVu}
-                </div>
-              )}
-              {ctd.soDienThoai && (
-                <div className={styles.trucDetailItem}>
-                  <span className={styles.detailLabel}>Sđt:</span>{" "}
-                  {ctd.soDienThoai}
-                </div>
-              )}
-              {!ctd.capBac && !ctd.chucVu && !ctd.soDienThoai && (
-                <div className={styles.trucDetailEmpty}>
-                  — Chưa có thông tin chi tiết —
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
       </div>
-
+      
       <div className={styles.timelineContainer}>
         <div className={styles.timelineItem}>
           <div className={styles.timelineLeft}>

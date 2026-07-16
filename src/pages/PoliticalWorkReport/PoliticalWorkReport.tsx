@@ -124,6 +124,28 @@ export default function PoliticalWorkReport() {
 
   const canExportExcel = isTacChienSuDoan;
 
+  const {
+    reportData,
+    parentReportData,
+    childUnits,
+    loading,
+    fetchReports,
+    dutyReport,
+  } = usePoliticalWorkData({
+    maDonViCurrent: viewMaDonVi,
+    isParentUnit,
+    showError,
+    reportDate,
+    submitMaDonVi: isPoliticalOffice ? submitMaDonVi : undefined,
+    fetchPctDuty: false,
+  });
+
+  const hasChildren = childUnits.length > 0;
+
+  const showSkeleton = useMinLoading(loading);
+
+  const ownReport = reportData.find((r) => r.donVi === submitMaDonVi) ?? null;
+
   const handleExportExcel = () => {
     const row = parentReportData ?? ownReport;
     if (!row) {
@@ -142,37 +164,11 @@ export default function PoliticalWorkReport() {
     });
   };
 
-  const {
-    reportData,
-    parentReportData,
-    childUnits,
-    loading,
-    fetchReports,
-    dutyReport,
-  } = usePoliticalWorkData({
-    maDonViCurrent: viewMaDonVi,
-    isParentUnit,
-    showError,
-    reportDate,
-    submitMaDonVi: isPoliticalOffice ? submitMaDonVi : undefined,
-    fetchPctDuty: isAdmin || (isTacChien && capDonVi === "SU_DOAN"),
-  });
-
-  const hasChildren = childUnits.length > 0;
-
-  const showSkeleton = useMinLoading(loading);
-
-  const ownReport = reportData.find((r) => r.donVi === submitMaDonVi) ?? null;
-
   const reportForSubmit =
     isParentUnit && parentReportData ? parentReportData : ownReport;
 
   const dutyReportForDisplay =
-    isAdmin || (isTacChien && capDonVi === "SU_DOAN")
-      ? dutyReport
-      : isParentUnit && parentReportData
-        ? parentReportData
-        : ownReport;
+    isParentUnit && parentReportData ? parentReportData : ownReport;
 
   const commanderReport =
     reportData.find((r) => r.status === "Chờ_Duyệt") ?? null;
@@ -242,7 +238,9 @@ export default function PoliticalWorkReport() {
   const canConsolidate =
     isParentUnit && !parentReportData && approvedChildRows.length > 0;
 
-  const isPastDate = reportDate < todayIsoDate();
+  // const isPastDate = reportDate < todayIsoDate();
+  const isPastDate = false;
+
 
   const hasOwnReport = isPoliticalOffice
     ? Boolean(parentReportData)
