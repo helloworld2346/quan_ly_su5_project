@@ -15,7 +15,7 @@ import type { EditModalData, ReportRow } from "../../types/dailyReport";
 import type { NhiemVuNgay } from "../../services/dailyReport/dailyReportService";
 import type { DetailStepData } from "./DailyReportDetailStep";
 import { handleApiError } from "../../utils/errorHandler";
-import { todayIsoDate, normalizeRoleName } from "../../utils/reportUtils";
+import { todayIsoDate, normalizeRoleName, normalizeUnitName } from "../../utils/reportUtils";
 
 import { useReportData } from "./hooks/useReportData";
 import { useReportActions } from "./hooks/useReportActions";
@@ -543,7 +543,7 @@ export default function DailyTroopReport() {
 
       {selectedReportRow && (
         <TroopDetailModal
-          unit={selectedReportRow.kyhieuDonVi || selectedReportRow.tenDonVi}
+          unit={normalizeUnitName(selectedReportRow.kyhieuDonVi || selectedReportRow.tenDonVi)}
           members={selectedReportRow.chiTietVangList.map((m) => ({
             id: m.id,
             name: m.hoTen,
@@ -569,7 +569,7 @@ export default function DailyTroopReport() {
             rank: r.capBac,
             position: r.chucVu,
             reason: r.lyDoVang,
-            unitName: r.tenDonVi,
+           unitName: normalizeUnitName(r.tenDonVi),
           }))}
           onClose={() => setShowConsolidatedDetail(false)}
         />

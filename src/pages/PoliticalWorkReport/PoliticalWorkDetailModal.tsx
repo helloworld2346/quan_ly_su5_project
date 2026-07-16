@@ -3,6 +3,7 @@ import styles from "./PoliticalWorkDetailModal.module.css";
 import ReportStatusBadge from "../../components/ui/ReportStatusBadge/ReportStatusBadge";
 import type { PoliticalWorkRow } from "../../types/politicalWork";
 import { parseTrucNguoi } from "./utils/trucNguoi";
+import { normalizeUnitName } from "../../utils/reportUtils";
 
 type Props = {
   row: PoliticalWorkRow;
@@ -13,7 +14,7 @@ export default function PoliticalWorkDetailModal({ row, onClose }: Props) {
   const noiVu = parseTrucNguoi(row.trucBanNoiVu);
   const ctd = parseTrucNguoi(row.trucBanCtDangCt);
 
-  const unitLabel = row.kyhieuDonVi || row.tenDonVi || row.donVi;
+ const unitLabel = normalizeUnitName(row.kyhieuDonVi || row.tenDonVi || row.donVi);
 
   return (
     <ModalShell

@@ -2,6 +2,7 @@ import ModalShell from "../../components/ui/ModalShell/ModalShell";
 import ReportStatusBadge from "../../components/ui/ReportStatusBadge/ReportStatusBadge";
 import styles from "./TroopDetailModal.module.css";
 import type { TroopMember } from "../../types/troopStats";
+import { normalizeUnitName } from "../../utils/reportUtils";
 
 const LY_DO_VANG_MAP: Record<string, string> = {
   hoiThaiNgoaiSuDoan: "Hội thao (Ngoài Sư đoàn)",
@@ -73,7 +74,7 @@ export default function TroopDetailModal({
       title="Chi tiết quân số vắng"
       subHeader={
         <div className={styles.subHeaderArea}>
-          <span className={styles.unitName}>{unit}</span>
+         <span className={styles.unitName}>{normalizeUnitName(unit)}</span>
           {status && (
             <span className={styles.statusWrap}>
               <ReportStatusBadge status={status} />
@@ -173,7 +174,7 @@ export default function TroopDetailModal({
                     <tr key={m.id || i}>
                       <td>{i + 1}</td>
                       <td className={styles.nameCell}>{m.name}</td>
-                      {showUnitColumn && <td>{m.unitName || "—"}</td>}
+                      {showUnitColumn && <td>{normalizeUnitName(m.unitName) || "—"}</td>}
                       <td>{m.rank}</td>
                       <td>{m.position}</td>
                       <td>{LY_DO_VANG_MAP[m.reason] || m.reason}</td>

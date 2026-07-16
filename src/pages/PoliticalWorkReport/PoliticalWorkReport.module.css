@@ -545,3 +545,49 @@
   color: var(--login-text-muted);
   font-weight: 500;
 }
+
+/* Responsive cho màn hình nhỏ hơn 1366px */
+@media (max-width: 1366px) {
+  .political-badge {
+    min-width: 48px;
+    height: 24px;
+    font-size: 12px;
+    padding: 0 8px;
+  }
+  
+  .political-table th:nth-child(4),
+  .political-table td:nth-child(4) {
+    width: 8%;
+  }
+  
+  .political-table th:nth-child(5),
+  .political-table td:nth-child(5) {
+    width: 8%;
+  }
+}
+
+
+@media (max-width: 1024px) {
+  .political-badge {
+    min-width: 40px;
+    height: 22px;
+    font-size: 11px;
+    padding: 0 6px;
+  }
+  
+  .political-table th,
+  .political-table td {
+    padding: 8px 6px;
+    font-size: 13px;
+  }
+  
+  .political-table th:nth-child(4),
+  .political-table td:nth-child(4) {
+    width: 7%;
+  }
+  
+  .political-table th:nth-child(5),
+  .political-table td:nth-child(5) {
+    width: 7%;
+  }
+}
