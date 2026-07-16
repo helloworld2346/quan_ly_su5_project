@@ -28,6 +28,14 @@ function getToday(): string {
   return `${y}-${m}-${day}`;
 }
 
+// Hàm bổ sung giúp chuyển đổi hiển thị từ YYYY-MM-DD sang DD/MM/YYYY
+const formatDateVN = (dateStr: string) => {
+  if (!dateStr) return "";
+  const parts = dateStr.split("-");
+  if (parts.length !== 3) return dateStr;
+  return `${parts[2]}/${parts[1]}/${parts[0]}`;
+};
+
 type FieldErrors = {
   chiHuy?: string;
   tacChien?: string;
@@ -134,9 +142,12 @@ export default function CreateDutyShift() {
   const handleSubmit = async () => {
     if (!validate()) return;
 
+    // Chuyển đổi format ngày để hiển thị trong câu hỏi Confirm
+    const ngayTrucFormatted = formatDateVN(ngayTruc);
+
     const confirmed = await confirm({
       title: "Xác nhận tạo ca trực",
-      message: `Bạn có chắc chắn muốn tạo ca trực ngày ${ngayTruc}?`,
+      message: `Bạn có chắc chắn muốn tạo ca trực ngày ${ngayTrucFormatted}?`,
       confirmText: "Tạo ca trực",
       cancelText: "Hủy",
       type: "info",
@@ -157,11 +168,11 @@ export default function CreateDutyShift() {
           return;
         }
       } catch {
-        // Nếu backend trả lỗi khi không tìm thấy (vd 404), bỏ qua và tiếp tục tạo
+        // Bỏ qua lỗi 404 và tiếp tục tạo
       }
 
       const res = await dutyService.createCaTruc({
-        ngaytruc: ngayTruc,
+        ngaytruc: ngayTruc, // Gửi lên server vẫn dùng biến gốc format chuẩn YYYY-MM-DD
         matkhau: matKhau,
         ghichu: ghiChu,
         trucChiHuy: selectedChiHuyId,
@@ -198,8 +209,9 @@ export default function CreateDutyShift() {
           <span>Ca trực đã được tạo thành công</span>
         </div>
 
+        {/* Vị trí 1: Bọc formatDateVN cho kết quả hiển thị thành công */}
         <CaTrucInfoCard
-          ngaytruc={createdCaTruc.ngaytruc}
+          ngaytruc={formatDateVN(createdCaTruc.ngaytruc)}
           matkhau={createdCaTruc.matkhau}
           ghichu={createdCaTruc.ghichu ?? undefined}
           trucChiHuy={createdCaTruc.trucChiHuy}
@@ -377,11 +389,11 @@ export default function CreateDutyShift() {
           </div>
         </div>
 
-        {/* DÒNG 2: Live preview */}
+        {/* Vị trí 2: Bọc formatDateVN cho phần Live Preview (Xem trước) */}
         <div className={styles.previewPanel}>
           <span className={styles.previewLabel}>Xem trước</span>
           <CaTrucInfoCard
-            ngaytruc={ngayTruc}
+            ngaytruc={formatDateVN(ngayTruc)}
             matkhau={matKhau}
             ghichu={ghiChu || undefined}
             trucChiHuy={selectedChiHuy ?? undefined}
