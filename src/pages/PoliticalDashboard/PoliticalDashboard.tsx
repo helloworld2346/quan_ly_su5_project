@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   faBuilding,
-  faCalendarAlt,
   faChevronLeft,
   faChevronRight,
   faExclamationTriangle,
@@ -11,6 +10,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { formatFullDate, shiftDay, toDateParam } from "../../utils/date";
 import "./PoliticalDashboard.css";
+import DateInputVi from "../../components/ui/DateInputVi/DateInputVi";
 
 import {
   politicalDashboardService,
@@ -37,6 +37,11 @@ export default function PoliticalDashboard() {
     useState<PoliticalDashboardResult | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const toLocalIso = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+      d.getDate(),
+    ).padStart(2, "0")}`;
+
   const [hoveredData, setHoveredData] = useState<{
     unitName: string;
     key: "proposals" | "incidents" | null;
@@ -44,8 +49,6 @@ export default function PoliticalDashboard() {
     unitName: "",
     key: null,
   });
-
-  const dateInputRef = useRef<HTMLInputElement>(null);
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -68,9 +71,8 @@ export default function PoliticalDashboard() {
         }
 
         const dateParam = toDateParam(selectedDate);
-        const dashboard = await politicalDashboardService.getThongKeCtDangCt(
-          dateParam,
-        );
+        const dashboard =
+          await politicalDashboardService.getThongKeCtDangCt(dateParam);
 
         if (ignore) return;
 
@@ -90,8 +92,8 @@ export default function PoliticalDashboard() {
 
     fetchDashboard(false);
 
-    const todayStr = toDateParam(new Date());
-    const selectedStr = toDateParam(selectedDate);
+    const todayStr = toLocalIso(new Date());
+    const selectedStr = toLocalIso(selectedDate);
 
     if (todayStr === selectedStr) {
       intervalId = setInterval(() => {
@@ -141,13 +143,26 @@ export default function PoliticalDashboard() {
         return nameLower.includes("phòng");
       }
       if (filter === "regiment") {
-        return nameLower.includes("trung đoàn") || nameLower.includes("sư đoàn") || nameLower.includes("e ") || nameLower.startsWith("e");
+        return (
+          nameLower.includes("trung đoàn") ||
+          nameLower.includes("sư đoàn") ||
+          nameLower.includes("e ") ||
+          nameLower.startsWith("e")
+        );
       }
       if (filter === "battalion") {
-        return nameLower.includes("tiểu đoàn") || nameLower.includes("d ") || nameLower.startsWith("d");
+        return (
+          nameLower.includes("tiểu đoàn") ||
+          nameLower.includes("d ") ||
+          nameLower.startsWith("d")
+        );
       }
       if (filter === "company") {
-        return nameLower.includes("đại đội") || nameLower.includes("c ") || nameLower.startsWith("c");
+        return (
+          nameLower.includes("đại đội") ||
+          nameLower.includes("c ") ||
+          nameLower.startsWith("c")
+        );
       }
       return true;
     });
@@ -156,7 +171,8 @@ export default function PoliticalDashboard() {
   const percent = (value: number) =>
     overview.tongDonVi > 0 ? Math.round((value / overview.tongDonVi) * 100) : 0;
 
-  const totalOverviewIssues = overview.donViCoKienNghi + overview.donViCoDotXuat;
+  const totalOverviewIssues =
+    overview.donViCoKienNghi + overview.donViCoDotXuat;
   const overviewGreenRatio = totalOverviewIssues
     ? Math.round((overview.donViCoKienNghi / totalOverviewIssues) * 100)
     : 0;
@@ -191,35 +207,30 @@ export default function PoliticalDashboard() {
           </button>
         </div>
 
-        <div
-          className="political-date-picker"
-          onClick={() => dateInputRef.current?.showPicker()}
-        >
-          <FontAwesomeIcon icon={faCalendarAlt} />
-          <input
-            ref={dateInputRef}
-            type="date"
-            value={toDateParam(selectedDate)}
-            onChange={(event) => {
-              if (event.target.value) {
-                setSelectedDate(new Date(event.target.value));
-              }
+        <div className="political-date-picker">
+          <DateInputVi
+            value={toLocalIso(selectedDate)}
+            max={toLocalIso(new Date())}
+            onChange={(iso) => {
+              if (iso) setSelectedDate(new Date(iso + "T00:00:00"));
             }}
           />
-          <span>Chọn ngày</span>
-          <FontAwesomeIcon className="political-date-arrow" icon={faChevronRight} />
         </div>
       </div>
 
       <div className="political-summary-card">
         <div className="political-donut-block">
-          <h3 className="political-section-title">Tổng hợp hoạt động CTĐ,CTCT</h3>
+          <h3 className="political-section-title">
+            Tổng hợp hoạt động CTĐ,CTCT
+          </h3>
 
           <div
             className={`political-main-donut ${overview.tongDonVi === 0 ? "is-empty" : ""}`}
-            style={{
-              "--overview-green": `${overviewGreenRatio}%`
-            } as React.CSSProperties}
+            style={
+              {
+                "--overview-green": `${overviewGreenRatio}%`,
+              } as React.CSSProperties
+            }
           >
             <div className="political-donut-center">
               <strong>{overview.tongDonVi}</strong>
@@ -293,108 +304,167 @@ export default function PoliticalDashboard() {
       {loading && <p className="political-updated">Đang tải dữ liệu...</p>}
 
       {!loading && visibleUnits.length === 0 && (
-        <p className="political-updated">Không có dữ liệu thuộc nhóm đơn vị này.</p>
+        <p className="political-updated">
+          Không có dữ liệu thuộc nhóm đơn vị này.
+        </p>
       )}
 
       <div className="political-unit-grid">
-        {!loading && visibleUnits.map((unit) => {
-          const isCurrentUnit = hoveredData.unitName === unit.name;
-          const activeKey = isCurrentUnit ? hoveredData.key : null;
+        {!loading &&
+          visibleUnits.map((unit) => {
+            const isCurrentUnit = hoveredData.unitName === unit.name;
+            const activeKey = isCurrentUnit ? hoveredData.key : null;
 
-          const totalIssues = unit.proposals + unit.incidents;
-          const pGreen = totalIssues ? Math.round((unit.proposals / totalIssues) * 100) : 0;
+            const totalIssues = unit.proposals + unit.incidents;
+            const pGreen = totalIssues
+              ? Math.round((unit.proposals / totalIssues) * 100)
+              : 0;
 
-          let centerValue = totalIssues;
-          let centerLabel = "Báo cáo";
+            let centerValue = totalIssues;
+            let centerLabel = "Báo cáo";
 
-          if (activeKey === "proposals") {
-            centerValue = unit.proposals;
-            centerLabel = "Kiến nghị";
-          } else if (activeKey === "incidents") {
-            centerValue = unit.incidents;
-            centerLabel = "Đột xuất";
-          }
+            if (activeKey === "proposals") {
+              centerValue = unit.proposals;
+              centerLabel = "Kiến nghị";
+            } else if (activeKey === "incidents") {
+              centerValue = unit.incidents;
+              centerLabel = "Đột xuất";
+            }
 
-          return (
-            <article className="political-unit-card" key={unit.id}>
-              <div className="political-unit-head">
-                <div>
-                  <FontAwesomeIcon icon={faBuilding} />
-                  <strong>{unit.name}</strong>
-                </div>
-                <span
-                  className={
-                    unit.status === "Tốt"
-                      ? "status-good"
-                      : unit.status === "Cần chú ý" || unit.status === "Có vấn đề"
-                        ? "status-warning"
-                        : "status-danger"
-                  }
-                >
-                  {unit.status}
-                </span>
-              </div>
-
-              <div className="political-unit-body">
-                <div
-                  className={`political-small-donut ${totalIssues === 0 ? "is-empty" : ""} ${activeKey ? `hover-${activeKey}` : ""}`}
-                  style={
-                    {
-                      "--green-ratio": `${pGreen}%`,
-                    } as React.CSSProperties
-                  }
-                >
-                  <div className="political-hover-zones">
-                    <div
-                      className="hover-zone-segment"
-                      onMouseEnter={() => totalIssues > 0 && setHoveredData({ unitName: unit.name, key: "proposals" })}
-                      onMouseLeave={() => setHoveredData({ unitName: "", key: null })}
-                    />
-                    <div
-                      className="hover-zone-segment"
-                      onMouseEnter={() => totalIssues > 0 && setHoveredData({ unitName: unit.name, key: "incidents" })}
-                      onMouseLeave={() => setHoveredData({ unitName: "", key: null })}
-                    />
+            return (
+              <article className="political-unit-card" key={unit.id}>
+                <div className="political-unit-head">
+                  <div>
+                    <FontAwesomeIcon icon={faBuilding} />
+                    <strong>{unit.name}</strong>
                   </div>
-
-                  <div className="political-donut-inner-content">
-                    <strong className={activeKey ? `text-${activeKey}` : ""}>
-                      {centerValue}
-                    </strong>
-                    <span>{centerLabel}</span>
-                  </div>
+                  <span
+                    className={
+                      unit.status === "Tốt"
+                        ? "status-good"
+                        : unit.status === "Cần chú ý" ||
+                            unit.status === "Có vấn đề"
+                          ? "status-warning"
+                          : "status-danger"
+                    }
+                  >
+                    {unit.status}
+                  </span>
                 </div>
 
-                <ul className={activeKey ? "has-active" : ""}>
-                  <li
-                    className={isCurrentUnit && activeKey === "proposals" ? "active-legend" : ""}
-                    onMouseEnter={() => totalIssues > 0 && setHoveredData({ unitName: unit.name, key: "proposals" })}
-                    onMouseLeave={() => setHoveredData({ unitName: "", key: null })}
+                <div className="political-unit-body">
+                  <div
+                    className={`political-small-donut ${totalIssues === 0 ? "is-empty" : ""} ${activeKey ? `hover-${activeKey}` : ""}`}
+                    style={
+                      {
+                        "--green-ratio": `${pGreen}%`,
+                      } as React.CSSProperties
+                    }
                   >
-                    <span className="dot green" />
-                    <span>Có kiến nghị</span>
-                    <b>{unit.proposals}</b>
-                    <small>({totalIssues ? Math.round((unit.proposals / totalIssues) * 100) : 0}%)</small>
-                  </li>
-                  <li
-                    className={isCurrentUnit && activeKey === "incidents" ? "active-legend" : ""}
-                    onMouseEnter={() => totalIssues > 0 && setHoveredData({ unitName: unit.name, key: "incidents" })}
-                    onMouseLeave={() => setHoveredData({ unitName: "", key: null })}
-                  >
-                    <span className="dot orange" />
-                    <span>Có đột xuất</span>
-                    <b>{unit.incidents}</b>
-                    <small>({totalIssues ? Math.round((unit.incidents / totalIssues) * 100) : 0}%)</small>
-                  </li>
-                </ul>
-              </div>
+                    <div className="political-hover-zones">
+                      <div
+                        className="hover-zone-segment"
+                        onMouseEnter={() =>
+                          totalIssues > 0 &&
+                          setHoveredData({
+                            unitName: unit.name,
+                            key: "proposals",
+                          })
+                        }
+                        onMouseLeave={() =>
+                          setHoveredData({ unitName: "", key: null })
+                        }
+                      />
+                      <div
+                        className="hover-zone-segment"
+                        onMouseEnter={() =>
+                          totalIssues > 0 &&
+                          setHoveredData({
+                            unitName: unit.name,
+                            key: "incidents",
+                          })
+                        }
+                        onMouseLeave={() =>
+                          setHoveredData({ unitName: "", key: null })
+                        }
+                      />
+                    </div>
 
-              <p className="political-updated">
-                Thời gian nộp: {unit.updateAt ? unit.updateAt : "Chưa có báo cáo"}
-              </p>
-            </article>
-          );
-        })}
+                    <div className="political-donut-inner-content">
+                      <strong className={activeKey ? `text-${activeKey}` : ""}>
+                        {centerValue}
+                      </strong>
+                      <span>{centerLabel}</span>
+                    </div>
+                  </div>
+
+                  <ul className={activeKey ? "has-active" : ""}>
+                    <li
+                      className={
+                        isCurrentUnit && activeKey === "proposals"
+                          ? "active-legend"
+                          : ""
+                      }
+                      onMouseEnter={() =>
+                        totalIssues > 0 &&
+                        setHoveredData({
+                          unitName: unit.name,
+                          key: "proposals",
+                        })
+                      }
+                      onMouseLeave={() =>
+                        setHoveredData({ unitName: "", key: null })
+                      }
+                    >
+                      <span className="dot green" />
+                      <span>Có kiến nghị</span>
+                      <b>{unit.proposals}</b>
+                      <small>
+                        (
+                        {totalIssues
+                          ? Math.round((unit.proposals / totalIssues) * 100)
+                          : 0}
+                        %)
+                      </small>
+                    </li>
+                    <li
+                      className={
+                        isCurrentUnit && activeKey === "incidents"
+                          ? "active-legend"
+                          : ""
+                      }
+                      onMouseEnter={() =>
+                        totalIssues > 0 &&
+                        setHoveredData({
+                          unitName: unit.name,
+                          key: "incidents",
+                        })
+                      }
+                      onMouseLeave={() =>
+                        setHoveredData({ unitName: "", key: null })
+                      }
+                    >
+                      <span className="dot orange" />
+                      <span>Có đột xuất</span>
+                      <b>{unit.incidents}</b>
+                      <small>
+                        (
+                        {totalIssues
+                          ? Math.round((unit.incidents / totalIssues) * 100)
+                          : 0}
+                        %)
+                      </small>
+                    </li>
+                  </ul>
+                </div>
+
+                <p className="political-updated">
+                  Thời gian nộp:{" "}
+                  {unit.updateAt ? unit.updateAt : "Chưa có báo cáo"}
+                </p>
+              </article>
+            );
+          })}
       </div>
     </section>
   );

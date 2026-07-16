@@ -19,6 +19,8 @@ import { useConfirmDialog } from "../../components/ui/ConfirmDialog/useConfirmDi
 import { generateMatKhau } from "../../utils/passwordGenerator";
 
 import { formatNguoiTrucLabel } from "../../utils/duty";
+import DateInputVi from "../../components/ui/DateInputVi/DateInputVi";
+
 
 function getToday(): string {
   const d = new Date();
@@ -259,12 +261,10 @@ export default function CreateDutyShift() {
                   setErrors((prev) => ({ ...prev, ngayTruc: undefined }));
                 }}
               /> */}
-              <input
-                type="date"
-                className={`${styles.input} ${errors.ngayTruc ? styles.inputError : ""}`}
+              <DateInputVi
+                className={errors.ngayTruc ? styles.inputError : ""}
                 value={ngayTruc}
-                onChange={(e) => {
-                  const v = e.target.value;
+                onChange={(v) => {
                   setNgayTruc(v);
                   setDateStatus(v ? "checking" : "idle");
                   setErrors((prev) => ({ ...prev, ngayTruc: undefined }));
