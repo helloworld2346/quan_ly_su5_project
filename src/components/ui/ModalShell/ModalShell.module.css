@@ -145,6 +145,7 @@
   overflow-y: auto;  
   min-height: 0;  
   padding: 24px;  
+  overscroll-behavior: contain;
 }  
   
 .primary .body {  
