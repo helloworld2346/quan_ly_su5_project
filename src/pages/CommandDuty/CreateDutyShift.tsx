@@ -21,7 +21,6 @@ import { generateMatKhau } from "../../utils/passwordGenerator";
 import { formatNguoiTrucLabel } from "../../utils/duty";
 import DateInputVi from "../../components/ui/DateInputVi/DateInputVi";
 
-
 function getToday(): string {
   const d = new Date();
   const y = d.getFullYear();
@@ -144,7 +143,6 @@ export default function CreateDutyShift() {
   const handleSubmit = async () => {
     if (!validate()) return;
 
-    // Chuyển đổi format ngày để hiển thị trong câu hỏi Confirm
     const ngayTrucFormatted = formatDateVN(ngayTruc);
 
     const confirmed = await confirm({
@@ -174,7 +172,7 @@ export default function CreateDutyShift() {
       }
 
       const res = await dutyService.createCaTruc({
-        ngaytruc: ngayTruc, // Gửi lên server vẫn dùng biến gốc format chuẩn YYYY-MM-DD
+        ngaytruc: ngayTruc,
         matkhau: matKhau,
         ghichu: ghiChu,
         trucChiHuy: selectedChiHuyId,
@@ -318,6 +316,7 @@ export default function CreateDutyShift() {
                   title="Tạo mật khẩu ngẫu nhiên"
                 >
                   <FontAwesomeIcon icon={faDice} />
+                  <span> </span>
                   Ngẫu nhiên
                 </button>
               </div>
