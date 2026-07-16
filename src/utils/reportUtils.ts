@@ -57,6 +57,15 @@ export function normalizeRoleName(role: string | undefined): string {
   return role;
 }
 
+export function normalizeUnitName(unitName: string | undefined): string {
+  if (!unitName) return "";
+  const lower = unitName.toLowerCase();
+  if (lower.includes("ptm")) return unitName.replace(/ptm/gi, "PTM");
+  if (lower.includes("phckt")) return unitName.replace(/phckt/gi, "PHC-KT");
+  if (lower.includes("pct")) return unitName.replace(/pct/gi, "PCT");
+  return unitName;
+}
+
 export function mapItemToRow(item: ReportItemInput): ReportRow {
   let vang: VangChiTiet = { ...EMPTY_VANG };
   let chiTietVangList: ChiTietVangQuanNhan[] = [];

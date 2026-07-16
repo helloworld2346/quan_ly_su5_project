@@ -182,12 +182,10 @@
 }
 
 .political-text-cell .political-clamp {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  overflow: hidden;
-  max-height: calc(1.5em * 3);
+  display: block;
+  overflow: visible; 
+  max-height: none; 
+  word-break: break-word; 
 }
 
 .political-text-cell p {
