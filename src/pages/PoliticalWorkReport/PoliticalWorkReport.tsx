@@ -122,25 +122,25 @@ export default function PoliticalWorkReport() {
   const isTacChienSuDoan = isTacChien && capDonVi === "SU_DOAN";
   const canAddOwnReport = isTacChienSuDoan || isAdmin || isPoliticalOffice;
 
-   const canExportExcel = isTacChienSuDoan || isPoliticalOffice;
+  const canExportExcel = isTacChienSuDoan;
 
-   const handleExportExcel = () => {
-     const row = parentReportData ?? ownReport;
-     if (!row) {
-       showError("Chưa có báo cáo tổng hợp để xuất!");
-       return;
-     }
-     void exportPoliticalWorkToExcel({
-       row,
-       reportDate,
-       tenDonVi: account?.donVi?.tenDonvi ?? "",
-       quanSo: {
-         siQuan: account?.donVi?.quanSoSiQuan ?? 0,
-         qncn: account?.donVi?.quanSoQncn ?? 0,
-         hsqBs: account?.donVi?.quanSoHsqBs ?? 0,
-       },
-     });
-   };
+  const handleExportExcel = () => {
+    const row = parentReportData ?? ownReport;
+    if (!row) {
+      showError("Chưa có báo cáo tổng hợp để xuất!");
+      return;
+    }
+    void exportPoliticalWorkToExcel({
+      row,
+      reportDate,
+      tenDonVi: account?.donVi?.tenDonvi ?? "",
+      quanSo: {
+        siQuan: account?.donVi?.quanSoSiQuan ?? 0,
+        qncn: account?.donVi?.quanSoQncn ?? 0,
+        hsqBs: account?.donVi?.quanSoHsqBs ?? 0,
+      },
+    });
+  };
 
   const {
     reportData,
@@ -244,11 +244,11 @@ export default function PoliticalWorkReport() {
 
   const isPastDate = reportDate < todayIsoDate();
 
-const hasOwnReport = isPoliticalOffice
-  ? Boolean(parentReportData)
-  : canAddOwnReport
-    ? Boolean(dutyReport && !dutyReport.notSubmitted)
-    : Boolean(ownReport && !ownReport.notSubmitted);
+  const hasOwnReport = isPoliticalOffice
+    ? Boolean(parentReportData)
+    : canAddOwnReport
+      ? Boolean(dutyReport && !dutyReport.notSubmitted)
+      : Boolean(ownReport && !ownReport.notSubmitted);
 
   const handleAddReport = () => {
     if (isPastDate) {
@@ -308,7 +308,7 @@ const hasOwnReport = isPoliticalOffice
   const filteredChildRows = childRows.filter(matchesQuery);
   const filteredFlatRows = flatRows.filter(matchesQuery);
 
-  const showTwoSections = isParentUnit;
+  const showTwoSections = isParentUnit && !isPoliticalOffice;
 
   const totalUnits = isParentUnit ? childRows.length : reportData.length;
   const reported = isParentUnit
