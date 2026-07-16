@@ -21,7 +21,7 @@ import styles from "./PoliticalWorkReport.module.css";
 import { useAuth } from "../../context/useAuth";
 import { useToast } from "../../context/useToast";
 import { handleApiError } from "../../utils/errorHandler";
-import { todayIsoDate, normalizeRoleName } from "../../utils/reportUtils";
+import { todayIsoDate, normalizeRoleName, normalizeUnitName } from "../../utils/reportUtils";
 import { politicalWorkService } from "../../services/politicalWork/politicalWorkService";
 
 import { usePoliticalWorkData } from "./hooks/usePoliticalWorkData";
@@ -118,9 +118,6 @@ export default function PoliticalWorkReport() {
     isPoliticalOffice ||
     (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
     (isNoiVu && capDonVi === "TIEU_DOAN");
-
-  // const shouldHideConsolidatedSections =
-  //   isAdmin || isPoliticalOffice || (isTacChien && capDonVi === "SU_DOAN");
 
   const isTacChienSuDoan = isTacChien && capDonVi === "SU_DOAN";
   const canAddOwnReport = isTacChienSuDoan || isAdmin || isPoliticalOffice;
@@ -367,7 +364,7 @@ const hasOwnReport = isPoliticalOffice
         className={styles["political-row--not-submitted"]}
       >
         <td className={styles["political-unit-cell"]}>
-          {row.kyhieuDonVi || row.tenDonVi}
+          {normalizeUnitName(row.kyhieuDonVi || row.tenDonVi)}
         </td>
         <td
           className={`${styles["political-text-cell"]} ${
@@ -407,7 +404,7 @@ const hasOwnReport = isPoliticalOffice
     ) : (
       <tr key={row.idCongtac}>
         <td className={styles["political-unit-cell"]}>
-          {row.kyhieuDonVi || row.tenDonVi}
+          {normalizeUnitName(row.kyhieuDonVi || row.tenDonVi)}
         </td>
         <td className={styles["political-text-cell"]}>
           <span className={styles["political-clamp"]}>{row.tinhHinh}</span>
