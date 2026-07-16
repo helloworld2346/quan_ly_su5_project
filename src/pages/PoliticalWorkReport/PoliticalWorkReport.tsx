@@ -242,7 +242,9 @@ export default function PoliticalWorkReport() {
   const canConsolidate =
     isParentUnit && !parentReportData && approvedChildRows.length > 0;
 
-  const isPastDate = reportDate < todayIsoDate();
+  // const isPastDate = reportDate < todayIsoDate();
+  const isPastDate = false;
+
 
   const hasOwnReport = isPoliticalOffice
     ? Boolean(parentReportData)

@@ -209,9 +209,8 @@ export default function CreateDutyShift() {
           <span>Ca trực đã được tạo thành công</span>
         </div>
 
-        {/* Vị trí 1: Bọc formatDateVN cho kết quả hiển thị thành công */}
         <CaTrucInfoCard
-          ngaytruc={formatDateVN(createdCaTruc.ngaytruc)}
+          ngaytruc={createdCaTruc.ngaytruc}
           matkhau={createdCaTruc.matkhau}
           ghichu={createdCaTruc.ghichu ?? undefined}
           trucChiHuy={createdCaTruc.trucChiHuy}
@@ -246,13 +245,24 @@ export default function CreateDutyShift() {
               <label className={styles.label}>
                 Ngày trực <span className={styles.required}>*</span>
               </label>
-              <input
+              {/* <input
                 type="date"
                 className={`${styles.input} ${
                   errors.ngayTruc ? styles.inputError : ""
                 }`}
                 value={ngayTruc}
                 min={today}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setNgayTruc(v);
+                  setDateStatus(v ? "checking" : "idle");
+                  setErrors((prev) => ({ ...prev, ngayTruc: undefined }));
+                }}
+              /> */}
+              <input
+                type="date"
+                className={`${styles.input} ${errors.ngayTruc ? styles.inputError : ""}`}
+                value={ngayTruc}
                 onChange={(e) => {
                   const v = e.target.value;
                   setNgayTruc(v);
@@ -393,7 +403,7 @@ export default function CreateDutyShift() {
         <div className={styles.previewPanel}>
           <span className={styles.previewLabel}>Xem trước</span>
           <CaTrucInfoCard
-            ngaytruc={formatDateVN(ngayTruc)}
+            ngaytruc={ngayTruc}
             matkhau={matKhau}
             ghichu={ghiChu || undefined}
             trucChiHuy={selectedChiHuy ?? undefined}
