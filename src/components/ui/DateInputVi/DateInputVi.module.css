@@ -9,12 +9,12 @@
   display: flex;  
   align-items: center;  
   height: 40px;  
-  border: 1px solid var(--input-border);  
-  border-radius: 10px;  
+  border: 1px solid var(--modal-input-border);  
+  border-radius: 6px;
   background: var(--input-bg);  
   overflow: hidden;  
   transition: border-color 0.15s, box-shadow 0.15s;  
-}  
+}
   
 .inputRow:hover {  
   border-color: var(--input-date-hover-border);  
