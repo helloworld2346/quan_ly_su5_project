@@ -14,6 +14,7 @@ export interface PoliticalWorkRequest {
   trucBanNoiVu: string;
   trucBanCtDangCt: string;
   kienNghi: string;
+  thoiGianBaoCao: string;
   donVi: string;
 }
 

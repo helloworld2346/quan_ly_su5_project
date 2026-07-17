@@ -19,6 +19,7 @@ interface CreateReportProps {
   onSubmit?: (data: PoliticalWorkRequest) => void;
   initialData: PoliticalWorkRow | null;
   maDonViCurrent: string;
+  reportDate: string; // thêm — ISO "YYYY-MM-DD"
 }
 
 interface ReportFormData {
@@ -97,6 +98,7 @@ export default function CreateReport({
   onSubmit,
   initialData,
   maDonViCurrent,
+  reportDate,
 }: CreateReportProps) {
   const { account } = useAuth();
   const capDonVi = account?.donVi?.capDonVi;
@@ -104,9 +106,16 @@ export default function CreateReport({
 
   const isSuDoan = capDonVi === "SU_DOAN";
 
-
-  const ctdRankOptions: SelectOption[] = getCapBacOptions(capDonVi ?? undefined, false, isSuDoan).map(r => ({ value: r, label: r }));
-  const reporterRankOptions: SelectOption[] = getCapBacOptions(capDonVi ?? undefined, true, isSuDoan).map(r => ({ value: r, label: r }));
+  const ctdRankOptions: SelectOption[] = getCapBacOptions(
+    capDonVi ?? undefined,
+    false,
+    isSuDoan,
+  ).map((r) => ({ value: r, label: r }));
+  const reporterRankOptions: SelectOption[] = getCapBacOptions(
+    capDonVi ?? undefined,
+    true,
+    isSuDoan,
+  ).map((r) => ({ value: r, label: r }));
 
   const [formData, setFormData] = useState<ReportFormData>(() => {
     if (initialData) {
@@ -198,6 +207,7 @@ export default function CreateReport({
         soDienThoai: formData.ctdPhone,
       }),
       kienNghi: formData.hasProposal ? formData.proposal : "",
+      thoiGianBaoCao: `${reportDate}T00:00:00.000Z`,
       donVi: maDonViCurrent,
     };
     onSubmit?.(payload);

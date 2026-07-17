@@ -811,6 +811,7 @@ export default function PoliticalWorkReport() {
             : editingRow
         }
         maDonViCurrent={submitMaDonVi ?? ""}
+        reportDate={reportDate}
         onSubmit={async (payload) => {
           try {
             if (editingRow) {
