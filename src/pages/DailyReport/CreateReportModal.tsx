@@ -485,7 +485,6 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                 <div className={styles.field}>
                   <label className={styles.label}>Ngày báo cáo</label>
                   <DateInputVi
-                    className={styles.input}
                     value={ngayBaoCao}
                     disabled
                     onChange={() => {}}
