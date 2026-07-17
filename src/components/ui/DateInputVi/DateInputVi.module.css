@@ -131,8 +131,9 @@
   background: transparent;  
   color: var(--input-text);  
   cursor: pointer;  
+  font-weight: 600;
   font-family: inherit;  
-}  
+}
   
 .day:hover:not(:disabled) {  
   background: var(--modal-input-focus-shadow);  

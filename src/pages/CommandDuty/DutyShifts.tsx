@@ -489,6 +489,7 @@ export default function DutyShifts() {
                       title="Tạo mật khẩu ngẫu nhiên"
                     >
                       <FontAwesomeIcon icon={faDice} />
+                      <span> </span>
                       {" Ngẫu nhiên"}
                     </button>
                   </div>
