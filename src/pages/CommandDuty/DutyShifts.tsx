@@ -244,14 +244,17 @@ export default function DutyShifts() {
         trucBanTacChien: editForm.trucBanTacChien,
         ngaytruc: editForm.ngaytruc,
       });
-      if (!res.success) throw new Error(res.message);
+      if (!res.success) {
+        showError(res.message || "Không thể cập nhật ca trực");
+        return;
+      }
       showSuccess("Cập nhật ca trực thành công");
       setShiftList((prev) =>
         prev.map((s) => (s.idCatruc === idCatruc ? res.Result : s)),
       );
       closeModal();
-    } catch (e: unknown) {
-      showError(e instanceof Error ? e.message : "Không thể cập nhật ca trực");
+    } catch {
+      // Lỗi API (409...) đã được interceptor toàn cục hiển thị
     } finally {
       setSaving(false);
     }
