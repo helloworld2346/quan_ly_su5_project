@@ -543,7 +543,9 @@ export default function DailyTroopReport() {
 
       {selectedReportRow && (
         <TroopDetailModal
-          unit={normalizeUnitName(selectedReportRow.kyhieuDonVi || selectedReportRow.tenDonVi)}
+          unit={normalizeUnitName(
+            selectedReportRow.kyhieuDonVi || selectedReportRow.tenDonVi,
+          )}
           members={selectedReportRow.chiTietVangList.map((m) => ({
             id: m.id,
             name: m.hoTen,
@@ -569,7 +571,7 @@ export default function DailyTroopReport() {
             rank: r.capBac,
             position: r.chucVu,
             reason: r.lyDoVang,
-           unitName: normalizeUnitName(r.tenDonVi),
+            unitName: normalizeUnitName(r.tenDonVi),
           }))}
           onClose={() => setShowConsolidatedDetail(false)}
         />
@@ -726,6 +728,7 @@ export default function DailyTroopReport() {
             }
           }}
           caTrucInfo={caTrucInfo}
+          reportDate={reportDate}
         />
       )}
 
