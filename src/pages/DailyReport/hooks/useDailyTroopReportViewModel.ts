@@ -124,7 +124,7 @@ export function useDailyTroopReportViewModel(
     !shouldHideDraftAndUnsubmitted &&
     (isChiHuyLeaf || (isTacChien && capDonVi === "SU_DOAN"));
 
-  const isPastDate = isPastDateForReport(reportDate);
+const isPastDate = isPastDateForReport();
 
   const checkIfDateHasReport = hasReportForDate({
     reportDate,

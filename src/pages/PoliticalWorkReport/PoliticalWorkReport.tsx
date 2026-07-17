@@ -102,6 +102,7 @@ export default function PoliticalWorkReport() {
   const isTacChien = normalizedRole === "Trực ban tác chiến";
   const isNoiVu = normalizedRole === "Trực ban nội vụ";
   const isAdmin = normalizedRole === "Quản Trị Viên";
+  const isChiHuy = normalizedRole === "Trực chỉ huy";
 
   const isPoliticalOffice =
     (account?.tenDangNhap ?? "")
@@ -523,7 +524,9 @@ export default function PoliticalWorkReport() {
         showExport={canExportExcel}
         onExportExcel={handleExportExcel}
         onAddReport={
-          (!isParentUnit || canAddOwnReport || isPoliticalOffice) &&
+          ((!isParentUnit && !isChiHuy) ||
+            canAddOwnReport ||
+            isPoliticalOffice) &&
           !hasOwnReport
             ? handleAddReport
             : undefined

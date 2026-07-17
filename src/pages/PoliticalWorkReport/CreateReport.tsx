@@ -207,7 +207,7 @@ export default function CreateReport({
         soDienThoai: formData.ctdPhone,
       }),
       kienNghi: formData.hasProposal ? formData.proposal : "",
-      thoiGianBaoCao: `${reportDate}T00:00:00.000Z`,
+      thoiGianBaoCao: new Date(`${reportDate}T12:00:00.000Z`).toISOString(),
       donVi: maDonViCurrent,
     };
     onSubmit?.(payload);
