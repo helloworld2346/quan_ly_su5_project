@@ -82,10 +82,10 @@ export default function DailyTroopStatisticsSection({
           ) : (
             <table className={styles.reportTable}>
               <colgroup>
-                <col style={{ width: "9%" }} />
-                <col style={{ width: "4%" }} />
                 <col style={{ width: "6%" }} />
-                <col style={{ width: "6%" }} />
+                <col style={{ width: "7%" }} />
+                <col style={{ width: "7%" }} />
+                <col style={{ width: "7%" }} />
                 <col style={{ width: "6%" }} />
                 <col style={{ width: "6%" }} />
                 <col style={{ width: "6%" }} />

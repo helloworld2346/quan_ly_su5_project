@@ -221,7 +221,7 @@ export default function QuanSoForm({
               className={styles.cardHeaderIcon}
             />
             <h2 className={styles.cardTitle}>
-              Quân số cộng dồn từ các đơn vị trực thuộc
+              Quân số cộng từ các đơn vị trực thuộc
             </h2>
           </div>
 
@@ -246,10 +246,10 @@ export default function QuanSoForm({
             />
 
             <div className={styles.totalCard}>
+              <span className={styles.totalLabel}>Tổng quân số toàn Sư đoàn</span>
               <span className={styles.totalValue}>
                 {formatNum(childAggTong)}
               </span>
-              <span className={styles.totalValue}>{childAggTong}</span>
             </div>
           </div>
         </div>

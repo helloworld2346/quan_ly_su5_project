@@ -307,7 +307,9 @@ export function getNavGroupLabelByRole(
     normalizedUnitName.includes("dbo") ||
     normalizedUnitName.includes("ebo") ||
     normalizedUnitName.includes("d bộ") ||
-    normalizedUnitName.includes("e bộ");
+    normalizedUnitName.includes("e bộ") ||
+    normalizedUnitSymbol.includes("ch/e") ||
+    normalizedUnitSymbol.includes("CH/e");
 
   if (groupLabel === "Thống kê") {
     if (normalized === "Trực chỉ huy") {
