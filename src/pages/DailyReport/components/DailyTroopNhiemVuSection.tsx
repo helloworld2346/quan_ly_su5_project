@@ -35,7 +35,7 @@ export default function DailyTroopNhiemVuSection({
             <span className={styles.sectionKicker}>II</span>
             <div>
               <h2 className={styles.sectionTitle}>
-                TÌNH HÌNH HOẠT ĐỘNG NHIỆM VỤ NGÀY
+                HOẠT ĐỘNG TRONG NGÀY
               </h2>
               <div className={styles.sectionSubTitle}>
                 Nội dung nhiệm vụ, đột xuất, ưu điểm, khuyết điểm và việc cần

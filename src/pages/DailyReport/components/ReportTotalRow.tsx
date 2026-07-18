@@ -2,6 +2,7 @@ import { createPortal } from "react-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisVertical, faEye } from "@fortawesome/free-solid-svg-icons";
 import styles from "../DailyTroopReport.module.css";
+import { formatNum } from "../../../utils/reportUtils";
 
 type DisplayTotals = {
   quanSoTong: number;
@@ -47,23 +48,23 @@ export default function ReportTotalRow({
   return (
     <tr className={styles.totalRow}>
       <td className={styles.unitCell}>Tổng</td>
-      <td>{displayTotals.quanSoTong}</td>
-      <td>{displayTotals.quanSoHienDien}</td>
-      <td>{displayTotals.quanSoVang}</td>
-      <td>{displayTotals.hoiThaiNgoaiSuDoan}</td>
-      <td>{displayTotals.hoiThaiEF}</td>
-      <td>{displayTotals.xayDungNgoaiSuDoan}</td>
-      <td>{displayTotals.xayDungEF}</td>
-      <td>{displayTotals.choHuu}</td>
-      <td>{displayTotals.nghiTranhThu}</td>
-      <td>{displayTotals.phep}</td>
-      <td>{displayTotals.vienNgoaiSuDoan}</td>
-      <td>{displayTotals.vienEF}</td>
-      <td>{displayTotals.congTacNgoaiSuDoan}</td>
-      <td>{displayTotals.congTacSuDoan}</td>
-      <td>{displayTotals.hocSQ}</td>
-      <td>{displayTotals.hocCS}</td>
-      <td>{displayTotals.lyDoVangKhac}</td>
+      <td>{formatNum(displayTotals.quanSoTong)}</td>
+      <td>{formatNum(displayTotals.quanSoHienDien)}</td>
+      <td>{formatNum(displayTotals.quanSoVang)}</td>
+      <td>{formatNum(displayTotals.hoiThaiNgoaiSuDoan)}</td>
+      <td>{formatNum(displayTotals.hoiThaiEF)}</td>
+      <td>{formatNum(displayTotals.xayDungNgoaiSuDoan)}</td>
+      <td>{formatNum(displayTotals.xayDungEF)}</td>
+      <td>{formatNum(displayTotals.choHuu)}</td>
+      <td>{formatNum(displayTotals.nghiTranhThu)}</td>
+      <td>{formatNum(displayTotals.phep)}</td>
+      <td>{formatNum(displayTotals.vienNgoaiSuDoan)}</td>
+      <td>{formatNum(displayTotals.vienEF)}</td>
+      <td>{formatNum(displayTotals.congTacNgoaiSuDoan)}</td>
+      <td>{formatNum(displayTotals.congTacSuDoan)}</td>
+      <td>{formatNum(displayTotals.hocSQ)}</td>
+      <td>{formatNum(displayTotals.hocCS)}</td>
+      <td>{formatNum(displayTotals.lyDoVangKhac)}</td>
       <td></td>
       <td></td>
       <td className={styles.actionCell}>

@@ -82,27 +82,27 @@ export default function DailyTroopStatisticsSection({
           ) : (
             <table className={styles.reportTable}>
               <colgroup>
-                <col style={{ width: "9%" }} />
-                <col style={{ width: "4%" }} />
-                <col style={{ width: "5%" }} />
-                <col style={{ width: "5%" }} />
-                <col style={{ width: "6%" }} />
-                <col style={{ width: "6%" }} />
-                <col style={{ width: "6%" }} />
-                <col style={{ width: "6%" }} />
-                <col style={{ width: "6%" }} />
-                <col style={{ width: "6%" }} />
-                <col style={{ width: "6%" }} />
-                <col style={{ width: "6%" }} />
-                <col style={{ width: "6%" }} />
-                <col style={{ width: "6%" }} />
-                <col style={{ width: "6%" }} />
-                <col style={{ width: "6%" }} />
-                <col style={{ width: "6%" }} />
-                <col style={{ width: "6%" }} />
-                <col style={{ width: "8%" }} />
-                <col style={{ width: "10%" }} />
-                <col style={{ width: "5%" }} />
+                <col style={{ width: "130px" }} /> {/* Đơn vị */}
+                <col style={{ width: "90px" }} /> {/* Tổng quân số */}
+                <col style={{ width: "70px" }} />
+                <col style={{ width: "70px" }} />
+                <col style={{ width: "70px" }} />
+                <col style={{ width: "70px" }} />
+                <col style={{ width: "70px" }} />
+                <col style={{ width: "70px" }} />
+                <col style={{ width: "70px" }} />
+                <col style={{ width: "70px" }} />
+                <col style={{ width: "70px" }} />
+                <col style={{ width: "70px" }} />
+                <col style={{ width: "70px" }} />
+                <col style={{ width: "70px" }} />
+                <col style={{ width: "70px" }} />
+                <col style={{ width: "70px" }} />
+                <col style={{ width: "70px" }} />
+                <col style={{ width: "70px" }} />
+                <col style={{ width: "100px" }} /> {/* cột 19 */}
+                <col style={{ width: "140px" }} /> {/* Ghi chú */}
+                <col style={{ width: "60px" }} /> {/* Thao tác */}
               </colgroup>
 
               <ReportTableHeader />

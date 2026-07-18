@@ -9,7 +9,7 @@ import ReportStatusBadge from "../../../components/ui/ReportStatusBadge/ReportSt
 import styles from "../DailyTroopReport.module.css";
 import type { ReportRow } from "../../../types/dailyReport";
 import { normalizeUnitName } from "../../../utils/reportUtils";
-
+import { formatNum } from "../../../utils/reportUtils";  
 
 type Props = {
   row: ReportRow;
@@ -112,24 +112,26 @@ export default function ReportTableRow({
           .join(" ") || undefined
       }
     >
-     <td className={styles.unitCell}>{normalizeUnitName(row.kyhieuDonVi || row.tenDonVi)}</td>
-      <td>{row.quanSoTong}</td>
-      <td>{row.quanSoHienDien}</td>
-      <td>{row.quanSoVang}</td>
-      <td>{row.vang.hoiThaiNgoaiSuDoan}</td>
-      <td>{row.vang.hoiThaiEF}</td>
-      <td>{row.vang.xayDungNgoaiSuDoan}</td>
-      <td>{row.vang.xayDungEF}</td>
-      <td>{row.vang.choHuu}</td>
-      <td>{row.vang.nghiTranhThu}</td>
-      <td>{row.vang.phep}</td>
-      <td>{row.vang.vienNgoaiSuDoan}</td>
-      <td>{row.vang.vienEF}</td>
-      <td>{row.vang.congTacNgoaiSuDoan}</td>
-      <td>{row.vang.congTacSuDoan}</td>
-      <td>{row.vang.hocSQ}</td>
-      <td>{row.vang.hocCS}</td>
-      <td>{row.vang.lyDoVangKhac ?? 0}</td>
+      <td className={styles.unitCell}>
+        {normalizeUnitName(row.kyhieuDonVi || row.tenDonVi)}
+      </td>
+      <td>{formatNum(row.quanSoTong)}</td>
+      <td>{formatNum(row.quanSoHienDien)}</td>
+      <td>{formatNum(row.quanSoVang)}</td>
+      <td>{formatNum(row.vang.hoiThaiNgoaiSuDoan)}</td>
+      <td>{formatNum(row.vang.hoiThaiEF)}</td>
+      <td>{formatNum(row.vang.xayDungNgoaiSuDoan)}</td>
+      <td>{formatNum(row.vang.xayDungEF)}</td>
+      <td>{formatNum(row.vang.choHuu)}</td>
+      <td>{formatNum(row.vang.nghiTranhThu)}</td>
+      <td>{formatNum(row.vang.phep)}</td>
+      <td>{formatNum(row.vang.vienNgoaiSuDoan)}</td>
+      <td>{formatNum(row.vang.vienEF)}</td>
+      <td>{formatNum(row.vang.congTacNgoaiSuDoan)}</td>
+      <td>{formatNum(row.vang.congTacSuDoan)}</td>
+      <td>{formatNum(row.vang.hocSQ)}</td>
+      <td>{formatNum(row.vang.hocCS)}</td>
+      <td>{formatNum(row.vang.lyDoVangKhac ?? 0)}</td>
       <td>
         <ReportStatusBadge status={row.status} />
       </td>

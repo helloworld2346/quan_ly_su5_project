@@ -165,7 +165,7 @@ export default function ExecutiveDashboard() {
       <header className={styles.pageHeader}>
         <div>
           <h2 id="troop-charts-title" className={styles.sectionTitle}>
-            Tổng hợp ngày
+            Tổng hợp trong ngày
           </h2>
           <p className={styles.sectionDesc}>
             Theo dõi tổng quân số, hiện diện và vắng của từng đơn vị theo từng

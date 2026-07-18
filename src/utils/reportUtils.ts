@@ -45,6 +45,10 @@ export function todayIsoDate(): string {
   ].join("-");
 }
 
+export function formatNum(value: number | null | undefined): string {
+  return (value ?? 0).toLocaleString("vi-VN");
+}
+
 export function normalizeRoleName(role: string | undefined): string {
   if (!role) return "";
   const r = role.toLowerCase();

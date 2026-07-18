@@ -66,9 +66,9 @@ const Settings = lazy(() => import("../pages/Settings/Settings"));
 
 export const EXECUTIVE_NAV: NavItem = {
   id: "executive",
-  label: "Tổng hợp ngày",
+  label: "Tổng hợp trong ngày",
   path: "/dashboard",
-  loadingTitle: "Đang tải tổng hợp ngày",
+  loadingTitle: "Đang tải tổng hợp trong ngày",
   loadingSubtitle: "Đang đồng bộ dữ liệu quân số...",
   component: ExecutiveDashboard,
   allowedRoles: ["Quản Trị Viên", "Trực ban tác chiến"],
@@ -90,7 +90,7 @@ export const EXECUTIVE_NAV_GROUP = {
 };
 
 export const REPORT_NAV_GROUP = {
-  label: "Thống kê",
+  label: "Cập nhật thống kê",
   labelByRole: {
     "Trực ban tác chiến": "Báo ban",
     "Trực ban nội vụ": "Báo ban",
@@ -98,7 +98,7 @@ export const REPORT_NAV_GROUP = {
   items: [
     {
       id: "report-troop" as const,
-      label: "Thống kê quân số hoạt động trong ngày ",
+      label: "Thống kê quân số trong ngày ",
       path: "/daily-report",
       loadingTitle: "Đang tải báo cáo ngày",
       loadingSubtitle: "Đang tải dữ liệu…",
@@ -218,7 +218,7 @@ export const SETTINGS_NAV: NavItem = {
 };
 
 export const CHUC_NANG_OPTIONS: { value: NavItemId; label: string }[] = [
-  { value: "executive", label: "Tổng hợp ngày" },
+  { value: "executive", label: "Tổng hợp trong ngày" },
   { value: "executive-political-work", label: "Tổng hợp CTĐ, CTCT" },
   { value: "report-troop", label: "Thống kê quân số" },
   { value: "report-political-work", label: "Hoạt động CTĐ, CTCT" },
@@ -236,7 +236,7 @@ export const getChucNangLabel = (key: string): string =>
   CHUC_NANG_OPTIONS.find((o) => o.value === key)?.label ?? key;
 
 export const NAV_PAGE_TITLES: Record<NavItemId, string> = {
-  executive: "Tổng hợp ngày",
+  executive: "Tổng hợp trong ngày",
   "executive-political-work":
     "Tổng hợp hoạt động Công tác Đảng, công tác chính trị",
   "executive-training": "Tổng hợp huấn luyện",

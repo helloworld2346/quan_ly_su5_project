@@ -92,9 +92,9 @@ export default function Login({ onSuccess }: Props) {
         <header className={styles.branding}>
           <p className={styles.unitName}>Sư đoàn 5</p>
           <p className={styles.appName}>
-            THỐNG KÊ QUÂN SỐ, NHIỆM VỤ NGÀY
+            THỐNG KÊ QUÂN SỐ,
             <br />
-            VÀ HOẠT ĐỘNG CTĐ, CTCT
+            HOẠT ĐỘNG CTĐ, CTCT
           </p>
         </header>
 

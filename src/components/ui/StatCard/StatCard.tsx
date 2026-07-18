@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import styles from "./StatCard.module.css";
 import Skeleton from "../Skeleton/Skeleton";
+import { formatNum } from "../../../utils/reportUtils";
 
 export type StatCardTone = "green" | "blue" | "orange" | "red" | "purple";
 
@@ -27,9 +28,12 @@ export default function StatCard({
         {loading ? (
           <Skeleton width={72} height={26} radius={8} />
         ) : (
-          <strong>{value}</strong>
+          <strong>
+            {typeof value === "number" ? formatNum(value) : value}
+          </strong>
         )}
       </div>
     </article>
   );
 }
+  

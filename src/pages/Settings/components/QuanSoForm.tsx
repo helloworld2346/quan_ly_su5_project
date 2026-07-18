@@ -10,7 +10,7 @@ import {
 import { donviService } from "../../../services/unit/unitService";
 import { useToast } from "../../../context/useToast";
 import { useAuth } from "../../../context/useAuth";
-import { normalizeRoleName } from "../../../utils/reportUtils";
+import { normalizeRoleName, formatNum } from "../../../utils/reportUtils";
 import type { DonVi } from "../../../types/account";
 
 import NumberStepper from "../../../components/ui/NumberStepper/NumberStepper";
@@ -187,7 +187,7 @@ export default function QuanSoForm({
 
             <div className={styles.totalCard}>
               <span className={styles.totalLabel}>Tổng quân số biên chế</span>
-              <span className={styles.totalValue}>{quanSoTong}</span>
+              <span className={styles.totalValue}>{formatNum(quanSoTong)}</span>
             </div>
           </div>
 
@@ -246,7 +246,9 @@ export default function QuanSoForm({
             />
 
             <div className={styles.totalCard}>
-              <span className={styles.totalLabel}>Tổng cộng dồn</span>
+              <span className={styles.totalValue}>
+                {formatNum(childAggTong)}
+              </span>
               <span className={styles.totalValue}>{childAggTong}</span>
             </div>
           </div>
