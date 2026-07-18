@@ -182,7 +182,7 @@ export default function Sidebar({
             <>
               <p className={styles.unitName}>{unitName}</p>
               <p className={styles.appName}>
-                Thống kê quân số . <br></br>
+                Thống kê quân số, <br></br>
                 Hoạt động CTĐ, CTCT
               </p>
             </>
