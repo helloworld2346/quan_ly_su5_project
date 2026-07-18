@@ -112,7 +112,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
 
   const unitName = (account?.donVi?.tenDonvi ?? "").toLowerCase();
   const unitSymbol = (account?.donVi?.kyhieuDonvi ?? "").toLowerCase();
-  const isDonViBo = ["e bộ", "ebộ", "ebo", "d bộ", "dbộ", "dbo"].some(
+  const isDonViBo = ["e bộ", "ebộ", "ebo", "d bộ", "dbộ", "dbo", "ch/e", "CH/e"].some(
     (k) => unitName.includes(k) || unitSymbol.includes(k),
   );
 

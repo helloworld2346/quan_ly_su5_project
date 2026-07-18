@@ -21,7 +21,9 @@ function isDbOrEbUnit(accountDonVi?: AccountDonVi): boolean {
     normalizedUnitSymbol.includes("dbộ") ||
     normalizedUnitSymbol.includes("ebộ") ||
     normalizedUnitSymbol.includes("dbo") ||
-    normalizedUnitSymbol.includes("ebo")
+    normalizedUnitSymbol.includes("ebo") ||
+    normalizedUnitSymbol.includes("ch/e") ||
+    normalizedUnitSymbol.includes("CH/e")
   );
 }
 
