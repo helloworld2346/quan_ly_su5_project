@@ -29,7 +29,6 @@ function getToday(): string {
   return `${y}-${m}-${day}`;
 }
 
-// Hàm bổ sung giúp chuyển đổi hiển thị từ YYYY-MM-DD sang DD/MM/YYYY
 const formatDateVN = (dateStr: string) => {
   if (!dateStr) return "";
   const parts = dateStr.split("-");
@@ -44,7 +43,7 @@ type FieldErrors = {
   matKhau?: string;
 };
 
-type DateStatus = "idle" | "checking" | "available" | "taken";
+type DateStatus = "idle" | "checking" | "available" | "existing";
 
 export default function CreateDutyShift() {
   const { showSuccess, showError } = useToast();
@@ -62,6 +61,10 @@ export default function CreateDutyShift() {
   const [ngayTruc, setNgayTruc] = useState(today);
   const [matKhau, setMatKhau] = useState("");
   const [ghiChu, setGhiChu] = useState("");
+
+  const [existingCaTruc, setExistingCaTruc] = useState<CaTrucDetail | null>(
+    null,
+  );
 
   const [errors, setErrors] = useState<FieldErrors>({});
   const [dateStatus, setDateStatus] = useState<DateStatus>(
@@ -99,11 +102,25 @@ export default function CreateDutyShift() {
       try {
         const existing = await dutyService.getCaTrucByDate(ngayTruc);
         if (cancelled) return;
-        setDateStatus(
-          existing.success && existing.Result ? "taken" : "available",
-        );
+        if (existing.success && existing.Result) {
+          const ca = existing.Result;
+          setExistingCaTruc(ca);
+          setDateStatus("existing");
+          setMatKhau(ca.matkhau ?? "");
+          if (ca.trucChiHuy?.idNguoitruc)
+            setSelectedChiHuyId(ca.trucChiHuy.idNguoitruc);
+          if (ca.trucBanTacChien?.idNguoitruc)
+            setSelectedTacChienId(ca.trucBanTacChien.idNguoitruc);
+          if (ca.ghichu) setGhiChu(ca.ghichu);
+        } else {
+          setExistingCaTruc(null);
+          setDateStatus("available");
+        }
       } catch {
-        if (!cancelled) setDateStatus("available");
+        if (!cancelled) {
+          setExistingCaTruc(null);
+          setDateStatus("available");
+        }
       }
     }, 400);
 
@@ -133,8 +150,6 @@ export default function CreateDutyShift() {
     if (!selectedChiHuyId) next.chiHuy = "Vui lòng chọn trực chỉ huy";
     if (!selectedTacChienId) next.tacChien = "Vui lòng chọn trực ban tác chiến";
     if (!ngayTruc) next.ngayTruc = "Vui lòng chọn ngày trực";
-    else if (dateStatus === "taken")
-      next.ngayTruc = "Ngày này đã có ca trực, không thể tạo thêm";
     if (!matKhau.trim()) next.matKhau = "Vui lòng nhập mật khẩu ca trực";
     setErrors(next);
     return Object.keys(next).length === 0;
@@ -146,9 +161,13 @@ export default function CreateDutyShift() {
     const ngayTrucFormatted = formatDateVN(ngayTruc);
 
     const confirmed = await confirm({
-      title: "Xác nhận tạo ca trực",
-      message: `Bạn có chắc chắn muốn tạo ca trực ngày ${ngayTrucFormatted}?`,
-      confirmText: "Tạo ca trực",
+      title: existingCaTruc
+        ? "Xác nhận cập nhật ca trực"
+        : "Xác nhận tạo ca trực",
+      message: `Bạn có chắc chắn muốn ${
+        existingCaTruc ? "cập nhật" : "tạo"
+      } ca trực ngày ${ngayTrucFormatted}?`,
+      confirmText: existingCaTruc ? "Cập nhật" : "Tạo ca trực",
       cancelText: "Hủy",
       type: "info",
     });
@@ -156,34 +175,46 @@ export default function CreateDutyShift() {
 
     setSubmitting(true);
     try {
+      let target = existingCaTruc;
       try {
         const existing = await dutyService.getCaTrucByDate(ngayTruc);
         if (existing.success && existing.Result) {
-          setDateStatus("taken");
-          setErrors((prev) => ({
-            ...prev,
-            ngayTruc: "Ngày này đã có ca trực, không thể tạo thêm",
-          }));
-          showError("Ngày này đã có ca trực, không thể tạo thêm");
-          return;
+          target = existing.Result;
+          setExistingCaTruc(existing.Result);
         }
       } catch {
-        // Bỏ qua lỗi 404 và tiếp tục tạo
+        // 404: chưa có ca trực → sẽ tạo mới
       }
 
-      const res = await dutyService.createCaTruc({
-        ngaytruc: ngayTruc,
-        matkhau: matKhau,
-        ghichu: ghiChu,
-        trucChiHuy: selectedChiHuyId,
-        trucBanTacChien: selectedTacChienId,
-      });
-      if (!res.success) throw new Error(res.message);
-      showSuccess("Tạo ca trực thành công");
-      const detail = await dutyService.getCaTruc(res.Result.idCatruc);
+      let idCatruc: string;
+      if (target) {
+        const res = await dutyService.updateCaTruc(target.idCatruc, {
+          ngaytruc: ngayTruc,
+          matkhau: matKhau,
+          ghichu: ghiChu,
+          trucChiHuy: selectedChiHuyId,
+          trucBanTacChien: selectedTacChienId,
+        });
+        if (!res.success) throw new Error(res.message);
+        idCatruc = res.Result.idCatruc;
+        showSuccess("Cập nhật ca trực thành công");
+      } else {
+        const res = await dutyService.createCaTruc({
+          ngaytruc: ngayTruc,
+          matkhau: matKhau,
+          ghichu: ghiChu,
+          trucChiHuy: selectedChiHuyId,
+          trucBanTacChien: selectedTacChienId,
+        });
+        if (!res.success) throw new Error(res.message);
+        idCatruc = res.Result.idCatruc;
+        showSuccess("Tạo ca trực thành công");
+      }
+
+      const detail = await dutyService.getCaTruc(idCatruc);
       if (detail.success) setCreatedCaTruc(detail.Result);
     } catch (e: unknown) {
-      showError(e instanceof Error ? e.message : "Không thể tạo ca trực");
+      showError(e instanceof Error ? e.message : "Không thể lưu ca trực");
     } finally {
       setSubmitting(false);
     }
@@ -191,6 +222,7 @@ export default function CreateDutyShift() {
 
   const handleReset = () => {
     setCreatedCaTruc(null);
+    setExistingCaTruc(null);
     setSelectedChiHuyId("");
     setSelectedTacChienId("");
     const t = getToday();
@@ -278,10 +310,10 @@ export default function CreateDutyShift() {
                   <FontAwesomeIcon icon={faCircleNotch} spin />
                   Đang kiểm tra ngày...
                 </span>
-              ) : dateStatus === "taken" ? (
-                <span className={styles.fieldError}>
-                  <FontAwesomeIcon icon={faTriangleExclamation} />
-                  Ngày này đã có ca trực
+              ) : dateStatus === "existing" ? (
+                <span className={styles.fieldOk}>
+                  <FontAwesomeIcon icon={faCircleCheck} />
+                  Ngày này đã có ca trực (tự sinh), bạn có thể cập nhật
                 </span>
               ) : dateStatus === "available" ? (
                 <span className={styles.fieldOk}>
@@ -392,13 +424,18 @@ export default function CreateDutyShift() {
               onClick={handleSubmit}
               disabled={submitting || dateStatus === "checking"}
             >
-              {submitting ? "Đang tạo..." : "Tạo ca trực"}
+              {submitting
+                ? existingCaTruc
+                  ? "Đang cập nhật..."
+                  : "Đang tạo..."
+                : existingCaTruc
+                  ? "Cập nhật ca trực"
+                  : "Tạo ca trực"}
               {!submitting && <FontAwesomeIcon icon={faCheck} />}
             </button>
           </div>
         </div>
 
-        {/* Vị trí 2: Bọc formatDateVN cho phần Live Preview (Xem trước) */}
         <div className={styles.previewPanel}>
           <span className={styles.previewLabel}>Xem trước</span>
           <CaTrucInfoCard
