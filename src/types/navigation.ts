@@ -238,9 +238,9 @@ export const getChucNangLabel = (key: string): string =>
 export const NAV_PAGE_TITLES: Record<NavItemId, string> = {
   executive: "Tổng hợp trong ngày",
   "executive-political-work":
-    "Tổng hợp hoạt động Công tác Đảng, công tác chính trị",
+    "Tổng hợp hoạt động công tác Đảng, công tác chính trị",
   "executive-training": "Tổng hợp huấn luyện",
-  "report-troop": "Thống kê quân số, hoạt động trong ngày",
+  "report-troop": "Thống kê quân số. Hoạt động trong ngày",
   "report-political-work": "Hoạt động công tác Đảng, công tác chính trị",
   "duty-personnel": "Quản lý ca trực",
   "duty-shifts": "Lịch sử ca trực",

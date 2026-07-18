@@ -546,7 +546,6 @@
   font-weight: 500;
 }
 
-/* Responsive cho màn hình nhỏ hơn 1366px */
 @media (max-width: 1366px) {
   .political-badge {
     min-width: 48px;
