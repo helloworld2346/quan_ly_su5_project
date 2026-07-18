@@ -386,18 +386,22 @@ export function buildCaTrucInfo(args: {
         matkhau: caTrucFromApi.matkhau,
         ghichu: caTrucFromApi.ghichu ?? undefined,
         ngaytruc: caTrucFromApi.ngaytruc,
-        trucChiHuy: {
-          tenNguoitruc: caTrucFromApi.trucChiHuy.tenNguoitruc,
-          capbacNguoitruc: caTrucFromApi.trucChiHuy.capbacNguoitruc,
-          chucvuNguoitruc: caTrucFromApi.trucChiHuy.chucvuNguoitruc,
-          sodienthoai: caTrucFromApi.trucChiHuy.sodienthoai,
-        },
-        trucBanTacChien: {
-          tenNguoitruc: caTrucFromApi.trucBanTacChien.tenNguoitruc,
-          capbacNguoitruc: caTrucFromApi.trucBanTacChien.capbacNguoitruc,
-          chucvuNguoitruc: caTrucFromApi.trucBanTacChien.chucvuNguoitruc,
-          sodienthoai: caTrucFromApi.trucBanTacChien.sodienthoai,
-        },
+        trucChiHuy: caTrucFromApi.trucChiHuy
+          ? {
+              tenNguoitruc: caTrucFromApi.trucChiHuy.tenNguoitruc,
+              capbacNguoitruc: caTrucFromApi.trucChiHuy.capbacNguoitruc,
+              chucvuNguoitruc: caTrucFromApi.trucChiHuy.chucvuNguoitruc,
+              sodienthoai: caTrucFromApi.trucChiHuy.sodienthoai,
+            }
+          : undefined,
+        trucBanTacChien: caTrucFromApi.trucBanTacChien
+          ? {
+              tenNguoitruc: caTrucFromApi.trucBanTacChien.tenNguoitruc,
+              capbacNguoitruc: caTrucFromApi.trucBanTacChien.capbacNguoitruc,
+              chucvuNguoitruc: caTrucFromApi.trucBanTacChien.chucvuNguoitruc,
+              sodienthoai: caTrucFromApi.trucBanTacChien.sodienthoai,
+            }
+          : undefined,
       };
     }
 
