@@ -26,6 +26,16 @@ import { generateId } from "../../utils/uuid";
 import { useAuth } from "../../context/useAuth";
 import DateInputVi from "../../components/ui/DateInputVi/DateInputVi";
 
+type QuanSoLoai = "siQuan" | "qncn" | "hsqBs";
+
+function classifyCapBac(capBac: string): QuanSoLoai {
+  const c = capBac.toLowerCase();
+  if (c.includes("qncn")) return "qncn";
+  if (c.includes("úy") || c.includes("tá") || c.includes("tướng")) {
+    return "siQuan";
+  }
+  return "hsqBs";
+}
 
 const CHUC_VU_CHI_HUY_DAI_DOI = [
   "Đại đội trưởng",
@@ -105,16 +115,23 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   reportDate,
   initialDetailData,
 }) => {
-  const { account } = useAuth();
+  const { account, donVi } = useAuth();
   const capDonVi = account?.donVi?.capDonVi;
   const isDaiDoi = capDonVi === "DAI_DOI";
   const isSuDoan = capDonVi === "SU_DOAN";
 
   const unitName = (account?.donVi?.tenDonvi ?? "").toLowerCase();
   const unitSymbol = (account?.donVi?.kyhieuDonvi ?? "").toLowerCase();
-  const isDonViBo = ["e bộ", "ebộ", "ebo", "d bộ", "dbộ", "dbo", "ch/e", "CH/e"].some(
-    (k) => unitName.includes(k) || unitSymbol.includes(k),
-  );
+  const isDonViBo = [
+    "e bộ",
+    "ebộ",
+    "ebo",
+    "d bộ",
+    "dbộ",
+    "dbo",
+    "ch/e",
+    "CH/e",
+  ].some((k) => unitName.includes(k) || unitSymbol.includes(k));
 
   const { showWarning } = useToast();
   const [step, setStep] = useState(1);
@@ -218,6 +235,48 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
     return result >= 0 ? result : 0;
   }, [tongQuanSo, quanSoVang]);
 
+  const bienCheSiQuan = donVi?.quanSoSiQuan ?? 0;
+  const bienCheQncn = donVi?.quanSoQncn ?? 0;
+  const bienCheHsqBs = donVi?.quanSoHsqBs ?? 0;
+  const capBacWarnings = useMemo(() => {
+    if (consolidatedAbsentRows) return [] as string[];
+
+    const vangByLoai: Record<QuanSoLoai, number> = {
+      siQuan: 0,
+      qncn: 0,
+      hsqBs: 0,
+    };
+
+    absentRows.forEach((row) => {
+      if (!row.capBac.trim()) return;
+      vangByLoai[classifyCapBac(row.capBac)]++;
+    });
+
+    const warnings: string[] = [];
+    if (bienCheSiQuan > 0 && vangByLoai.siQuan > bienCheSiQuan) {
+      warnings.push(
+        `Vắng Sĩ quan (${vangByLoai.siQuan}) vượt biên chế Sĩ quan (${bienCheSiQuan}).`,
+      );
+    }
+    if (bienCheQncn > 0 && vangByLoai.qncn > bienCheQncn) {
+      warnings.push(
+        `Vắng QNCN (${vangByLoai.qncn}) vượt biên chế QNCN (${bienCheQncn}).`,
+      );
+    }
+    if (bienCheHsqBs > 0 && vangByLoai.hsqBs > bienCheHsqBs) {
+      warnings.push(
+        `Vắng HSQ-BS (${vangByLoai.hsqBs}) vượt biên chế HSQ-BS (${bienCheHsqBs}).`,
+      );
+    }
+    return warnings;
+  }, [
+    absentRows,
+    bienCheSiQuan,
+    bienCheQncn,
+    bienCheHsqBs,
+    consolidatedAbsentRows,
+  ]);
+
   const effectiveDetailData = detailData ?? detailFromInitialData;
   const capBacChiHuyOptions = useMemo(() => {
     return getCapBacOptions(capDonVi ?? undefined, false, isSuDoan);
@@ -260,6 +319,10 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       return `Dòng ${
         invalidIndex + 1
       } của danh sách quân nhân vắng chưa điền đủ họ tên, cấp bậc hoặc lý do vắng.`;
+    }
+
+    if (tongQuanSo > 0 && quanSoVang > tongQuanSo) {
+      return `Tổng vắng (${quanSoVang}) vượt tổng quân số biên chế (${tongQuanSo}).`;
     }
 
     return "";
@@ -578,6 +641,13 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                   </button>
                 </div>
               </div>
+              {capBacWarnings.length > 0 && (
+                <div className={styles.softWarning} role="alert">
+                  {capBacWarnings.map((w, i) => (
+                    <div key={i}>⚠ {w}</div>
+                  ))}
+                </div>
+              )}
               <div className={styles.tableContainer}>
                 <AbsentRowsTable
                   rows={absentRows}
