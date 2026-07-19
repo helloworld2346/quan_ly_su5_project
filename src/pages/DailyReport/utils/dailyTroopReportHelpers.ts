@@ -118,29 +118,26 @@ export function hasReportForDate(args: {
   reportDate: string;
   maDonViCurrent?: string;
   isParentUnit: boolean;
+  isTrungDoan: boolean;
   parentReportData: ReportRow | null;
+  parentOwnReportData: ReportRow | null;
   reportData: ReportRow[];
 }): boolean {
   const {
-    // reportDate,
     maDonViCurrent,
     isParentUnit,
+    isTrungDoan,
     parentReportData,
+    parentOwnReportData,
     reportData,
   } = args;
 
   if (!maDonViCurrent) return false;
 
-  // const selectedDate = new Date(reportDate);
-  // const today = new Date();
-  // today.setHours(0, 0, 0, 0);
-
-  // if (selectedDate < today) return true;
-  // if (isParentUnit) return parentReportData !== null;
-
-  // return reportData.some((report) => report.donVi === maDonViCurrent);
-
-  if (isParentUnit) return parentReportData !== null;
+  if (isParentUnit) {
+    if (isTrungDoan) return parentOwnReportData !== null;
+    return parentReportData !== null;
+  }
 
   return reportData.some((report) => report.donVi === maDonViCurrent);
 }
@@ -289,7 +286,7 @@ export function buildDisplayRows(args: {
     );
 
   const ownUnitRow =
-    isParentUnit && !isTieuDoan && ownUnitMatches
+    isParentUnit && !isTieuDoan && !isTrungDoan && ownUnitMatches
       ? [
           parentOwnReportData
             ? { ...parentOwnReportData, notSubmitted: false }

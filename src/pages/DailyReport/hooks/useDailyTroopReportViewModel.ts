@@ -143,7 +143,9 @@ export function useDailyTroopReportViewModel(
     reportDate,
     maDonViCurrent,
     isParentUnit,
+    isTrungDoan,
     parentReportData,
+    parentOwnReportData,
     reportData,
   });
 
