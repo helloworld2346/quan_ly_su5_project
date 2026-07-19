@@ -25,14 +25,14 @@ import { useConfirmDialog } from "../../components/ui/ConfirmDialog/useConfirmDi
 import Skeleton from "../../components/ui/Skeleton/Skeleton";
 import { useMinLoading } from "../../hooks/useMinLoading";
 
-import { buildAllowedOptions } from "../../utils/duty";
+
 
 const CHI_HUY_CAP_BAC = ["Đại tá", "Thượng tá", "Trung tá"];
 const CHI_HUY_CHUC_VU = [
   "Sư đoàn trưởng",
-  "Tham mưu trưởng",
-  "Sư đoàn phó",
-  "Tham mưu phó",
+  "Phó Sư đoàn trưởng - TMT",
+  "Phó Sư đoàn trưởng",
+ 
 ];
 const TAC_CHIEN_CAP_BAC = [
   "Trung tá",
@@ -42,7 +42,7 @@ const TAC_CHIEN_CAP_BAC = [
   "Trung úy",
   "Thiếu úy",
 ];
-const TAC_CHIEN_CHUC_VU = ["Trợ lý tác chiến", "Trợ lý tham mưu"];
+const TAC_CHIEN_CHUC_VU = ["Trợ lý tác chiến"];
 
 const sortByNewest = (arr: NguoiTrucWithCaTruc[]) =>
   [...arr].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
@@ -80,8 +80,7 @@ export default function DutyPersonnel() {
   const { showSuccess, showError } = useToast();
   const { confirm, isOpen, options, onConfirm, onCancel } = useConfirmDialog();
 
-  const [capBacList, setCapBacList] = useState<CapBac[]>([]);
-  const [chucVuList, setChucVuList] = useState<ChucVu[]>([]);
+
 
   const [chiHuyList, setChiHuyList] = useState<NguoiTrucWithCaTruc[]>([]);
   const [tacChienList, setTacChienList] = useState<NguoiTrucWithCaTruc[]>([]);
@@ -108,15 +107,11 @@ export default function DutyPersonnel() {
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        const [capBacRes, chucVuRes, chiHuyRes, tacChienRes] =
+        const [chiHuyRes, tacChienRes] =
           await Promise.all([
-            dutyService.getCapBac(),
-            dutyService.getChucVu(),
             dutyService.getAllTrucChiHuy(),
             dutyService.getAllTrucBanTacChien(),
           ]);
-        if (capBacRes.success) setCapBacList(capBacRes.Result);
-        if (chucVuRes.success) setChucVuList(chucVuRes.Result);
         if (chiHuyRes.success)
           setChiHuyList(sortByNewest(chiHuyRes.Result ?? []));
         if (tacChienRes.success)
@@ -323,42 +318,34 @@ export default function DutyPersonnel() {
 
   const capBacOptions = useMemo(
     () =>
-      buildAllowedOptions(
-        dutyType === "chiHuy" ? CHI_HUY_CAP_BAC : TAC_CHIEN_CAP_BAC,
-        capBacList,
-        (c) => c.tenCapBac,
+      (dutyType === "chiHuy" ? CHI_HUY_CAP_BAC : TAC_CHIEN_CAP_BAC).map(
+        (name) => ({ value: name, label: name }),
       ),
-    [capBacList, dutyType],
+    [dutyType],
   );
 
   const chucVuOptions = useMemo(
     () =>
-      buildAllowedOptions(
-        dutyType === "chiHuy" ? CHI_HUY_CHUC_VU : TAC_CHIEN_CHUC_VU,
-        chucVuList,
-        (c) => c.tenChucVu,
+      (dutyType === "chiHuy" ? CHI_HUY_CHUC_VU : TAC_CHIEN_CHUC_VU).map(
+        (name) => ({ value: name, label: name }),
       ),
-    [chucVuList, dutyType],
+    [dutyType],
   );
 
   const editCapBacOptions = useMemo(
     () =>
-      buildAllowedOptions(
-        editType === "chiHuy" ? CHI_HUY_CAP_BAC : TAC_CHIEN_CAP_BAC,
-        capBacList,
-        (c) => c.tenCapBac,
+      (editType === "chiHuy" ? CHI_HUY_CAP_BAC : TAC_CHIEN_CAP_BAC).map(
+        (name) => ({ value: name, label: name }),
       ),
-    [capBacList, editType],
+    [editType],
   );
 
   const editChucVuOptions = useMemo(
     () =>
-      buildAllowedOptions(
-        editType === "chiHuy" ? CHI_HUY_CHUC_VU : TAC_CHIEN_CHUC_VU,
-        chucVuList,
-        (c) => c.tenChucVu,
+      (editType === "chiHuy" ? CHI_HUY_CHUC_VU : TAC_CHIEN_CHUC_VU).map(
+        (name) => ({ value: name, label: name }),
       ),
-    [chucVuList, editType],
+    [editType],
   );
 
   const filteredChiHuy = useMemo(() => {
