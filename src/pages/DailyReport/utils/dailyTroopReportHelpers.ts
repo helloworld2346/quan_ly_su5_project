@@ -302,16 +302,18 @@ export function buildDisplayRows(args: {
   // CH/e (DON_VI) của chính trung đoàn -> hiển thị như 1 dòng trong "Báo cáo các đơn vị"
   const trungDoanOwnRow =
     isParentUnit && isTrungDoan && parentOwnReportData
-      ? [{ ...parentOwnReportData, notSubmitted: false }]
+      ? [{ ...parentOwnReportData, kyhieuDonVi: "CH/e", notSubmitted: false }]
       : [];
 
-  const visibleChildUnits = !q
+const visibleChildUnits = (
+  !q
     ? childUnits
     : childUnits.filter(
         (unit) =>
           filtered.some((row) => row.donVi === unit.maDonVi) ||
           matchesQuery([unit.tenDonvi, unit.kyhieuDonvi, unit.maDonVi], q),
-      );
+      )
+).filter((unit) => unit.kyhieuDonvi !== "CH/e");
 
   const childRows = visibleChildUnits.map((unit) => {
     const matched = filtered.find((row) => row.donVi === unit.maDonVi);
