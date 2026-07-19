@@ -3,23 +3,23 @@ import random
 import requests  
   
 BASE_URL = "http://192.168.2.46:8080/api"      # đổi theo môi trường demo  
-USERNAME = "dbo_d4"  
+USERNAME = "c5_d5"  
 PASSWORD = "1"  
-MA_DON_VI = "GS003.002.005.005"                    # maDonVi đơn vị đang đăng nhập  
+MA_DON_VI = "GS003.002.006.001"                    # maDonVi đơn vị đang đăng nhập  
 NGAY_BAO_CAO = "2026-07-19"                # ngày báo cáo (YYYY-MM-DD)  
-TONG_QUAN_SO = 90                 # tổng quân số biên chế của đơn vị  
-SO_VANG = 10  
+TONG_QUAN_SO = 85                 # tổng quân số biên chế của đơn vị  
+SO_VANG = 28  
   
 # --- Cặp cấp bậc -> danh sách chức vụ hợp lệ ---  
 # Chiến sĩ / Hạ sĩ quan  
 CS_HSQ = {  
-    # "Binh nhì":   ["Chiến sĩ"],  
+    "Binh nhì":   ["Chiến sĩ"],  
     # "Binh nhất":  ["Chiến sĩ"],  
     # "Hạ sĩ":      ["Chiến sĩ", "Tiểu đội trưởng"],  
     # "Trung sĩ":   ["Tiểu đội trưởng"],  
     # "Thượng sĩ":  ["Tiểu đội trưởng"],  
-    "Hạ sĩ":      ["Chiến sĩ"],  
-    "Trung sĩ":   ["Chiến sĩ"],  
+    # "Hạ sĩ":      ["Chiến sĩ"],  
+    # "Trung sĩ":   ["Chiến sĩ"],  
 }  
   
 # Sĩ quan  

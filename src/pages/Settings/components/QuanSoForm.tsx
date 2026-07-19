@@ -43,6 +43,7 @@ export default function QuanSoForm({
 
   const isAggregatedOnly = hasChildren && !isDivisionTacChien;
 
+  // Tổng biên chế CHỈ của các đơn vị con (seed = 0, KHÔNG cộng CH/f ở đây)
   const childAgg = useMemo(() => {
     return childUnits.reduce(
       (acc, c) => ({
@@ -50,15 +51,9 @@ export default function QuanSoForm({
         qncn: acc.qncn + c.quanSoQncn,
         hsqBs: acc.hsqBs + c.quanSoHsqBs,
       }),
-      {
-        siQuan: donVi.quanSoSiQuan,
-        qncn: donVi.quanSoQncn,
-        hsqBs: donVi.quanSoHsqBs,
-      },
+      { siQuan: 0, qncn: 0, hsqBs: 0 },
     );
-  }, [childUnits, donVi.quanSoSiQuan, donVi.quanSoQncn, donVi.quanSoHsqBs]);
-  
-  const childAggTong = childAgg.siQuan + childAgg.qncn + childAgg.hsqBs;
+  }, [childUnits]);
 
   const initSiQuan = isAggregatedOnly ? childAgg.siQuan : donVi.quanSoSiQuan;
   const initQncn = isAggregatedOnly ? childAgg.qncn : donVi.quanSoQncn;
@@ -73,6 +68,12 @@ export default function QuanSoForm({
     () => quanSoSiQuan + quanSoHsqBs + quanSoQncn,
     [quanSoSiQuan, quanSoHsqBs, quanSoQncn],
   );
+
+  // Tổng toàn Sư đoàn = biên chế CH/f (đang chỉnh) + tổng các đơn vị con
+  const suDoanSiQuan = quanSoSiQuan + childAgg.siQuan;
+  const suDoanQncn = quanSoQncn + childAgg.qncn;
+  const suDoanHsqBs = quanSoHsqBs + childAgg.hsqBs;
+  const suDoanTong = suDoanSiQuan + suDoanQncn + suDoanHsqBs;
 
   const hasUnsavedChanges =
     quanSoSiQuan !== donVi.quanSoSiQuan ||
@@ -221,35 +222,35 @@ export default function QuanSoForm({
               className={styles.cardHeaderIcon}
             />
             <h2 className={styles.cardTitle}>
-              Quân số cộng từ các đơn vị trực thuộc
+              Quân số cộng dồn toàn Sư đoàn (gồm CH/f)
             </h2>
           </div>
 
           <div className={styles.statGrid}>
             <NumberStepper
               label="Quân số Sĩ quan"
-              value={childAgg.siQuan}
+              value={suDoanSiQuan}
               onChange={() => {}}
               disabled
             />
             <NumberStepper
               label="Quân số QNCN"
-              value={childAgg.qncn}
+              value={suDoanQncn}
               onChange={() => {}}
               disabled
             />
             <NumberStepper
               label="Quân số HSQ-BS"
-              value={childAgg.hsqBs}
+              value={suDoanHsqBs}
               onChange={() => {}}
               disabled
             />
 
             <div className={styles.totalCard}>
-              <span className={styles.totalLabel}>Tổng quân số toàn Sư đoàn</span>
-              <span className={styles.totalValue}>
-                {formatNum(childAggTong)}
+              <span className={styles.totalLabel}>
+                Tổng quân số toàn Sư đoàn
               </span>
+              <span className={styles.totalValue}>{formatNum(suDoanTong)}</span>
             </div>
           </div>
         </div>

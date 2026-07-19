@@ -84,9 +84,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                   hsqBs: acc.hsqBs + c.quanSoHsqBs,
                 }),
                 {
-                  siQuan: donViData.quanSoSiQuan,
-                  qncn: donViData.quanSoQncn,
-                  hsqBs: donViData.quanSoHsqBs,
+                  siQuan: 0,
+                  qncn: 0,
+                  hsqBs: 0,
                 },
               );
               setDonVi({
