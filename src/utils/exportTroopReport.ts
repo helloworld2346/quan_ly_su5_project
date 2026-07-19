@@ -82,7 +82,7 @@ export async function exportTroopReportToExcel({
     bold: true,
     italic: true,
     size: 14,
-    underline: true, // gạch chân tự co đúng bề rộng chữ "Độc ... phúc"
+    underline: true,
   };
   ws.getCell(2, rightStart).alignment = { horizontal: "center" };
 
