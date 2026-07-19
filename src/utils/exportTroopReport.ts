@@ -82,6 +82,7 @@ export async function exportTroopReportToExcel({
     bold: true,
     italic: true,
     size: 14,
+    underline: true, // gạch chân tự co đúng bề rộng chữ "Độc ... phúc"
   };
   ws.getCell(2, rightStart).alignment = { horizontal: "center" };
 
@@ -194,37 +195,37 @@ export async function exportTroopReportToExcel({
   );
   rowIdx++;
 
-const EXPLAIN_LINES = 4;
-const explainStartRow = rowIdx;
+  const EXPLAIN_LINES = 4;
+  const explainStartRow = rowIdx;
 
-ws.getCell(rowIdx, 1).value = "Giải trình\nquân số\nthay đổi\ntrong ngày";
-ws.getCell(explainStartRow, 1).font = { name: FONT, bold: true, size: 12 };
-ws.getCell(explainStartRow, 1).alignment = {
-  horizontal: "center",
-  vertical: "middle",
-  wrapText: true,
-};
-setMerged(
-  ws,
-  explainStartRow,
-  1,
-  explainStartRow + EXPLAIN_LINES - 1,
-  1,
-  "Giải trình quân số thay đổi trong ngày",
-);
+  ws.getCell(rowIdx, 1).value = "Giải trình\nquân số\nthay đổi\ntrong ngày";
+  ws.getCell(explainStartRow, 1).font = { name: FONT, bold: true, size: 12 };
+  ws.getCell(explainStartRow, 1).alignment = {
+    horizontal: "center",
+    vertical: "middle",
+    wrapText: true,
+  };
+  setMerged(
+    ws,
+    explainStartRow,
+    1,
+    explainStartRow + EXPLAIN_LINES - 1,
+    1,
+    "Giải trình quân số thay đổi trong ngày",
+  );
 
-for (let line = 0; line < EXPLAIN_LINES; line++) {
-  const lineRow = explainStartRow + line;
-  setMerged(ws, lineRow, 2, lineRow, COLUMN_COUNT, "");
-  for (let c = 2; c <= COLUMN_COUNT; c++) {
-    ws.getCell(lineRow, c).border = {
-      bottom: { style: "dotted" },
-    };
+  for (let line = 0; line < EXPLAIN_LINES; line++) {
+    const lineRow = explainStartRow + line;
+    setMerged(ws, lineRow, 2, lineRow, COLUMN_COUNT, "");
+    for (let c = 2; c <= COLUMN_COUNT; c++) {
+      ws.getCell(lineRow, c).border = {
+        bottom: { style: "dotted" },
+      };
+    }
+    ws.getRow(lineRow).height = 18;
   }
-  ws.getRow(lineRow).height = 18;
-}
 
-rowIdx = explainStartRow + EXPLAIN_LINES;
+  rowIdx = explainStartRow + EXPLAIN_LINES;
 
   ws.getColumn(1).width = 12;
   for (let c = 2; c <= COLUMN_COUNT; c++) ws.getColumn(c).width = 12;
