@@ -490,6 +490,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       trucBanChiHuy: JSON.stringify(trucChiHuy),
       trucBanTacChien: JSON.stringify(trucBanTacChien),
       tinhHinhHoatDong: JSON.stringify(currentDetailData),
+      loaiDonBaoCao: consolidatedAbsentRows ? "TONG_HOP" : "DON_VI",
     };
 
     onSubmit(payload, currentDetailData);

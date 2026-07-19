@@ -26,10 +26,13 @@ export function useReportData({
   isParentUnit: boolean;
   isTacChien: boolean;
   isChiHuy: boolean;
+  capDonVi?: string | null;
   reportDate: string;
   showError: (msg: string) => void;
 }) {
   const [reportData, setReportData] = useState<ReportRow[]>([]);
+const [parentOwnReportData, setParentOwnReportData] =
+  useState<ReportRow | null>(null);  
   const [parentReportData, setParentReportData] = useState<ReportRow | null>(
     null,
   );
@@ -53,14 +56,35 @@ export function useReportData({
     try {
       let response;
       if (isParentUnit) {
+        // danh sách báo cáo các đơn vị con (mặc định DON_VI)
         response = await dailyReportService.searchChildrenReports(
           maDonViCurrent,
           reportDate,
+          "DON_VI",
         );
+
+        // CH/e - báo cáo riêng của chính đơn vị cha
+        try {
+          const ownRes = await dailyReportService.searchReportByUnitAndDate(
+            maDonViCurrent,
+            reportDate,
+            "DON_VI",
+          );
+          setParentOwnReportData(
+            ownRes.success && ownRes.Result
+              ? mapItemToRow(ownRes.Result)
+              : null,
+          );
+        } catch {
+          setParentOwnReportData(null);
+        }
+
+        // e4 - báo cáo tổng hợp
         try {
           const parentRes = await dailyReportService.searchReportByUnitAndDate(
             maDonViCurrent,
             reportDate,
+            "TONG_HOP",
           );
           if (parentRes.success && parentRes.Result) {
             setParentReportData({
@@ -77,9 +101,12 @@ export function useReportData({
         response = await dailyReportService.searchReportByUnitAndDate(
           maDonViCurrent,
           reportDate,
+          "DON_VI",
         );
         setParentReportData(null);
+        setParentOwnReportData(null);
       }
+
       if (response.success && response.Result) {
         const data = Array.isArray(response.Result)
           ? response.Result
@@ -158,6 +185,7 @@ export function useReportData({
   return {
     reportData,
     parentReportData,
+    parentOwnReportData,
     loading,
     donViQuanSoTong,
     childUnits,

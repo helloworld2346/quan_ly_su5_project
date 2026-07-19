@@ -1,3 +1,5 @@
+export type LoaiDonBaoCao = "DON_VI" | "TONG_HOP";
+
 export interface TrucNguoiInfo {
   idNguoitruc?: string;
   tenNguoitruc: string;
@@ -67,6 +69,7 @@ export type ReportItemInput = {
   donVi: { maDonVi: string; tenDonvi: string; kyhieuDonvi?: string };
   caTruc: CaTrucInfo;
   tinhHinhHoatDong?: string;
+  loaiDonBaoCao?: LoaiDonBaoCao;
 };
 
 export interface CreateReportRequest {
@@ -80,6 +83,7 @@ export interface CreateReportRequest {
   trucBanChiHuy?: string;
   trucBanTacChien?: string;
   tinhHinhHoatDong?: string;
+  loaiDonBaoCao?: LoaiDonBaoCao;
 }
 
 export interface CreateReportResponse {
@@ -217,6 +221,7 @@ export interface SearchReportResponse {
     };
     caTruc: CaTrucInfo;
   };
+  loaiDonBaoCao?: LoaiDonBaoCao;
 }
 
 export interface SearchChildrenResponse {
@@ -242,6 +247,7 @@ export interface SearchChildrenResponse {
     };
     caTruc: CaTrucInfo;
   }>;
+  loaiDonBaoCao?: LoaiDonBaoCao;
 }
 
 export interface SearchByRangeResponse {
@@ -323,7 +329,8 @@ export interface ReportRow {
   ghiChu: string;
   rawItem: CreateReportResponse["Result"];
   notSubmitted?: boolean;
-  isConsolidated?: boolean; 
+  isConsolidated?: boolean;
+  loaiDonBaoCao?: LoaiDonBaoCao;
 }
 
 export type EditModalData = {

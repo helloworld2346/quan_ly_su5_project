@@ -104,6 +104,7 @@ export function mapItemToRow(item: ReportItemInput): ReportRow {
     chiTietVangList,
     status: item.status,
     ghiChu: (item.ghiChu ?? "") || "",
+    loaiDonBaoCao: item.loaiDonBaoCao ?? "DON_VI",
     rawItem: item as unknown as CreateReportResponse["Result"],
   };
 }

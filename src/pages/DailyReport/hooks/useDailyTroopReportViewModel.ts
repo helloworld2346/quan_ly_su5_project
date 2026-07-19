@@ -43,6 +43,7 @@ export type UseDailyTroopReportViewModelArgs = {
   maDonViCurrent?: string;
   reportData: ReportRow[];
   parentReportData: ReportRow | null;
+  parentOwnReportData: ReportRow | null;
   childUnits: DonVi[];
   caTrucFromApi: CaTrucDetail | null;
   consolidatedData: ConsolidatedData | null;
@@ -92,6 +93,7 @@ export function useDailyTroopReportViewModel(
     maDonViCurrent,
     reportData,
     parentReportData,
+    parentOwnReportData,
     childUnits,
     caTrucFromApi,
     consolidatedData,
@@ -109,16 +111,34 @@ export function useDailyTroopReportViewModel(
 
   const isChiHuyLeaf = isChiHuy && childUnits.length === 0;
 
-  const ownReport = useMemo(() => {
-    if (isParentUnit) return parentReportData;
-    return reportData.length > 0 ? reportData[0] : null;
-  }, [isParentUnit, parentReportData, reportData]);
+    const isTrungDoan = capDonVi === "TRUNG_DOAN";
 
-  const commanderReport = useMemo(() => {
-    if (!isChiHuy) return null;
-    if (isParentUnit) return parentReportData;
-    return reportData.length > 0 ? reportData[0] : null;
-  }, [isChiHuy, isParentUnit, parentReportData, reportData]);
+    const ownReport = useMemo(() => {
+      // Trung đoàn: báo cáo riêng CH/e (DON_VI)
+      if (isParentUnit && isTrungDoan) return parentOwnReportData;
+      if (isParentUnit) return parentReportData;
+      return reportData.length > 0 ? reportData[0] : null;
+    }, [
+      isParentUnit,
+      isTrungDoan,
+      parentOwnReportData,
+      parentReportData,
+      reportData,
+    ]);
+
+    const commanderReport = useMemo(() => {
+      if (!isChiHuy) return null;
+      if (isParentUnit && isTrungDoan) return parentOwnReportData;
+      if (isParentUnit) return parentReportData;
+      return reportData.length > 0 ? reportData[0] : null;
+    }, [
+      isChiHuy,
+      isParentUnit,
+      isTrungDoan,
+      parentOwnReportData,
+      parentReportData,
+      reportData,
+    ]);
 
   const canAddReport =
     !shouldHideDraftAndUnsubmitted &&

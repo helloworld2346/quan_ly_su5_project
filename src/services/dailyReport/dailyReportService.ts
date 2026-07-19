@@ -10,6 +10,7 @@ import type {
   SearchReportResponse,
   SearchChildrenResponse,
   SearchByRangeResponse,
+  LoaiDonBaoCao,
 } from "../../types/dailyReport";
 export interface NhiemVuNgay {
   idNhiemvuNgay: string;
@@ -86,9 +87,7 @@ export const dailyReportService = {
   },
 
   approveReport: async (id: string): Promise<ApproveResponse> => {
-    const response = await api.put<ApproveResponse>(
-      `/donbaocao/approve/${id}`,
-    );
+    const response = await api.put<ApproveResponse>(`/donbaocao/approve/${id}`);
     return response.data;
   },
 
@@ -106,10 +105,11 @@ export const dailyReportService = {
   searchReportByUnitAndDate: async (
     maDonVi: string,
     ngayLoc: string,
+    loaiDonBaoCao: LoaiDonBaoCao = "DON_VI",
   ): Promise<SearchReportResponse> => {
     const response = await api.get<SearchReportResponse>(
       `/donbaocao/search/DonVi/${maDonVi}`,
-      { params: { ngayLoc } },
+      { params: { ngayLoc, loaiDonBaoCao } },
     );
     return response.data;
   },
@@ -117,10 +117,11 @@ export const dailyReportService = {
   searchChildrenReports: async (
     maDonVi: string,
     ngayLoc: string,
+    loaiDonBaoCao: LoaiDonBaoCao = "DON_VI",
   ): Promise<SearchChildrenResponse> => {
     const response = await api.get<SearchChildrenResponse>(
       `/donbaocao/search/DonVi/${maDonVi}/children`,
-      { params: { ngayLoc } },
+      { params: { ngayLoc, loaiDonBaoCao } },
     );
     return response.data;
   },
@@ -175,9 +176,7 @@ export const dailyReportService = {
   },
 
   getNhiemVuNgayByDonBaoCao: async (idDonBaoCao: string) => {
-    const response = await api.get(
-      `/nhiemvungay/donbaocao/${idDonBaoCao}`,
-    );
+    const response = await api.get(`/nhiemvungay/donbaocao/${idDonBaoCao}`);
     return response.data as {
       success: boolean;
       Result: {
