@@ -60,8 +60,8 @@ export default function CustomSelect({
 
       if (spaceBelow >= MIN_DROPDOWN_HEIGHT || spaceBelow >= spaceAbove) {
         return {
-          top: rect.bottom + window.scrollY + DROPDOWN_OFFSET,
-          left: rect.left + window.scrollX,
+          top: rect.bottom + DROPDOWN_OFFSET,
+          left: rect.left,
           width,
           maxHeight: Math.min(
             DEFAULT_MAX_HEIGHT,
@@ -71,8 +71,8 @@ export default function CustomSelect({
       }
 
       return {
-        bottom: viewportHeight - rect.top + window.scrollY + DROPDOWN_OFFSET,
-        left: rect.left + window.scrollX,
+        bottom: viewportHeight - rect.top + DROPDOWN_OFFSET,
+        left: rect.left,
         width,
         maxHeight: Math.min(
           DEFAULT_MAX_HEIGHT,
@@ -177,7 +177,7 @@ export default function CustomSelect({
           <ul
             className={styles.dropdown}
             style={{
-              position: "absolute",
+              position: "fixed",
               ...(dropdownPos.top !== undefined
                 ? { top: dropdownPos.top }
                 : { bottom: dropdownPos.bottom }),
