@@ -606,11 +606,6 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                 value={trucBanTacChien}
                 onChange={setTrucBanTacChien}
                 capBacOptions={capBacTacChienOptions}
-                chucVuOptions={getChucVuOptions(
-                  capDonVi ?? undefined,
-                  isDonViBo,
-                  "ctd",
-                )}
                 disabled={isDaiDoi}
               />
               <hr className={styles.divider} />

@@ -15,8 +15,6 @@ import { useToast } from "../../context/useToast";
 import type {
   TrucNguoiPayload,
   NguoiTrucWithCaTruc,
-  CapBac,
-  ChucVu,
 } from "../../types/duty";
 import CustomSelect from "../../components/ui/CustomSelect/CustomSelect";
 import SearchBar from "../../components/ui/SearchBar/SearchBar";
