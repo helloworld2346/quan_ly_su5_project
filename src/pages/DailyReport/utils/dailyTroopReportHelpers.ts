@@ -227,6 +227,7 @@ export function buildDisplayRows(args: {
   const {
     query,
     reportData,
+    parentReportData,
     parentOwnReportData,
     childUnits,
     isParentUnit,
@@ -271,7 +272,7 @@ export function buildDisplayRows(args: {
   const ownUnitMatches =
     !q ||
     (parentOwnReportData
-      ? buildFilteredRows(query, [parentOwnReportData ]).length > 0
+      ? buildFilteredRows(query, [parentOwnReportData]).length > 0
       : false) ||
     matchesQuery(
       [
@@ -286,16 +287,22 @@ export function buildDisplayRows(args: {
     );
 
   const ownUnitRow =
-    isParentUnit && !isTieuDoan && !isTrungDoan && ownUnitMatches
+    isParentUnit && !isTrungDoan && !isTieuDoan && ownUnitMatches
       ? [
-          parentOwnReportData
-            ? { ...parentOwnReportData, notSubmitted: false }
+          parentReportData
+            ? { ...parentReportData, notSubmitted: false }
             : createEmptyReportRow({
                 idDonBaoCao: maDonViCurrent ?? "",
                 tenDonVi: accountDonVi?.tenDonvi ?? "",
                 kyhieuDonVi: accountDonVi?.kyhieuDonvi,
               }),
         ]
+      : [];
+
+  // CH/e (DON_VI) của chính trung đoàn -> hiển thị như 1 dòng trong "Báo cáo các đơn vị"
+  const trungDoanOwnRow =
+    isParentUnit && isTrungDoan && parentOwnReportData
+      ? [{ ...parentOwnReportData, notSubmitted: false }]
       : [];
 
   const visibleChildUnits = !q
@@ -317,7 +324,7 @@ export function buildDisplayRows(args: {
     });
   });
 
-  return [...ownUnitRow, ...childRows];
+  return [...ownUnitRow, ...trungDoanOwnRow, ...childRows];
 }
 
 function classifyCapBac(capBac: string): "SQ" | "QNCN" | "HSQBS" {

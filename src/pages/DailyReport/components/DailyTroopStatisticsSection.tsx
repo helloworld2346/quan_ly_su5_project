@@ -31,7 +31,6 @@ type Props = {
   displayRows: ReportRow[];
   displayTotals: DisplayTotals;
   parentReportData: ReportRow | null;
-  parentOwnReportData: ReportRow | null;
   consolidatedData: ConsolidatedData | null;
   canConsolidateUnit: boolean;
   shouldHideConsolidatedSections: boolean;
@@ -48,7 +47,6 @@ export default function DailyTroopStatisticsSection({
   displayRows,
   displayTotals,
   parentReportData,
-  parentOwnReportData,
   consolidatedData,
   canConsolidateUnit,
   shouldHideConsolidatedSections,
@@ -145,23 +143,6 @@ export default function DailyTroopStatisticsSection({
                           onToggleMenu={sharedRowProps.onToggleMenu}
                           onViewConsolidatedDetail={onViewConsolidatedDetail}
                         />
-                      )}
-
-                    {/* Dòng CH/e (DON_VI) của chính trung đoàn */}
-                    {!shouldHideConsolidatedSections &&
-                      canConsolidateUnit &&
-                      parentOwnReportData && (
-                        <>
-                          <tr className={styles.separatorRow}>
-                            <td colSpan={22}>Báo cáo đơn vị (CH/e)</td>
-                          </tr>
-                          <ReportTableRow
-                            key={`own-${parentOwnReportData.idDonBaoCao}`}
-                            row={parentOwnReportData}
-                            isConsolidatedRow={false}
-                            {...sharedRowProps}
-                          />
-                        </>
                       )}
 
                     {/* separator + dòng e4 (TONG_HOP) giữ nguyên như cũ */}

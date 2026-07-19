@@ -508,7 +508,6 @@ export default function DailyTroopReport() {
         displayRows={displayRows}
         displayTotals={displayTotals}
         parentReportData={parentReportData}
-        parentOwnReportData={parentOwnReportData}
         consolidatedData={consolidatedData}
         canConsolidateUnit={isParentUnit}
         shouldHideConsolidatedSections={shouldHideConsolidatedSections}
