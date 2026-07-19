@@ -114,17 +114,9 @@ export function useDailyTroopReportViewModel(
   const isTrungDoan = capDonVi === "TRUNG_DOAN";
 
   const ownReport = useMemo(() => {
-    // Trung đoàn: báo cáo riêng CH/e (DON_VI)
-    if (isParentUnit && isTrungDoan) return parentOwnReportData;
-    if (isParentUnit) return parentReportData;
+    if (isParentUnit) return parentOwnReportData ?? parentReportData;
     return reportData.length > 0 ? reportData[0] : null;
-  }, [
-    isParentUnit,
-    isTrungDoan,
-    parentOwnReportData,
-    parentReportData,
-    reportData,
-  ]);
+  }, [isParentUnit, parentOwnReportData, parentReportData, reportData]);
 
   const commanderReport = useMemo(() => {
     if (!isChiHuy) return null;
@@ -162,6 +154,7 @@ export function useDailyTroopReportViewModel(
           query,
           reportData,
           parentReportData,
+          parentOwnReportData,
           childUnits,
           isParentUnit,
           isTrungDoan: capDonVi === "TRUNG_DOAN",
@@ -177,6 +170,7 @@ export function useDailyTroopReportViewModel(
       query,
       reportData,
       parentReportData,
+      parentOwnReportData,
       childUnits,
       isParentUnit,
       capDonVi,

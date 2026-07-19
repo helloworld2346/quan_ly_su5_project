@@ -217,6 +217,7 @@ export function buildDisplayRows(args: {
   query: string;
   reportData: ReportRow[];
   parentReportData: ReportRow | null;
+  parentOwnReportData: ReportRow | null;
   childUnits: ChildUnit[];
   isParentUnit: boolean;
   isTrungDoan: boolean;
@@ -224,16 +225,12 @@ export function buildDisplayRows(args: {
   isChiHuy: boolean;
   isChiHuyLeaf: boolean;
   maDonViCurrent?: string;
-  accountDonVi?: {
-    maDonVi?: string;
-    tenDonvi?: string;
-    kyhieuDonvi?: string;
-  };
+  accountDonVi?: { maDonVi?: string; tenDonvi?: string; kyhieuDonvi?: string };
 }): ReportRow[] {
   const {
     query,
     reportData,
-    parentReportData,
+    parentOwnReportData,
     childUnits,
     isParentUnit,
     isTrungDoan,
@@ -246,8 +243,8 @@ export function buildDisplayRows(args: {
 
   if (!isParentUnit || childUnits.length === 0) {
     if (isParentUnit && !isTrungDoan) {
-      const rows: ReportRow[] = parentReportData
-        ? [{ ...parentReportData, notSubmitted: false }]
+      const rows: ReportRow[] = parentOwnReportData
+        ? [{ ...parentOwnReportData, notSubmitted: false }]
         : [
             createEmptyReportRow({
               idDonBaoCao: maDonViCurrent ?? "",
@@ -276,14 +273,14 @@ export function buildDisplayRows(args: {
 
   const ownUnitMatches =
     !q ||
-    (parentReportData
-      ? buildFilteredRows(query, [parentReportData]).length > 0
+    (parentOwnReportData
+      ? buildFilteredRows(query, [parentOwnReportData ]).length > 0
       : false) ||
     matchesQuery(
       [
-        parentReportData?.tenDonVi,
-        parentReportData?.kyhieuDonVi,
-        parentReportData?.donVi,
+        parentOwnReportData?.tenDonVi,
+        parentOwnReportData?.kyhieuDonVi,
+        parentOwnReportData?.donVi,
         accountDonVi?.tenDonvi,
         accountDonVi?.kyhieuDonvi,
         maDonViCurrent,
@@ -292,10 +289,10 @@ export function buildDisplayRows(args: {
     );
 
   const ownUnitRow =
-    isParentUnit && !isTrungDoan && !isTieuDoan && ownUnitMatches
+    isParentUnit && !isTieuDoan && ownUnitMatches
       ? [
-          parentReportData
-            ? { ...parentReportData, notSubmitted: false }
+          parentOwnReportData
+            ? { ...parentOwnReportData, notSubmitted: false }
             : createEmptyReportRow({
                 idDonBaoCao: maDonViCurrent ?? "",
                 tenDonVi: accountDonVi?.tenDonvi ?? "",

@@ -10,7 +10,6 @@ import type {
   SearchReportResponse,
   SearchChildrenResponse,
   SearchByRangeResponse,
-  LoaiDonBaoCao,
 } from "../../types/dailyReport";
 export interface NhiemVuNgay {
   idNhiemvuNgay: string;
@@ -105,11 +104,11 @@ export const dailyReportService = {
   searchReportByUnitAndDate: async (
     maDonVi: string,
     ngayLoc: string,
-    loaiDonBaoCao: LoaiDonBaoCao = "DON_VI",
+    loaiDonBaoCao?: "DON_VI" | "TONG_HOP",
   ): Promise<SearchReportResponse> => {
     const response = await api.get<SearchReportResponse>(
       `/donbaocao/search/DonVi/${maDonVi}`,
-      { params: { ngayLoc, loaiDonBaoCao } },
+      { params: { ngayLoc, ...(loaiDonBaoCao ? { loaiDonBaoCao } : {}) } },
     );
     return response.data;
   },
@@ -117,11 +116,11 @@ export const dailyReportService = {
   searchChildrenReports: async (
     maDonVi: string,
     ngayLoc: string,
-    loaiDonBaoCao: LoaiDonBaoCao = "DON_VI",
+    loaiDonBaoCao?: "DON_VI" | "TONG_HOP",
   ): Promise<SearchChildrenResponse> => {
     const response = await api.get<SearchChildrenResponse>(
       `/donbaocao/search/DonVi/${maDonVi}/children`,
-      { params: { ngayLoc, loaiDonBaoCao } },
+      { params: { ngayLoc, ...(loaiDonBaoCao ? { loaiDonBaoCao } : {}) } },
     );
     return response.data;
   },

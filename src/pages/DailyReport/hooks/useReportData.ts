@@ -19,6 +19,7 @@ export type { ReportRow };
 export function useReportData({
   maDonViCurrent,
   isParentUnit,
+  capDonVi,
   reportDate,
   showError,
 }: {
@@ -31,11 +32,13 @@ export function useReportData({
   showError: (msg: string) => void;
 }) {
   const [reportData, setReportData] = useState<ReportRow[]>([]);
-const [parentOwnReportData, setParentOwnReportData] =
-  useState<ReportRow | null>(null);  
+  // e4 (TONG_HOP)
   const [parentReportData, setParentReportData] = useState<ReportRow | null>(
     null,
   );
+  // CH/e hoặc CH/f (DON_VI của chính đơn vị cha)
+  const [parentOwnReportData, setParentOwnReportData] =
+    useState<ReportRow | null>(null);
   const [loading, setLoading] = useState(false);
   const [caTrucFromApi, setCaTrucFromApi] = useState<CaTrucDetail | null>(null);
 
@@ -44,6 +47,8 @@ const [parentOwnReportData, setParentOwnReportData] =
     isParentUnit,
   );
   const donViQuanSoTong = currentUnit?.quanSoTong ?? 0;
+
+  const isTrungDoan = capDonVi === "TRUNG_DOAN";
 
   const showErrorRef = useRef(showError);
   useEffect(() => {
@@ -56,14 +61,14 @@ const [parentOwnReportData, setParentOwnReportData] =
     try {
       let response;
       if (isParentUnit) {
-        // danh sách báo cáo các đơn vị con (mặc định DON_VI)
+        // danh sách báo cáo các đơn vị con (chỉ DON_VI)
         response = await dailyReportService.searchChildrenReports(
           maDonViCurrent,
           reportDate,
           "DON_VI",
         );
 
-        // CH/e - báo cáo riêng của chính đơn vị cha
+        // báo cáo DON_VI của chính đơn vị cha: CH/e (trung đoàn) / CH/f (sư đoàn)
         try {
           const ownRes = await dailyReportService.searchReportByUnitAndDate(
             maDonViCurrent,
@@ -79,22 +84,23 @@ const [parentOwnReportData, setParentOwnReportData] =
           setParentOwnReportData(null);
         }
 
-        // e4 - báo cáo tổng hợp
-        try {
-          const parentRes = await dailyReportService.searchReportByUnitAndDate(
-            maDonViCurrent,
-            reportDate,
-            "TONG_HOP",
-          );
-          if (parentRes.success && parentRes.Result) {
-            setParentReportData({
-              ...mapItemToRow(parentRes.Result),
-              isConsolidated: true,
-            });
-          } else {
+        // báo cáo TONG_HOP (e4) - chỉ trung đoàn
+        if (isTrungDoan) {
+          try {
+            const consRes = await dailyReportService.searchReportByUnitAndDate(
+              maDonViCurrent,
+              reportDate,
+              "TONG_HOP",
+            );
+            setParentReportData(
+              consRes.success && consRes.Result
+                ? { ...mapItemToRow(consRes.Result), isConsolidated: true }
+                : null,
+            );
+          } catch {
             setParentReportData(null);
           }
-        } catch {
+        } else {
           setParentReportData(null);
         }
       } else {
@@ -124,7 +130,7 @@ const [parentOwnReportData, setParentOwnReportData] =
     } finally {
       setLoading(false);
     }
-  }, [maDonViCurrent, isParentUnit, reportDate]);
+  }, [maDonViCurrent, isParentUnit, isTrungDoan, reportDate]);
 
   useInitialFetch(fetchReports);
   useReportDataChangedListener(fetchReports);

@@ -89,6 +89,7 @@ export default function DailyTroopReport() {
   const {
     reportData,
     parentReportData,
+    parentOwnReportData,
     loading,
     donViQuanSoTong,
     childUnits,
@@ -157,6 +158,7 @@ export default function DailyTroopReport() {
     maDonViCurrent,
     reportData,
     parentReportData,
+    parentOwnReportData,
     childUnits,
     caTrucFromApi,
     consolidatedData,
@@ -506,6 +508,7 @@ export default function DailyTroopReport() {
         displayRows={displayRows}
         displayTotals={displayTotals}
         parentReportData={parentReportData}
+        parentOwnReportData={parentOwnReportData}
         consolidatedData={consolidatedData}
         canConsolidateUnit={isParentUnit}
         shouldHideConsolidatedSections={shouldHideConsolidatedSections}
