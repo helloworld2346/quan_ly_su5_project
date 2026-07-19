@@ -70,11 +70,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const normalizedRole = normalizeRoleName(
               result.vaiTro?.tenVaiTro ?? undefined,
             );
-            const isDivisionTacChien =
+            const isTacChienParent =
               normalizedRole === "Trực ban tác chiến" &&
-              donViData.capDonVi === "SU_DOAN";
-            const isAggregatedOnly =
-              childUnits.length > 0 && !isDivisionTacChien;
+              (donViData.capDonVi === "SU_DOAN" ||
+                donViData.capDonVi === "TRUNG_DOAN");
+            const isAggregatedOnly = childUnits.length > 0 && !isTacChienParent;
 
             if (isAggregatedOnly) {
               const agg = childUnits.reduce(

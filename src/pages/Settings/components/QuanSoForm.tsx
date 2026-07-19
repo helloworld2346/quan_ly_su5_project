@@ -37,11 +37,16 @@ export default function QuanSoForm({
   const normalizedRole = normalizeRoleName(
     account?.vaiTro?.tenVaiTro ?? undefined,
   );
-  const isDivisionTacChien =
-    normalizedRole === "Trực ban tác chiến" && donVi.capDonVi === "SU_DOAN";
+  const isTacChienParent =
+    normalizedRole === "Trực ban tác chiến" &&
+    (donVi.capDonVi === "SU_DOAN" || donVi.capDonVi === "TRUNG_DOAN");
   const hasChildren = childUnits.length > 0;
 
-  const isAggregatedOnly = hasChildren && !isDivisionTacChien;
+  const isAggregatedOnly = hasChildren && !isTacChienParent;
+
+  // nhãn động theo cấp
+  const chLabel = donVi.capDonVi === "TRUNG_DOAN" ? "CH/e" : "CH/f";
+  const capLabel = donVi.capDonVi === "TRUNG_DOAN" ? "Trung đoàn" : "Sư đoàn";
 
   // Tổng biên chế CHỈ của các đơn vị con (seed = 0, KHÔNG cộng CH/f ở đây)
   const childAgg = useMemo(() => {
@@ -143,8 +148,8 @@ export default function QuanSoForm({
         <div className={styles.cardHeader}>
           <FontAwesomeIcon icon={faUsers} className={styles.cardHeaderIcon} />
           <h2 className={styles.cardTitle}>
-            {isDivisionTacChien
-              ? `Quân số biên chế CH/f — ${donVi.tenDonvi}`
+            {isTacChienParent
+              ? `Quân số biên chế ${chLabel} — ${donVi.tenDonvi}`
               : `Quân số biên chế — ${donVi.tenDonvi}`}
           </h2>
         </div>
@@ -214,7 +219,7 @@ export default function QuanSoForm({
         </form>
       </div>
 
-      {isDivisionTacChien && hasChildren && (
+      {isTacChienParent && hasChildren && (
         <div className={styles.cardSection}>
           <div className={styles.cardHeader}>
             <FontAwesomeIcon
@@ -222,7 +227,7 @@ export default function QuanSoForm({
               className={styles.cardHeaderIcon}
             />
             <h2 className={styles.cardTitle}>
-              Quân số cộng dồn toàn Sư đoàn (gồm CH/f)
+              Quân số cộng dồn toàn {capLabel} (gồm {chLabel})
             </h2>
           </div>
 
@@ -248,7 +253,7 @@ export default function QuanSoForm({
 
             <div className={styles.totalCard}>
               <span className={styles.totalLabel}>
-                Tổng quân số toàn Sư đoàn
+                Tổng quân số toàn {capLabel}
               </span>
               <span className={styles.totalValue}>{formatNum(suDoanTong)}</span>
             </div>

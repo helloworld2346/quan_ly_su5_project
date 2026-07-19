@@ -111,40 +111,41 @@ export function useDailyTroopReportViewModel(
 
   const isChiHuyLeaf = isChiHuy && childUnits.length === 0;
 
-    const isTrungDoan = capDonVi === "TRUNG_DOAN";
+  const isTrungDoan = capDonVi === "TRUNG_DOAN";
 
-    const ownReport = useMemo(() => {
-      // Trung đoàn: báo cáo riêng CH/e (DON_VI)
-      if (isParentUnit && isTrungDoan) return parentOwnReportData;
-      if (isParentUnit) return parentReportData;
-      return reportData.length > 0 ? reportData[0] : null;
-    }, [
-      isParentUnit,
-      isTrungDoan,
-      parentOwnReportData,
-      parentReportData,
-      reportData,
-    ]);
+  const ownReport = useMemo(() => {
+    // Trung đoàn: báo cáo riêng CH/e (DON_VI)
+    if (isParentUnit && isTrungDoan) return parentOwnReportData;
+    if (isParentUnit) return parentReportData;
+    return reportData.length > 0 ? reportData[0] : null;
+  }, [
+    isParentUnit,
+    isTrungDoan,
+    parentOwnReportData,
+    parentReportData,
+    reportData,
+  ]);
 
-    const commanderReport = useMemo(() => {
-      if (!isChiHuy) return null;
-      if (isParentUnit && isTrungDoan) return parentOwnReportData;
-      if (isParentUnit) return parentReportData;
-      return reportData.length > 0 ? reportData[0] : null;
-    }, [
-      isChiHuy,
-      isParentUnit,
-      isTrungDoan,
-      parentOwnReportData,
-      parentReportData,
-      reportData,
-    ]);
+  const commanderReport = useMemo(() => {
+    if (!isChiHuy) return null;
+    if (isParentUnit && isTrungDoan) return parentOwnReportData;
+    if (isParentUnit) return parentReportData;
+    return reportData.length > 0 ? reportData[0] : null;
+  }, [
+    isChiHuy,
+    isParentUnit,
+    isTrungDoan,
+    parentOwnReportData,
+    parentReportData,
+    reportData,
+  ]);
 
   const canAddReport =
     !shouldHideDraftAndUnsubmitted &&
-    (isChiHuyLeaf || (isTacChien && capDonVi === "SU_DOAN"));
+    (isChiHuyLeaf ||
+      (isTacChien && (capDonVi === "SU_DOAN" || capDonVi === "TRUNG_DOAN")));
 
-const isPastDate = isPastDateForReport();
+  const isPastDate = isPastDateForReport();
 
   const checkIfDateHasReport = hasReportForDate({
     reportDate,
@@ -229,20 +230,20 @@ const isPastDate = isPastDateForReport();
     return null;
   }, [editModalData, reportData, parentReportData]);
 
-const currentEditingDetail = useMemo<DetailStepData | null>(() => {
-  const raw = (currentEditingReport as { tinhHinhHoatDong?: string } | null)
-    ?.tinhHinhHoatDong;
+  const currentEditingDetail = useMemo<DetailStepData | null>(() => {
+    const raw = (currentEditingReport as { tinhHinhHoatDong?: string } | null)
+      ?.tinhHinhHoatDong;
 
-  if (raw) {
-    try {
-      return JSON.parse(raw) as DetailStepData;
-    } catch {
-      // JSON không hợp lệ -> bỏ qua, fallback về editNhiemVuData
+    if (raw) {
+      try {
+        return JSON.parse(raw) as DetailStepData;
+      } catch {
+        // JSON không hợp lệ -> bỏ qua, fallback về editNhiemVuData
+      }
     }
-  }
 
-  return editNhiemVuData;
-}, [currentEditingReport, editNhiemVuData]);
+    return editNhiemVuData;
+  }, [currentEditingReport, editNhiemVuData]);
 
   const nhiemVuEntries = useMemo<NhiemVuEntry[]>(() => {
     const q = query.trim().toLowerCase();
