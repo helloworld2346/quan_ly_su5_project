@@ -8,6 +8,8 @@ import {
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 
+import { useAuth } from "../../context/useAuth";
+
 import PieChart from "../../components/charts/PieChart/PieChart";
 import Skeleton from "../../components/ui/Skeleton/Skeleton";
 import { useMinLoading } from "../../hooks/useMinLoading";
@@ -25,10 +27,19 @@ import DateInputVi from "../../components/ui/DateInputVi/DateInputVi";
 
 type FilterKey = "all" | SubordinateUnitType;
 
-const FILTER_OPTIONS: { key: FilterKey; label: string }[] = [
+type FilterOption = { key: FilterKey; label: string };
+
+const FILTER_OPTIONS_SD: FilterOption[] = [
   { key: "all", label: "Tất cả đơn vị" },
   { key: "department", label: "Phòng" },
   { key: "regiment", label: "Trung đoàn" },
+  { key: "battalion", label: "Tiểu đoàn" },
+  { key: "company", label: "Đại đội" },
+];
+
+const FILTER_OPTIONS_TD: FilterOption[] = [
+  { key: "all", label: "Tất cả đơn vị" },
+  { key: "department", label: "Ban" },
   { key: "battalion", label: "Tiểu đoàn" },
   { key: "company", label: "Đại đội" },
 ];
@@ -116,6 +127,18 @@ export default function ExecutiveDashboard() {
   const [data, setData] = useState<ThongKeQuanSoResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const { account } = useAuth();
+  const capDonVi = account?.donVi?.capDonVi;
+  const isTrungDoan = capDonVi === "TRUNG_DOAN";  
+
+  const filterOptions = isTrungDoan ? FILTER_OPTIONS_TD : FILTER_OPTIONS_SD;
+const capLabel = isTrungDoan ? "Trung đoàn" : "Sư đoàn";
+const capLabelUpper = isTrungDoan ? "TRUNG ĐOÀN" : "SƯ ĐOÀN";
+const tenDonVi = account?.donVi?.tenDonvi ?? capLabel;
+const subordinateTypesText = isTrungDoan
+  ? "ban, tiểu đoàn, đại đội"
+  : "phòng, trung đoàn, tiểu đoàn, đại đội";
 
   const showSkeleton = useMinLoading(loading);
 
@@ -224,7 +247,9 @@ export default function ExecutiveDashboard() {
               ) : (
                 <>
                   {subordinateCount}
-                  <span className={styles.metricPct}>+ 1 toàn SD</span>
+                  <span className={styles.metricPct}>
+                    + 1 toàn {capDonVi === "TRUNG_DOAN" ? "TĐ" : "SD"}
+                  </span>
                 </>
               )}
             </dd>
@@ -326,10 +351,10 @@ export default function ExecutiveDashboard() {
             <div className={styles.chartSectionHead}>
               <div>
                 <h3 className={styles.chartSectionTitle}>
-                  Báo ban quân số toàn Sư đoàn
+                  Báo ban quân số toàn {capLabel}
                 </h3>
                 <p className={styles.chartSectionSubtitle}>
-                  Tổng hợp quân số toàn Sư đoàn 5 - Cập nhật ngày{" "}
+                  Tổng hợp quân số toàn {tenDonVi} - Cập nhật ngày{" "}
                   {data.ngayBaoCao}
                 </p>
               </div>
@@ -391,13 +416,13 @@ export default function ExecutiveDashboard() {
                   size="large"
                   chart={{
                     id: "division",
-                    name: "Toàn Sư đoàn",
+                    name: `Toàn ${capLabel}`,
                     unitType: "regiment",
                     total: data.tongQuanSo,
                     present: data.tongHienDien,
                     absent: data.tongVang,
                   }}
-                  badge="TOÀN SƯ ĐOÀN"
+                  badge={`TOÀN ${capLabelUpper}`}
                 />
               </div>
 
@@ -452,8 +477,7 @@ export default function ExecutiveDashboard() {
                 Thống kê theo đơn vị trực thuộc
               </h3>
               <p className={styles.subSectionDesc}>
-                {subordinateCount} đơn vị — phòng, trung đoàn, tiểu đoàn, đại
-                đội
+                {subordinateCount} đơn vị — {subordinateTypesText}
               </p>
             </div>
 
@@ -466,7 +490,7 @@ export default function ExecutiveDashboard() {
                 role="tablist"
                 aria-label="Lọc loại đơn vị"
               >
-                {FILTER_OPTIONS.map((option) => (
+                {filterOptions.map((option) => (
                   <button
                     key={option.key}
                     type="button"
