@@ -3,12 +3,12 @@ import random
 import requests  
   
 BASE_URL = "http://192.168.2.46:8080/api"      # đổi theo môi trường demo  
-USERNAME = "c3_d7"  
+USERNAME = "dbo_d7"  
 PASSWORD = "1"  
-MA_DON_VI = "GS003.003.005.003"                    # maDonVi đơn vị đang đăng nhập  
+MA_DON_VI = "GS003.003.005.005"                    # maDonVi đơn vị đang đăng nhập  
 NGAY_BAO_CAO = "2026-07-19"                # ngày báo cáo (YYYY-MM-DD)  
-TONG_QUAN_SO = 108                 # tổng quân số biên chế của đơn vị  
-SO_VANG = 40
+TONG_QUAN_SO = 52                 # tổng quân số biên chế của đơn vị  
+SO_VANG = 10
   
 # --- Cặp cấp bậc -> danh sách chức vụ hợp lệ ---  
 # Chiến sĩ / Hạ sĩ quan  

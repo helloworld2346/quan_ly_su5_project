@@ -40,12 +40,15 @@ export const politicalWorkService = {
   getByDonVi: async (
     idDonVi: string,
     ngayLoc: string,
-    loaiDonBaoCao?: LoaiDonBaoCao,
+    loaiDonBaoCao?: "DON_VI" | "TONG_HOP",
   ): Promise<PoliticalWorkSingleResponse> => {
     const response = await api.get<PoliticalWorkSingleResponse>(
       `/ctdangct/search/DonVi/${idDonVi}`,
       {
-        params: loaiDonBaoCao ? { ngayLoc, loaiDonBaoCao } : { ngayLoc },
+        params: {
+          ngayLoc,
+          ...(loaiDonBaoCao ? { loaiDonBaoCao } : {}),
+        },
         skipErrorToast: true,
       },
     );

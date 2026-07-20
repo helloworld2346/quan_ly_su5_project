@@ -144,7 +144,7 @@ export function usePoliticalWorkData({
           const res = await politicalWorkService.getByDonVi(
             maDonViCurrent,
             reportDate,
-            "DON_VI",
+            isTrungDoan ? "TONG_HOP" : "DON_VI",
           );
           if (res.success && res.Result) {
             setReportData([mapItemToRow(res.Result)]);

@@ -35,8 +35,9 @@ export function useReportPermissions<T extends ApprovableRow>(
   }, [commanderReport, isChiHuy]);
 
   const canSubmit = useMemo(() => {
+    const chiHuyLeafCanSubmit = isChiHuyLeaf && selfApprove;
     if (
-      (!isReporter && !selfApprove && !isChiHuyLeaf) ||
+      (!isReporter && !selfApprove && !chiHuyLeafCanSubmit) ||
       !ownReport ||
       ownReport.notSubmitted
     ) {

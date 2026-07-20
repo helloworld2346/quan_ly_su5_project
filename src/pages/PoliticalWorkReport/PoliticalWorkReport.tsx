@@ -100,6 +100,7 @@ export default function PoliticalWorkReport() {
   const userRole = account?.vaiTro?.tenVaiTro;
   const normalizedRole = normalizeRoleName(userRole ?? undefined);
   const isTacChien = normalizedRole === "Trực ban tác chiến";
+  const isChiHuy = normalizedRole === "Trực chỉ huy";
   const isNoiVu = normalizedRole === "Trực ban nội vụ";
   const isAdmin = normalizedRole === "Quản Trị Viên";
 
@@ -167,20 +168,24 @@ export default function PoliticalWorkReport() {
     });
   };
 
+const trungDoanReports = [parentOwnReportData, parentReportData].filter(
+  (r): r is PoliticalWorkRow => Boolean(r),
+);
+
 const reportForSubmit =
   isParentUnit && isTrungDoan
-    ? parentOwnReportData
+    ? (trungDoanReports.find((r) => r.status === "Nháp") ?? null)
     : isParentUnit && parentReportData
       ? parentReportData
-      : ownReport;
+      : ownReport;  
 
   const dutyReportForDisplay =
     isParentUnit && parentReportData ? parentReportData : ownReport;
 
-const commanderReport =
-  isParentUnit && isTrungDoan
-    ? parentOwnReportData
-    : (reportData.find((r) => r.status === "Chờ_Duyệt") ?? null);
+  const commanderReport =
+    isParentUnit && isTrungDoan
+      ? (trungDoanReports.find((r) => r.status === "Chờ_Duyệt") ?? null)
+      : (reportData.find((r) => r.status === "Chờ_Duyệt") ?? null);
 
   const {
     showRefuseDialog,
@@ -314,6 +319,15 @@ const hasOwnReport = isPoliticalOffice
         });
   }, [parentReportData, submitMaDonVi, account]);
 
+  const shouldHideDraftAndUnsubmitted =
+    isChiHuy &&
+    (capDonVi === "TRUNG_DOAN" || capDonVi === "TIEU_DOAN") &&
+    !(
+      (account?.donVi?.kyhieuDonvi ?? "").toLowerCase().includes("ch/e") ||
+      (account?.donVi?.tenDonvi ?? "").toLowerCase().includes("e bộ") ||
+      (account?.donVi?.tenDonvi ?? "").toLowerCase().includes("d bộ")
+    );
+
   const flatRows = useMemo<PoliticalWorkRow[]>(() => {
     if (!isParentUnit) return reportData;
     return [parentRow, ...childRows];
@@ -337,8 +351,13 @@ const hasOwnReport = isPoliticalOffice
       .includes(keyword);
   };
 
-  const filteredChildRows = childRows.filter(matchesQuery);
-  const filteredFlatRows = flatRows.filter(matchesQuery);
+const hideDraft = (rows: PoliticalWorkRow[]) =>
+  shouldHideDraftAndUnsubmitted
+    ? rows.filter((r) => !r.notSubmitted && r.status !== "Nháp")
+    : rows;
+
+const filteredChildRows = hideDraft(childRows.filter(matchesQuery));
+const filteredFlatRows = hideDraft(flatRows.filter(matchesQuery));
 
   const showTwoSections = isParentUnit && !isPoliticalOffice;
 
