@@ -1,4 +1,3 @@
-// src/pages/PoliticalWorkReport/hooks/usePoliticalWorkData.ts
 import { useState, useEffect, useCallback, useRef } from "react";
 import { politicalWorkService } from "../../../services/politicalWork/politicalWorkService";
 import { handleApiError } from "../../../utils/errorHandler";
@@ -131,6 +130,26 @@ export function usePoliticalWorkData({
                 ? mapItemToRow(consRes.Result)
                 : null,
             );
+          } catch {
+            setParentReportData(null);
+          }
+        } else if (isTieuDoan) {
+          setParentOwnReportData(null);
+          try {
+            const consRes = await politicalWorkService.getByDonViCha(
+              ownMaDonVi,
+              reportDate,
+              "TONG_HOP",
+            );
+            const consItem =
+              consRes.success && consRes.Result
+                ? (consRes.Result.find(
+                    (it) => it.donVi.maDonVi === ownMaDonVi,
+                  ) ??
+                  consRes.Result[0] ??
+                  null)
+                : null;
+            setParentReportData(consItem ? mapItemToRow(consItem) : null);
           } catch {
             setParentReportData(null);
           }
