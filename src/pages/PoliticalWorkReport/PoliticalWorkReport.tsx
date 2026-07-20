@@ -215,6 +215,7 @@ export default function PoliticalWorkReport() {
       reportForSubmit,
       commanderReport,
       hasChildren,
+      isDbOrEb,
     );
 
   useEffect(() => {

@@ -7,6 +7,7 @@ export function usePoliticalWorkPermissions(
   ownReport: PoliticalWorkRow | null,
   commanderReport: PoliticalWorkRow | null,
   hasChildren: boolean,
+  isSelfReporter = false,
 ) {
   return useReportPermissions<PoliticalWorkRow>(
     userRole,
@@ -14,5 +15,6 @@ export function usePoliticalWorkPermissions(
     ownReport,
     commanderReport,
     hasChildren,
+    isSelfReporter,
   );
 }

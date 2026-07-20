@@ -12,6 +12,7 @@ export function useReportPermissions<T extends ApprovableRow>(
   ownReport: T | null,
   commanderReport: T | null,
   hasChildren: boolean,
+  isSelfReporter = false,
 ) {
   const normalizedRole = normalizeRoleName(userRole ?? undefined);
   const isChiHuy = normalizedRole === "Trực chỉ huy";
@@ -34,24 +35,31 @@ export function useReportPermissions<T extends ApprovableRow>(
     return isChiHuy && commanderReport.status === "Chờ_Duyệt";
   }, [commanderReport, isChiHuy]);
 
-  const canSubmit = useMemo(() => {
-    const chiHuyLeafCanSubmit = isChiHuyLeaf && selfApprove;
-    if (
-      (!isReporter && !selfApprove && !chiHuyLeafCanSubmit) ||
-      !ownReport ||
-      ownReport.notSubmitted
-    ) {
-      return false;
-    }
-    return ownReport.status === "Nháp";
-  }, [isReporter, selfApprove, isChiHuyLeaf, ownReport]);
+    const canSubmit = useMemo(() => {
+      const chiHuyLeafCanSubmit = isChiHuyLeaf && selfApprove;
+      if (
+        (!isReporter &&
+          !selfApprove &&
+          !chiHuyLeafCanSubmit &&
+          !isSelfReporter) ||
+        !ownReport ||
+        ownReport.notSubmitted
+      ) {
+        return false;
+      }
+      return ownReport.status === "Nháp";
+    }, [isReporter, selfApprove, isChiHuyLeaf, isSelfReporter, ownReport]);
 
-  const canRecall = useMemo(() => {
-    if ((!isReporter && !selfApprove) || !ownReport || ownReport.notSubmitted) {
-      return false;
-    }
-    return ownReport.status === "Chờ_Duyệt";
-  }, [isReporter, selfApprove, ownReport]);
+    const canRecall = useMemo(() => {
+      if (
+        (!isReporter && !selfApprove && !isSelfReporter) ||
+        !ownReport ||
+        ownReport.notSubmitted
+      ) {
+        return false;
+      }
+      return ownReport.status === "Chờ_Duyệt";
+    }, [isReporter, selfApprove, isSelfReporter, ownReport]);
 
   return {
     isChiHuy,
