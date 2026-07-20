@@ -3,7 +3,10 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { politicalWorkService } from "../../../services/politicalWork/politicalWorkService";
 import { handleApiError } from "../../../utils/errorHandler";
 import { mapItemToRow } from "../utils/politicalWorkUtils";
-import type { PoliticalWorkRow } from "../../../types/politicalWork";
+import type {
+  PoliticalWorkRow,
+  PoliticalWorkItem,
+} from "../../../types/politicalWork";
 import { useReportDataChangedListener } from "../../../shared/report/hooks/useReportDataChangedListener";
 import { useInitialFetch } from "../../../shared/report/hooks/useInitialFetch";
 import { useChildUnits } from "../../../shared/report/hooks/useChildUnits";
@@ -12,7 +15,6 @@ export function usePoliticalWorkData({
   maDonViCurrent,
   isParentUnit,
   isTrungDoan,
-  isTieuDoan,
   capDonVi,
   reportDate,
   showError,
@@ -23,7 +25,6 @@ export function usePoliticalWorkData({
   isParentUnit: boolean;
   capDonVi?: string | null;
   isTrungDoan?: boolean;
-  isTieuDoan?: boolean;
   reportDate: string;
   showError: (msg: string) => void;
   submitMaDonVi?: string;
@@ -54,15 +55,45 @@ export function usePoliticalWorkData({
     setLoading(true);
     try {
       if (isParentUnit) {
-        const res = await politicalWorkService.getByDonViCha(
-          maDonViCurrent,
-          reportDate,
-          isSuDoan ? "TONG_HOP" : "DON_VI",
-        );
-        if (res.success && res.Result) {
-          setReportData(res.Result.map((item) => mapItemToRow(item)));
+        if (isTrungDoan) {
+          // trung đoàn: đại đội/ban -> DON_VI, tiểu đoàn -> TONG_HOP, gộp lại
+          const [donViRes, tongHopRes] = await Promise.all([
+            politicalWorkService.getByDonViCha(
+              maDonViCurrent,
+              reportDate,
+              "DON_VI",
+            ),
+            politicalWorkService.getByDonViCha(
+              maDonViCurrent,
+              reportDate,
+              "TONG_HOP",
+            ),
+          ]);
+
+          const merged = new Map<string, PoliticalWorkItem>();
+          if (donViRes.success && donViRes.Result) {
+            for (const item of donViRes.Result) {
+              merged.set(item.donVi.maDonVi, item);
+            }
+          }
+          if (tongHopRes.success && tongHopRes.Result) {
+            for (const item of tongHopRes.Result) {
+              merged.set(item.donVi.maDonVi, item);
+            }
+          }
+          setReportData(Array.from(merged.values()).map(mapItemToRow));
         } else {
-          setReportData([]);
+          // sư đoàn: con là trung đoàn/tiểu đoàn -> TONG_HOP; cấp khác -> DON_VI
+          const res = await politicalWorkService.getByDonViCha(
+            maDonViCurrent,
+            reportDate,
+            isSuDoan ? "TONG_HOP" : "DON_VI",
+          );
+          if (res.success && res.Result) {
+            setReportData(res.Result.map((item) => mapItemToRow(item)));
+          } else {
+            setReportData([]);
+          }
         }
 
         const ownMaDonVi = submitMaDonVi ?? maDonViCurrent;
@@ -85,23 +116,6 @@ export function usePoliticalWorkData({
           }
 
           // e4 - báo cáo tổng hợp TONG_HOP
-          try {
-            const consRes = await politicalWorkService.getByDonVi(
-              maDonViCurrent,
-              reportDate,
-              "TONG_HOP",
-            );
-            setParentReportData(
-              consRes.success && consRes.Result
-                ? mapItemToRow(consRes.Result)
-                : null,
-            );
-          } catch {
-            setParentReportData(null);
-          }
-        } else if (isTieuDoan) {
-          // Tiểu đoàn: không có CH/e riêng, chỉ có báo cáo tổng hợp TONG_HOP
-          setParentOwnReportData(null);
           try {
             const consRes = await politicalWorkService.getByDonVi(
               maDonViCurrent,
@@ -167,7 +181,7 @@ export function usePoliticalWorkData({
           const res = await politicalWorkService.getByDonVi(
             maDonViCurrent,
             reportDate,
-            isTrungDoan || isTieuDoan ? "TONG_HOP" : "DON_VI",
+            isTrungDoan ? "TONG_HOP" : "DON_VI",
           );
           if (res.success && res.Result) {
             setReportData([mapItemToRow(res.Result)]);
@@ -191,7 +205,6 @@ export function usePoliticalWorkData({
     maDonViCurrent,
     isParentUnit,
     isTrungDoan,
-    isTieuDoan,
     isSuDoan,
     reportDate,
     submitMaDonVi,

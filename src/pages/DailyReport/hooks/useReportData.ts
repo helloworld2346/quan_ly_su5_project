@@ -7,6 +7,7 @@ import type {
   AbsentRow,
   VangChiTiet,
   ReportRow,
+  ReportItemInput,
 } from "../../../types/dailyReport";
 import type { CaTrucDetail } from "../../../types/duty";
 import { generateId } from "../../../utils/uuid";
@@ -65,12 +66,47 @@ export function useReportData({
       let response;
       if (isParentUnit) {
         // danh sách báo cáo các đơn vị con
-        // sư đoàn: nhận báo cáo TONG_HOP của trung đoàn/tiểu đoàn; cấp khác: DON_VI
-        response = await dailyReportService.searchChildrenReports(
-          maDonViCurrent,
-          reportDate,
-          isSuDoan ? "TONG_HOP" : "DON_VI",
-        );
+        if (isTrungDoan) {
+          // trung đoàn: đại đội/ban -> DON_VI, tiểu đoàn -> TONG_HOP, gộp lại
+          const [donViRes, tongHopRes] = await Promise.all([
+            dailyReportService.searchChildrenReports(
+              maDonViCurrent,
+              reportDate,
+              "DON_VI",
+            ),
+            dailyReportService.searchChildrenReports(
+              maDonViCurrent,
+              reportDate,
+              "TONG_HOP",
+            ),
+          ]);
+
+          const merged = new Map<string, ReportItemInput>();
+          if (donViRes.success && donViRes.Result) {
+            for (const item of donViRes.Result) {
+              merged.set(item.donVi.maDonVi, item);
+            }
+          }
+          if (tongHopRes.success && tongHopRes.Result) {
+            // TONG_HOP (tiểu đoàn) ghi đè nếu trùng đơn vị
+            for (const item of tongHopRes.Result) {
+              merged.set(item.donVi.maDonVi, item);
+            }
+          }
+
+          response = {
+            ...donViRes,
+            success: donViRes.success || tongHopRes.success,
+            Result: Array.from(merged.values()),
+          };
+        } else {
+          // sư đoàn: con là trung đoàn/tiểu đoàn -> TONG_HOP; cấp khác -> DON_VI
+          response = await dailyReportService.searchChildrenReports(
+            maDonViCurrent,
+            reportDate,
+            isSuDoan ? "TONG_HOP" : "DON_VI",
+          );
+        }
 
         // báo cáo DON_VI của chính đơn vị cha: CH/e (trung đoàn) / CH/f (sư đoàn)
         try {
