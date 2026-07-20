@@ -19,6 +19,7 @@ export type { ReportRow };
 export function useReportData({
   maDonViCurrent,
   isParentUnit,
+  isChiHuy,
   capDonVi,
   reportDate,
   showError,
@@ -50,7 +51,7 @@ export function useReportData({
 
   const isTrungDoan = capDonVi === "TRUNG_DOAN";
   const isSuDoan = capDonVi === "SU_DOAN";
-
+  const isTieuDoan = capDonVi === "TIEU_DOAN";
 
   const showErrorRef = useRef(showError);
   useEffect(() => {
@@ -87,8 +88,8 @@ export function useReportData({
           setParentOwnReportData(null);
         }
 
-        // báo cáo TONG_HOP (e4) - chỉ trung đoàn
-        if (isTrungDoan) {
+        // báo cáo TONG_HOP (e4) - trung đoàn và tiểu đoàn
+        if (isTrungDoan || isTieuDoan) {
           try {
             const consRes = await dailyReportService.searchReportByUnitAndDate(
               maDonViCurrent,
@@ -107,10 +108,12 @@ export function useReportData({
           setParentReportData(null);
         }
       } else {
+        const loaiChiHuy =
+          isChiHuy && (isTrungDoan || isTieuDoan) ? "TONG_HOP" : "DON_VI";
         response = await dailyReportService.searchReportByUnitAndDate(
           maDonViCurrent,
           reportDate,
-          "DON_VI",
+          loaiChiHuy,
         );
         setParentReportData(null);
         setParentOwnReportData(null);
@@ -133,7 +136,15 @@ export function useReportData({
     } finally {
       setLoading(false);
     }
-  }, [maDonViCurrent, isParentUnit, isTrungDoan, isSuDoan, reportDate]);
+  }, [
+    maDonViCurrent,
+    isParentUnit,
+    isChiHuy,
+    isSuDoan,
+    isTrungDoan,
+    isTieuDoan,
+    reportDate,
+  ]);
 
   useInitialFetch(fetchReports);
   useReportDataChangedListener(fetchReports);

@@ -104,6 +104,7 @@ export default function DailyTroopReport() {
       (isNoiVu && capDonVi === "TIEU_DOAN"),
     isTacChien,
     isChiHuy,
+    capDonVi,
     reportDate,
     showError,
   });
