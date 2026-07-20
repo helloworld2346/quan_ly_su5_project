@@ -40,11 +40,14 @@ export const politicalWorkService = {
   getByDonVi: async (
     idDonVi: string,
     ngayLoc: string,
-    loaiDonBaoCao: LoaiDonBaoCao = "DON_VI",
+    loaiDonBaoCao?: LoaiDonBaoCao,
   ): Promise<PoliticalWorkSingleResponse> => {
     const response = await api.get<PoliticalWorkSingleResponse>(
       `/ctdangct/search/DonVi/${idDonVi}`,
-      { params: { ngayLoc, loaiDonBaoCao }, skipErrorToast: true },
+      {
+        params: loaiDonBaoCao ? { ngayLoc, loaiDonBaoCao } : { ngayLoc },
+        skipErrorToast: true,
+      },
     );
     return response.data;
   },
@@ -52,11 +55,11 @@ export const politicalWorkService = {
   getByDonViCha: async (
     idDonVi: string,
     ngayLoc: string,
-    loaiDonBaoCao: LoaiDonBaoCao = "DON_VI",
+    loaiDonBaoCao?: LoaiDonBaoCao,
   ): Promise<PoliticalWorkListResponse> => {
     const response = await api.get<PoliticalWorkListResponse>(
       `/ctdangct/search/DonVi/${idDonVi}/children`,
-      { params: { ngayLoc, loaiDonBaoCao } },
+      { params: loaiDonBaoCao ? { ngayLoc, loaiDonBaoCao } : { ngayLoc } },
     );
     return response.data;
   },

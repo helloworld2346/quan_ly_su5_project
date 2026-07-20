@@ -10,7 +10,7 @@ import { useChildUnits } from "../../../shared/report/hooks/useChildUnits";
 export function usePoliticalWorkData({
   maDonViCurrent,
   isParentUnit,
-  capDonVi,
+  isTrungDoan,
   reportDate,
   showError,
   submitMaDonVi,
@@ -18,17 +18,17 @@ export function usePoliticalWorkData({
 }: {
   maDonViCurrent: string | undefined;
   isParentUnit: boolean;
-  capDonVi?: string | null;
+  isTrungDoan?: boolean;
   reportDate: string;
   showError: (msg: string) => void;
   submitMaDonVi?: string;
   fetchPctDuty?: boolean;
 }) {
   const [reportData, setReportData] = useState<PoliticalWorkRow[]>([]);
-  // e4 (TONG_HOP)
+  // e4 (TONG_HOP) - báo cáo tổng hợp
   const [parentReportData, setParentReportData] =
     useState<PoliticalWorkRow | null>(null);
-  // CH/e (DON_VI của chính đơn vị cha)
+  // CH/e (DON_VI của chính trung đoàn)
   const [parentOwnReportData, setParentOwnReportData] =
     useState<PoliticalWorkRow | null>(null);
   const [loading, setLoading] = useState(false);
@@ -36,8 +36,6 @@ export function usePoliticalWorkData({
   const [dutyReport, setDutyReport] = useState<PoliticalWorkRow | null>(null);
 
   const { childUnits } = useChildUnits(maDonViCurrent, isParentUnit);
-
-  const isTrungDoan = capDonVi === "TRUNG_DOAN";
 
   const showErrorRef = useRef(showError);
   useEffect(() => {
@@ -61,25 +59,26 @@ export function usePoliticalWorkData({
           setReportData([]);
         }
 
-        // báo cáo DON_VI của chính đơn vị cha: CH/e (trung đoàn) / CH/f (sư đoàn)
         const ownMaDonVi = submitMaDonVi ?? maDonViCurrent;
-        try {
-          const ownRes = await politicalWorkService.getByDonVi(
-            ownMaDonVi,
-            reportDate,
-            "DON_VI",
-          );
-          setParentOwnReportData(
-            ownRes.success && ownRes.Result
-              ? mapItemToRow(ownRes.Result)
-              : null,
-          );
-        } catch {
-          setParentOwnReportData(null);
-        }
 
-        // báo cáo TONG_HOP (e4) - chỉ trung đoàn
         if (isTrungDoan) {
+          // CH/e - báo cáo DON_VI của chính trung đoàn
+          try {
+            const ownRes = await politicalWorkService.getByDonVi(
+              ownMaDonVi,
+              reportDate,
+              "DON_VI",
+            );
+            setParentOwnReportData(
+              ownRes.success && ownRes.Result
+                ? mapItemToRow(ownRes.Result)
+                : null,
+            );
+          } catch {
+            setParentOwnReportData(null);
+          }
+
+          // e4 - báo cáo tổng hợp TONG_HOP
           try {
             const consRes = await politicalWorkService.getByDonVi(
               maDonViCurrent,
@@ -95,7 +94,21 @@ export function usePoliticalWorkData({
             setParentReportData(null);
           }
         } else {
-          setParentReportData(null);
+          // sư đoàn / phòng chính trị: giữ nguyên hành vi cũ
+          setParentOwnReportData(null);
+          try {
+            const ownRes = await politicalWorkService.getByDonVi(
+              ownMaDonVi,
+              reportDate,
+            );
+            if (ownRes.success && ownRes.Result) {
+              setParentReportData(mapItemToRow(ownRes.Result));
+            } else {
+              setParentReportData(null);
+            }
+          } catch {
+            setParentReportData(null);
+          }
         }
 
         if (fetchPctDuty) {
@@ -109,7 +122,6 @@ export function usePoliticalWorkData({
               const pctRes = await politicalWorkService.getByDonVi(
                 pctUnit.maDonVi,
                 reportDate,
-                "DON_VI",
               );
               setDutyReport(
                 pctRes.success && pctRes.Result
@@ -128,7 +140,6 @@ export function usePoliticalWorkData({
       } else {
         setParentReportData(null);
         setParentOwnReportData(null);
-        setDutyReport(null);
         try {
           const res = await politicalWorkService.getByDonVi(
             maDonViCurrent,

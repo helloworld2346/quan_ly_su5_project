@@ -136,6 +136,7 @@ export default function PoliticalWorkReport() {
   } = usePoliticalWorkData({
     maDonViCurrent: viewMaDonVi,
     isParentUnit,
+    isTrungDoan,
     showError,
     reportDate,
     submitMaDonVi: isPoliticalOffice ? submitMaDonVi : undefined,
@@ -166,14 +167,20 @@ export default function PoliticalWorkReport() {
     });
   };
 
-  const reportForSubmit =
-    isParentUnit && parentReportData ? parentReportData : ownReport;
+const reportForSubmit =
+  isParentUnit && isTrungDoan
+    ? parentOwnReportData
+    : isParentUnit && parentReportData
+      ? parentReportData
+      : ownReport;
 
   const dutyReportForDisplay =
     isParentUnit && parentReportData ? parentReportData : ownReport;
 
-  const commanderReport =
-    reportData.find((r) => r.status === "Chờ_Duyệt") ?? null;
+const commanderReport =
+  isParentUnit && isTrungDoan
+    ? parentOwnReportData
+    : (reportData.find((r) => r.status === "Chờ_Duyệt") ?? null);
 
   const {
     showRefuseDialog,
@@ -218,13 +225,9 @@ export default function PoliticalWorkReport() {
   const childRows = useMemo<PoliticalWorkRow[]>(() => {
     if (!isParentUnit) return [];
 
-    const trungDoanOwnRow: PoliticalWorkRow[] =
-      isTrungDoan && parentOwnReportData
-        ? [{ ...parentOwnReportData, kyhieuDonVi: "CH/e", notSubmitted: false }]
-        : [];
-
     const rows = (childUnits ?? [])
       .filter((unit) => !isPoliticalOffice || unit.maDonVi !== submitMaDonVi)
+      .filter((unit) => unit.kyhieuDonvi !== "CH/e")
       .map((unit) => {
         const matched = reportData.find((r) => r.donVi === unit.maDonVi);
         if (matched) return { ...matched, notSubmitted: false };
@@ -235,15 +238,28 @@ export default function PoliticalWorkReport() {
         });
       });
 
-    return [...trungDoanOwnRow, ...rows];
+    if (isTrungDoan) {
+      const cheRow: PoliticalWorkRow = parentOwnReportData
+        ? { ...parentOwnReportData, kyhieuDonVi: "CH/e", notSubmitted: false }
+        : createEmptyPoliticalWorkRow({
+            maDonVi: viewMaDonVi ?? "",
+            tenDonVi: account?.donVi?.tenDonvi ?? "",
+            kyhieuDonVi: "CH/e",
+          });
+      return [cheRow, ...rows];
+    }
+
+    return rows;
   }, [
     isParentUnit,
     isTrungDoan,
-    parentOwnReportData,
     childUnits,
     reportData,
+    parentOwnReportData,
     isPoliticalOffice,
     submitMaDonVi,
+    viewMaDonVi,
+    account?.donVi?.tenDonvi,
   ]);
 
   const approvedChildRows = useMemo(() => {
@@ -257,7 +273,6 @@ export default function PoliticalWorkReport() {
     isParentUnit && !parentReportData && approvedChildRows.length > 0;
 
   const isPastDate = false;
-
 
 const hasOwnReport = isPoliticalOffice
   ? Boolean(parentReportData)
@@ -542,7 +557,10 @@ const hasOwnReport = isPoliticalOffice
         showExport={canExportExcel}
         onExportExcel={handleExportExcel}
         onAddReport={
-          (!isParentUnit || canAddOwnReport || isPoliticalOffice) &&
+          (!isParentUnit ||
+            canAddOwnReport ||
+            isPoliticalOffice ||
+            isTrungDoan) &&
           !hasOwnReport
             ? handleAddReport
             : undefined
