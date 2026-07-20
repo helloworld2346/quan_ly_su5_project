@@ -138,6 +138,7 @@ export default function PoliticalWorkReport() {
     maDonViCurrent: viewMaDonVi,
     isParentUnit,
     isTrungDoan,
+    capDonVi,
     showError,
     reportDate,
     submitMaDonVi: isPoliticalOffice ? submitMaDonVi : undefined,

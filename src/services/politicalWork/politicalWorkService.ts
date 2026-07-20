@@ -6,7 +6,6 @@ import type {
   PoliticalWorkSingleResponse,
   PoliticalWorkListResponse,
 } from "../../types/politicalWork";
-import type { LoaiDonBaoCao } from "../../types/dailyReport";
 
 export const politicalWorkService = {
   createReport: async (
@@ -58,11 +57,11 @@ export const politicalWorkService = {
   getByDonViCha: async (
     idDonVi: string,
     ngayLoc: string,
-    loaiDonBaoCao?: LoaiDonBaoCao,
+    loaiDonBaoCao?: "DON_VI" | "TONG_HOP",
   ): Promise<PoliticalWorkListResponse> => {
     const response = await api.get<PoliticalWorkListResponse>(
       `/ctdangct/search/DonVi/${idDonVi}/children`,
-      { params: loaiDonBaoCao ? { ngayLoc, loaiDonBaoCao } : { ngayLoc } },
+      { params: { ngayLoc, ...(loaiDonBaoCao ? { loaiDonBaoCao } : {}) } },
     );
     return response.data;
   },

@@ -11,6 +11,7 @@ export function usePoliticalWorkData({
   maDonViCurrent,
   isParentUnit,
   isTrungDoan,
+  capDonVi,
   reportDate,
   showError,
   submitMaDonVi,
@@ -18,6 +19,7 @@ export function usePoliticalWorkData({
 }: {
   maDonViCurrent: string | undefined;
   isParentUnit: boolean;
+  capDonVi?: string | null;
   isTrungDoan?: boolean;
   reportDate: string;
   showError: (msg: string) => void;
@@ -42,16 +44,17 @@ export function usePoliticalWorkData({
     showErrorRef.current = showError;
   }, [showError]);
 
+  const isSuDoan = capDonVi === "SU_DOAN";
+
   const fetchReports = useCallback(async () => {
     if (!maDonViCurrent) return;
     setLoading(true);
     try {
       if (isParentUnit) {
-        // danh sách báo cáo các đơn vị con (chỉ DON_VI)
         const res = await politicalWorkService.getByDonViCha(
           maDonViCurrent,
           reportDate,
-          "DON_VI",
+          isSuDoan ? "TONG_HOP" : "DON_VI",
         );
         if (res.success && res.Result) {
           setReportData(res.Result.map((item) => mapItemToRow(item)));
@@ -168,6 +171,7 @@ export function usePoliticalWorkData({
     maDonViCurrent,
     isParentUnit,
     isTrungDoan,
+    isSuDoan,
     reportDate,
     submitMaDonVi,
     childUnits,

@@ -49,6 +49,8 @@ export function useReportData({
   const donViQuanSoTong = currentUnit?.quanSoTong ?? 0;
 
   const isTrungDoan = capDonVi === "TRUNG_DOAN";
+  const isSuDoan = capDonVi === "SU_DOAN";
+
 
   const showErrorRef = useRef(showError);
   useEffect(() => {
@@ -61,11 +63,12 @@ export function useReportData({
     try {
       let response;
       if (isParentUnit) {
-        // danh sách báo cáo các đơn vị con (chỉ DON_VI)
+        // danh sách báo cáo các đơn vị con
+        // sư đoàn: nhận báo cáo TONG_HOP của trung đoàn/tiểu đoàn; cấp khác: DON_VI
         response = await dailyReportService.searchChildrenReports(
           maDonViCurrent,
           reportDate,
-          "DON_VI",
+          isSuDoan ? "TONG_HOP" : "DON_VI",
         );
 
         // báo cáo DON_VI của chính đơn vị cha: CH/e (trung đoàn) / CH/f (sư đoàn)
@@ -130,7 +133,7 @@ export function useReportData({
     } finally {
       setLoading(false);
     }
-  }, [maDonViCurrent, isParentUnit, isTrungDoan, reportDate]);
+  }, [maDonViCurrent, isParentUnit, isTrungDoan, isSuDoan, reportDate]);
 
   useInitialFetch(fetchReports);
   useReportDataChangedListener(fetchReports);
