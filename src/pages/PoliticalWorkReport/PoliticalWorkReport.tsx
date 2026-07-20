@@ -10,7 +10,7 @@ import {
   faEllipsisVertical,
   faPenToSquare,
 } from "@fortawesome/free-solid-svg-icons";
-
+import { shouldHideDraftAndUnsubmittedForCommander } from "../DailyReport/utils/dailyTroopReportVisibility";
 import ReportToolbar from "../../components/report/ReportToolbar";
 import ReportStatusBadge from "../../components/ui/ReportStatusBadge/ReportStatusBadge";
 import RefuseDialog from "../../components/ui/RefuseDialog/RefuseDialog";
@@ -323,13 +323,11 @@ export default function PoliticalWorkReport() {
   }, [parentReportData, submitMaDonVi, account]);
 
   const shouldHideDraftAndUnsubmitted =
-    isChiHuy &&
-    (capDonVi === "TRUNG_DOAN" || capDonVi === "TIEU_DOAN") &&
-    !(
-      (account?.donVi?.kyhieuDonvi ?? "").toLowerCase().includes("ch/e") ||
-      (account?.donVi?.tenDonvi ?? "").toLowerCase().includes("e bộ") ||
-      (account?.donVi?.tenDonvi ?? "").toLowerCase().includes("d bộ")
-    );
+    shouldHideDraftAndUnsubmittedForCommander({
+      isChiHuy,
+      capDonVi,
+      accountDonVi: account?.donVi,
+    });
 
   const flatRows = useMemo<PoliticalWorkRow[]>(() => {
     if (!isParentUnit) return reportData;
@@ -584,7 +582,7 @@ export default function PoliticalWorkReport() {
             isPoliticalOffice ||
             isTrungDoan) &&
           !hasOwnReport &&
-          !(isChiHuy && (isTrungDoan || isTieuDoan))
+          !shouldHideDraftAndUnsubmitted
             ? handleAddReport
             : undefined
         }
