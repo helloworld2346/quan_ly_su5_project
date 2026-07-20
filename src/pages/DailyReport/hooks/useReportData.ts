@@ -203,7 +203,14 @@ export function useReportData({
 
   const consolidatedData = useMemo(() => {
     if (!isParentUnit || reportData.length === 0) return null;
-    const submittedReports = reportData.filter(
+
+    // Trung đoàn: gộp thêm báo cáo DON_VI của chính trung đoàn (CH/e)
+    const allReports =
+      isTrungDoan && parentOwnReportData
+        ? [...reportData, parentOwnReportData]
+        : reportData;
+
+    const submittedReports = allReports.filter(
       (r) => r.status !== "Chưa_Nộp" && r.status !== "Chưa nộp",
     );
     const quanSoTong = submittedReports.reduce(
@@ -234,9 +241,9 @@ export function useReportData({
       thongTinVang,
       absentRows,
       submittedCount: submittedReports.length,
-      totalCount: reportData.length,
+      totalCount: allReports.length,
     };
-  }, [isParentUnit, reportData]);
+  }, [isParentUnit, isTrungDoan, parentOwnReportData, reportData]);
 
   return {
     reportData,

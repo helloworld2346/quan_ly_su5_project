@@ -284,9 +284,12 @@ export default function PoliticalWorkReport() {
     );
   }, [childRows]);
 
-  const totalRequiredCount = childUnits.length;
+  const totalRequiredCount = childRows.length;
   const canConsolidate =
-    isParentUnit && !parentReportData && approvedChildRows.length > 0;
+    isParentUnit &&
+    !parentReportData &&
+    totalRequiredCount > 0 &&
+    approvedChildRows.length === totalRequiredCount;
 
   const isPastDate = false;
 

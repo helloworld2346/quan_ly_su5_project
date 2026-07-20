@@ -340,7 +340,9 @@ export function useDailyTroopReportViewModel(
     nhiemVuEntries,
     shouldHideConsolidatedSections,
     showTotalRow,
-    totalRequiredCount: childUnits.length,
+    totalRequiredCount:
+      childUnits.filter((u) => u.kyhieuDonvi !== "CH/e").length +
+      (isTrungDoan ? 1 : 0),
     consolidatedData,
   };
 }
