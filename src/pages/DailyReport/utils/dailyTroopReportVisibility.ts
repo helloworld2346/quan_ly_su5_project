@@ -5,7 +5,7 @@ type AccountDonVi = {
   kyhieuDonvi?: string;
 };
 
-function isDbOrEbUnit(accountDonVi?: AccountDonVi): boolean {
+export function isDbOrEbUnit(accountDonVi?: AccountDonVi): boolean {
   const normalizedUnitName = (accountDonVi?.tenDonvi ?? "").toLowerCase();
   const normalizedUnitSymbol = (accountDonVi?.kyhieuDonvi ?? "").toLowerCase();
 

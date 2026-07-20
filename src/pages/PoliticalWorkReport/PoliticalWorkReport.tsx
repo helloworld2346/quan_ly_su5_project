@@ -18,10 +18,15 @@ import CreateReport from "./CreateReport";
 import PoliticalWorkDetailModal from "./PoliticalWorkDetailModal";
 import styles from "./PoliticalWorkReport.module.css";
 
+import { isDbOrEbUnit } from "../DailyReport/utils/dailyTroopReportVisibility";
 import { useAuth } from "../../context/useAuth";
 import { useToast } from "../../context/useToast";
 import { handleApiError } from "../../utils/errorHandler";
-import { todayIsoDate, normalizeRoleName, normalizeUnitName } from "../../utils/reportUtils";
+import {
+  todayIsoDate,
+  normalizeRoleName,
+  normalizeUnitName,
+} from "../../utils/reportUtils";
 import { politicalWorkService } from "../../services/politicalWork/politicalWorkService";
 
 import { usePoliticalWorkData } from "./hooks/usePoliticalWorkData";
@@ -126,6 +131,7 @@ export default function PoliticalWorkReport() {
   const canAddOwnReport = isTacChienSuDoan || isAdmin || isPoliticalOffice;
 
   const canExportExcel = isTacChienSuDoan;
+  const isDbOrEb = isDbOrEbUnit(account?.donVi);
 
   const {
     reportData,
@@ -140,6 +146,7 @@ export default function PoliticalWorkReport() {
     isParentUnit,
     isTrungDoan,
     isTieuDoan,
+    isDbOrEb,
     capDonVi,
     showError,
     reportDate,

@@ -16,6 +16,7 @@ export function usePoliticalWorkData({
   isParentUnit,
   isTrungDoan,
   isTieuDoan,
+  isDbOrEb,
   capDonVi,
   reportDate,
   showError,
@@ -27,6 +28,7 @@ export function usePoliticalWorkData({
   capDonVi?: string | null;
   isTrungDoan?: boolean;
   isTieuDoan?: boolean;
+  isDbOrEb?: boolean;
   reportDate: string;
   showError: (msg: string) => void;
   submitMaDonVi?: string;
@@ -183,7 +185,7 @@ export function usePoliticalWorkData({
           const res = await politicalWorkService.getByDonVi(
             maDonViCurrent,
             reportDate,
-            isTrungDoan || isTieuDoan ? "TONG_HOP" : "DON_VI",
+            (isTrungDoan || isTieuDoan) && !isDbOrEb ? "TONG_HOP" : "DON_VI",
           );
           if (res.success && res.Result) {
             setReportData([mapItemToRow(res.Result)]);
@@ -209,6 +211,7 @@ export function usePoliticalWorkData({
     isTrungDoan,
     isSuDoan,
     isTieuDoan,
+    isDbOrEb,
     reportDate,
     submitMaDonVi,
     childUnits,
