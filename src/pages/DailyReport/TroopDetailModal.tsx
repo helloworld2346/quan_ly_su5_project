@@ -74,7 +74,7 @@ export default function TroopDetailModal({
       title="Chi tiết quân số vắng"
       subHeader={
         <div className={styles.subHeaderArea}>
-         <span className={styles.unitName}>{normalizeUnitName(unit)}</span>
+          <span className={styles.unitName}>{normalizeUnitName(unit)}</span>
           {status && (
             <span className={styles.statusWrap}>
               <ReportStatusBadge status={status} />
@@ -167,6 +167,7 @@ export default function TroopDetailModal({
                     <th>Cấp bậc</th>
                     <th>Chức vụ</th>
                     <th>Lý do vắng</th>
+                    <th>Ghi chú chi tiết</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -174,10 +175,13 @@ export default function TroopDetailModal({
                     <tr key={m.id || i}>
                       <td>{i + 1}</td>
                       <td className={styles.nameCell}>{m.name}</td>
-                      {showUnitColumn && <td>{normalizeUnitName(m.unitName) || "—"}</td>}
+                      {showUnitColumn && (
+                        <td>{normalizeUnitName(m.unitName) || "—"}</td>
+                      )}
                       <td>{m.rank}</td>
                       <td>{m.position}</td>
                       <td>{LY_DO_VANG_MAP[m.reason] || m.reason}</td>
+                      <td>{m.note || "—"}</td>
                     </tr>
                   ))}
                 </tbody>

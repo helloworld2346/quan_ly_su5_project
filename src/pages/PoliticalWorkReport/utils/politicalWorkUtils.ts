@@ -17,6 +17,7 @@ export function mapItemToRow(item: PoliticalWorkItem): PoliticalWorkRow {
     kienNghi: item.kienNghi ?? "",
     status: item.status,
     ghiChu: (item.ghiChu ?? "") || "",
+    loaiDonBaoCao: item.loaiDonBaoCao,
     rawItem: item,
   };
 }

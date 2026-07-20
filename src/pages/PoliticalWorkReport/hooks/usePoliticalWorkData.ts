@@ -10,6 +10,7 @@ import { useChildUnits } from "../../../shared/report/hooks/useChildUnits";
 export function usePoliticalWorkData({
   maDonViCurrent,
   isParentUnit,
+  capDonVi,
   reportDate,
   showError,
   submitMaDonVi,
@@ -17,19 +18,26 @@ export function usePoliticalWorkData({
 }: {
   maDonViCurrent: string | undefined;
   isParentUnit: boolean;
+  capDonVi?: string | null;
   reportDate: string;
   showError: (msg: string) => void;
   submitMaDonVi?: string;
   fetchPctDuty?: boolean;
 }) {
   const [reportData, setReportData] = useState<PoliticalWorkRow[]>([]);
+  // e4 (TONG_HOP)
   const [parentReportData, setParentReportData] =
+    useState<PoliticalWorkRow | null>(null);
+  // CH/e (DON_VI của chính đơn vị cha)
+  const [parentOwnReportData, setParentOwnReportData] =
     useState<PoliticalWorkRow | null>(null);
   const [loading, setLoading] = useState(false);
 
   const [dutyReport, setDutyReport] = useState<PoliticalWorkRow | null>(null);
 
   const { childUnits } = useChildUnits(maDonViCurrent, isParentUnit);
+
+  const isTrungDoan = capDonVi === "TRUNG_DOAN";
 
   const showErrorRef = useRef(showError);
   useEffect(() => {
@@ -41,9 +49,11 @@ export function usePoliticalWorkData({
     setLoading(true);
     try {
       if (isParentUnit) {
+        // danh sách báo cáo các đơn vị con (chỉ DON_VI)
         const res = await politicalWorkService.getByDonViCha(
           maDonViCurrent,
           reportDate,
+          "DON_VI",
         );
         if (res.success && res.Result) {
           setReportData(res.Result.map((item) => mapItemToRow(item)));
@@ -51,20 +61,43 @@ export function usePoliticalWorkData({
           setReportData([]);
         }
 
+        // báo cáo DON_VI của chính đơn vị cha: CH/e (trung đoàn) / CH/f (sư đoàn)
         const ownMaDonVi = submitMaDonVi ?? maDonViCurrent;
         try {
           const ownRes = await politicalWorkService.getByDonVi(
             ownMaDonVi,
             reportDate,
+            "DON_VI",
           );
-          if (ownRes.success && ownRes.Result) {
-            setParentReportData(mapItemToRow(ownRes.Result));
-          } else {
+          setParentOwnReportData(
+            ownRes.success && ownRes.Result
+              ? mapItemToRow(ownRes.Result)
+              : null,
+          );
+        } catch {
+          setParentOwnReportData(null);
+        }
+
+        // báo cáo TONG_HOP (e4) - chỉ trung đoàn
+        if (isTrungDoan) {
+          try {
+            const consRes = await politicalWorkService.getByDonVi(
+              maDonViCurrent,
+              reportDate,
+              "TONG_HOP",
+            );
+            setParentReportData(
+              consRes.success && consRes.Result
+                ? mapItemToRow(consRes.Result)
+                : null,
+            );
+          } catch {
             setParentReportData(null);
           }
-        } catch {
+        } else {
           setParentReportData(null);
         }
+
         if (fetchPctDuty) {
           const pctUnit = childUnits.find(
             (u) =>
@@ -76,6 +109,7 @@ export function usePoliticalWorkData({
               const pctRes = await politicalWorkService.getByDonVi(
                 pctUnit.maDonVi,
                 reportDate,
+                "DON_VI",
               );
               setDutyReport(
                 pctRes.success && pctRes.Result
@@ -93,10 +127,13 @@ export function usePoliticalWorkData({
         }
       } else {
         setParentReportData(null);
+        setParentOwnReportData(null);
+        setDutyReport(null);
         try {
           const res = await politicalWorkService.getByDonVi(
             maDonViCurrent,
             reportDate,
+            "DON_VI",
           );
           if (res.success && res.Result) {
             setReportData([mapItemToRow(res.Result)]);
@@ -119,6 +156,7 @@ export function usePoliticalWorkData({
   }, [
     maDonViCurrent,
     isParentUnit,
+    isTrungDoan,
     reportDate,
     submitMaDonVi,
     childUnits,
@@ -131,6 +169,7 @@ export function usePoliticalWorkData({
   return {
     reportData,
     parentReportData,
+    parentOwnReportData,
     childUnits,
     loading,
     fetchReports,

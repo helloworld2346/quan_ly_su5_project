@@ -554,6 +554,7 @@ export default function DailyTroopReport() {
             rank: m.capBac,
             position: m.chucVu,
             reason: m.lyDoVang,
+            note: m.ghiChu,
           }))}
           onClose={() => setSelectedReportRow(null)}
           trucBanChiHuy={selectedReportRow.rawItem.trucBanChiHuy}
@@ -574,6 +575,7 @@ export default function DailyTroopReport() {
             position: r.chucVu,
             reason: r.lyDoVang,
             unitName: normalizeUnitName(r.tenDonVi),
+            note: r.ghiChu,
           }))}
           onClose={() => setShowConsolidatedDetail(false)}
         />

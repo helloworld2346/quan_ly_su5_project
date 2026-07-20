@@ -3,23 +3,23 @@ import random
 import requests  
   
 BASE_URL = "http://192.168.2.46:8080/api"      # đổi theo môi trường demo  
-USERNAME = "c12_d9"  
+USERNAME = "c1_d1"  
 PASSWORD = "1"  
-MA_DON_VI = "GS003.003.007.004"                    # maDonVi đơn vị đang đăng nhập  
+MA_DON_VI = "GS003.001.005.002"                    # maDonVi đơn vị đang đăng nhập  
 NGAY_BAO_CAO = "2026-07-19"                # ngày báo cáo (YYYY-MM-DD)  
-TONG_QUAN_SO = 107                 # tổng quân số biên chế của đơn vị  
-SO_VANG = 20
+TONG_QUAN_SO = 105                 # tổng quân số biên chế của đơn vị  
+SO_VANG = 41
   
 # --- Cặp cấp bậc -> danh sách chức vụ hợp lệ ---  
 # Chiến sĩ / Hạ sĩ quan  
 CS_HSQ = {  
-    "Binh nhì":   ["Chiến sĩ"],  
+    # "Binh nhì":   ["Chiến sĩ"],  
     # "Binh nhất":  ["Chiến sĩ"],  
     # "Hạ sĩ":      ["Chiến sĩ", "Tiểu đội trưởng"],  
     # "Trung sĩ":   ["Tiểu đội trưởng"],  
     # "Thượng sĩ":  ["Tiểu đội trưởng"],  
-    # "Hạ sĩ":      ["Chiến sĩ"],  
-    # "Trung sĩ":   ["Chiến sĩ"],  
+    "Hạ sĩ":      ["Chiến sĩ"],  
+    "Trung sĩ":   ["Chiến sĩ"],  
 }  
   
 # Sĩ quan  
@@ -51,7 +51,7 @@ RANKS = list(RANK_POSITION.keys())
   
 # Lý do vắng: key phải thuộc VangChiTiet  
 LY_DO_KEYS = [  
-    "hocCS"
+    "congTacNgoaiSuDoan"
 ]  
   
 HO = ["Nguyễn", "Trần", "Lê", "Phạm", "Hoàng", "Vũ", "Đặng", "Bùi", "Đỗ", "Hồ", "Ngô", "Dương", "Lý", "Đinh", "Phan", "Võ", "Trương", "Đoàn", "Nguyễn", "Bùi"]

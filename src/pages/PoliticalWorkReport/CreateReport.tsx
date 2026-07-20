@@ -19,8 +19,9 @@ interface CreateReportProps {
   onSubmit?: (data: PoliticalWorkRequest) => void;
   initialData: PoliticalWorkRow | null;
   maDonViCurrent: string;
-  reportDate: string; // thêm — ISO "YYYY-MM-DD"
-}
+  reportDate: string;
+  consolidating?: boolean;
+}  
 
 interface ReportFormData {
   reporterName: string;
@@ -99,6 +100,7 @@ export default function CreateReport({
   initialData,
   maDonViCurrent,
   reportDate,
+  consolidating = false,
 }: CreateReportProps) {
   const { account } = useAuth();
   const capDonVi = account?.donVi?.capDonVi;
@@ -209,6 +211,7 @@ export default function CreateReport({
       kienNghi: formData.hasProposal ? formData.proposal : "",
       thoiGianBaoCao: new Date(`${reportDate}T12:00:00.000Z`).toISOString(),
       donVi: maDonViCurrent,
+      loaiDonBaoCao: consolidating ? "TONG_HOP" : "DON_VI",
     };
     onSubmit?.(payload);
   };

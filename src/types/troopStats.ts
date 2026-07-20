@@ -23,6 +23,7 @@ export interface TroopMember {
   position: string;
   reason: string;
   unitName?: string;
+  note?: string;
 }
 
 export const ATTENDANCE_META: Record<

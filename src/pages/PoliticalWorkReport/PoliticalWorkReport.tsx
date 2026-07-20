@@ -119,6 +119,7 @@ export default function PoliticalWorkReport() {
     (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
     (isNoiVu && capDonVi === "TIEU_DOAN");
 
+  const isTrungDoan = capDonVi === "TRUNG_DOAN";
   const isTacChienSuDoan = isTacChien && capDonVi === "SU_DOAN";
   const canAddOwnReport = isTacChienSuDoan || isAdmin || isPoliticalOffice;
 
@@ -127,6 +128,7 @@ export default function PoliticalWorkReport() {
   const {
     reportData,
     parentReportData,
+    parentOwnReportData,
     childUnits,
     loading,
     fetchReports,
@@ -215,7 +217,13 @@ export default function PoliticalWorkReport() {
 
   const childRows = useMemo<PoliticalWorkRow[]>(() => {
     if (!isParentUnit) return [];
-    return (childUnits ?? [])
+
+    const trungDoanOwnRow: PoliticalWorkRow[] =
+      isTrungDoan && parentOwnReportData
+        ? [{ ...parentOwnReportData, kyhieuDonVi: "CH/e", notSubmitted: false }]
+        : [];
+
+    const rows = (childUnits ?? [])
       .filter((unit) => !isPoliticalOffice || unit.maDonVi !== submitMaDonVi)
       .map((unit) => {
         const matched = reportData.find((r) => r.donVi === unit.maDonVi);
@@ -226,7 +234,17 @@ export default function PoliticalWorkReport() {
           kyhieuDonVi: unit.kyhieuDonvi,
         });
       });
-  }, [isParentUnit, childUnits, reportData, isPoliticalOffice, submitMaDonVi]);
+
+    return [...trungDoanOwnRow, ...rows];
+  }, [
+    isParentUnit,
+    isTrungDoan,
+    parentOwnReportData,
+    childUnits,
+    reportData,
+    isPoliticalOffice,
+    submitMaDonVi,
+  ]);
 
   const approvedChildRows = useMemo(() => {
     return childRows.filter(
@@ -238,12 +256,13 @@ export default function PoliticalWorkReport() {
   const canConsolidate =
     isParentUnit && !parentReportData && approvedChildRows.length > 0;
 
-  // const isPastDate = reportDate < todayIsoDate();
   const isPastDate = false;
 
 
-  const hasOwnReport = isPoliticalOffice
-    ? Boolean(parentReportData)
+const hasOwnReport = isPoliticalOffice
+  ? Boolean(parentReportData)
+  : isTrungDoan
+    ? Boolean(parentOwnReportData)
     : canAddOwnReport
       ? Boolean(dutyReport && !dutyReport.notSubmitted)
       : Boolean(ownReport && !ownReport.notSubmitted);
@@ -812,6 +831,7 @@ export default function PoliticalWorkReport() {
         }
         maDonViCurrent={submitMaDonVi ?? ""}
         reportDate={reportDate}
+        consolidating={consolidating}
         onSubmit={async (payload) => {
           try {
             if (editingRow) {

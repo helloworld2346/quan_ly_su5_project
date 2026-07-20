@@ -1,3 +1,5 @@
+import type { LoaiDonBaoCao } from "./dailyReport";
+
 export type PoliticalWorkStatus = "Nháp" | "Chờ_Duyệt" | "Đã_Duyệt" | "Từ_Chối";
 
 export interface PoliticalWorkDonVi {
@@ -16,6 +18,7 @@ export interface PoliticalWorkRequest {
   kienNghi: string;
   thoiGianBaoCao: string;
   donVi: string;
+  loaiDonBaoCao?: LoaiDonBaoCao;
 }
 
 export interface PoliticalWorkForm {
@@ -39,6 +42,7 @@ export interface PoliticalWorkItem {
   status: string;
   ghiChu?: string | null;
   donVi: PoliticalWorkDonVi;
+  loaiDonBaoCao?: LoaiDonBaoCao;
 }
 
 export interface RefuseRequest {
@@ -59,19 +63,20 @@ export interface PoliticalWorkListResponse {
   Result: PoliticalWorkItem[];
 }
 
-export interface PoliticalWorkRow {  
-  idCongtac: string;  
+export interface PoliticalWorkRow {
+  idCongtac: string;
   donVi: string;
-  tenDonVi: string;  
-  kyhieuDonVi?: string;  
-  tinhHinh: string;  
-  noiDungDotXuat: string;  
-  ketQua: string;  
-  trucBanNoiVu: string;  
-  trucBanCtDangCt: string;  
-  kienNghi: string;  
-  status: string;  
-  ghiChu: string;  
+  tenDonVi: string;
+  kyhieuDonVi?: string;
+  tinhHinh: string;
+  noiDungDotXuat: string;
+  ketQua: string;
+  trucBanNoiVu: string;
+  trucBanCtDangCt: string;
+  kienNghi: string;
+  status: string;
+  ghiChu: string;
+  loaiDonBaoCao?: LoaiDonBaoCao;
   notSubmitted?: boolean;
-  rawItem: PoliticalWorkItem;  
+  rawItem: PoliticalWorkItem;
 }
