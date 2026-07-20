@@ -148,7 +148,7 @@ export default function DailyTroopStatisticsSection({
                     {/* separator + dòng e4 (TONG_HOP) giữ nguyên như cũ */}
                     {!shouldHideConsolidatedSections && canConsolidateUnit && (
                       <tr className={styles.separatorRow}>
-                        <td colSpan={22}>Báo cáo tổng hợp (e4)</td>
+                        <td colSpan={22}>Báo cáo tổng hợp</td>
                       </tr>
                     )}
                     {!shouldHideConsolidatedSections &&
