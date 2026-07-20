@@ -583,7 +583,8 @@ export default function PoliticalWorkReport() {
             canAddOwnReport ||
             isPoliticalOffice ||
             isTrungDoan) &&
-          !hasOwnReport
+          !hasOwnReport &&
+          !(isChiHuy && (isTrungDoan || isTieuDoan))
             ? handleAddReport
             : undefined
         }
