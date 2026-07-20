@@ -1,3 +1,4 @@
+// src/pages/PoliticalWorkReport/hooks/usePoliticalWorkData.ts
 import { useState, useEffect, useCallback, useRef } from "react";
 import { politicalWorkService } from "../../../services/politicalWork/politicalWorkService";
 import { handleApiError } from "../../../utils/errorHandler";
@@ -11,6 +12,7 @@ export function usePoliticalWorkData({
   maDonViCurrent,
   isParentUnit,
   isTrungDoan,
+  isTieuDoan,
   capDonVi,
   reportDate,
   showError,
@@ -21,6 +23,7 @@ export function usePoliticalWorkData({
   isParentUnit: boolean;
   capDonVi?: string | null;
   isTrungDoan?: boolean;
+  isTieuDoan?: boolean;
   reportDate: string;
   showError: (msg: string) => void;
   submitMaDonVi?: string;
@@ -96,6 +99,23 @@ export function usePoliticalWorkData({
           } catch {
             setParentReportData(null);
           }
+        } else if (isTieuDoan) {
+          // Tiểu đoàn: không có CH/e riêng, chỉ có báo cáo tổng hợp TONG_HOP
+          setParentOwnReportData(null);
+          try {
+            const consRes = await politicalWorkService.getByDonVi(
+              maDonViCurrent,
+              reportDate,
+              "TONG_HOP",
+            );
+            setParentReportData(
+              consRes.success && consRes.Result
+                ? mapItemToRow(consRes.Result)
+                : null,
+            );
+          } catch {
+            setParentReportData(null);
+          }
         } else {
           // sư đoàn / phòng chính trị: giữ nguyên hành vi cũ
           setParentOwnReportData(null);
@@ -147,7 +167,7 @@ export function usePoliticalWorkData({
           const res = await politicalWorkService.getByDonVi(
             maDonViCurrent,
             reportDate,
-            isTrungDoan ? "TONG_HOP" : "DON_VI",
+            isTrungDoan || isTieuDoan ? "TONG_HOP" : "DON_VI",
           );
           if (res.success && res.Result) {
             setReportData([mapItemToRow(res.Result)]);
@@ -171,6 +191,7 @@ export function usePoliticalWorkData({
     maDonViCurrent,
     isParentUnit,
     isTrungDoan,
+    isTieuDoan,
     isSuDoan,
     reportDate,
     submitMaDonVi,

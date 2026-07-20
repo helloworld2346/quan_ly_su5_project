@@ -44,10 +44,7 @@ export const politicalWorkService = {
     const response = await api.get<PoliticalWorkSingleResponse>(
       `/ctdangct/search/DonVi/${idDonVi}`,
       {
-        params: {
-          ngayLoc,
-          ...(loaiDonBaoCao ? { loaiDonBaoCao } : {}),
-        },
+        params: { ngayLoc, ...(loaiDonBaoCao ? { loaiDonBaoCao } : {}) },
         skipErrorToast: true,
       },
     );

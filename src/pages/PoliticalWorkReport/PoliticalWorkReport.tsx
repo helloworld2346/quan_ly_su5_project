@@ -121,6 +121,7 @@ export default function PoliticalWorkReport() {
     (isNoiVu && capDonVi === "TIEU_DOAN");
 
   const isTrungDoan = capDonVi === "TRUNG_DOAN";
+  const isTieuDoan = capDonVi === "TIEU_DOAN";
   const isTacChienSuDoan = isTacChien && capDonVi === "SU_DOAN";
   const canAddOwnReport = isTacChienSuDoan || isAdmin || isPoliticalOffice;
 
@@ -138,6 +139,7 @@ export default function PoliticalWorkReport() {
     maDonViCurrent: viewMaDonVi,
     isParentUnit,
     isTrungDoan,
+    isTieuDoan,
     capDonVi,
     showError,
     reportDate,
@@ -169,16 +171,16 @@ export default function PoliticalWorkReport() {
     });
   };
 
-const trungDoanReports = [parentOwnReportData, parentReportData].filter(
-  (r): r is PoliticalWorkRow => Boolean(r),
-);
+  const trungDoanReports = [parentOwnReportData, parentReportData].filter(
+    (r): r is PoliticalWorkRow => Boolean(r),
+  );
 
-const reportForSubmit =
-  isParentUnit && isTrungDoan
-    ? (trungDoanReports.find((r) => r.status === "Nháp") ?? null)
-    : isParentUnit && parentReportData
-      ? parentReportData
-      : ownReport;  
+  const reportForSubmit =
+    isParentUnit && isTrungDoan
+      ? (trungDoanReports.find((r) => r.status === "Nháp") ?? null)
+      : isParentUnit && parentReportData
+        ? parentReportData
+        : ownReport;
 
   const dutyReportForDisplay =
     isParentUnit && parentReportData ? parentReportData : ownReport;
@@ -280,13 +282,13 @@ const reportForSubmit =
 
   const isPastDate = false;
 
-const hasOwnReport = isPoliticalOffice
-  ? Boolean(parentReportData)
-  : isTrungDoan
-    ? Boolean(parentOwnReportData)
-    : canAddOwnReport
-      ? Boolean(dutyReport && !dutyReport.notSubmitted)
-      : Boolean(ownReport && !ownReport.notSubmitted);
+  const hasOwnReport = isPoliticalOffice
+    ? Boolean(parentReportData)
+    : isTrungDoan
+      ? Boolean(parentOwnReportData)
+      : canAddOwnReport
+        ? Boolean(dutyReport && !dutyReport.notSubmitted)
+        : Boolean(ownReport && !ownReport.notSubmitted);
 
   const handleAddReport = () => {
     if (isPastDate) {
@@ -352,13 +354,13 @@ const hasOwnReport = isPoliticalOffice
       .includes(keyword);
   };
 
-const hideDraft = (rows: PoliticalWorkRow[]) =>
-  shouldHideDraftAndUnsubmitted
-    ? rows.filter((r) => !r.notSubmitted && r.status !== "Nháp")
-    : rows;
+  const hideDraft = (rows: PoliticalWorkRow[]) =>
+    shouldHideDraftAndUnsubmitted
+      ? rows.filter((r) => !r.notSubmitted && r.status !== "Nháp")
+      : rows;
 
-const filteredChildRows = hideDraft(childRows.filter(matchesQuery));
-const filteredFlatRows = hideDraft(flatRows.filter(matchesQuery));
+  const filteredChildRows = hideDraft(childRows.filter(matchesQuery));
+  const filteredFlatRows = hideDraft(flatRows.filter(matchesQuery));
 
   const showTwoSections = isParentUnit && !isPoliticalOffice;
 
