@@ -26,6 +26,7 @@ export function useTopBarReportStatus(): string | null {
         const res = await dailyReportService.searchReportByUnitAndDate(
           maDonVi,
           getTodayString(),
+          "DON_VI",
         );
         if (!active) return;
         if (res.success && res.Result) {
