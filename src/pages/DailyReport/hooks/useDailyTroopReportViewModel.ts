@@ -112,11 +112,26 @@ export function useDailyTroopReportViewModel(
   const isChiHuyLeaf = isChiHuy && childUnits.length === 0;
 
   const isTrungDoan = capDonVi === "TRUNG_DOAN";
+  const isTieuDoan = capDonVi === "TIEU_DOAN";
 
   const ownReport = useMemo(() => {
-    if (isParentUnit) return parentOwnReportData ?? parentReportData;
+    if (isParentUnit) {
+      // trung đoàn / tiểu đoàn: trình báo cáo TONG_HOP (e4) đã tổng hợp
+      if (isTrungDoan || isTieuDoan) {
+        return parentReportData ?? parentOwnReportData;
+      }
+      // sư đoàn: trình báo cáo DON_VI của chính đơn vị (CH/f)
+      return parentOwnReportData ?? parentReportData;
+    }
     return reportData.length > 0 ? reportData[0] : null;
-  }, [isParentUnit, parentOwnReportData, parentReportData, reportData]);
+  }, [
+    isParentUnit,
+    isTrungDoan,
+    isTieuDoan,
+    parentOwnReportData,
+    parentReportData,
+    reportData,
+  ]);
 
   const commanderReport = useMemo(() => {
     if (!isChiHuy) return null;
