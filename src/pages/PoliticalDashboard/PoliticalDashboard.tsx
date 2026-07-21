@@ -154,7 +154,7 @@ export default function PoliticalDashboard() {
       const nameLower = (unit.name || "").toLowerCase();
 
       if (filter === "department") {
-        return nameLower.includes("phòng");
+        return nameLower.includes("phòng") || nameLower.includes("ban");
       }
       if (filter === "regiment") {
         return (
