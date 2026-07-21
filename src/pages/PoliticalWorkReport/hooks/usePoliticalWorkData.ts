@@ -34,8 +34,7 @@ export function usePoliticalWorkData({
   showError: (msg: string) => void;
   submitMaDonVi?: string;
   fetchPctDuty?: boolean;
-  }) {
-  
+}) {
   const [reportData, setReportData] = useState<PoliticalWorkRow[]>([]);
   // e4 (TONG_HOP) - báo cáo tổng hợp
   const [parentReportData, setParentReportData] =
@@ -153,21 +152,37 @@ export function usePoliticalWorkData({
             setParentOwnReportData(null);
           }
 
-          // TONG_HOP của GS003 -> tab tổng hợp
+          // TONG_HOP: ưu tiên của chính PCT (GS003.017), fallback về GS003
+          let consItem: PoliticalWorkItem | null = null;
           try {
-            const consRes = await politicalWorkService.getByDonVi(
-              maDonViCurrent, // GS003
+            const ownConsRes = await politicalWorkService.getByDonVi(
+              ownMaDonVi, // GS003.017
               reportDate,
               "TONG_HOP",
             );
-            setParentReportData(
-              consRes.success && consRes.Result
-                ? mapItemToRow(consRes.Result)
-                : null,
-            );
+            if (ownConsRes.success && ownConsRes.Result) {
+              consItem = ownConsRes.Result;
+            }
           } catch {
-            setParentReportData(null);
+            /* bỏ qua, thử GS003 bên dưới */
           }
+
+          if (!consItem) {
+            try {
+              const groupConsRes = await politicalWorkService.getByDonVi(
+                maDonViCurrent, // GS003
+                reportDate,
+                "TONG_HOP",
+              );
+              if (groupConsRes.success && groupConsRes.Result) {
+                consItem = groupConsRes.Result;
+              }
+            } catch {
+              /* bỏ qua */
+            }
+          }
+
+          setParentReportData(consItem ? mapItemToRow(consItem) : null);
         } else if (isTieuDoan && !isDbOrEb) {
           // d4 - báo cáo tổng hợp TONG_HOP của chính tiểu đoàn
           setParentOwnReportData(null);
@@ -185,9 +200,8 @@ export function usePoliticalWorkData({
           } catch {
             setParentReportData(null);
           }
-        } else if (isSuDoan || isPoliticalOffice) {
-          // sư đoàn (TBTC F5) và phòng chính trị (PCT):
-          // báo cáo TONG_HOP của GS003 do PCT tổng hợp
+        } else if (isSuDoan) {
+          // sư đoàn (TBTC F5): báo cáo TONG_HOP của GS003 do PCT tổng hợp
           setParentOwnReportData(null);
           try {
             const consRes = await politicalWorkService.getByDonVi(
@@ -204,7 +218,7 @@ export function usePoliticalWorkData({
             setParentReportData(null);
           }
         } else {
-          // phòng chính trị (nếu capDonVi != SU_DOAN): giữ nguyên hành vi cũ
+          // các trường hợp còn lại: giữ nguyên hành vi cũ
           setParentOwnReportData(null);
           try {
             const ownRes = await politicalWorkService.getByDonVi(

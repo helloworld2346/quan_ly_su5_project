@@ -186,20 +186,20 @@ export default function PoliticalWorkReport() {
     (r): r is PoliticalWorkRow => Boolean(r),
   );
 
-  const reportForSubmit =
-    isParentUnit && isTrungDoan
-      ? (trungDoanReports.find((r) => r.status === "Nháp") ?? null)
-      : isParentUnit && parentReportData
-        ? parentReportData
-        : ownReport;
+const reportForSubmit =
+  isParentUnit && (isTrungDoan || isPoliticalOffice)
+    ? (trungDoanReports.find((r) => r.status === "Nháp") ?? null)
+    : isParentUnit && parentReportData
+      ? parentReportData
+      : ownReport;
 
   const dutyReportForDisplay =
     isParentUnit && parentReportData ? parentReportData : ownReport;
 
-  const commanderReport =
-    isParentUnit && isTrungDoan
-      ? (trungDoanReports.find((r) => r.status === "Chờ_Duyệt") ?? null)
-      : (reportData.find((r) => r.status === "Chờ_Duyệt") ?? null);
+const commanderReport =
+  isParentUnit && (isTrungDoan || isPoliticalOffice)
+    ? (trungDoanReports.find((r) => r.status === "Chờ_Duyệt") ?? null)
+    : (reportData.find((r) => r.status === "Chờ_Duyệt") ?? null);
 
   const {
     showRefuseDialog,
