@@ -52,6 +52,7 @@ export type UseDailyTroopReportViewModelArgs = {
   editNhiemVuData: DetailStepData | null;
   shouldHideDraftAndUnsubmitted: boolean;
   nhiemVuData: NhiemVuNgay | null;
+  cheNhiemVuData: NhiemVuNgay | null;
   nhiemVuList: NhiemVuListItem[];
 };
 
@@ -103,6 +104,7 @@ export function useDailyTroopReportViewModel(
     editNhiemVuData,
     shouldHideDraftAndUnsubmitted,
     nhiemVuData,
+    cheNhiemVuData,
     nhiemVuList,
   } = args;
 
@@ -272,27 +274,43 @@ const isParentUnit =
         reportStatusLabel: getNhiemVuReportStatusLabel(ownReportRow),
       });
 
-      childUnits.forEach((unit) => {
-        const matched = nhiemVuList.find((item) => {
-          const itemDonVi = item.donVi.toLowerCase();
-          return (
-            itemDonVi === (unit.kyhieuDonvi ?? "").toLowerCase() ||
-            itemDonVi === unit.tenDonvi.toLowerCase() ||
-            itemDonVi === unit.maDonVi.toLowerCase()
-          );
-        });
-
-        const childReportRow =
-          reportData.find((row) => row.donVi === unit.maDonVi) ?? null;
-
+      if (isTrungDoan) {
+        const cheMatched = nhiemVuList.find(
+          (item) => item.donVi.toLowerCase() === "ch/e",
+        );
+        const cheData = cheNhiemVuData ?? cheMatched?.data ?? null;
         entries.push({
-          id: unit.maDonVi,
-          title: unit.tenDonvi || unit.kyhieuDonvi || unit.maDonVi,
+          id: `${maDonViCurrent ?? "own"}-che`,
+          title: "CH/e",
           subtitle: "",
-          data: matched ? buildNhiemVuSummary(matched.data) : null,
-          reportStatusLabel: getNhiemVuReportStatusLabel(childReportRow),
+          data: cheData ? buildNhiemVuSummary(cheData) : null,
+          reportStatusLabel: getNhiemVuReportStatusLabel(parentOwnReportData),
         });
-      });
+      }
+
+      childUnits
+        .filter((unit) => unit.kyhieuDonvi !== "CH/e")
+        .forEach((unit) => {
+          const matched = nhiemVuList.find((item) => {
+            const itemDonVi = item.donVi.toLowerCase();
+            return (
+              itemDonVi === (unit.kyhieuDonvi ?? "").toLowerCase() ||
+              itemDonVi === unit.tenDonvi.toLowerCase() ||
+              itemDonVi === unit.maDonVi.toLowerCase()
+            );
+          });
+
+          const childReportRow =
+            reportData.find((row) => row.donVi === unit.maDonVi) ?? null;
+
+          entries.push({
+            id: unit.maDonVi,
+            title: unit.tenDonvi || unit.kyhieuDonvi || unit.maDonVi,
+            subtitle: "",
+            data: matched ? buildNhiemVuSummary(matched.data) : null,
+            reportStatusLabel: getNhiemVuReportStatusLabel(childReportRow),
+          });
+        });
 
       return filterVisibleNhiemVuEntries(
         entries.filter(
@@ -327,8 +345,11 @@ const isParentUnit =
     maDonViCurrent,
     account?.donVi,
     parentReportData,
+    parentOwnReportData,
+    isTrungDoan,
     nhiemVuData,
     nhiemVuList,
+    cheNhiemVuData,
     childUnits,
     reportData,
     shouldHideDraftAndUnsubmitted,

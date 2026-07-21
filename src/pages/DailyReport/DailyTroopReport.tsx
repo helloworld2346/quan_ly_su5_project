@@ -68,7 +68,10 @@ export default function DailyTroopReport() {
   );
   const [editNhiemVuId, setEditNhiemVuId] = useState<string | null>(null);
 
-  const [nhiemVuData, setNhiemVuData] = useState<NhiemVuNgay | null>(null);
+  const [nhiemVuData] = useState<NhiemVuNgay | null>(null);
+  const [cheNhiemVuData, setCheNhiemVuData] = useState<NhiemVuNgay | null>(
+    null,
+  );
   const [nhiemVuList, setNhiemVuList] = useState<
     Array<{
       maDonVi: string;
@@ -200,17 +203,18 @@ export default function DailyTroopReport() {
     shouldHideDraftAndUnsubmitted,
     nhiemVuData,
     nhiemVuList,
+    cheNhiemVuData,
   });
 
-const { isReporter, canApprove, canRefuse, canSubmit, canRecall } =
-  useReportPermissions(
-    userRole,
-    capDonVi,
-    ownReport,
-    commanderReport,
-    childUnits.length > 0,
-    isDbOrEb,
-  );
+  const { isReporter, canApprove, canRefuse, canSubmit, canRecall } =
+    useReportPermissions(
+      userRole,
+      capDonVi,
+      ownReport,
+      commanderReport,
+      childUnits.length > 0,
+      isDbOrEb,
+    );
 
   const handleToggleMenu = (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -313,21 +317,21 @@ const { isReporter, canApprove, canRefuse, canSubmit, canRecall } =
 
   useEffect(() => {
     void (async () => {
-      if (!ownReport?.idDonBaoCao) {
-        setNhiemVuData(null);
+      if (!parentOwnReportData?.idDonBaoCao) {
+        setCheNhiemVuData(null);
         return;
       }
 
       try {
         const res = await dailyReportService.getNhiemVuNgayByDonBaoCao(
-          ownReport.idDonBaoCao,
+          parentOwnReportData.idDonBaoCao,
         );
-        setNhiemVuData((res.Result ?? null) as NhiemVuNgay | null);
+        setCheNhiemVuData((res.Result ?? null) as NhiemVuNgay | null);
       } catch {
-        setNhiemVuData(null);
+        setCheNhiemVuData(null);
       }
     })();
-  }, [ownReport]);
+  }, [parentOwnReportData]);
 
   useEffect(() => {
     let cancelled = false;
@@ -369,7 +373,7 @@ const { isReporter, canApprove, canRefuse, canSubmit, canRecall } =
       cancelled = true;
     };
   }, [isParentUnit, maDonViCurrent, reportDate, isTrungDoan, isTieuDoan]);
-  
+
   const handleAddReport = () => {
     if (isPastDate) {
       showError("Không thể tạo báo cáo cho ngày trong quá khứ!");
