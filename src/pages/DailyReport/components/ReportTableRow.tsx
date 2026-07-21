@@ -160,15 +160,17 @@ export default function ReportTableRow({
                 }}
                 onClick={(e) => e.stopPropagation()}
               >
-                <button
-                  type="button"
-                  className={styles.menuItem}
-                  role="menuitem"
-                  onClick={() => onViewDetail(row)}
-                >
-                  <FontAwesomeIcon icon={faEye} className={styles.menuIcon} />
-                  Xem chi tiết
-                </button>
+                {row.status !== "Nháp" && (
+                  <button
+                    type="button"
+                    className={styles.menuItem}
+                    role="menuitem"
+                    onClick={() => onViewDetail(row)}
+                  >
+                    <FontAwesomeIcon icon={faEye} className={styles.menuIcon} />
+                    Xem chi tiết
+                  </button>
+                )}
                 {(canEdit || canEditParent || canEditOwn) && (
                   <button
                     type="button"

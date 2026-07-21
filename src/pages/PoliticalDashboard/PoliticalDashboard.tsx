@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { formatFullDate, shiftDay, toDateParam } from "../../utils/date";
 import "./PoliticalDashboard.css";
 import DateInputVi from "../../components/ui/DateInputVi/DateInputVi";
+import { useAuth } from "../../context/useAuth";
 
 import {
   politicalDashboardService,
@@ -21,7 +22,7 @@ import {
 type UnitType = "department" | "regiment" | "battalion" | "company";
 type FilterKey = "all" | UnitType;
 
-const FILTER_OPTIONS: { key: FilterKey; label: string }[] = [
+const FILTER_OPTIONS_SD: { key: FilterKey; label: string }[] = [
   { key: "all", label: "Tất cả đơn vị" },
   { key: "department", label: "Phòng" },
   { key: "regiment", label: "Trung đoàn" },
@@ -29,7 +30,20 @@ const FILTER_OPTIONS: { key: FilterKey; label: string }[] = [
   { key: "company", label: "Đại đội" },
 ];
 
+const FILTER_OPTIONS_TD: { key: FilterKey; label: string }[] = [
+  { key: "all", label: "Tất cả đơn vị" },
+  { key: "department", label: "Ban" },
+  { key: "battalion", label: "Tiểu đoàn" },
+  { key: "company", label: "Đại đội" },
+];
+
 export default function PoliticalDashboard() {
+  const { account } = useAuth();
+  const capDonVi = account?.donVi?.capDonVi;
+  const isTrungDoan = capDonVi === "TRUNG_DOAN";
+
+  const filterOptions = isTrungDoan ? FILTER_OPTIONS_TD : FILTER_OPTIONS_SD;
+
   const [filter, setFilter] = useState<FilterKey>("all");
   const [selectedDate, setSelectedDate] = useState<Date>(() => new Date());
 
@@ -289,7 +303,7 @@ export default function PoliticalDashboard() {
           <FontAwesomeIcon icon={faFilter} />
         </span>
 
-        {FILTER_OPTIONS.map((option) => (
+        {filterOptions.map((option) => (
           <button
             key={option.key}
             type="button"
