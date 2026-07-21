@@ -186,20 +186,20 @@ export default function PoliticalWorkReport() {
     (r): r is PoliticalWorkRow => Boolean(r),
   );
 
-const reportForSubmit =
-  isParentUnit && (isTrungDoan || isPoliticalOffice)
-    ? (trungDoanReports.find((r) => r.status === "Nháp") ?? null)
-    : isParentUnit && parentReportData
-      ? parentReportData
-      : ownReport;
+  const reportForSubmit =
+    isParentUnit && (isTrungDoan || isPoliticalOffice)
+      ? (trungDoanReports.find((r) => r.status === "Nháp") ?? null)
+      : isParentUnit && parentReportData
+        ? parentReportData
+        : ownReport;
 
   const dutyReportForDisplay =
     isParentUnit && parentReportData ? parentReportData : ownReport;
 
-const commanderReport =
-  isParentUnit && (isTrungDoan || isPoliticalOffice)
-    ? (trungDoanReports.find((r) => r.status === "Chờ_Duyệt") ?? null)
-    : (reportData.find((r) => r.status === "Chờ_Duyệt") ?? null);
+  const commanderReport =
+    isParentUnit && (isTrungDoan || isPoliticalOffice)
+      ? (trungDoanReports.find((r) => r.status === "Chờ_Duyệt") ?? null)
+      : (reportData.find((r) => r.status === "Chờ_Duyệt") ?? null);
 
   const {
     showRefuseDialog,
@@ -300,8 +300,8 @@ const commanderReport =
     );
   }, [childRows]);
 
-const canConsolidate =
-  isParentUnit && !parentReportData && approvedChildRows.length > 0;
+  const canConsolidate =
+    isParentUnit && !parentReportData && approvedChildRows.length > 0;
 
   const isPastDate = false;
 
@@ -604,6 +604,7 @@ const canConsolidate =
             canAddOwnReport ||
             isPoliticalOffice ||
             isTrungDoan) &&
+          !isTacChienSuDoan &&
           !hasOwnReport &&
           !shouldHideDraftAndUnsubmitted
             ? handleAddReport
