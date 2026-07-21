@@ -133,7 +133,7 @@ export function usePoliticalWorkData({
           } catch {
             setParentReportData(null);
           }
-        } else if (isTieuDoan) {
+        } else if (isTieuDoan && !isDbOrEb) {
           // d4 - báo cáo tổng hợp TONG_HOP của chính tiểu đoàn
           setParentOwnReportData(null);
           try {
