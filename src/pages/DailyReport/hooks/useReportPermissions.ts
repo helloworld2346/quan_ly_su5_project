@@ -7,6 +7,7 @@ export function useReportPermissions(
   ownReport: ReportRow | null,
   commanderReport: ReportRow | null,
   hasChildren: boolean,
+  isSelfReporter = false,
 ) {
   return useReportPermissionsBase<ReportRow>(
     userRole,
@@ -14,5 +15,6 @@ export function useReportPermissions(
     ownReport,
     commanderReport,
     hasChildren,
+    isSelfReporter,
   );
 }

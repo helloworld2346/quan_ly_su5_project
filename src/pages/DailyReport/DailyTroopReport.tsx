@@ -181,14 +181,15 @@ export default function DailyTroopReport() {
     nhiemVuList,
   });
 
-  const { isReporter, canApprove, canRefuse, canSubmit, canRecall } =
-    useReportPermissions(
-      userRole,
-      capDonVi,
-      ownReport,
-      commanderReport,
-      childUnits.length > 0,
-    );
+const { isReporter, canApprove, canRefuse, canSubmit, canRecall } =
+  useReportPermissions(
+    userRole,
+    capDonVi,
+    ownReport,
+    commanderReport,
+    childUnits.length > 0,
+    isDbOrEb,
+  );
 
   const handleToggleMenu = (
     event: React.MouseEvent<HTMLButtonElement>,
