@@ -15,7 +15,11 @@ import type { EditModalData, ReportRow } from "../../types/dailyReport";
 import type { NhiemVuNgay } from "../../services/dailyReport/dailyReportService";
 import type { DetailStepData } from "./DailyReportDetailStep";
 import { handleApiError } from "../../utils/errorHandler";
-import { todayIsoDate, normalizeRoleName, normalizeUnitName } from "../../utils/reportUtils";
+import {
+  todayIsoDate,
+  normalizeRoleName,
+  normalizeUnitName,
+} from "../../utils/reportUtils";
 
 import { useReportData } from "./hooks/useReportData";
 import { useReportActions } from "./hooks/useReportActions";
@@ -78,8 +82,7 @@ export default function DailyTroopReport() {
 
   const maDonViCurrent = account?.donVi?.maDonVi;
   const capDonVi = account?.donVi?.capDonVi;
-  const kyHieuDonVi = account?.donVi?.kyhieuDonvi;
-
+  const kyHieuDonVi = account?.donVi?.kyhieuDonvi ?? null;
   const userRole = account?.vaiTro?.tenVaiTro;
   const normalizedRole = normalizeRoleName(userRole ?? undefined);
   const isChiHuy = normalizedRole === "Trực chỉ huy";
