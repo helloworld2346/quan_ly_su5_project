@@ -192,10 +192,13 @@ export const dailyReportService = {
   searchNhiemVuNgayChildrenByDonVi: async (
     maDonVi: string,
     ngayLoc: string,
+    loaiDonBaoCao?: "DON_VI" | "TONG_HOP",
   ) => {
     const response = await api.get(
       `/nhiemvungay/search/donvi/${maDonVi}/children`,
-      { params: { ngayLoc } },
+      {
+        params: { ngayLoc, ...(loaiDonBaoCao ? { loaiDonBaoCao } : {}) },
+      },
     );
 
     return response.data as {

@@ -346,6 +346,7 @@ export default function DailyTroopReport() {
         const res = await dailyReportService.searchNhiemVuNgayChildrenByDonVi(
           maDonViCurrent,
           reportDate,
+          "DON_VI",
         );
 
         const list = (res.Result ?? []).map((item) => ({
