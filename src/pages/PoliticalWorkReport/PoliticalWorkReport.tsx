@@ -69,12 +69,16 @@ function StatusBadge({
   );
 }
 
-function buildConsolidatedPoliticalWork() {
+function buildConsolidatedPoliticalWork(
+  parentOwnReportData: PoliticalWorkRow | null,
+) {
   return {
     tinhHinh: "",
     noiDungDotXuat: "",
     ketQua: "",
     kienNghi: "",
+    trucBanCtDangCt: parentOwnReportData?.trucBanCtDangCt ?? "",
+    trucBanNoiVu: parentOwnReportData?.trucBanNoiVu ?? "",
   };
 }
 
@@ -875,7 +879,7 @@ export default function PoliticalWorkReport() {
                   tenDonVi: account?.donVi?.tenDonvi ?? "",
                   kyhieuDonVi: account?.donVi?.kyhieuDonvi,
                 }),
-                ...buildConsolidatedPoliticalWork(),
+                ...buildConsolidatedPoliticalWork(parentOwnReportData),
               }
             : editingRow
         }
