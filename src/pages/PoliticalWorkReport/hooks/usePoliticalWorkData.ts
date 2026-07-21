@@ -151,12 +151,12 @@ export function usePoliticalWorkData({
             setParentReportData(null);
           }
         } else {
-          // sư đoàn / phòng chính trị: giữ nguyên hành vi cũ
           setParentOwnReportData(null);
           try {
             const ownRes = await politicalWorkService.getByDonVi(
               ownMaDonVi,
               reportDate,
+              "DON_VI",
             );
             if (ownRes.success && ownRes.Result) {
               setParentReportData(mapItemToRow(ownRes.Result));
