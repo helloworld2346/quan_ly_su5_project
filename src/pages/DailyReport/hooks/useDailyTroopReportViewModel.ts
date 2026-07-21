@@ -116,7 +116,6 @@ export function useDailyTroopReportViewModel(
 
   const ownReport = useMemo(() => {
     if (isParentUnit) {
-      // trung đoàn / tiểu đoàn: trình báo cáo TONG_HOP (e4) đã tổng hợp
       if (isTrungDoan || isTieuDoan) {
         return parentReportData ?? parentOwnReportData;
       }

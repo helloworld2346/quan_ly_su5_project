@@ -23,6 +23,7 @@ export function useReportData({
   isChiHuy,
   capDonVi,
   reportDate,
+  kyHieuDonVi,
   showError,
 }: {
   maDonViCurrent: string | undefined;
@@ -31,6 +32,7 @@ export function useReportData({
   isChiHuy: boolean;
   capDonVi?: string | null;
   reportDate: string;
+  kyHieuDonVi: string | null;
   showError: (msg: string) => void;
 }) {
   const [reportData, setReportData] = useState<ReportRow[]>([]);
@@ -53,6 +55,8 @@ export function useReportData({
   const isTrungDoan = capDonVi === "TRUNG_DOAN";
   const isSuDoan = capDonVi === "SU_DOAN";
   const isTieuDoan = capDonVi === "TIEU_DOAN";
+
+  console.log(kyHieuDonVi);
 
   const showErrorRef = useRef(showError);
   useEffect(() => {
@@ -145,7 +149,9 @@ export function useReportData({
         }
       } else {
         const loaiChiHuy =
-          isChiHuy && (isTrungDoan || isTieuDoan) ? "TONG_HOP" : "DON_VI";
+          isChiHuy && (isTrungDoan || (isTieuDoan && kyHieuDonVi != "dbộ"))
+            ? "TONG_HOP"
+            : "DON_VI";
         response = await dailyReportService.searchReportByUnitAndDate(
           maDonViCurrent,
           reportDate,
@@ -180,6 +186,7 @@ export function useReportData({
     isTrungDoan,
     isTieuDoan,
     reportDate,
+    kyHieuDonVi,
   ]);
 
   useInitialFetch(fetchReports);

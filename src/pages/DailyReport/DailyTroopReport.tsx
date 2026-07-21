@@ -78,6 +78,7 @@ export default function DailyTroopReport() {
 
   const maDonViCurrent = account?.donVi?.maDonVi;
   const capDonVi = account?.donVi?.capDonVi;
+  const kyHieuDonVi = account?.donVi?.kyhieuDonvi;
 
   const userRole = account?.vaiTro?.tenVaiTro;
   const normalizedRole = normalizeRoleName(userRole ?? undefined);
@@ -106,6 +107,7 @@ export default function DailyTroopReport() {
     isChiHuy,
     capDonVi,
     reportDate,
+    kyHieuDonVi,
     showError,
   });
 
