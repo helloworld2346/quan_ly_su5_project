@@ -122,12 +122,13 @@ export default function PoliticalWorkReport() {
     (account?.donVi?.tenDonvi ?? "").toLowerCase().includes("phòng chính trị");
 
   const viewMaDonVi = isPoliticalOffice ? "GS003" : submitMaDonVi;
+  const isDbOrEb = isDbOrEbUnit(account?.donVi);
 
   const isParentUnit =
     isAdmin ||
     isPoliticalOffice ||
     (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
-    (isNoiVu && capDonVi === "TIEU_DOAN");
+    (isNoiVu && capDonVi === "TIEU_DOAN" && !isDbOrEb);
 
   const isTrungDoan = capDonVi === "TRUNG_DOAN";
   const isTieuDoan = capDonVi === "TIEU_DOAN";
@@ -135,8 +136,6 @@ export default function PoliticalWorkReport() {
   const canAddOwnReport = isTacChienSuDoan || isAdmin || isPoliticalOffice;
 
   const canExportExcel = isTacChienSuDoan;
-  const isDbOrEb = isDbOrEbUnit(account?.donVi);
-
   const {
     reportData,
     parentReportData,

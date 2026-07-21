@@ -5,25 +5,25 @@ type AccountDonVi = {
   kyhieuDonvi?: string;
 };
 
+function stripMarks(s: string): string {
+  return s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
 export function isDbOrEbUnit(accountDonVi?: AccountDonVi): boolean {
-  const normalizedUnitName = (accountDonVi?.tenDonvi ?? "").toLowerCase();
-  const normalizedUnitSymbol = (accountDonVi?.kyhieuDonvi ?? "").toLowerCase();
+  const name = stripMarks(accountDonVi?.tenDonvi ?? "");
+  const symbol = stripMarks(accountDonVi?.kyhieuDonvi ?? "");
+  const hay = `${name} ${symbol}`;
 
   return (
-    normalizedUnitName.includes("d bộ") ||
-    normalizedUnitName.includes("e bộ") ||
-    normalizedUnitName.includes("dbộ") ||
-    normalizedUnitName.includes("ebộ") ||
-    normalizedUnitName.includes("dbo") ||
-    normalizedUnitName.includes("ebo") ||
-    normalizedUnitSymbol.includes("d bộ") ||
-    normalizedUnitSymbol.includes("e bộ") ||
-    normalizedUnitSymbol.includes("dbộ") ||
-    normalizedUnitSymbol.includes("ebộ") ||
-    normalizedUnitSymbol.includes("dbo") ||
-    normalizedUnitSymbol.includes("ebo") ||
-    normalizedUnitSymbol.includes("ch/e") ||
-    normalizedUnitSymbol.includes("CH/e")
+    hay.includes("d bo") ||
+    hay.includes("e bo") ||
+    hay.includes("dbo") ||
+    hay.includes("ebo") ||
+    symbol.includes("ch/e") ||
+    symbol.includes("ch/d")
   );
 }
 
