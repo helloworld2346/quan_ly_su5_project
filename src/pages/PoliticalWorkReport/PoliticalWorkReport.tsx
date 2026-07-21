@@ -150,6 +150,7 @@ export default function PoliticalWorkReport() {
     isTrungDoan,
     isTieuDoan,
     isDbOrEb,
+    isPoliticalOffice,
     capDonVi,
     showError,
     reportDate,
@@ -296,13 +297,13 @@ export default function PoliticalWorkReport() {
 
   const isPastDate = false;
 
-  const hasOwnReport = isPoliticalOffice
-    ? Boolean(parentReportData)
-    : isTrungDoan
-      ? Boolean(parentOwnReportData)
-      : canAddOwnReport
-        ? Boolean(dutyReport && !dutyReport.notSubmitted)
-        : Boolean(ownReport && !ownReport.notSubmitted);
+const hasOwnReport = isPoliticalOffice
+  ? Boolean(ownReport && !ownReport.notSubmitted)
+  : isTrungDoan
+    ? Boolean(parentOwnReportData)
+    : canAddOwnReport
+      ? Boolean(dutyReport && !dutyReport.notSubmitted)
+      : Boolean(ownReport && !ownReport.notSubmitted);
 
   const handleAddReport = () => {
     if (isPastDate) {
@@ -374,7 +375,7 @@ export default function PoliticalWorkReport() {
   const filteredChildRows = hideDraft(childRows.filter(matchesQuery));
   const filteredFlatRows = hideDraft(flatRows.filter(matchesQuery));
 
-  const showTwoSections = isParentUnit && !isPoliticalOffice;
+const showTwoSections = isParentUnit;
 
   const totalUnits = isParentUnit ? childRows.length : reportData.length;
   const reported = isParentUnit
@@ -623,7 +624,7 @@ export default function PoliticalWorkReport() {
         hasReport={hasOwnReport}
         isPastDate={isPastDate}
         onConsolidate={
-          isParentUnit && !isPoliticalOffice ? handleConsolidate : undefined
+          isParentUnit && !isTacChienSuDoan ? handleConsolidate : undefined
         }
         consolidateDisabled={!canConsolidate}
         consolidateLabel={
