@@ -337,7 +337,12 @@ export default function PoliticalWorkReport() {
 
   const parentRow = useMemo<PoliticalWorkRow>(() => {
     return parentReportData
-      ? { ...parentReportData, notSubmitted: false }
+      ? {
+          ...parentReportData,
+          notSubmitted: false,
+          tenDonVi: "Sư đoàn 5",
+          kyhieuDonVi: "f5",
+        }
       : createEmptyPoliticalWorkRow({
           maDonVi: submitMaDonVi ?? "",
           tenDonVi: account?.donVi?.tenDonvi ?? "",
