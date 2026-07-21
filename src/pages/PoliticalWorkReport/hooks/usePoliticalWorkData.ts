@@ -34,7 +34,8 @@ export function usePoliticalWorkData({
   showError: (msg: string) => void;
   submitMaDonVi?: string;
   fetchPctDuty?: boolean;
-}) {
+  }) {
+  
   const [reportData, setReportData] = useState<PoliticalWorkRow[]>([]);
   // e4 (TONG_HOP) - báo cáo tổng hợp
   const [parentReportData, setParentReportData] =
@@ -124,6 +125,38 @@ export function usePoliticalWorkData({
           try {
             const consRes = await politicalWorkService.getByDonVi(
               maDonViCurrent,
+              reportDate,
+              "TONG_HOP",
+            );
+            setParentReportData(
+              consRes.success && consRes.Result
+                ? mapItemToRow(consRes.Result)
+                : null,
+            );
+          } catch {
+            setParentReportData(null);
+          }
+        } else if (isPoliticalOffice) {
+          // PCT: DON_VI riêng của PCT (GS003.017) -> table
+          try {
+            const ownRes = await politicalWorkService.getByDonVi(
+              ownMaDonVi, // GS003.017
+              reportDate,
+              "DON_VI",
+            );
+            setParentOwnReportData(
+              ownRes.success && ownRes.Result
+                ? mapItemToRow(ownRes.Result)
+                : null,
+            );
+          } catch {
+            setParentOwnReportData(null);
+          }
+
+          // TONG_HOP của GS003 -> tab tổng hợp
+          try {
+            const consRes = await politicalWorkService.getByDonVi(
+              maDonViCurrent, // GS003
               reportDate,
               "TONG_HOP",
             );

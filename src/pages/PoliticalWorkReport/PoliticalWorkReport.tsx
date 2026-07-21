@@ -269,6 +269,17 @@ export default function PoliticalWorkReport() {
       return [cheRow, ...rows];
     }
 
+    if (isPoliticalOffice) {
+      const pctOwnRow: PoliticalWorkRow = parentOwnReportData
+        ? { ...parentOwnReportData, notSubmitted: false }
+        : createEmptyPoliticalWorkRow({
+            maDonVi: submitMaDonVi ?? "",
+            tenDonVi: account?.donVi?.tenDonvi ?? "",
+            kyhieuDonVi: account?.donVi?.kyhieuDonvi,
+          });
+      return [pctOwnRow, ...rows];
+    }
+
     return rows;
   }, [
     isParentUnit,
@@ -280,6 +291,7 @@ export default function PoliticalWorkReport() {
     submitMaDonVi,
     viewMaDonVi,
     account?.donVi?.tenDonvi,
+    account?.donVi?.kyhieuDonvi,
   ]);
 
   const approvedChildRows = useMemo(() => {
