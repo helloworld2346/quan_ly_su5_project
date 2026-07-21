@@ -24,7 +24,10 @@ import {
 import { useReportData } from "./hooks/useReportData";
 import { useReportActions } from "./hooks/useReportActions";
 import { useReportPermissions } from "./hooks/useReportPermissions";
-import { shouldHideDraftAndUnsubmittedForCommander } from "./utils/dailyTroopReportVisibility";
+import {
+  shouldHideDraftAndUnsubmittedForCommander,
+  isDbOrEbUnit,
+} from "./utils/dailyTroopReportVisibility";
 import { useDailyTroopReportViewModel } from "./hooks/useDailyTroopReportViewModel";
 import { useMinLoading } from "../../hooks/useMinLoading";
 
@@ -89,6 +92,8 @@ export default function DailyTroopReport() {
   const isTacChien = normalizedRole === "Trực ban tác chiến";
   const isNoiVu = normalizedRole === "Trực ban nội vụ";
   const isAdmin = normalizedRole === "Quản Trị Viên";
+  const isDbOrEb = isDbOrEbUnit(account?.donVi);
+
 
   const {
     reportData,
@@ -111,9 +116,10 @@ export default function DailyTroopReport() {
     capDonVi,
     reportDate,
     kyHieuDonVi,
+    isDbOrEb,
     showError,
   });
-
+  
   const showSkeleton = useMinLoading(loading);
 
   const isChiHuyLeaf = isChiHuy && childUnits.length === 0;
