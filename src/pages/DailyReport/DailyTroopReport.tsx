@@ -93,6 +93,8 @@ export default function DailyTroopReport() {
   const isNoiVu = normalizedRole === "Trực ban nội vụ";
   const isAdmin = normalizedRole === "Quản Trị Viên";
   const isDbOrEb = isDbOrEbUnit(account?.donVi);
+  const isTrungDoan = capDonVi === "TRUNG_DOAN";
+  const isTieuDoan = capDonVi === "TIEU_DOAN";
 
   const {
     reportData,
@@ -331,7 +333,7 @@ const { isReporter, canApprove, canRefuse, canSubmit, canRecall } =
     let cancelled = false;
 
     const fetchNhiemVuList = async () => {
-      if (!isParentUnit || !maDonViCurrent) {
+      if (!isParentUnit || !maDonViCurrent || !(isTrungDoan || isTieuDoan)) {
         if (!cancelled) setNhiemVuList([]);
         return;
       }
@@ -366,8 +368,8 @@ const { isReporter, canApprove, canRefuse, canSubmit, canRecall } =
     return () => {
       cancelled = true;
     };
-  }, [isParentUnit, maDonViCurrent, reportDate]);
-
+  }, [isParentUnit, maDonViCurrent, reportDate, isTrungDoan, isTieuDoan]);
+  
   const handleAddReport = () => {
     if (isPastDate) {
       showError("Không thể tạo báo cáo cho ngày trong quá khứ!");
