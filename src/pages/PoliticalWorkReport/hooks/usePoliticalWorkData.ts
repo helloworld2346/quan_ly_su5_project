@@ -9,6 +9,7 @@ import type {
 import { useReportDataChangedListener } from "../../../shared/report/hooks/useReportDataChangedListener";
 import { useInitialFetch } from "../../../shared/report/hooks/useInitialFetch";
 import { useChildUnits } from "../../../shared/report/hooks/useChildUnits";
+import { isApprovedStatus } from "../../../utils/reportStatus";
 
 export function usePoliticalWorkData({
   maDonViCurrent,
@@ -233,10 +234,13 @@ export function usePoliticalWorkData({
               reportDate,
               "TONG_HOP",
             );
-            setParentReportData(
+            const consRow =
               consRes.success && consRes.Result
                 ? mapItemToRow(consRes.Result)
-                : null,
+                : null;
+            // TBTC F5 chỉ thấy báo cáo tổng hợp của PCT khi đã duyệt
+            setParentReportData(
+              consRow && isApprovedStatus(consRow.status) ? consRow : null,
             );
           } catch {
             setParentReportData(null);
