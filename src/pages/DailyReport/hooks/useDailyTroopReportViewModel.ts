@@ -39,6 +39,7 @@ export type UseDailyTroopReportViewModelArgs = {
   isTacChien: boolean;
   isNoiVu: boolean;
   isAdmin: boolean;
+  isDbOrEb: boolean;
   capDonVi?: string | null;
   maDonViCurrent?: string;
   reportData: ReportRow[];
@@ -89,6 +90,7 @@ export function useDailyTroopReportViewModel(
     isTacChien,
     isNoiVu,
     isAdmin,
+    isDbOrEb,
     capDonVi,
     maDonViCurrent,
     reportData,
@@ -104,10 +106,10 @@ export function useDailyTroopReportViewModel(
     nhiemVuList,
   } = args;
 
-  const isParentUnit =
-    isAdmin ||
-    (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
-    (isNoiVu && capDonVi === "TIEU_DOAN");
+const isParentUnit =
+  isAdmin ||
+  (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
+  (isNoiVu && capDonVi === "TIEU_DOAN" && !isDbOrEb);
 
   const isChiHuyLeaf = isChiHuy && childUnits.length === 0;
 

@@ -94,7 +94,6 @@ export default function DailyTroopReport() {
   const isAdmin = normalizedRole === "Quản Trị Viên";
   const isDbOrEb = isDbOrEbUnit(account?.donVi);
 
-
   const {
     reportData,
     parentReportData,
@@ -110,7 +109,7 @@ export default function DailyTroopReport() {
     isParentUnit:
       isAdmin ||
       (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
-      (isNoiVu && capDonVi === "TIEU_DOAN"),
+      (isNoiVu && capDonVi === "TIEU_DOAN" && !isDbOrEb),
     isTacChien,
     isChiHuy,
     capDonVi,
@@ -119,7 +118,7 @@ export default function DailyTroopReport() {
     isDbOrEb,
     showError,
   });
-  
+
   const showSkeleton = useMinLoading(loading);
 
   const isChiHuyLeaf = isChiHuy && childUnits.length === 0;
@@ -166,6 +165,7 @@ export default function DailyTroopReport() {
     isTacChien,
     isNoiVu,
     isAdmin,
+    isDbOrEb,
     capDonVi,
     maDonViCurrent,
     reportData,
