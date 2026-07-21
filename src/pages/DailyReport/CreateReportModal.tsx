@@ -100,6 +100,7 @@ interface CreateReportModalProps {
   isTacChien?: boolean;
   reportDate?: string;
   initialDetailData?: DetailStepData | null;
+  bienCheTong?: { siQuan: number; qncn: number; hsqBs: number };
 }
 
 export const CreateReportModal: React.FC<CreateReportModalProps> = ({
@@ -114,6 +115,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   isTacChien,
   reportDate,
   initialDetailData,
+  bienCheTong,
 }) => {
   const { account, donVi } = useAuth();
   const capDonVi = account?.donVi?.capDonVi;
@@ -235,9 +237,9 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
     return result >= 0 ? result : 0;
   }, [tongQuanSo, quanSoVang]);
 
-  const bienCheSiQuan = donVi?.quanSoSiQuan ?? 0;
-  const bienCheQncn = donVi?.quanSoQncn ?? 0;
-  const bienCheHsqBs = donVi?.quanSoHsqBs ?? 0;
+  const bienCheSiQuan = bienCheTong?.siQuan ?? donVi?.quanSoSiQuan ?? 0;
+  const bienCheQncn = bienCheTong?.qncn ?? donVi?.quanSoQncn ?? 0;
+  const bienCheHsqBs = bienCheTong?.hsqBs ?? donVi?.quanSoHsqBs ?? 0;
   const capBacWarnings = useMemo(() => {
     if (consolidatedAbsentRows) return [] as string[];
 

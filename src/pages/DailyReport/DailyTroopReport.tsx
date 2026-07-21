@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import styles from "./DailyTroopReport.module.css";
 import type { AxiosError } from "axios";
 
@@ -118,6 +118,25 @@ export default function DailyTroopReport() {
     isDbOrEb,
     showError,
   });
+
+  const bienCheTongTrungDoan = useMemo(() => {
+    if (capDonVi !== "TRUNG_DOAN") return undefined;
+    const childAgg = childUnits
+      .filter((u) => u.kyhieuDonvi !== "CH/e")
+      .reduce(
+        (acc, c) => ({
+          siQuan: acc.siQuan + c.quanSoSiQuan,
+          qncn: acc.qncn + c.quanSoQncn,
+          hsqBs: acc.hsqBs + c.quanSoHsqBs,
+        }),
+        { siQuan: 0, qncn: 0, hsqBs: 0 },
+      );
+    return {
+      siQuan: (account?.donVi?.quanSoSiQuan ?? 0) + childAgg.siQuan,
+      qncn: (account?.donVi?.quanSoQncn ?? 0) + childAgg.qncn,
+      hsqBs: (account?.donVi?.quanSoHsqBs ?? 0) + childAgg.hsqBs,
+    };
+  }, [capDonVi, childUnits, account?.donVi]);
 
   const showSkeleton = useMinLoading(loading);
 
@@ -639,6 +658,7 @@ const { isReporter, canApprove, canRefuse, canSubmit, canRecall } =
           }}
           maDonViCurrent={account?.donVi?.maDonVi}
           tongQuanSoBienChe={donViQuanSoTong || undefined}
+          bienCheTong={bienCheTongTrungDoan}
           caTrucInfo={caTrucInfo}
           isTacChien={isTacChien}
           reportDate={reportDate}
@@ -703,6 +723,7 @@ const { isReporter, canApprove, canRefuse, canSubmit, canRecall } =
           }}
           maDonViCurrent={account?.donVi?.maDonVi}
           tongQuanSoBienChe={donViQuanSoTong || undefined}
+          bienCheTong={bienCheTongTrungDoan}
           caTrucInfo={caTrucInfo}
           isTacChien={isTacChien}
         />
