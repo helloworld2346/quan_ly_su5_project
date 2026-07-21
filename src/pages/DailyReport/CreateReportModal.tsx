@@ -392,6 +392,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       const res = await dailyReportService.searchReportByUnitAndDate(
         maDonViCurrent!,
         yesterday,
+        consolidatedAbsentRows ? "TONG_HOP" : "DON_VI",
       );
       if (res.success && res.Result) {
         if (res.Result.chiTietVang) {
