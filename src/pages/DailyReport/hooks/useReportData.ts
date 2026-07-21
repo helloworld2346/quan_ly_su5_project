@@ -69,8 +69,9 @@ export function useReportData({
       let response;
       if (isParentUnit) {
         // danh sách báo cáo các đơn vị con
-        if (isTrungDoan) {
-          // trung đoàn: đại đội/ban -> DON_VI, tiểu đoàn -> TONG_HOP, gộp lại
+        if (isTrungDoan || isSuDoan) {
+          // trung đoàn / sư đoàn: con lá (đại đội/ban/PTM/PCT...) -> DON_VI,
+          // con tổng hợp (tiểu đoàn/trung đoàn) -> TONG_HOP, gộp lại
           const [donViRes, tongHopRes] = await Promise.all([
             dailyReportService.searchChildrenReports(
               maDonViCurrent,
@@ -91,7 +92,6 @@ export function useReportData({
             }
           }
           if (tongHopRes.success && tongHopRes.Result) {
-            // TONG_HOP (tiểu đoàn) ghi đè nếu trùng đơn vị
             for (const item of tongHopRes.Result) {
               merged.set(item.donVi.maDonVi, item);
             }
@@ -103,11 +103,11 @@ export function useReportData({
             Result: Array.from(merged.values()),
           };
         } else {
-          // sư đoàn: con là trung đoàn/tiểu đoàn -> TONG_HOP; cấp khác -> DON_VI
+          // cấp khác: con -> DON_VI
           response = await dailyReportService.searchChildrenReports(
             maDonViCurrent,
             reportDate,
-            isSuDoan ? "TONG_HOP" : "DON_VI",
+            "DON_VI",
           );
         }
 
