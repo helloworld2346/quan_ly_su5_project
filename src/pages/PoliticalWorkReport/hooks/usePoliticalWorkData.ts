@@ -88,17 +88,32 @@ export function usePoliticalWorkData({
           }
           setReportData(Array.from(merged.values()).map(mapItemToRow));
         } else {
-          // sư đoàn: con là trung đoàn/tiểu đoàn -> TONG_HOP; cấp khác -> DON_VI
-          const res = await politicalWorkService.getByDonViCha(
-            maDonViCurrent,
-            reportDate,
-            isSuDoan ? "TONG_HOP" : "DON_VI",
-          );
-          if (res.success && res.Result) {
-            setReportData(res.Result.map((item) => mapItemToRow(item)));
-          } else {
-            setReportData([]);
+          // sư đoàn (TBTC F5): phòng ban lá -> DON_VI, trung đoàn/tiểu đoàn -> TONG_HOP, gộp lại
+          const [donViRes, tongHopRes] = await Promise.all([
+            politicalWorkService.getByDonViCha(
+              maDonViCurrent,
+              reportDate,
+              "DON_VI",
+            ),
+            politicalWorkService.getByDonViCha(
+              maDonViCurrent,
+              reportDate,
+              "TONG_HOP",
+            ),
+          ]);
+
+          const merged = new Map<string, PoliticalWorkItem>();
+          if (donViRes.success && donViRes.Result) {
+            for (const item of donViRes.Result) {
+              merged.set(item.donVi.maDonVi, item);
+            }
           }
+          if (tongHopRes.success && tongHopRes.Result) {
+            for (const item of tongHopRes.Result) {
+              merged.set(item.donVi.maDonVi, item);
+            }
+          }
+          setReportData(Array.from(merged.values()).map(mapItemToRow));
         }
 
         const ownMaDonVi = submitMaDonVi ?? maDonViCurrent;
@@ -201,11 +216,20 @@ export function usePoliticalWorkData({
             setParentReportData(null);
           }
         } else if (isSuDoan) {
-          // sư đoàn (TBTC F5): báo cáo TONG_HOP của GS003 do PCT tổng hợp
+          // sư đoàn (TBTC F5): lấy báo cáo TONG_HOP do PCT tổng hợp,
+          // báo cáo này được PCT lưu tại chính đơn vị PCT (vd GS003.017)
           setParentOwnReportData(null);
+
+          const pctUnit = childUnits.find(
+            (u) =>
+              (u.kyhieuDonvi ?? "").toLowerCase().includes("pct") ||
+              (u.tenDonvi ?? "").toLowerCase().includes("chính trị"),
+          );
+          const consMaDonVi = pctUnit?.maDonVi ?? maDonViCurrent;
+
           try {
             const consRes = await politicalWorkService.getByDonVi(
-              maDonViCurrent,
+              consMaDonVi,
               reportDate,
               "TONG_HOP",
             );
