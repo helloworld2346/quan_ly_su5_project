@@ -288,22 +288,18 @@ export default function PoliticalWorkReport() {
     );
   }, [childRows]);
 
-  const totalRequiredCount = childRows.length;
-  const canConsolidate =
-    isParentUnit &&
-    !parentReportData &&
-    totalRequiredCount > 0 &&
-    approvedChildRows.length === totalRequiredCount;
+const canConsolidate =
+  isParentUnit && !parentReportData && approvedChildRows.length > 0;
 
   const isPastDate = false;
 
-const hasOwnReport = isPoliticalOffice
-  ? Boolean(ownReport && !ownReport.notSubmitted)
-  : isTrungDoan
-    ? Boolean(parentOwnReportData)
-    : canAddOwnReport
-      ? Boolean(dutyReport && !dutyReport.notSubmitted)
-      : Boolean(ownReport && !ownReport.notSubmitted);
+  const hasOwnReport = isPoliticalOffice
+    ? Boolean(ownReport && !ownReport.notSubmitted)
+    : isTrungDoan
+      ? Boolean(parentOwnReportData)
+      : canAddOwnReport
+        ? Boolean(dutyReport && !dutyReport.notSubmitted)
+        : Boolean(ownReport && !ownReport.notSubmitted);
 
   const handleAddReport = () => {
     if (isPastDate) {
@@ -375,7 +371,7 @@ const hasOwnReport = isPoliticalOffice
   const filteredChildRows = hideDraft(childRows.filter(matchesQuery));
   const filteredFlatRows = hideDraft(flatRows.filter(matchesQuery));
 
-const showTwoSections = isParentUnit;
+  const showTwoSections = isParentUnit;
 
   const totalUnits = isParentUnit ? childRows.length : reportData.length;
   const reported = isParentUnit
@@ -630,8 +626,8 @@ const showTwoSections = isParentUnit;
         consolidateLabel={
           parentReportData
             ? "Đã tổng hợp"
-            : approvedChildRows.length < totalRequiredCount
-              ? `Chưa đủ (${approvedChildRows.length}/${totalRequiredCount} đơn vị)`
+            : approvedChildRows.length === 0
+              ? "Chưa có đơn vị nào duyệt"
               : "Tổng hợp"
         }
       />

@@ -53,13 +53,10 @@ export function usePoliticalWorkViewModel({
     [childRows],
   );
 
-  const totalRequiredCount = childRows.length;
+const totalRequiredCount = childRows.length;
 
-  const canConsolidate =
-    isParentUnit &&
-    !parentReportData &&
-    totalRequiredCount > 0 &&
-    approvedChildRows.length === totalRequiredCount;
+const canConsolidate =
+  isParentUnit && !parentReportData && approvedChildRows.length > 0;
 
   const commanderReport =
     reportData.find((r) => r.status === "Chờ_Duyệt") ?? null;
