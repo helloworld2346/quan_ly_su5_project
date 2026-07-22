@@ -285,22 +285,39 @@ export function usePoliticalWorkData({
 
           setParentReportData(consItem ? mapItemToRow(consItem) : null);
         } else if (isTieuDoan && !isDbOrEb) {
-          // d4 - báo cáo tổng hợp TONG_HOP của chính tiểu đoàn
+          // Tiểu đoàn: ưu tiên báo cáo TONG_HOP của chính tiểu đoàn (nếu có tổng hợp),
+          // nếu không có thì lấy báo cáo DON_VI do chính tiểu đoàn tự nộp (vd d1).
           setParentOwnReportData(null);
+          let tdItem: PoliticalWorkItem | null = null;
           try {
             const consRes = await politicalWorkService.getByDonVi(
               ownMaDonVi,
               reportDate,
               "TONG_HOP",
             );
-            setParentReportData(
-              consRes.success && consRes.Result
-                ? mapItemToRow(consRes.Result)
-                : null,
-            );
+            if (consRes.success && consRes.Result) {
+              tdItem = consRes.Result;
+            }
           } catch {
-            setParentReportData(null);
+            /* bỏ qua, thử DON_VI bên dưới */
           }
+
+          if (!tdItem) {
+            try {
+              const ownRes = await politicalWorkService.getByDonVi(
+                ownMaDonVi,
+                reportDate,
+                "DON_VI",
+              );
+              if (ownRes.success && ownRes.Result) {
+                tdItem = ownRes.Result;
+              }
+            } catch {
+              /* bỏ qua */
+            }
+          }
+
+          setParentReportData(tdItem ? mapItemToRow(tdItem) : null);
         } else if (isSuDoan) {
           // sư đoàn (TBTC F5): lấy báo cáo TONG_HOP do PCT tổng hợp,
           // báo cáo này được PCT lưu tại chính đơn vị PCT (vd GS003.017)
@@ -378,6 +395,27 @@ export function usePoliticalWorkData({
       } else {
         setParentReportData(null);
         setParentOwnReportData(null);
+
+        // dbo/eb: đơn vị đặc biệt tự nộp báo cáo DON_VI (không có TONG_HOP).
+        // Lấy DON_VI của chính đơn vị để đổ lên bảng.
+        if (isDbOrEb) {
+          try {
+            const ownRes = await politicalWorkService.getByDonVi(
+              maDonViCurrent,
+              reportDate,
+              "DON_VI",
+            );
+            setReportData(
+              ownRes.success && ownRes.Result
+                ? [mapItemToRow(ownRes.Result)]
+                : [],
+            );
+          } catch {
+            setReportData([]);
+          }
+          return;
+        }
+
         // TONG_HOP do BCT tổng hợp, lưu tại chính đơn vị BCT
         // (giống flow PCT ↔ TBTC F5)
         const bctUnit = childUnits.find(
