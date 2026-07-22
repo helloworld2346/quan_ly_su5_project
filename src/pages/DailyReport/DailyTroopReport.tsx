@@ -581,19 +581,19 @@ export default function DailyTroopReport() {
         <StatCard
           tone="orange"
           icon={<FontAwesomeIcon icon={faUserTie} />}
-          title="SỐ SQ VẮNG"
+          title="VẮNG (SQ)"
           value={displayTotals.vangSQ}
         />
         <StatCard
           tone="red"
           icon={<FontAwesomeIcon icon={faUserGear} />}
-          title="SỐ QNCN VẮNG"
+          title="VẮNG (QNCN)"
           value={displayTotals.vangQNCN}
         />
         <StatCard
           tone="purple"
           icon={<FontAwesomeIcon icon={faUserGroup} />}
-          title="SỐ HSQ-BS VẮNG"
+          title="VẮNG (HSQ-BS)"
           value={displayTotals.vangHSQBS}
         />
       </div>

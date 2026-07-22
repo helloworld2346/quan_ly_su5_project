@@ -431,7 +431,7 @@ export default function PoliticalDashboard() {
                       }
                     >
                       <span className="dot green" />
-                      <span>Có kiến nghị</span>
+                      <span>Kiến nghị</span>
                       <b>{unit.proposals}</b>
                       <small>
                         (
@@ -459,7 +459,7 @@ export default function PoliticalDashboard() {
                       }
                     >
                       <span className="dot orange" />
-                      <span>Có đột xuất</span>
+                      <span>Đột xuất</span>
                       <b>{unit.incidents}</b>
                       <small>
                         (
