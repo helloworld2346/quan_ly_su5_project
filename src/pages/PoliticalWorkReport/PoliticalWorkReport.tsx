@@ -279,7 +279,8 @@ export default function PoliticalWorkReport() {
       .map((unit) => {
         const matched = reportData.find((r) => r.donVi === unit.maDonVi);
         const isAggregatingChild =
-          unit.capDonVi === "TRUNG_DOAN" || unit.capDonVi === "TIEU_DOAN";
+          (unit.capDonVi === "TRUNG_DOAN" || unit.capDonVi === "TIEU_DOAN") &&
+          !isDbOrEbUnit(unit);
 
         if (
           matched &&
