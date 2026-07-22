@@ -213,10 +213,18 @@ const isParentUnit =
         isParentUnit,
         isTacChien,
         parentReportData,
+        parentOwnReportData,
         reportData,
         caTrucFromApi,
       }),
-    [isParentUnit, isTacChien, parentReportData, reportData, caTrucFromApi],
+    [
+      isParentUnit,
+      isTacChien,
+      parentReportData,
+      parentOwnReportData,
+      reportData,
+      caTrucFromApi,
+    ],
   );
 
   const trucInfoFromReport = useMemo(
@@ -224,9 +232,10 @@ const isParentUnit =
       buildTrucInfoFromReport({
         isParentUnit,
         parentReportData,
+        parentOwnReportData,
         reportData,
       }),
-    [isParentUnit, parentReportData, reportData],
+    [isParentUnit, parentReportData, parentOwnReportData, reportData],
   );
 
   const currentEditingReport = useMemo(() => {

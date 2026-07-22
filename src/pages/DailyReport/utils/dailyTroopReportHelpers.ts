@@ -396,6 +396,7 @@ export function buildCaTrucInfo(args: {
   isParentUnit: boolean;
   isTacChien: boolean;
   parentReportData: ReportRow | null;
+  parentOwnReportData: ReportRow | null;
   reportData: ReportRow[];
   caTrucFromApi: CaTrucFromApi | null;
 }): CaTrucInfo | null {
@@ -403,12 +404,19 @@ export function buildCaTrucInfo(args: {
     isParentUnit,
     isTacChien,
     parentReportData,
+    parentOwnReportData,
     reportData,
     caTrucFromApi,
   } = args;
 
   if (isParentUnit) {
+    // trung đoàn/tiểu đoàn: ca trực nằm trong báo cáo TONG_HOP
     if (parentReportData) return parentReportData.rawItem.caTruc as CaTrucInfo;
+
+    // sư đoàn: ca trực nằm trong báo cáo DON_VI của chính sư đoàn (CH/f)
+    if (parentOwnReportData?.rawItem?.caTruc) {
+      return parentOwnReportData.rawItem.caTruc as CaTrucInfo;
+    }
 
     if (isTacChien && caTrucFromApi) {
       return {
@@ -446,12 +454,14 @@ export function buildCaTrucInfo(args: {
 export function buildTrucInfoFromReport(args: {
   isParentUnit: boolean;
   parentReportData: ReportRow | null;
+  parentOwnReportData: ReportRow | null;
   reportData: ReportRow[];
 }) {
-  const { isParentUnit, parentReportData, reportData } = args;
+  const { isParentUnit, parentReportData, parentOwnReportData, reportData } =
+    args;
 
   const currentReport = isParentUnit
-    ? parentReportData
+    ? (parentReportData ?? parentOwnReportData)
     : reportData.length > 0
       ? reportData[0]
       : null;
