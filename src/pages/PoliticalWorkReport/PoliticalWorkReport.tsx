@@ -152,6 +152,8 @@ export default function PoliticalWorkReport() {
   const canAddOwnReport =
     isTacChienSuDoan || isAdmin || isPoliticalOffice || isBanChinhTri;
 
+  const isTacChienTrungDoan = isTacChien && isTrungDoan;
+
   const canExportExcel = isTacChienSuDoan;
   const {
     reportData,
@@ -266,15 +268,20 @@ export default function PoliticalWorkReport() {
     if (!isParentUnit) return [];
 
     const rows = (childUnits ?? [])
-      .filter(
-        (unit) =>
-          (!isPoliticalOffice && !isBanChinhTri) ||
-          unit.maDonVi !== submitMaDonVi,
-      )
+      .filter((unit) => !isPoliticalOffice || unit.maDonVi !== submitMaDonVi)
       .filter((unit) => unit.kyhieuDonvi !== "CH/e")
       .map((unit) => {
         const matched = reportData.find((r) => r.donVi === unit.maDonVi);
-        if (matched) return { ...matched, notSubmitted: false };
+        const isAggregatingChild =
+          unit.capDonVi === "TRUNG_DOAN" || unit.capDonVi === "TIEU_DOAN";
+
+        if (
+          matched &&
+          (!isAggregatingChild || matched.loaiDonBaoCao === "TONG_HOP")
+        ) {
+          return { ...matched, notSubmitted: false };
+        }
+
         return createEmptyPoliticalWorkRow({
           maDonVi: unit.maDonVi,
           tenDonVi: unit.tenDonvi,
@@ -690,7 +697,9 @@ export default function PoliticalWorkReport() {
         hasReport={hasOwnReport}
         isPastDate={isPastDate}
         onConsolidate={
-          isParentUnit && !isTacChienSuDoan ? handleConsolidate : undefined
+          isParentUnit && !isTacChienSuDoan && !isTacChienTrungDoan
+            ? handleConsolidate
+            : undefined
         }
         consolidateDisabled={!canConsolidate}
         consolidateLabel={

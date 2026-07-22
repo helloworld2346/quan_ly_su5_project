@@ -90,7 +90,16 @@ export function usePoliticalWorkData({
         }
         if (tongHopRes.success && tongHopRes.Result) {
           for (const item of tongHopRes.Result) {
-            merged.set(item.donVi.maDonVi, item);
+            const child = childUnits.find(
+              (u) => u.maDonVi === item.donVi.maDonVi,
+            );
+            const isAggregating =
+              child?.capDonVi === "TRUNG_DOAN" ||
+              child?.capDonVi === "TIEU_DOAN";
+            // Với đơn vị lá/BAN (vd BCT): không cho TONG_HOP ghi đè DON_VI
+            if (isAggregating || !merged.has(item.donVi.maDonVi)) {
+              merged.set(item.donVi.maDonVi, item);
+            }
           }
         }
         setReportData(Array.from(merged.values()).map(mapItemToRow));
@@ -98,7 +107,7 @@ export function usePoliticalWorkData({
         const ownMaDonVi = submitMaDonVi ?? maDonViCurrent;
 
         if (isTrungDoan) {
-          // CH/e - báo cáo DON_VI của chính trung đoàn
+          // CH/e - báo cáo DON_VI của chính trung đoàn (GIỮ NGUYÊN)
           try {
             const ownRes = await politicalWorkService.getByDonVi(
               ownMaDonVi,
@@ -114,17 +123,26 @@ export function usePoliticalWorkData({
             setParentOwnReportData(null);
           }
 
-          // e4 - báo cáo tổng hợp TONG_HOP
+          // TONG_HOP do BCT tổng hợp, lưu tại chính đơn vị BCT
+          // (giống flow PCT ↔ TBTC F5). TBTC e chỉ thấy khi đã duyệt.
+          const bctUnit = childUnits.find(
+            (u) =>
+              (u.kyhieuDonvi ?? "").toLowerCase().includes("bct") ||
+              (u.tenDonvi ?? "").toLowerCase().includes("ban chính trị"),
+          );
+          const consMaDonVi = bctUnit?.maDonVi ?? maDonViCurrent;
           try {
             const consRes = await politicalWorkService.getByDonVi(
-              maDonViCurrent,
+              consMaDonVi,
               reportDate,
               "TONG_HOP",
             );
-            setParentReportData(
+            const consRow =
               consRes.success && consRes.Result
                 ? mapItemToRow(consRes.Result)
-                : null,
+                : null;
+            setParentReportData(
+              consRow && isApprovedStatus(consRow.status) ? consRow : null,
             );
           } catch {
             setParentReportData(null);
@@ -303,19 +321,30 @@ export function usePoliticalWorkData({
       } else {
         setParentReportData(null);
         setParentOwnReportData(null);
+        // TONG_HOP do BCT tổng hợp, lưu tại chính đơn vị BCT
+        // (giống flow PCT ↔ TBTC F5)
+        const bctUnit = childUnits.find(
+          (u) =>
+            (u.kyhieuDonvi ?? "").toLowerCase().includes("bct") ||
+            (u.tenDonvi ?? "").toLowerCase().includes("ban chính trị"),
+        );
+        const consMaDonVi = bctUnit?.maDonVi ?? maDonViCurrent;
         try {
-          const res = await politicalWorkService.getByDonVi(
-            maDonViCurrent,
+          const consRes = await politicalWorkService.getByDonVi(
+            consMaDonVi,
             reportDate,
-            (isTrungDoan || isTieuDoan) && !isDbOrEb ? "TONG_HOP" : "DON_VI",
+            "TONG_HOP",
           );
-          if (res.success && res.Result) {
-            setReportData([mapItemToRow(res.Result)]);
-          } else {
-            setReportData([]);
-          }
+          const consRow =
+            consRes.success && consRes.Result
+              ? mapItemToRow(consRes.Result)
+              : null;
+          // TBTC e chỉ thấy báo cáo tổng hợp của BCT khi đã duyệt
+          setParentReportData(
+            consRow && isApprovedStatus(consRow.status) ? consRow : null,
+          );
         } catch {
-          setReportData([]);
+          setParentReportData(null);
         }
       }
     } catch (error) {
