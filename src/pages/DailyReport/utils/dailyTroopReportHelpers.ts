@@ -14,6 +14,7 @@ type ChildUnit = {
   tenDonvi: string;
   kyhieuDonvi?: string;
   capDonVi?: string | null;
+  donViCon?: string[];
 };
 
 type CaTrucFromApi = {
@@ -335,7 +336,8 @@ export function buildDisplayRows(args: {
   const childRows = visibleChildUnits.map((unit) => {
     const matched = filtered.find((row) => row.donVi === unit.maDonVi);
     const isAggregatingChild =
-      unit.capDonVi === "TRUNG_DOAN" || unit.capDonVi === "TIEU_DOAN";
+      (unit.capDonVi === "TRUNG_DOAN" || unit.capDonVi === "TIEU_DOAN") &&
+      (unit.donViCon?.length ?? 0) > 0;
 
     if (
       matched &&
