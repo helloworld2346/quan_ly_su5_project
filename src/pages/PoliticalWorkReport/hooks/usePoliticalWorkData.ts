@@ -125,14 +125,12 @@ export function usePoliticalWorkData({
 
           // TONG_HOP do BCT tổng hợp, lưu tại chính đơn vị BCT
           // (giống flow PCT ↔ TBTC F5). TBTC e chỉ thấy khi đã duyệt.
-          // trung đoàn: lấy TONG_HOP do BCT tổng hợp, chỉ hiện khi đã duyệt
           const bctUnit = childUnits.find(
             (u) =>
               (u.kyhieuDonvi ?? "").toLowerCase().includes("bct") ||
               (u.tenDonvi ?? "").toLowerCase().includes("ban chính trị"),
           );
           const consMaDonVi = bctUnit?.maDonVi ?? maDonViCurrent;
-
           try {
             const consRes = await politicalWorkService.getByDonVi(
               consMaDonVi,

@@ -139,15 +139,11 @@ export default function PoliticalWorkReport() {
 
   const isDbOrEb = isDbOrEbUnit(account?.donVi);
 
-  const isChiHuyTrungDoan = isChiHuy && capDonVi === "TRUNG_DOAN";
-
-    const isConsolidatedOnly = isChiHuyTrungDoan;
-
   const isParentUnit =
     isAdmin ||
     isPoliticalOffice ||
+    isBanChinhTri ||
     (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
-    isChiHuyTrungDoan ||
     (isNoiVu && capDonVi === "TIEU_DOAN" && !isDbOrEb);
 
   const isTrungDoan = capDonVi === "TRUNG_DOAN";
@@ -654,8 +650,6 @@ export default function PoliticalWorkReport() {
         </td>
       </tr>
     );
-  
-  const effectiveTab = isConsolidatedOnly ? "consolidated" : activeTab;
 
   return (
     <section
@@ -675,39 +669,35 @@ export default function PoliticalWorkReport() {
             isPoliticalOffice ||
             isTrungDoan) &&
           !isTacChienSuDoan &&
-          !isChiHuyTrungDoan &&
           !hasOwnReport &&
           !shouldHideDraftAndUnsubmitted
             ? handleAddReport
             : undefined
         }
         onApprove={
-          canApprove && !isChiHuyTrungDoan
+          canApprove
             ? () => handleApproveReport(commanderReport!.idCongtac)
             : undefined
         }
         onRefuse={
-          canRefuse && !isChiHuyTrungDoan
+          canRefuse
             ? () => handleRefuseReportClick(commanderReport!)
             : undefined
         }
         onSubmit={
-          canSubmit && !isChiHuyTrungDoan
+          canSubmit
             ? () => handleSubmitReport(reportForSubmit!.idCongtac)
             : undefined
         }
         onRecall={
-          canRecall && !isChiHuyTrungDoan
+          canRecall
             ? () => handleRecallReport(reportForSubmit!.idCongtac)
             : undefined
         }
         hasReport={hasOwnReport}
         isPastDate={isPastDate}
         onConsolidate={
-          isParentUnit &&
-          !isTacChienSuDoan &&
-          !isTacChienTrungDoan &&
-          !isChiHuyTrungDoan
+          isParentUnit && !isTacChienSuDoan && !isTacChienTrungDoan
             ? handleConsolidate
             : undefined
         }
@@ -774,27 +764,23 @@ export default function PoliticalWorkReport() {
 
             {showTwoSections && (
               <div className={styles["political-tabs"]} role="tablist">
-                {!isConsolidatedOnly && (
-                  <button
-                    type="button"
-                    role="tab"
-                    aria-selected={effectiveTab === "child"}
-                    className={`${styles["political-tab"]} ${
-                      effectiveTab === "child"
-                        ? styles["political-tab--active"]
-                        : ""
-                    }`}
-                    onClick={() => setActiveTab("child")}
-                  >
-                    Báo cáo đơn vị
-                  </button>
-                )}
                 <button
                   type="button"
                   role="tab"
-                  aria-selected={effectiveTab === "consolidated"}
+                  aria-selected={activeTab === "child"}
                   className={`${styles["political-tab"]} ${
-                    effectiveTab === "consolidated"
+                    activeTab === "child" ? styles["political-tab--active"] : ""
+                  }`}
+                  onClick={() => setActiveTab("child")}
+                >
+                  Báo cáo đơn vị
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === "consolidated"}
+                  className={`${styles["political-tab"]} ${
+                    activeTab === "consolidated"
                       ? styles["political-tab--active"]
                       : ""
                   }`}
@@ -826,9 +812,10 @@ export default function PoliticalWorkReport() {
                 {showSkeleton ? (
                   renderSkeletonRows()
                 ) : showTwoSections ? (
-                  effectiveTab === "child" ? (
+                  activeTab === "child" ? (
                     <>
                       {filteredChildRows.map(renderRow)}
+
                       {filteredChildRows.length === 0 && (
                         <tr>
                           <td
