@@ -16,6 +16,7 @@ export function usePoliticalWorkData({
   isParentUnit,
   isTrungDoan,
   isTieuDoan,
+  isBanChinhTri,
   isDbOrEb,
   isPoliticalOffice,
   capDonVi,
@@ -29,6 +30,7 @@ export function usePoliticalWorkData({
   capDonVi?: string | null;
   isTrungDoan?: boolean;
   isTieuDoan?: boolean;
+  isBanChinhTri?: boolean;
   isDbOrEb?: boolean;
   isPoliticalOffice?: boolean;
   reportDate: string;
@@ -47,7 +49,10 @@ export function usePoliticalWorkData({
 
   const [dutyReport, setDutyReport] = useState<PoliticalWorkRow | null>(null);
 
-  const { childUnits } = useChildUnits(maDonViCurrent, isParentUnit);
+  const { childUnits, currentUnit } = useChildUnits(
+    maDonViCurrent,
+    isParentUnit,
+  );
 
   const showErrorRef = useRef(showError);
   useEffect(() => {
@@ -61,61 +66,34 @@ export function usePoliticalWorkData({
     setLoading(true);
     try {
       if (isParentUnit) {
-        if (isTrungDoan) {
-          // trung đoàn: đại đội/ban -> DON_VI, tiểu đoàn -> TONG_HOP, gộp lại
-          const [donViRes, tongHopRes] = await Promise.all([
-            politicalWorkService.getByDonViCha(
-              maDonViCurrent,
-              reportDate,
-              "DON_VI",
-            ),
-            politicalWorkService.getByDonViCha(
-              maDonViCurrent,
-              reportDate,
-              "TONG_HOP",
-            ),
-          ]);
+        // Trung đoàn, sư đoàn VÀ BCT trung đoàn: lấy báo cáo các đơn vị con
+        // (DON_VI + TONG_HOP) theo mã đơn vị cha đang xem (maDonViCurrent).
+        // Với BCT, maDonViCurrent = mã trung đoàn cha (viewMaDonVi).
+        const [donViRes, tongHopRes] = await Promise.all([
+          politicalWorkService.getByDonViCha(
+            maDonViCurrent,
+            reportDate,
+            "DON_VI",
+          ),
+          politicalWorkService.getByDonViCha(
+            maDonViCurrent,
+            reportDate,
+            "TONG_HOP",
+          ),
+        ]);
 
-          const merged = new Map<string, PoliticalWorkItem>();
-          if (donViRes.success && donViRes.Result) {
-            for (const item of donViRes.Result) {
-              merged.set(item.donVi.maDonVi, item);
-            }
+        const merged = new Map<string, PoliticalWorkItem>();
+        if (donViRes.success && donViRes.Result) {
+          for (const item of donViRes.Result) {
+            merged.set(item.donVi.maDonVi, item);
           }
-          if (tongHopRes.success && tongHopRes.Result) {
-            for (const item of tongHopRes.Result) {
-              merged.set(item.donVi.maDonVi, item);
-            }
-          }
-          setReportData(Array.from(merged.values()).map(mapItemToRow));
-        } else {
-          // sư đoàn (TBTC F5): phòng ban lá -> DON_VI, trung đoàn/tiểu đoàn -> TONG_HOP, gộp lại
-          const [donViRes, tongHopRes] = await Promise.all([
-            politicalWorkService.getByDonViCha(
-              maDonViCurrent,
-              reportDate,
-              "DON_VI",
-            ),
-            politicalWorkService.getByDonViCha(
-              maDonViCurrent,
-              reportDate,
-              "TONG_HOP",
-            ),
-          ]);
-
-          const merged = new Map<string, PoliticalWorkItem>();
-          if (donViRes.success && donViRes.Result) {
-            for (const item of donViRes.Result) {
-              merged.set(item.donVi.maDonVi, item);
-            }
-          }
-          if (tongHopRes.success && tongHopRes.Result) {
-            for (const item of tongHopRes.Result) {
-              merged.set(item.donVi.maDonVi, item);
-            }
-          }
-          setReportData(Array.from(merged.values()).map(mapItemToRow));
         }
+        if (tongHopRes.success && tongHopRes.Result) {
+          for (const item of tongHopRes.Result) {
+            merged.set(item.donVi.maDonVi, item);
+          }
+        }
+        setReportData(Array.from(merged.values()).map(mapItemToRow));
 
         const ownMaDonVi = submitMaDonVi ?? maDonViCurrent;
 
@@ -140,6 +118,38 @@ export function usePoliticalWorkData({
           try {
             const consRes = await politicalWorkService.getByDonVi(
               maDonViCurrent,
+              reportDate,
+              "TONG_HOP",
+            );
+            setParentReportData(
+              consRes.success && consRes.Result
+                ? mapItemToRow(consRes.Result)
+                : null,
+            );
+          } catch {
+            setParentReportData(null);
+          }
+        } else if (isBanChinhTri) {
+          // BCT trung đoàn: DON_VI của chính BCT (ownMaDonVi = mã BCT)
+          try {
+            const ownRes = await politicalWorkService.getByDonVi(
+              ownMaDonVi,
+              reportDate,
+              "DON_VI",
+            );
+            setParentOwnReportData(
+              ownRes.success && ownRes.Result
+                ? mapItemToRow(ownRes.Result)
+                : null,
+            );
+          } catch {
+            setParentOwnReportData(null);
+          }
+
+          // TONG_HOP do chính BCT tổng hợp (lưu tại mã BCT)
+          try {
+            const consRes = await politicalWorkService.getByDonVi(
+              ownMaDonVi,
               reportDate,
               "TONG_HOP",
             );
@@ -321,6 +331,7 @@ export function usePoliticalWorkData({
     maDonViCurrent,
     isParentUnit,
     isTrungDoan,
+    isBanChinhTri,
     isSuDoan,
     isTieuDoan,
     isDbOrEb,
@@ -339,6 +350,7 @@ export function usePoliticalWorkData({
     parentReportData,
     parentOwnReportData,
     childUnits,
+    currentUnit,
     loading,
     fetchReports,
     dutyReport,

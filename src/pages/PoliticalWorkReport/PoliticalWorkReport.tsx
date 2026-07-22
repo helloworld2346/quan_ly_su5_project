@@ -121,19 +121,36 @@ export default function PoliticalWorkReport() {
     (account?.donVi?.kyhieuDonvi ?? "").toLowerCase().includes("pct") ||
     (account?.donVi?.tenDonvi ?? "").toLowerCase().includes("phòng chính trị");
 
-  const viewMaDonVi = isPoliticalOffice ? "GS003" : submitMaDonVi;
+  const isBanChinhTri =
+    !isPoliticalOffice &&
+    capDonVi === "BAN" &&
+    ((account?.donVi?.kyhieuDonvi ?? "").toLowerCase().includes("bct") ||
+      (account?.donVi?.tenDonvi ?? "").toLowerCase().includes("ban chính trị"));
+
+  const parentRegimentMaDonVi = submitMaDonVi
+    ? submitMaDonVi.split(".").slice(0, -1).join(".") || undefined
+    : undefined;
+
+  const viewMaDonVi = isPoliticalOffice
+    ? "GS003"
+    : isBanChinhTri
+      ? (parentRegimentMaDonVi ?? submitMaDonVi)
+      : submitMaDonVi;
+
   const isDbOrEb = isDbOrEbUnit(account?.donVi);
 
   const isParentUnit =
     isAdmin ||
     isPoliticalOffice ||
+    isBanChinhTri ||
     (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
     (isNoiVu && capDonVi === "TIEU_DOAN" && !isDbOrEb);
 
   const isTrungDoan = capDonVi === "TRUNG_DOAN";
   const isTieuDoan = capDonVi === "TIEU_DOAN";
   const isTacChienSuDoan = isTacChien && capDonVi === "SU_DOAN";
-  const canAddOwnReport = isTacChienSuDoan || isAdmin || isPoliticalOffice;
+  const canAddOwnReport =
+    isTacChienSuDoan || isAdmin || isPoliticalOffice || isBanChinhTri;
 
   const canExportExcel = isTacChienSuDoan;
   const {
@@ -141,6 +158,7 @@ export default function PoliticalWorkReport() {
     parentReportData,
     parentOwnReportData,
     childUnits,
+    currentUnit,
     loading,
     fetchReports,
     dutyReport,
@@ -151,10 +169,12 @@ export default function PoliticalWorkReport() {
     isTieuDoan,
     isDbOrEb,
     isPoliticalOffice,
+    isBanChinhTri,
     capDonVi,
     showError,
     reportDate,
-    submitMaDonVi: isPoliticalOffice ? submitMaDonVi : undefined,
+    submitMaDonVi:
+      isPoliticalOffice || isBanChinhTri ? submitMaDonVi : undefined,
     fetchPctDuty: false,
   });
 
@@ -187,7 +207,7 @@ export default function PoliticalWorkReport() {
   );
 
   const reportForSubmit =
-    isParentUnit && (isTrungDoan || isPoliticalOffice)
+    isParentUnit && (isTrungDoan || isPoliticalOffice || isBanChinhTri)
       ? (trungDoanReports.find((r) => r.status === "Nháp") ?? null)
       : isParentUnit && parentReportData
         ? parentReportData
@@ -197,7 +217,7 @@ export default function PoliticalWorkReport() {
     isParentUnit && parentReportData ? parentReportData : ownReport;
 
   const commanderReport =
-    isParentUnit && (isTrungDoan || isPoliticalOffice)
+    isParentUnit && (isTrungDoan || isPoliticalOffice || isBanChinhTri)
       ? (trungDoanReports.find((r) => r.status === "Chờ_Duyệt") ?? null)
       : (reportData.find((r) => r.status === "Chờ_Duyệt") ?? null);
 
@@ -246,7 +266,11 @@ export default function PoliticalWorkReport() {
     if (!isParentUnit) return [];
 
     const rows = (childUnits ?? [])
-      .filter((unit) => !isPoliticalOffice || unit.maDonVi !== submitMaDonVi)
+      .filter(
+        (unit) =>
+          (!isPoliticalOffice && !isBanChinhTri) ||
+          unit.maDonVi !== submitMaDonVi,
+      )
       .filter((unit) => unit.kyhieuDonvi !== "CH/e")
       .map((unit) => {
         const matched = reportData.find((r) => r.donVi === unit.maDonVi);
@@ -269,6 +293,17 @@ export default function PoliticalWorkReport() {
       return [cheRow, ...rows];
     }
 
+    if (isBanChinhTri) {
+      const bctOwnRow: PoliticalWorkRow = parentOwnReportData
+        ? { ...parentOwnReportData, notSubmitted: false }
+        : createEmptyPoliticalWorkRow({
+            maDonVi: submitMaDonVi ?? "",
+            tenDonVi: account?.donVi?.tenDonvi ?? "",
+            kyhieuDonVi: account?.donVi?.kyhieuDonvi,
+          });
+      return [bctOwnRow, ...rows];
+    }
+
     if (isPoliticalOffice) {
       const pctOwnRow: PoliticalWorkRow = parentOwnReportData
         ? { ...parentOwnReportData, notSubmitted: false }
@@ -284,6 +319,7 @@ export default function PoliticalWorkReport() {
   }, [
     isParentUnit,
     isTrungDoan,
+    isBanChinhTri,
     childUnits,
     reportData,
     parentOwnReportData,
@@ -307,11 +343,13 @@ export default function PoliticalWorkReport() {
 
   const hasOwnReport = isPoliticalOffice
     ? Boolean(ownReport && !ownReport.notSubmitted)
-    : isTrungDoan
+    : isBanChinhTri
       ? Boolean(parentOwnReportData)
-      : canAddOwnReport
-        ? Boolean(dutyReport && !dutyReport.notSubmitted)
-        : Boolean(ownReport && !ownReport.notSubmitted);
+      : isTrungDoan
+        ? Boolean(parentOwnReportData)
+        : canAddOwnReport
+          ? Boolean(dutyReport && !dutyReport.notSubmitted)
+          : Boolean(ownReport && !ownReport.notSubmitted);
 
   const handleAddReport = () => {
     if (isPastDate) {
@@ -336,19 +374,33 @@ export default function PoliticalWorkReport() {
   };
 
   const parentRow = useMemo<PoliticalWorkRow>(() => {
+    // PCT và TBTC F5: giữ nhãn cứng "Sư đoàn 5" / "f5" như cũ
+    const useSuDoanLabel = isPoliticalOffice || isTacChienSuDoan;
+
     return parentReportData
       ? {
           ...parentReportData,
           notSubmitted: false,
-          tenDonVi: "Sư đoàn 5",
-          kyhieuDonVi: "f5",
+          tenDonVi: useSuDoanLabel
+            ? "Sư đoàn 5"
+            : (currentUnit?.tenDonvi ?? parentReportData.tenDonVi),
+          kyhieuDonVi: useSuDoanLabel
+            ? "f5"
+            : (currentUnit?.kyhieuDonvi ?? parentReportData.kyhieuDonVi),
         }
       : createEmptyPoliticalWorkRow({
           maDonVi: submitMaDonVi ?? "",
           tenDonVi: account?.donVi?.tenDonvi ?? "",
           kyhieuDonVi: account?.donVi?.kyhieuDonvi,
         });
-  }, [parentReportData, submitMaDonVi, account]);
+  }, [
+    parentReportData,
+    submitMaDonVi,
+    account,
+    currentUnit,
+    isPoliticalOffice,
+    isTacChienSuDoan,
+  ]);
 
   const shouldHideDraftAndUnsubmitted =
     shouldHideDraftAndUnsubmittedForCommander({
