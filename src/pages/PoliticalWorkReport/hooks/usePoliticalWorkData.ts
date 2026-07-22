@@ -19,6 +19,7 @@ export function usePoliticalWorkData({
   isBanChinhTri,
   isDbOrEb,
   isPoliticalOffice,
+  isChiHuyTrungDoan,
   capDonVi,
   reportDate,
   showError,
@@ -33,6 +34,7 @@ export function usePoliticalWorkData({
   isBanChinhTri?: boolean;
   isDbOrEb?: boolean;
   isPoliticalOffice?: boolean;
+  isChiHuyTrungDoan?: boolean;
   reportDate: string;
   showError: (msg: string) => void;
   submitMaDonVi?: string;
@@ -52,6 +54,7 @@ export function usePoliticalWorkData({
   const { childUnits, currentUnit } = useChildUnits(
     maDonViCurrent,
     isParentUnit,
+    isChiHuyTrungDoan,
   );
 
   const showErrorRef = useRef(showError);
@@ -339,7 +342,7 @@ export function usePoliticalWorkData({
             consRes.success && consRes.Result
               ? mapItemToRow(consRes.Result)
               : null;
-          // TBTC e chỉ thấy báo cáo tổng hợp của BCT khi đã duyệt
+          // Trực chỉ huy trung đoàn / TBTC e chỉ thấy TONG_HOP của BCT khi đã duyệt
           setParentReportData(
             consRow && isApprovedStatus(consRow.status) ? consRow : null,
           );

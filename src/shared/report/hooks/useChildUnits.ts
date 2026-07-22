@@ -6,6 +6,7 @@ import { getDirectChildUnits } from "../utils/reportUnitTree";
 export function useChildUnits(
   maDonViCurrent: string | undefined,
   isParentUnit: boolean,
+  forceLoadChildren: boolean = false,
 ): { childUnits: DonVi[]; currentUnit: DonVi | null } {
   const [childUnits, setChildUnits] = useState<DonVi[]>([]);
   const [currentUnit, setCurrentUnit] = useState<DonVi | null>(null);
@@ -23,7 +24,9 @@ export function useChildUnits(
           allUnits.find((u) => u.maDonVi === maDonViCurrent) ?? null,
         );
         setChildUnits(
-          isParentUnit ? getDirectChildUnits(allUnits, maDonViCurrent) : [],
+          isParentUnit || forceLoadChildren
+            ? getDirectChildUnits(allUnits, maDonViCurrent)
+            : [],
         );
       } catch (err) {
         if (import.meta.env.DEV) {
@@ -34,7 +37,7 @@ export function useChildUnits(
       }
     };
     void fetchDonViInfo();
-  }, [maDonViCurrent, isParentUnit]);
+  }, [maDonViCurrent, isParentUnit, forceLoadChildren]);
 
   return { childUnits, currentUnit };
 }

@@ -98,6 +98,11 @@ export default function DailyTroopReport() {
   const isDbOrEb = isDbOrEbUnit(account?.donVi);
   const isTrungDoan = capDonVi === "TRUNG_DOAN";
   const isTieuDoan = capDonVi === "TIEU_DOAN";
+  const isSuDoan = capDonVi === "SU_DOAN";
+  const isParentUnit =
+    isAdmin ||
+    (isTacChien && (isTrungDoan || isSuDoan)) ||
+    (isNoiVu && isTieuDoan && !isDbOrEb);
 
   const {
     reportData,
@@ -165,7 +170,6 @@ export default function DailyTroopReport() {
   } = useReportActions({ showSuccess, showError, fetchReports });
 
   const {
-    isParentUnit,
     ownReport,
     commanderReport,
     canAddReport,
@@ -337,19 +341,63 @@ export default function DailyTroopReport() {
     let cancelled = false;
 
     const fetchNhiemVuList = async () => {
-      if (!isParentUnit || !maDonViCurrent || !(isTrungDoan || isTieuDoan)) {
+      if (
+        !isParentUnit ||
+        !maDonViCurrent ||
+        !(isTrungDoan || isTieuDoan || isSuDoan)
+      ) {
         if (!cancelled) setNhiemVuList([]);
         return;
       }
 
       try {
-        const res = await dailyReportService.searchNhiemVuNgayChildrenByDonVi(
-          maDonViCurrent,
-          reportDate,
-          "DON_VI",
-        );
+        const [donViRes, tongHopRes] = await Promise.all([
+          dailyReportService.searchNhiemVuNgayChildrenByDonVi(
+            maDonViCurrent,
+            reportDate,
+            "DON_VI",
+          ),
+          dailyReportService.searchNhiemVuNgayChildrenByDonVi(
+            maDonViCurrent,
+            reportDate,
+            "TONG_HOP",
+          ),
+        ]);
 
-        const list = (res.Result ?? []).map((item) => ({
+        // gom theo maDonVi; DON_VI làm nền, TONG_HOP chỉ ghi đè cho đơn vị tổng hợp
+        const merged = new Map<string, (typeof donViRes.Result)[number]>();
+
+        for (const item of donViRes.Result ?? []) {
+          merged.set(item.donViResponse.maDonVi, item);
+        }
+
+        for (const item of tongHopRes.Result ?? []) {
+          const ma = item.donViResponse.maDonVi;
+          const child = childUnits.find((u) => u.maDonVi === ma);
+          const kyhieu = (
+            child?.kyhieuDonvi ??
+            item.donViResponse.kyhieuDonvi ??
+            ""
+          ).toLowerCase();
+          const tenDonvi = (
+            child?.tenDonvi ??
+            item.donViResponse.tenDonvi ??
+            ""
+          ).toLowerCase();
+
+          // trung đoàn/tiểu đoàn + PCT => lấy TONG_HOP
+          const isAggregating =
+            child?.capDonVi === "TRUNG_DOAN" ||
+            child?.capDonVi === "TIEU_DOAN" ||
+            kyhieu.includes("pct") ||
+            tenDonvi.includes("chính trị");
+
+          if (isAggregating || !merged.has(ma)) {
+            merged.set(ma, item);
+          }
+        }
+
+        const list = Array.from(merged.values()).map((item) => ({
           maDonVi: item.donViResponse.maDonVi,
           donVi: item.donViResponse.kyhieuDonvi || "",
           data: {
@@ -373,7 +421,15 @@ export default function DailyTroopReport() {
     return () => {
       cancelled = true;
     };
-  }, [isParentUnit, maDonViCurrent, reportDate, isTrungDoan, isTieuDoan]);
+  }, [
+    isParentUnit,
+    maDonViCurrent,
+    reportDate,
+    isTrungDoan,
+    isTieuDoan,
+    isSuDoan,
+    childUnits,
+  ]);
 
   const handleAddReport = () => {
     if (isPastDate) {

@@ -277,14 +277,20 @@ const isParentUnit =
     const entries: NhiemVuEntry[] = [];
 
     if (isParentUnit) {
-      const ownReportRow = parentReportData ?? null;
+      const isSuDoan = capDonVi === "SU_DOAN";
+      const ownReportRow = isSuDoan
+        ? parentOwnReportData
+        : (parentReportData ?? null);
+      const ownNhiemVuData = isSuDoan ? cheNhiemVuData : nhiemVuData;
 
       entries.push({
         id: maDonViCurrent ?? "own",
         title: account?.donVi?.tenDonvi || account?.donVi?.kyhieuDonvi || "",
         subtitle: maDonViCurrent ?? "",
-        data: nhiemVuData ? buildNhiemVuSummary(nhiemVuData) : null,
-        reportStatusLabel: getNhiemVuReportStatusLabel(ownReportRow),
+        data: ownNhiemVuData ? buildNhiemVuSummary(ownNhiemVuData) : null,
+        reportStatusLabel: getNhiemVuReportStatusLabel(
+          ownNhiemVuData ? ownReportRow : ownReportRow,
+        ),
       });
 
       if (isTrungDoan) {
@@ -365,6 +371,7 @@ const isParentUnit =
     cheNhiemVuData,
     childUnits,
     reportData,
+    capDonVi,
     shouldHideDraftAndUnsubmitted,
   ]);
 

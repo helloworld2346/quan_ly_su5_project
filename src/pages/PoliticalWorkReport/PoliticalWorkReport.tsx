@@ -153,6 +153,7 @@ export default function PoliticalWorkReport() {
     isTacChienSuDoan || isAdmin || isPoliticalOffice || isBanChinhTri;
 
   const isTacChienTrungDoan = isTacChien && isTrungDoan;
+  const isChiHuyTrungDoan = isChiHuy && isTrungDoan;
 
   const canExportExcel = isTacChienSuDoan;
   const {
@@ -171,6 +172,7 @@ export default function PoliticalWorkReport() {
     isTieuDoan,
     isDbOrEb,
     isPoliticalOffice,
+    isChiHuyTrungDoan,
     isBanChinhTri,
     capDonVi,
     showError,
@@ -417,9 +419,21 @@ export default function PoliticalWorkReport() {
     });
 
   const flatRows = useMemo<PoliticalWorkRow[]>(() => {
+    if (isChiHuyTrungDoan) {
+      return parentReportData
+        ? [{ ...parentReportData, notSubmitted: false }]
+        : [];
+    }
     if (!isParentUnit) return reportData;
     return [parentRow, ...childRows];
-  }, [isParentUnit, reportData, parentRow, childRows]);
+  }, [
+    isParentUnit,
+    isChiHuyTrungDoan,
+    parentReportData,
+    reportData,
+    parentRow,
+    childRows,
+  ]);
 
   const matchesQuery = (row: PoliticalWorkRow) => {
     const keyword = query.trim().toLowerCase();
