@@ -733,6 +733,7 @@ export default function DailyTroopReport() {
           bienCheTong={bienCheTongTrungDoan}
           caTrucInfo={caTrucInfo}
           isTacChien={isTacChien}
+          reportDate={reportDate}
         />
       )}
 

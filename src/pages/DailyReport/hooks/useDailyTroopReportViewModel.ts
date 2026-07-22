@@ -241,8 +241,12 @@ const isParentUnit =
       return parentReportData.rawItem;
     }
 
+    if (parentOwnReportData?.idDonBaoCao === editModalData.reportId) {
+      return parentOwnReportData.rawItem;
+    }
+
     return null;
-  }, [editModalData, reportData, parentReportData]);
+  }, [editModalData, reportData, parentReportData, parentOwnReportData]);
 
   const currentEditingDetail = useMemo<DetailStepData | null>(() => {
     const raw = (currentEditingReport as { tinhHinhHoatDong?: string } | null)

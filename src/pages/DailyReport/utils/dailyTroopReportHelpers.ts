@@ -13,6 +13,7 @@ type ChildUnit = {
   maDonVi: string;
   tenDonvi: string;
   kyhieuDonvi?: string;
+  capDonVi?: string | null;
 };
 
 type CaTrucFromApi = {
@@ -227,7 +228,7 @@ export function buildDisplayRows(args: {
   const {
     query,
     reportData,
-    parentReportData,
+    // parentReportData,
     parentOwnReportData,
     childUnits,
     isParentUnit,
@@ -289,8 +290,8 @@ export function buildDisplayRows(args: {
   const ownUnitRow =
     isParentUnit && !isTrungDoan && !isTieuDoan && ownUnitMatches
       ? [
-          parentReportData
-            ? { ...parentReportData, notSubmitted: false }
+          parentOwnReportData
+            ? { ...parentOwnReportData, notSubmitted: false }
             : createEmptyReportRow({
                 idDonBaoCao: maDonViCurrent ?? "",
                 tenDonVi: accountDonVi?.tenDonvi ?? "",
@@ -333,7 +334,15 @@ export function buildDisplayRows(args: {
 
   const childRows = visibleChildUnits.map((unit) => {
     const matched = filtered.find((row) => row.donVi === unit.maDonVi);
-    if (matched) return { ...matched, notSubmitted: false };
+    const isAggregatingChild =
+      unit.capDonVi === "TRUNG_DOAN" || unit.capDonVi === "TIEU_DOAN";
+
+    if (
+      matched &&
+      (!isAggregatingChild || matched.loaiDonBaoCao === "TONG_HOP")
+    ) {
+      return { ...matched, notSubmitted: false };
+    }
 
     return createEmptyReportRow({
       idDonBaoCao: unit.maDonVi,

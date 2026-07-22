@@ -85,7 +85,7 @@ export const EXECUTIVE_POLITICAL_NAV: NavItem = {
 };
 
 export const EXECUTIVE_NAV_GROUP = {
-  label: "Tổng hợp điều hành",
+  label: "Dashboard",
   items: [EXECUTIVE_NAV, EXECUTIVE_POLITICAL_NAV],
 };
 
