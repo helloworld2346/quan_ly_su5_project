@@ -105,6 +105,60 @@ export function usePoliticalWorkData({
             }
           }
         }
+        // TBTC F5 & PCT: mỗi trung đoàn con hiển thị báo cáo TONG_HOP do BCT
+        // của chính trung đoàn đó tổng hợp (lưu tại mã BCT - cháu của F5/PCT).
+        // BCT là con trực tiếp của trung đoàn -> lấy qua getByDonViCha(mã trung đoàn).
+        if (isSuDoan || isPoliticalOffice) {
+          const trungDoanChildren = childUnits.filter(
+            (u) => u.capDonVi === "TRUNG_DOAN",
+          );
+          const bctResults = await Promise.all(
+            trungDoanChildren.map(async (td) => {
+              try {
+                const res = await politicalWorkService.getByDonViCha(
+                  td.maDonVi,
+                  reportDate,
+                  "TONG_HOP",
+                );
+                const bctItem =
+                  res.success && res.Result
+                    ? res.Result.find(
+                        (it) =>
+                          (it.donVi.kyhieuDonvi ?? "")
+                            .toLowerCase()
+                            .includes("bct") ||
+                          (it.donVi.tenDonvi ?? "")
+                            .toLowerCase()
+                            .includes("ban chính trị"),
+                      )
+                    : undefined;
+                return { td, bctItem };
+              } catch {
+                return {
+                  td,
+                  bctItem: undefined as PoliticalWorkItem | undefined,
+                };
+              }
+            }),
+          );
+
+          for (const { td, bctItem } of bctResults) {
+            // chỉ hiển thị khi đã duyệt (BCT trình phê duyệt -> backend tự duyệt)
+            if (bctItem && isApprovedStatus(bctItem.status)) {
+              // gán báo cáo TONG_HOP của BCT vào chính mã trung đoàn
+              merged.set(td.maDonVi, {
+                ...bctItem,
+                donVi: {
+                  maDonVi: td.maDonVi,
+                  tenDonvi: td.tenDonvi,
+                  kyhieuDonvi: td.kyhieuDonvi,
+                  capDonVi: td.capDonVi,
+                },
+              });
+            }
+          }
+        }
+
         setReportData(Array.from(merged.values()).map(mapItemToRow));
 
         const ownMaDonVi = submitMaDonVi ?? maDonViCurrent;
