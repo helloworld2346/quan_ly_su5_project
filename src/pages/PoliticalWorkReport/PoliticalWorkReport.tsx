@@ -270,7 +270,11 @@ export default function PoliticalWorkReport() {
     if (!isParentUnit) return [];
 
     const rows = (childUnits ?? [])
-      .filter((unit) => !isPoliticalOffice || unit.maDonVi !== submitMaDonVi)
+      .filter(
+        (unit) =>
+          (!isPoliticalOffice && !isBanChinhTri) ||
+          unit.maDonVi !== submitMaDonVi,
+      )
       .filter((unit) => unit.kyhieuDonvi !== "CH/e")
       .map((unit) => {
         const matched = reportData.find((r) => r.donVi === unit.maDonVi);
