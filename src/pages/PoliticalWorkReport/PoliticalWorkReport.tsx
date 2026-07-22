@@ -421,7 +421,16 @@ export default function PoliticalWorkReport() {
   const flatRows = useMemo<PoliticalWorkRow[]>(() => {
     if (isChiHuyTrungDoan) {
       return parentReportData
-        ? [{ ...parentReportData, notSubmitted: false }]
+        ? [
+            {
+              ...parentReportData,
+              donVi: currentUnit?.maDonVi ?? parentReportData.donVi,
+              tenDonVi: currentUnit?.tenDonvi ?? parentReportData.tenDonVi,
+              kyhieuDonVi:
+                currentUnit?.kyhieuDonvi ?? parentReportData.kyhieuDonVi,
+              notSubmitted: false,
+            },
+          ]
         : [];
     }
     if (!isParentUnit) return reportData;
@@ -430,6 +439,7 @@ export default function PoliticalWorkReport() {
     isParentUnit,
     isChiHuyTrungDoan,
     parentReportData,
+    currentUnit,
     reportData,
     parentRow,
     childRows,
