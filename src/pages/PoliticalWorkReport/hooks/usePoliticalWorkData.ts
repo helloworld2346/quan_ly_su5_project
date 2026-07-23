@@ -397,7 +397,6 @@ export function usePoliticalWorkData({
         setParentOwnReportData(null);
 
         // dbo/eb: đơn vị đặc biệt tự nộp báo cáo DON_VI (không có TONG_HOP).
-        // Lấy DON_VI của chính đơn vị để đổ lên bảng.
         if (isDbOrEb) {
           try {
             const ownRes = await politicalWorkService.getByDonVi(
@@ -416,8 +415,24 @@ export function usePoliticalWorkData({
           return;
         }
 
-        // TONG_HOP do BCT tổng hợp, lưu tại chính đơn vị BCT
-        // (giống flow PCT ↔ TBTC F5)
+        const ownLoai: "DON_VI" | "TONG_HOP" = isTieuDoan
+          ? "TONG_HOP"
+          : "DON_VI";
+        try {
+          const ownRes = await politicalWorkService.getByDonVi(
+            maDonViCurrent,
+            reportDate,
+            ownLoai,
+          );
+          setReportData(
+            ownRes.success && ownRes.Result
+              ? [mapItemToRow(ownRes.Result)]
+              : [],
+          );
+        } catch {
+          setReportData([]);
+        }
+
         const bctUnit = childUnits.find(
           (u) =>
             (u.kyhieuDonvi ?? "").toLowerCase().includes("bct") ||
@@ -434,7 +449,6 @@ export function usePoliticalWorkData({
             consRes.success && consRes.Result
               ? mapItemToRow(consRes.Result)
               : null;
-          // Trực chỉ huy trung đoàn / TBTC e chỉ thấy TONG_HOP của BCT khi đã duyệt
           setParentReportData(
             consRow && isApprovedStatus(consRow.status) ? consRow : null,
           );

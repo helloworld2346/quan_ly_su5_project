@@ -144,8 +144,7 @@ export default function PoliticalWorkReport() {
     isPoliticalOffice ||
     isBanChinhTri ||
     (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
-    ((isNoiVu || isChiHuy) && capDonVi === "TIEU_DOAN" && !isDbOrEb);
-
+    (isNoiVu && capDonVi === "TIEU_DOAN" && !isDbOrEb);
   const isTrungDoan = capDonVi === "TRUNG_DOAN";
   const isTieuDoan = capDonVi === "TIEU_DOAN";
   const isTacChienSuDoan = isTacChien && capDonVi === "SU_DOAN";
