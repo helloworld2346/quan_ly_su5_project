@@ -216,6 +216,40 @@ export default function DailyTroopReport() {
     cheNhiemVuData,
   });
 
+  const handleCompleteSignature = async () => {
+    // Chưa có báo cáo (đang tạo mới): chỉ set cờ, chữ ký sẽ gửi kèm khi createReport
+    if (!ownReport?.idDonBaoCao || !signatureBase64) {
+      setSignatureDone(true);
+      return;
+    }
+
+    const raw = ownReport.rawItem;
+    try {
+      await dailyReportService.updateReport(ownReport.idDonBaoCao, {
+        quanSoTong: raw.quanSoTong,
+        quanSoHienDien: raw.quanSoHienDien,
+        quanSoVang: raw.quanSoVang,
+        thoiGianBaoCao: raw.thoiGianBaoCao,
+        thongTinVang: raw.thongTinVang,
+        chiTietVang: raw.chiTietVang,
+        trucBanChiHuy: raw.trucBanChiHuy,
+        trucBanTacChien: raw.trucBanTacChien,
+        tinhHinhHoatDong: raw.tinhHinhHoatDong,
+        account: account?.idTaiKhoan ?? "",
+        donVi: raw.donVi.maDonVi,
+        chuKySo: signatureBase64,
+      });
+      setSignatureDone(true);
+      showSuccess("Ký số thành công");
+      await fetchReports();
+    } catch (error) {
+      handleApiError(error, {
+        showError,
+        errorMessage: "Không thể lưu chữ ký",
+      });
+    }
+  };
+
     const [prevReportId, setPrevReportId] = useState<string | undefined>(
       ownReport?.idDonBaoCao,
     );
@@ -668,7 +702,7 @@ export default function DailyTroopReport() {
         }
         signature={ownReport?.rawItem?.chuKySo}
         onSign={setSignatureBase64}
-        onComplete={() => setSignatureDone(true)}
+        onComplete={handleCompleteSignature}
         completed={signatureDone}
       />
 

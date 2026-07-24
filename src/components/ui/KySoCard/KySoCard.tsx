@@ -19,7 +19,13 @@ export default function KySoCard({
   completed = false,
 }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
-  const [preview, setPreview] = useState<string | undefined>(signature);
+  const [preview, setPreview] = useState<string | undefined>(signature);  
+
+    const [prevSignature, setPrevSignature] = useState(signature);
+    if (signature !== prevSignature) {
+      setPrevSignature(signature);
+      setPreview(signature);
+    }
 
   const handlePick = () => fileRef.current?.click();
 

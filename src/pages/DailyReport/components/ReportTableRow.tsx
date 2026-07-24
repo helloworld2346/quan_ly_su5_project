@@ -138,7 +138,7 @@ export default function ReportTableRow({
       <td>
         <ReportStatusBadge status={row.status} />
       </td>
-      <td>{row.rawItem.anhChuKy ? "Đã ký" : "Chưa ký"}</td>
+      <td>{row.rawItem.chuKySo ? "Đã ký" : "Chưa ký"}</td>
       <td className={styles.noteCell}>{row.ghiChu}</td>
       <td className={styles.actionCell}>
         <div className={styles.actionWrapper}>
