@@ -1,0 +1,38 @@
+.kySoInfoBox {  
+  display: flex;  
+  flex-direction: column;  
+  align-items: center;  
+  gap: 12px;  
+  padding: 16px;  
+}  
+  
+.kySoRole {  
+  font-weight: 600;  
+  font-size: 15px;  
+}  
+  
+.kySoImageArea {  
+  display: flex;  
+  align-items: center;  
+  justify-content: center;  
+  min-height: 120px;  
+  min-width: 220px;  
+  border: 1px dashed var(--border-color, #cbd5e1);  
+  border-radius: 8px;  
+}  
+  
+.kySoImage {  
+  max-width: 260px;  
+  max-height: 160px;  
+  object-fit: contain;  
+}  
+  
+.kySoEmpty {  
+  color: var(--text-muted, #94a3b8);  
+  font-size: 13px;  
+}  
+  
+.kySoName {  
+  font-weight: 600;  
+  font-size: 14px;  
+}

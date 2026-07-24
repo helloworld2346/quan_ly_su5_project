@@ -1,4 +1,5 @@
 import { createPortal } from "react-dom";
+import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faEllipsisVertical,
@@ -9,7 +10,8 @@ import ReportStatusBadge from "../../../components/ui/ReportStatusBadge/ReportSt
 import styles from "../DailyTroopReport.module.css";
 import type { ReportRow } from "../../../types/dailyReport";
 import { normalizeUnitName } from "../../../utils/reportUtils";
-import { formatNum } from "../../../utils/reportUtils";  
+import { formatNum } from "../../../utils/reportUtils";
+import KySoInfoModal from "../KySoInfoModal";
 
 type Props = {
   row: ReportRow;
@@ -42,6 +44,8 @@ export default function ReportTableRow({
   onViewDetail,
   onEditReport,
 }: Props) {
+  const [showKySo, setShowKySo] = useState(false);
+
   if (row.notSubmitted) {
     return (
       <tr
@@ -99,6 +103,27 @@ export default function ReportTableRow({
       row.status === "Từ_Chối" ||
       row.status === "Từ chối");
 
+  const parseTrucSafe = (raw?: string) => {
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw) as {
+        tenNguoitruc?: string;
+        capbacNguoitruc?: string;
+        chucvuNguoitruc?: string;
+      };
+    } catch {
+      return null;
+    }
+  };
+
+  const nguoiKy = parseTrucSafe(row.rawItem.trucBanTacChien)?.tenNguoitruc
+    ? parseTrucSafe(row.rawItem.trucBanTacChien)
+    : parseTrucSafe(row.rawItem.trucBanChiHuy);
+
+  const hoTenKy = nguoiKy?.tenNguoitruc
+    ? `${nguoiKy.capbacNguoitruc ?? ""} - ${nguoiKy.tenNguoitruc}`
+    : undefined;
+
   return (
     <tr
       key={row.idDonBaoCao}
@@ -138,7 +163,19 @@ export default function ReportTableRow({
       <td>
         <ReportStatusBadge status={row.status} />
       </td>
-      <td>{row.rawItem.chuKySo ? "Đã ký" : "Chưa ký"}</td>
+      <td>
+        {row.rawItem.chuKySo ? (
+          <button
+            type="button"
+            className={styles.kySoLinkBtn}
+            onClick={() => setShowKySo(true)}
+          >
+            Đã ký
+          </button>
+        ) : (
+          "Chưa ký"
+        )}
+      </td>
       <td className={styles.noteCell}>{row.ghiChu}</td>
       <td className={styles.actionCell}>
         <div className={styles.actionWrapper}>
@@ -194,6 +231,16 @@ export default function ReportTableRow({
             )}
         </div>
       </td>
+      {showKySo &&
+        createPortal(
+          <KySoInfoModal
+            chuKySo={row.rawItem.chuKySo}
+            chucVu={nguoiKy?.chucvuNguoitruc}
+            hoTen={hoTenKy}
+            onClose={() => setShowKySo(false)}
+          />,
+          document.body,
+        )}
     </tr>
   );
 }
