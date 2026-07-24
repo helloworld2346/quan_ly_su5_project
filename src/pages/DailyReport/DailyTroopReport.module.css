@@ -1073,3 +1073,40 @@
   text-decoration: underline;  
   padding: 0;  
 }
+
+.kySoBadge {  
+  display: inline-flex;  
+  align-items: center;  
+  justify-content: center;  
+  padding: 3px 10px;  
+  border-radius: 12px;  
+  font-size: 12px;  
+  font-weight: 600;  
+  line-height: 1.2;  
+  white-space: nowrap;  
+}  
+  
+/* Đã ký: badge xanh, click được */  
+.kySoSigned {  
+  border: none;  
+  cursor: pointer;  
+  color: #15803d;  
+  background: #dcfce7;  
+  font: inherit;  
+}  
+.kySoSigned:hover {  
+  background: #bbf7d0;  
+}  
+  
+/* Chưa ký: badge xám */  
+.kySoUnsigned {  
+  color: #64748b;  
+  background: #f1f5f9;  
+}  
+  
+@media (max-width: 768px) {  
+  .kySoBadge {  
+    padding: 2px 8px;  
+    font-size: 10px;  
+  }  
+}

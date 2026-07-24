@@ -167,13 +167,15 @@ export default function ReportTableRow({
         {row.rawItem.chuKySo ? (
           <button
             type="button"
-            className={styles.kySoLinkBtn}
+            className={`${styles.kySoBadge} ${styles.kySoSigned}`}
             onClick={() => setShowKySo(true)}
           >
             Đã ký
           </button>
         ) : (
-          "Chưa ký"
+          <span className={`${styles.kySoBadge} ${styles.kySoUnsigned}`}>
+            Chưa ký
+          </span>
         )}
       </td>
       <td className={styles.noteCell}>{row.ghiChu}</td>
