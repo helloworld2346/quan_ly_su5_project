@@ -607,7 +607,7 @@ export default function DailyTroopReport() {
               ? () => handleSubmitReport(ownReport!.idDonBaoCao)
               : undefined
         }
-        submitDisabled={!signatureDone || !signatureBase64}
+        submitDisabled={isChiHuy ? !signatureDone || !signatureBase64 : false}
         onRecall={
           canRecall
             ? () => handleRecallReport(ownReport!.idDonBaoCao)
@@ -693,18 +693,20 @@ export default function DailyTroopReport() {
         />
       )}
 
-      <KySoCard
-        chucVu="Người báo cáo"
-        hoTen={
-          nguoiBaoCao?.tenNguoitruc
-            ? `${nguoiBaoCao.capbacNguoitruc} - ${nguoiBaoCao.tenNguoitruc}`
-            : undefined
-        }
-        signature={ownReport?.rawItem?.chuKySo}
-        onSign={setSignatureBase64}
-        onComplete={handleCompleteSignature}
-        completed={signatureDone}
-      />
+      {isChiHuy && (
+        <KySoCard
+          chucVu="Người báo cáo"
+          hoTen={
+            nguoiBaoCao?.tenNguoitruc
+              ? `${nguoiBaoCao.capbacNguoitruc} - ${nguoiBaoCao.tenNguoitruc}`
+              : undefined
+          }
+          signature={ownReport?.rawItem?.chuKySo}
+          onSign={setSignatureBase64}
+          onComplete={handleCompleteSignature}
+          completed={signatureDone}
+        />
+      )}
 
       {selectedReportRow && (
         <TroopDetailModal

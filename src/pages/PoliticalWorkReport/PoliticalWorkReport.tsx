@@ -785,7 +785,9 @@ export default function PoliticalWorkReport() {
             ? () => handleSubmitReport(reportForSubmit!.idCongtac)
             : undefined
         }
-        submitDisabled={ownReport ? !signatureDone || !signatureBase64 : false}
+        submitDisabled={
+          ownReport && isChiHuy ? !signatureDone || !signatureBase64 : false
+        }
         onRecall={
           canRecall
             ? () => handleRecallReport(reportForSubmit!.idCongtac)
@@ -1031,7 +1033,7 @@ export default function PoliticalWorkReport() {
               })()}
             </div>
           </div>
-          {ownReport && (
+          {ownReport && isChiHuy && (
             <KySoCard
               chucVu="Người báo cáo"
               hoTen={(() => {
