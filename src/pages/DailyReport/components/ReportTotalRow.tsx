@@ -64,7 +64,7 @@ export default function ReportTotalRow({
       <td>{formatNum(displayTotals.congTacSuDoan)}</td>
       <td>{formatNum(displayTotals.hocSQ)}</td>
       <td>{formatNum(displayTotals.hocCS)}</td>
-      <td>{formatNum(displayTotals.lyDoVangKhac)}</td>
+      <td></td>
       <td></td>
       <td></td>
       <td className={styles.actionCell}>

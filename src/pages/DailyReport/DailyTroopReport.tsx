@@ -7,6 +7,7 @@ import TroopDetailModal from "./TroopDetailModal";
 import CreateReportModal from "./CreateReportModal";
 import RefuseDialog from "../../components/ui/RefuseDialog/RefuseDialog";
 import CaTrucInfoCard from "../../components/ui/CaTrucInfoCard/CaTrucInfoCard";
+import KySoCard from "../../components/ui/KySoCard/KySoCard";
 
 import { dailyReportService } from "../../services/dailyReport/dailyReportService";
 import { useAuth } from "../../context/useAuth";
@@ -103,6 +104,11 @@ export default function DailyTroopReport() {
     isAdmin ||
     (isTacChien && (isTrungDoan || isSuDoan)) ||
     (isNoiVu && isTieuDoan && !isDbOrEb);
+
+  const [signatureBase64, setSignatureBase64] = useState<string | undefined>(
+    undefined,
+  );
+  const [signatureDone, setSignatureDone] = useState(false);
 
   const {
     reportData,
@@ -210,6 +216,16 @@ export default function DailyTroopReport() {
     cheNhiemVuData,
   });
 
+    const [prevReportId, setPrevReportId] = useState<string | undefined>(
+      ownReport?.idDonBaoCao,
+    );
+    if (ownReport?.idDonBaoCao !== prevReportId) {
+      setPrevReportId(ownReport?.idDonBaoCao);
+      const saved = ownReport?.rawItem?.chuKySo;
+      setSignatureBase64(saved ?? undefined);
+      setSignatureDone(Boolean(saved));
+    }
+
   const { isReporter, canApprove, canRefuse, canSubmit, canRecall } =
     useReportPermissions(
       userRole,
@@ -249,6 +265,10 @@ export default function DailyTroopReport() {
 
     setActiveMenuUnit(menuKey);
   };
+
+  const nguoiBaoCao = trucInfoFromReport?.trucBanTacChien?.tenNguoitruc
+    ? trucInfoFromReport.trucBanTacChien
+    : trucInfoFromReport?.trucChiHuy;
 
   useEffect(() => {
     function handleGlobalClose(event: Event) {
@@ -553,6 +573,7 @@ export default function DailyTroopReport() {
               ? () => handleSubmitReport(ownReport!.idDonBaoCao)
               : undefined
         }
+        submitDisabled={!signatureDone || !signatureBase64}
         onRecall={
           canRecall
             ? () => handleRecallReport(ownReport!.idDonBaoCao)
@@ -638,6 +659,19 @@ export default function DailyTroopReport() {
         />
       )}
 
+      <KySoCard
+        chucVu="Người báo cáo"
+        hoTen={
+          nguoiBaoCao?.tenNguoitruc
+            ? `${nguoiBaoCao.capbacNguoitruc} - ${nguoiBaoCao.tenNguoitruc}`
+            : undefined
+        }
+        signature={ownReport?.rawItem?.chuKySo}
+        onSign={setSignatureBase64}
+        onComplete={() => setSignatureDone(true)}
+        completed={signatureDone}
+      />
+
       {selectedReportRow && (
         <TroopDetailModal
           unit={normalizeUnitName(
@@ -682,8 +716,10 @@ export default function DailyTroopReport() {
           onClose={() => setShowCreateModal(false)}
           onSubmit={async (payload, detailData) => {
             try {
-              const res = await dailyReportService.createReport(payload);
-
+              const res = await dailyReportService.createReport({
+                ...payload,
+                chuKySo: signatureBase64,
+              });
               if (detailData && res.Result?.idDonBaoCao) {
                 try {
                   await dailyReportService.createNhiemVuNgay({
@@ -748,6 +784,7 @@ export default function DailyTroopReport() {
                 tinhHinhHoatDong: payload.tinhHinhHoatDong,
                 account: account?.idTaiKhoan ?? "",
                 donVi: account?.donVi?.maDonVi ?? "",
+                chuKySo: signatureBase64,
               });
 
               if (detailData) {
@@ -802,7 +839,10 @@ export default function DailyTroopReport() {
           consolidatedAbsentRows={consolidatedData.absentRows}
           onSubmit={async (payload, detailData) => {
             try {
-              const res = await dailyReportService.createReport(payload);
+              const res = await dailyReportService.createReport({
+                ...payload,
+                chuKySo: signatureBase64,
+              });
 
               if (detailData && res.Result?.idDonBaoCao) {
                 try {

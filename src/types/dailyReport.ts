@@ -84,6 +84,7 @@ export interface CreateReportRequest {
   trucBanTacChien?: string;
   tinhHinhHoatDong?: string;
   loaiDonBaoCao?: LoaiDonBaoCao;
+  chuKySo?: string;
 }
 
 export interface CreateReportResponse {
@@ -109,6 +110,7 @@ export interface CreateReportResponse {
     };
     caTruc: CaTrucInfo;
     tinhHinhHoatDong?: string;
+    chuKySo?: string;
   };
 }
 
@@ -124,6 +126,7 @@ export interface UpdateReportRequest {
   trucBanChiHuy?: string;
   trucBanTacChien?: string;
   tinhHinhHoatDong?: string;
+  chuKySo?: string;
 }
 
 export interface UpdateReportResponse {
@@ -148,6 +151,7 @@ export interface UpdateReportResponse {
     };
     caTruc: CaTrucInfo;
     tinhHinhHoatDong?: string;
+    chuKySo?: string;
   };
 }
 

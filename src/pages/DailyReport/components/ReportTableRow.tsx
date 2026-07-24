@@ -59,13 +59,16 @@ export default function ReportTableRow({
             .join(" ") || undefined
         }
       >
-       <td className={styles.unitCell}>{normalizeUnitName(row.kyhieuDonVi || row.tenDonVi)}</td>
+        <td className={styles.unitCell}>
+          {normalizeUnitName(row.kyhieuDonVi || row.tenDonVi)}
+        </td>
         {Array.from({ length: 17 }).map((_, i) => (
           <td key={i}>—</td>
         ))}
         <td>
           <ReportStatusBadge status="Chưa_Nộp" />
         </td>
+        <td>—</td>
         <td>—</td>
         <td>—</td>
       </tr>
@@ -135,6 +138,7 @@ export default function ReportTableRow({
       <td>
         <ReportStatusBadge status={row.status} />
       </td>
+      <td>{row.rawItem.anhChuKy ? "Đã ký" : "Chưa ký"}</td>
       <td className={styles.noteCell}>{row.ghiChu}</td>
       <td className={styles.actionCell}>
         <div className={styles.actionWrapper}>

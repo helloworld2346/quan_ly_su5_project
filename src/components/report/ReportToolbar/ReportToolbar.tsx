@@ -23,6 +23,7 @@ type Props = {
   onApprove?: () => void;
   onRefuse?: () => void;
   onSubmit?: () => void;
+  submitDisabled?: boolean;
   onRecall?: () => void;
   onExportWord?: () => void;
   onExportExcel?: () => void;
@@ -53,6 +54,7 @@ export default function ReportToolbar({
   onApprove,
   onRefuse,
   onSubmit,
+  submitDisabled = false,
   onRecall,
   onExportWord,
   onExportExcel,
@@ -116,8 +118,12 @@ export default function ReportToolbar({
         {onSubmit && (
           <button
             type="button"
-            className={`${styles.actionBtn} ${styles.submitBtn}`}
+            className={`${styles.actionBtn} ${styles.submitBtn} ${submitDisabled ? styles.disabledBtn : ""}`}
             onClick={onSubmit}
+            disabled={submitDisabled}
+            title={
+              submitDisabled ? "Cần ký số trước khi trình phê duyệt" : undefined
+            }
           >
             <FontAwesomeIcon icon={faPaperPlane} className={styles.addIcon} />
             Trình phê duyệt

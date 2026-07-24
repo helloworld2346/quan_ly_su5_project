@@ -5,8 +5,7 @@ import type { DisplayTotals } from "../utils/dailyTroopReportHelpers";
 import ReportTableHeader from "./ReportTableHeader";
 import ReportTableRow from "./ReportTableRow";
 import ReportTotalRow from "./ReportTotalRow";
-import Skeleton from "../../../components/ui/Skeleton/Skeleton";  
-
+import Skeleton from "../../../components/ui/Skeleton/Skeleton";
 
 type SharedRowProps = {
   isParentUnit: boolean;
@@ -100,6 +99,7 @@ export default function DailyTroopStatisticsSection({
                 <col style={{ width: "6%" }} />
                 <col style={{ width: "6%" }} />
                 <col style={{ width: "6%" }} />
+                <col style={{ width: "6%" }} />
                 <col style={{ width: "8%" }} />
                 <col style={{ width: "8%" }} />
                 <col style={{ width: "4%" }} />
@@ -110,7 +110,7 @@ export default function DailyTroopStatisticsSection({
               <tbody>
                 {displayRows.length === 0 && !parentReportData ? (
                   <tr className={styles.noReportRow}>
-                    <td colSpan={22}>Chưa có dữ liệu báo cáo</td>
+                    <td colSpan={23}>Chưa có dữ liệu báo cáo</td>
                   </tr>
                 ) : (
                   <>
@@ -118,7 +118,7 @@ export default function DailyTroopStatisticsSection({
                       canConsolidateUnit &&
                       displayRows.length > 0 && (
                         <tr className={styles.separatorRow}>
-                          <td colSpan={22}>Báo cáo các đơn vị</td>
+                          <td colSpan={23}>Báo cáo các đơn vị</td>
                         </tr>
                       )}
 
@@ -148,7 +148,7 @@ export default function DailyTroopStatisticsSection({
                     {/* separator + dòng e4 (TONG_HOP) giữ nguyên như cũ */}
                     {!shouldHideConsolidatedSections && canConsolidateUnit && (
                       <tr className={styles.separatorRow}>
-                        <td colSpan={22}>Báo cáo tổng hợp</td>
+                        <td colSpan={23}>Báo cáo tổng hợp</td>
                       </tr>
                     )}
                     {!shouldHideConsolidatedSections &&
@@ -164,7 +164,7 @@ export default function DailyTroopStatisticsSection({
                       !shouldHideConsolidatedSections &&
                       canConsolidateUnit && (
                         <tr className={styles.noConsolidatedRow}>
-                          <td colSpan={22}>Chưa có báo cáo tổng hợp</td>
+                          <td colSpan={23}>Chưa có báo cáo tổng hợp</td>
                         </tr>
                       )
                     )}
