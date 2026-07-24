@@ -1,4 +1,6 @@
 import { useMemo, useState, useRef, useEffect } from "react";
+import KySoCard from "../../components/ui/KySoCard/KySoCard";
+import KySoInfoModal from "../DailyReport/KySoInfoModal";
 import { createPortal } from "react-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -186,6 +188,53 @@ export default function PoliticalWorkReport() {
   const showSkeleton = useMinLoading(loading);
 
   const ownReport = reportData.find((r) => r.donVi === submitMaDonVi) ?? null;
+
+  const [signatureBase64, setSignatureBase64] = useState<string | undefined>(
+    undefined,
+  );
+  const [signatureDone, setSignatureDone] = useState(false);
+  const [kySoRow, setKySoRow] = useState<PoliticalWorkRow | null>(null);
+
+  const handleCompleteSignature = async () => {
+    if (!signatureBase64) return;
+
+    if (!ownReport) {
+      setSignatureDone(true);
+      return;
+    }
+
+    try {
+      const raw = ownReport.rawItem;
+      await politicalWorkService.updateReport(ownReport.idCongtac, {
+        tinhHinh: raw.tinhHinh,
+        noiDungDotXuat: raw.noiDungDotXuat,
+        ketQua: raw.ketQua,
+        trucBanNoiVu: raw.trucBanNoiVu,
+        trucBanCtDangCt: raw.trucBanCtDangCt,
+        kienNghi: raw.kienNghi,
+        donVi: raw.donVi.maDonVi,
+        chuKySo: signatureBase64,
+      });
+      setSignatureDone(true);
+      showSuccess("Ký số thành công");
+      await fetchReports();
+    } catch (error) {
+      handleApiError(error, {
+        showError,
+        errorMessage: "Không thể lưu chữ ký",
+      });
+    }
+  };
+
+  const [prevReportId, setPrevReportId] = useState<string | undefined>(
+    ownReport?.idCongtac,
+  );
+  if (ownReport?.idCongtac !== prevReportId) {
+    setPrevReportId(ownReport?.idCongtac);
+    const saved = ownReport?.rawItem?.chuKySo;
+    setSignatureBase64(saved ?? undefined);
+    setSignatureDone(Boolean(saved));
+  }
 
   const handleExportExcel = () => {
     const row = parentReportData ?? ownReport;
@@ -518,6 +567,9 @@ export default function PoliticalWorkReport() {
         <td>
           <Skeleton width={80} height={22} radius={999} />
         </td>
+        <td>
+          <Skeleton width={60} height={22} radius={999} />
+        </td>
         <td className={styles["political-action-cell"]}>
           <Skeleton width={24} height={24} radius={6} />
         </td>
@@ -566,6 +618,7 @@ export default function PoliticalWorkReport() {
         <td>
           <ReportStatusBadge status="Chưa_Nộp" />
         </td>
+        <td>—</td>
         <td className={styles["political-action-cell"]}>—</td>
       </tr>
     ) : (
@@ -595,6 +648,21 @@ export default function PoliticalWorkReport() {
         </td>
         <td>
           <ReportStatusBadge status={row.status} />
+        </td>
+        <td>
+          {row.rawItem?.chuKySo ? (
+            <button
+              type="button"
+              className={`${styles.kySoBadge} ${styles.kySoSigned}`}
+              onClick={() => setKySoRow(row)}
+            >
+              Đã ký
+            </button>
+          ) : (
+            <span className={`${styles.kySoBadge} ${styles.kySoUnsigned}`}>
+              Chưa ký
+            </span>
+          )}
         </td>
         <td
           className={styles["political-action-cell"]}
@@ -717,6 +785,7 @@ export default function PoliticalWorkReport() {
             ? () => handleSubmitReport(reportForSubmit!.idCongtac)
             : undefined
         }
+        submitDisabled={ownReport ? !signatureDone || !signatureBase64 : false}
         onRecall={
           canRecall
             ? () => handleRecallReport(reportForSubmit!.idCongtac)
@@ -771,7 +840,6 @@ export default function PoliticalWorkReport() {
           value={proposals}
         />
       </div>
-
       <section className={styles["political-section-block"]}>
         <div className={styles["political-section-card"]}>
           <div className={styles["political-section-heading"]}>
@@ -832,6 +900,7 @@ export default function PoliticalWorkReport() {
                   <th style={{ whiteSpace: "nowrap" }}>Trực ban</th>
                   <th style={{ whiteSpace: "nowrap" }}>Trực CTĐ, CTCT</th>
                   <th>Trạng thái</th>
+                  <th>Ký số</th>
                   <th>Thao tác</th>
                 </tr>
               </thead>
@@ -883,7 +952,6 @@ export default function PoliticalWorkReport() {
           </div>
         </div>
       </section>
-
       {dutyReportForDisplay && !dutyReportForDisplay.notSubmitted && (
         <section className={styles["political-duty-section"]}>
           <div className={styles["political-duty-card"]}>
@@ -963,6 +1031,22 @@ export default function PoliticalWorkReport() {
               })()}
             </div>
           </div>
+          {ownReport && (
+            <KySoCard
+              chucVu="Người báo cáo"
+              hoTen={(() => {
+                const ky = parseTrucNguoi(ownReport.rawItem.trucBanCtDangCt)
+                  .hoTen
+                  ? parseTrucNguoi(ownReport.rawItem.trucBanCtDangCt)
+                  : parseTrucNguoi(ownReport.rawItem.trucBanNoiVu);
+                return ky?.hoTen ? `${ky.capBac} - ${ky.hoTen}` : undefined;
+              })()}
+              signature={ownReport.rawItem.chuKySo}
+              onSign={setSignatureBase64}
+              onComplete={handleCompleteSignature}
+              completed={signatureDone}
+            />
+          )}
         </section>
       )}
 
@@ -992,13 +1076,16 @@ export default function PoliticalWorkReport() {
         onSubmit={async (payload) => {
           try {
             if (editingRow) {
-              await politicalWorkService.updateReport(
-                editingRow.idCongtac,
-                payload,
-              );
+              await politicalWorkService.updateReport(editingRow.idCongtac, {
+                ...payload,
+                chuKySo: signatureBase64,
+              });
               showSuccess("Cập nhật báo cáo (nháp) thành công");
             } else {
-              await politicalWorkService.createReport(payload);
+              await politicalWorkService.createReport({
+                ...payload,
+                chuKySo: signatureBase64,
+              });
               showSuccess(
                 consolidating
                   ? "Tổng hợp và lưu báo cáo thành công"
@@ -1031,6 +1118,20 @@ export default function PoliticalWorkReport() {
           onClose={() => setDetailRow(null)}
         />
       )}
+      {kySoRow &&
+        (() => {
+          const ky = parseTrucNguoi(kySoRow.trucBanCtDangCt).hoTen
+            ? parseTrucNguoi(kySoRow.trucBanCtDangCt)
+            : parseTrucNguoi(kySoRow.trucBanNoiVu);
+          return (
+            <KySoInfoModal
+              chuKySo={kySoRow.rawItem?.chuKySo}
+              chucVu={ky.chucVu}
+              hoTen={ky.hoTen ? `${ky.capBac} - ${ky.hoTen}` : undefined}
+              onClose={() => setKySoRow(null)}
+            />
+          );
+        })()}
     </section>
   );
 }

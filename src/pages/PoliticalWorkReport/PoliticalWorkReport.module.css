@@ -126,7 +126,7 @@
 }
 .political-table th:nth-child(2),
 .political-table td:nth-child(2) {
-  width: 26%;
+  width: 28%;
 }
 .political-table th:nth-child(3),
 .political-table td:nth-child(3) {
@@ -134,19 +134,19 @@
 }
 .political-table th:nth-child(4),
 .political-table td:nth-child(4) {
-  width: 9%;
+  width: 6%;
 }
 .political-table th:nth-child(5),
 .political-table td:nth-child(5) {
-  width: 9%;
+  width: 6%;
 }
 .political-table th:nth-child(6),
 .political-table td:nth-child(6) {
-  width: 8%;
+  width: 10%;
 }
 .political-table th:nth-child(7),
 .political-table td:nth-child(7) {
-  width: 8%;
+  width: 10%;
 }
 .political-table th:nth-child(8),
 .political-table td:nth-child(8) {
@@ -154,6 +154,10 @@
 }
 .political-table th:nth-child(9),
 .political-table td:nth-child(9) {
+  width: 4%;
+}
+.political-table th:nth-child(10),
+.political-table td:nth-child(10) {
   width: 2%;
 }
 
@@ -589,4 +593,29 @@
   .political-table td:nth-child(5) {
     width: 7%;
   }
+}
+
+.kySoBadge {  
+  display: inline-flex;  
+  align-items: center;  
+  justify-content: center;  
+  padding: 3px 10px;  
+  border-radius: 12px;  
+  font-size: 12px;  
+  font-weight: 600;  
+  white-space: nowrap;
+}  
+.kySoSigned {  
+  color: #15803d;  
+  background: #dcfce7;  
+  border: none;  
+  cursor: pointer;  
+  font: inherit;  
+}  
+.kySoSigned:hover {  
+  background: #bbf7d0;  
+}  
+.kySoUnsigned {  
+  color: #64748b;  
+  background: #f1f5f9;  
 }
