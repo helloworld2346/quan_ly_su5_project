@@ -21,6 +21,7 @@ type Props = {
   reportDate: string;
   onReportDateChange: (value: string) => void;
   onApprove?: () => void;
+  approveDisabled?: boolean;
   onRefuse?: () => void;
   onSubmit?: () => void;
   submitDisabled?: boolean;
@@ -52,6 +53,7 @@ export default function ReportToolbar({
   reportDate,
   onReportDateChange,
   onApprove,
+  approveDisabled = false,
   onRefuse,
   onSubmit,
   submitDisabled = false,
@@ -144,8 +146,12 @@ export default function ReportToolbar({
         {onApprove && (
           <button
             type="button"
-            className={`${styles.actionBtn} ${styles.approveBtn}`}
+            className={`${styles.actionBtn} ${styles.approveBtn} ${approveDisabled ? styles.disabledBtn : ""}`}
             onClick={onApprove}
+            disabled={approveDisabled}
+            title={
+              approveDisabled ? "Cần ký số trước khi phê duyệt" : undefined
+            }
           >
             <FontAwesomeIcon icon={faCheck} className={styles.addIcon} />
             Phê duyệt

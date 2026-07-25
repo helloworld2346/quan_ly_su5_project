@@ -595,6 +595,7 @@ export default function DailyTroopReport() {
             ? () => handleApproveReport(commanderReport!.idDonBaoCao)
             : undefined
         }
+        approveDisabled={isChiHuy ? !signatureDone || !signatureBase64 : false}
         onRefuse={
           canRefuse
             ? () => handleRefuseReportClick(commanderReport!)
