@@ -9,6 +9,7 @@ import {
   faBan,
   faPaperPlane,
   faRotateLeft,
+  faSave,
 } from "@fortawesome/free-solid-svg-icons";
 
 import styles from "./ReportToolbar.module.css";
@@ -34,6 +35,8 @@ type Props = {
   hasReport?: boolean;
   isPastDate?: boolean;
   showExport?: boolean;
+  onSaveInline?: () => void;
+  inlineSaveDisabled?: boolean;
 };
 
 function todayIsoDate() {
@@ -64,6 +67,8 @@ export default function ReportToolbar({
   isPastDate = false,
   hasReport = false,
   showExport = false,
+  onSaveInline,
+  inlineSaveDisabled = false,
 }: Props) {
   const dateId = useId();
 
@@ -156,6 +161,19 @@ export default function ReportToolbar({
             Từ chối
           </button>
         )}
+
+        {onSaveInline && (
+          <button
+            type="button"
+            className={`${styles.actionBtn} ${styles.submitBtn}`}
+            onClick={onSaveInline}
+            disabled={inlineSaveDisabled}
+          >
+            <FontAwesomeIcon icon={faSave} className={styles.addIcon} />
+            Lưu
+          </button>
+        )}
+
         {showExport && (
           <div className={styles.exportGroup}>
             <button

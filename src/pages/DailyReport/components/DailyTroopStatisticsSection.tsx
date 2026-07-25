@@ -7,12 +7,30 @@ import ReportTableRow from "./ReportTableRow";
 import ReportTotalRow from "./ReportTotalRow";
 import Skeleton from "../../../components/ui/Skeleton/Skeleton";  
 
-
 type SharedRowProps = {
   isParentUnit: boolean;
   isReporter: boolean;
   isTacChien: boolean;
   isChiHuyLeaf: boolean;
+  canEditOwnNotSubmitted?: boolean;
+  canInlineInputChf?: boolean;
+  inlineEditingRowId?: string | null;
+ inlineDraft?: {
+  reportId: string;
+  isNew: boolean;
+  quanSoTong: number;
+  quanSoHienDien: number;
+  vang: ReportRow["vang"];
+  ghiChu: string;
+};
+onInlineDraftChange?: (draft: {
+  reportId: string;
+  isNew: boolean;
+  quanSoTong: number;
+  quanSoHienDien: number;
+  vang: ReportRow["vang"];
+  ghiChu: string;
+}) => void;
   maDonViCurrent: string | undefined;
   activeMenuUnit: string | null;
   menuPosition: { top?: number; bottom?: number; left: number };

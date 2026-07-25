@@ -909,6 +909,67 @@
   font-size: 16px;
   overscroll-behavior: contain;
 }
+.inlineCellInput {
+  width: 100%;
+  max-width: 45px;
+  min-width: 35px;
+  height: 28px;
+  padding: 2px 4px;
+  border: 1px solid var(--modal-input-border);
+  border-radius: 6px;
+  background: var(--input-bg);
+  color: var(--input-text);
+  font: inherit;
+  font-weight: 700;
+  font-size: 12px;
+  text-align: center;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  display: block;
+  margin: 0 auto;
+}
+
+.inlineCellInput:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+.inlineCellInput:hover {
+  border-color: var(--primary-color);
+}
+
+.inlineCellInput::-webkit-outer-spin-button,
+.inlineCellInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.inlineCellInput[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+
+@media (max-width: 1366px) {
+  .inlineCellInput {
+    max-width: 40px;
+    min-width: 30px;
+    height: 26px;
+    font-size: 11px;
+    padding: 2px 3px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .inlineCellInput {
+    max-width: 35px;
+    min-width: 25px;
+    height: 24px;
+    font-size: 10px;
+    padding: 1px 2px;
+  }
+}
 
 @media (max-width: 1100px) {
   .nhiemVuGrid {

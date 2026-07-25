@@ -22,18 +22,18 @@ type CaTrucFromApi = {
   matkhau?: string;
   ghichu?: string | null;
   ngaytruc?: string;
-  trucChiHuy: {
+  trucChiHuy?: {
     tenNguoitruc: string;
     capbacNguoitruc: string;
     chucvuNguoitruc: string;
     sodienthoai?: string;
-  };
-  trucBanTacChien: {
+  } | null;
+  trucBanTacChien?: {
     tenNguoitruc: string;
     capbacNguoitruc: string;
     chucvuNguoitruc: string;
     sodienthoai?: string;
-  };
+  } | null;
 };
 
 export type DisplayTotals = {
@@ -395,6 +395,7 @@ export function buildDisplayTotals(displayRows: ReportRow[]): DisplayTotals {
 export function buildCaTrucInfo(args: {
   isParentUnit: boolean;
   isTacChien: boolean;
+  preferDutyShift?: boolean;
   parentReportData: ReportRow | null;
   parentOwnReportData: ReportRow | null;
   reportData: ReportRow[];
@@ -403,45 +404,38 @@ export function buildCaTrucInfo(args: {
   const {
     isParentUnit,
     isTacChien,
+    preferDutyShift = false,
     parentReportData,
     parentOwnReportData,
     reportData,
     caTrucFromApi,
   } = args;
 
-  if (isParentUnit) {
-    // trung đoàn/tiểu đoàn: ca trực nằm trong báo cáo TONG_HOP
-    if (parentReportData) return parentReportData.rawItem.caTruc as CaTrucInfo;
-
-    // sư đoàn: ca trực nằm trong báo cáo DON_VI của chính sư đoàn (CH/f)
-    if (parentOwnReportData?.rawItem?.caTruc) {
-      return parentOwnReportData.rawItem.caTruc as CaTrucInfo;
-    }
-
-    if (isTacChien && caTrucFromApi) {
-      return {
+  const dutyShiftInfo = caTrucFromApi
+    ? ({
         idCatruc: caTrucFromApi.idCatruc,
         matkhau: caTrucFromApi.matkhau,
         ghichu: caTrucFromApi.ghichu ?? undefined,
         ngaytruc: caTrucFromApi.ngaytruc,
         trucChiHuy: caTrucFromApi.trucChiHuy
-          ? {
-              tenNguoitruc: caTrucFromApi.trucChiHuy.tenNguoitruc,
-              capbacNguoitruc: caTrucFromApi.trucChiHuy.capbacNguoitruc,
-              chucvuNguoitruc: caTrucFromApi.trucChiHuy.chucvuNguoitruc,
-              sodienthoai: caTrucFromApi.trucChiHuy.sodienthoai,
-            }
+          ? { ...caTrucFromApi.trucChiHuy }
           : undefined,
         trucBanTacChien: caTrucFromApi.trucBanTacChien
-          ? {
-              tenNguoitruc: caTrucFromApi.trucBanTacChien.tenNguoitruc,
-              capbacNguoitruc: caTrucFromApi.trucBanTacChien.capbacNguoitruc,
-              chucvuNguoitruc: caTrucFromApi.trucBanTacChien.chucvuNguoitruc,
-              sodienthoai: caTrucFromApi.trucBanTacChien.sodienthoai,
-            }
+          ? { ...caTrucFromApi.trucBanTacChien }
           : undefined,
-      };
+      } as CaTrucInfo)
+    : null;
+
+  if (preferDutyShift) return dutyShiftInfo;
+
+  if (isParentUnit) {
+    if (parentReportData) return parentReportData.rawItem.caTruc as CaTrucInfo;
+
+    if (parentOwnReportData?.rawItem?.caTruc) {
+      return parentOwnReportData.rawItem.caTruc as CaTrucInfo;
     }
+
+    if (isTacChien && dutyShiftInfo) return dutyShiftInfo;
 
     return null;
   }
