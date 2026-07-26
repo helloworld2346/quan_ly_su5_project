@@ -266,7 +266,8 @@ export default function PoliticalWorkReport() {
   };
 
   const dutyReportForDisplay =
-    isParentUnit && parentReportData ? parentReportData : ownReport;
+    (isParentUnit && parentReportData ? parentReportData : ownReport) ??
+    reportForSubmit;
 
   const commanderReport =
     isParentUnit && (isTrungDoan || isPoliticalOffice || isBanChinhTri)
