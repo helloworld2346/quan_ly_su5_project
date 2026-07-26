@@ -12,7 +12,7 @@ import KySoCard from "../../components/ui/KySoCard/KySoCard";
 import { dailyReportService } from "../../services/dailyReport/dailyReportService";
 import { useAuth } from "../../context/useAuth";
 import { useToast } from "../../context/useToast";
-import type { EditModalData, ReportRow } from "../../types/dailyReport";
+import type { EditModalData, ReportRow, VangChiTiet } from "../../types/dailyReport";
 import type { NhiemVuNgay } from "../../services/dailyReport/dailyReportService";
 import type { DetailStepData } from "./DailyReportDetailStep";
 import { handleApiError } from "../../utils/errorHandler";
@@ -82,6 +82,17 @@ export default function DailyTroopReport() {
   >([]);
   const [openNhiemVuId, setOpenNhiemVuId] = useState<string | null>(null);
 
+  // Inline editing state
+  const [inlineEditingRowId, setInlineEditingRowId] = useState<string | null>(null);
+const [inlineDraft, setInlineDraft] = useState<{
+  reportId: string;
+  isNew: boolean;
+  quanSoTong: number;
+  quanSoHienDien: number;
+  vang: VangChiTiet;
+  ghiChu: string;
+} | null>(null);
+
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const { account } = useAuth();
@@ -100,6 +111,7 @@ export default function DailyTroopReport() {
   const isTrungDoan = capDonVi === "TRUNG_DOAN";
   const isTieuDoan = capDonVi === "TIEU_DOAN";
   const isSuDoan = capDonVi === "SU_DOAN";
+  const useDutyShiftForCaTruc = isTacChien && isSuDoan;
   const isParentUnit =
     isAdmin ||
     (isTacChien && (isTrungDoan || isSuDoan)) ||
@@ -214,6 +226,7 @@ export default function DailyTroopReport() {
     nhiemVuData,
     nhiemVuList,
     cheNhiemVuData,
+    preferDutyShiftForCaTruc: useDutyShiftForCaTruc,
   });
 
   const handleCompleteSignature = async () => {
@@ -269,6 +282,71 @@ export default function DailyTroopReport() {
       childUnits.length > 0,
       isDbOrEb,
     );
+const handleStartInlineInput = (row: ReportRow) => {
+  setActiveMenuUnit(null);
+  setInlineEditingRowId(row.idDonBaoCao);
+  setInlineDraft({
+    reportId: row.idDonBaoCao,
+    isNew: Boolean(row.notSubmitted),
+    quanSoTong: row.quanSoTong || 0,
+    quanSoHienDien: row.quanSoHienDien || 0,
+    vang: { ...row.vang },
+    ghiChu: row.ghiChu || "",
+  });
+};
+
+const handleSaveInlineInput = async () => {
+  if (!inlineDraft || !maDonViCurrent) return;
+
+  const quanSoTong = inlineDraft.quanSoTong;
+  const quanSoHienDien = inlineDraft.quanSoHienDien;
+  const quanSoVang = Math.max(0, quanSoTong - quanSoHienDien);
+
+  // Validate: tổng các cột quân số vắng phải bằng tổng vắng tính toán
+  const tongVangNhap = Object.values(inlineDraft.vang).reduce((sum, val) => sum + (val || 0), 0);
+  if (tongVangNhap !== quanSoVang) {
+    showError(`Tổng số quân vắng nhập vào (${tongVangNhap}) phải bằng tổng vắng (${quanSoVang})`);
+    return;
+  }
+
+  const basePayload = {
+    quanSoTong,
+    quanSoHienDien,
+    quanSoVang,
+    thoiGianBaoCao: new Date(`${reportDate}T12:00:00.000Z`).toISOString(),
+    thongTinVang: JSON.stringify(inlineDraft.vang),
+    chiTietVang: JSON.stringify([]),
+    trucBanChiHuy: JSON.stringify(caTrucInfo?.trucChiHuy ?? {}),
+    trucBanTacChien: JSON.stringify(caTrucInfo?.trucBanTacChien ?? {}),
+    tinhHinhHoatDong: JSON.stringify({}),
+  };
+
+  try {
+    if (inlineDraft.isNew) {
+      await dailyReportService.createReport({
+        ...basePayload,
+        donVi: maDonViCurrent,
+        loaiDonBaoCao: "DON_VI",
+      });
+    } else {
+      await dailyReportService.updateReport(inlineDraft.reportId, {
+        ...basePayload,
+        account: account?.idTaiKhoan ?? "",
+        donVi: maDonViCurrent,
+      });
+    }
+
+    showSuccess("Lưu báo cáo CH/f thành công");
+    setInlineEditingRowId(null);
+    setInlineDraft(null);
+    await fetchReports();
+  } catch (error) {
+    handleApiError(error, {
+      showError,
+      errorMessage: "Không thể lưu báo cáo CH/f",
+    });
+  }
+};
 
   const handleToggleMenu = (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -515,13 +593,18 @@ export default function DailyTroopReport() {
     await fetchReports();
   };
 
-  const handleEditReport = (row: ReportRow) => {
-    setEditModalData({ reportId: row.idDonBaoCao, ngayBaoCao: reportDate });
-    setActiveMenuUnit(null);
-  };
+const handleEditReport = (row: ReportRow) => {
+  if (useDutyShiftForCaTruc && (row.kyhieuDonVi ?? row.tenDonVi) === "CH/f") {
+    handleStartInlineInput(row);
+    return;
+  }
+
+  setEditModalData({ reportId: row.idDonBaoCao, ngayBaoCao: reportDate });
+  setActiveMenuUnit(null);
+};
 
   const handleExportWord = () => {
-    // TODO: chức năng xuất Word chưa được triển khai
+  
   };
 
   const handleExportExcel = async () => {
@@ -547,10 +630,16 @@ export default function DailyTroopReport() {
     isReporter,
     isTacChien,
     isChiHuyLeaf,
+    canEditOwnNotSubmitted: useDutyShiftForCaTruc,
     maDonViCurrent,
     activeMenuUnit,
     menuPosition,
     dropdownRef,
+    canInlineInputChf: useDutyShiftForCaTruc,
+    inlineEditingRowId,
+    inlineDraft: inlineDraft ?? undefined,
+    onStartInlineInput: handleStartInlineInput,
+    onInlineDraftChange: setInlineDraft,
     onToggleMenu: handleToggleMenu,
     onViewDetail: (row: ReportRow) => {
       setSelectedReportRow(row);
@@ -566,7 +655,9 @@ export default function DailyTroopReport() {
         onQueryChange={setQuery}
         reportDate={reportDate}
         onReportDateChange={setReportDate}
-        onAddReport={canAddReport ? handleAddReport : undefined}
+        onAddReport={
+          canAddReport && !useDutyShiftForCaTruc ? handleAddReport : undefined
+        }
         onConsolidate={
           isParentUnit && !shouldHideConsolidatedSections
             ? handleConsolidate
@@ -619,6 +710,10 @@ export default function DailyTroopReport() {
         isPastDate={isPastDate}
         hasReport={checkIfDateHasReport}
         showExport={isTacChien && capDonVi === "SU_DOAN"}
+        onSaveInline={
+          useDutyShiftForCaTruc && inlineEditingRowId ? handleSaveInlineInput : undefined
+        }
+        inlineSaveDisabled={!inlineDraft}
       />
 
       <div className={styles["daily-stats-grid"]}>
@@ -684,8 +779,16 @@ export default function DailyTroopReport() {
           ngaytruc={caTrucInfo.ngaytruc ?? ""}
           matkhau={caTrucInfo.matkhau ?? ""}
           ghichu={caTrucInfo.ghichu}
-          trucChiHuy={trucInfoFromReport?.trucChiHuy ?? undefined}
-          trucBanTacChien={trucInfoFromReport?.trucBanTacChien ?? undefined}
+          trucChiHuy={
+            useDutyShiftForCaTruc
+              ? caTrucInfo.trucChiHuy
+              : (trucInfoFromReport?.trucChiHuy ?? undefined)
+          }
+          trucBanTacChien={
+            useDutyShiftForCaTruc
+              ? caTrucInfo.trucBanTacChien
+              : (trucInfoFromReport?.trucBanTacChien ?? undefined)
+          }
           labelSecond={
             capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN"
               ? "Trực ban tác chiến"

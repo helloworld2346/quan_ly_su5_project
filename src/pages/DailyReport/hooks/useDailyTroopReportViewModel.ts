@@ -54,6 +54,7 @@ export type UseDailyTroopReportViewModelArgs = {
   nhiemVuData: NhiemVuNgay | null;
   cheNhiemVuData: NhiemVuNgay | null;
   nhiemVuList: NhiemVuListItem[];
+  preferDutyShiftForCaTruc?: boolean;
 };
 
 function buildNhiemVuSummary(data: NhiemVuNgay): NhiemVuSummary {
@@ -106,12 +107,13 @@ export function useDailyTroopReportViewModel(
     nhiemVuData,
     cheNhiemVuData,
     nhiemVuList,
+    preferDutyShiftForCaTruc = false,
   } = args;
 
-const isParentUnit =
-  isAdmin ||
-  (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
-  (isNoiVu && capDonVi === "TIEU_DOAN" && !isDbOrEb);
+  const isParentUnit =
+    isAdmin ||
+    (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
+    (isNoiVu && capDonVi === "TIEU_DOAN" && !isDbOrEb);
 
   const isChiHuyLeaf = isChiHuy && childUnits.length === 0;
 
@@ -212,6 +214,7 @@ const isParentUnit =
       buildCaTrucInfo({
         isParentUnit,
         isTacChien,
+        preferDutyShift: preferDutyShiftForCaTruc,
         parentReportData,
         parentOwnReportData,
         reportData,
@@ -220,6 +223,7 @@ const isParentUnit =
     [
       isParentUnit,
       isTacChien,
+      preferDutyShiftForCaTruc,
       parentReportData,
       parentOwnReportData,
       reportData,
