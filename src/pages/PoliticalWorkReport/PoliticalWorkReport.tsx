@@ -189,6 +189,17 @@ export default function PoliticalWorkReport() {
 
   const ownReport = reportData.find((r) => r.donVi === submitMaDonVi) ?? null;
 
+  const trungDoanReports = [parentOwnReportData, parentReportData].filter(
+    (r): r is PoliticalWorkRow => Boolean(r),
+  );
+
+  const reportForSubmit =
+    isParentUnit && (isTrungDoan || isPoliticalOffice || isBanChinhTri)
+      ? (trungDoanReports.find((r) => r.status === "Nháp") ?? null)
+      : isParentUnit && parentReportData
+        ? parentReportData
+        : ownReport;
+
   const [signatureBase64, setSignatureBase64] = useState<string | undefined>(
     undefined,
   );
@@ -198,14 +209,14 @@ export default function PoliticalWorkReport() {
   const handleCompleteSignature = async () => {
     if (!signatureBase64) return;
 
-    if (!ownReport) {
+    if (!reportForSubmit) {
       setSignatureDone(true);
       return;
     }
 
     try {
-      const raw = ownReport.rawItem;
-      await politicalWorkService.updateReport(ownReport.idCongtac, {
+      const raw = reportForSubmit.rawItem;
+      await politicalWorkService.updateReport(reportForSubmit.idCongtac, {
         tinhHinh: raw.tinhHinh,
         noiDungDotXuat: raw.noiDungDotXuat,
         ketQua: raw.ketQua,
@@ -227,11 +238,11 @@ export default function PoliticalWorkReport() {
   };
 
   const [prevReportId, setPrevReportId] = useState<string | undefined>(
-    ownReport?.idCongtac,
+    reportForSubmit?.idCongtac,
   );
-  if (ownReport?.idCongtac !== prevReportId) {
-    setPrevReportId(ownReport?.idCongtac);
-    const saved = ownReport?.rawItem?.chuKySo;
+  if (reportForSubmit?.idCongtac !== prevReportId) {
+    setPrevReportId(reportForSubmit?.idCongtac);
+    const saved = reportForSubmit?.rawItem?.chuKySo;
     setSignatureBase64(saved ?? undefined);
     setSignatureDone(Boolean(saved));
   }
@@ -253,17 +264,6 @@ export default function PoliticalWorkReport() {
       },
     });
   };
-
-  const trungDoanReports = [parentOwnReportData, parentReportData].filter(
-    (r): r is PoliticalWorkRow => Boolean(r),
-  );
-
-  const reportForSubmit =
-    isParentUnit && (isTrungDoan || isPoliticalOffice || isBanChinhTri)
-      ? (trungDoanReports.find((r) => r.status === "Nháp") ?? null)
-      : isParentUnit && parentReportData
-        ? parentReportData
-        : ownReport;
 
   const dutyReportForDisplay =
     isParentUnit && parentReportData ? parentReportData : ownReport;
@@ -789,7 +789,9 @@ export default function PoliticalWorkReport() {
             : undefined
         }
         submitDisabled={
-          ownReport && isChiHuy ? !signatureDone || !signatureBase64 : false
+          reportForSubmit && isChiHuy
+            ? !signatureDone || !signatureBase64
+            : false
         }
         onRecall={
           canRecall
@@ -1036,17 +1038,16 @@ export default function PoliticalWorkReport() {
               })()}
             </div>
           </div>
-          {ownReport && isChiHuy && (
+          {isChiHuy && reportForSubmit && (
             <KySoCard
               chucVu="Người báo cáo"
               hoTen={(() => {
-                const ky = parseTrucNguoi(ownReport.rawItem.trucBanCtDangCt)
-                  .hoTen
-                  ? parseTrucNguoi(ownReport.rawItem.trucBanCtDangCt)
-                  : parseTrucNguoi(ownReport.rawItem.trucBanNoiVu);
+                const ky = parseTrucNguoi(reportForSubmit.trucBanCtDangCt).hoTen
+                  ? parseTrucNguoi(reportForSubmit.trucBanCtDangCt)
+                  : parseTrucNguoi(reportForSubmit.trucBanNoiVu);
                 return ky?.hoTen ? `${ky.capBac} - ${ky.hoTen}` : undefined;
               })()}
-              signature={ownReport.rawItem.chuKySo}
+              signature={reportForSubmit.rawItem?.chuKySo}
               onSign={setSignatureBase64}
               onComplete={handleCompleteSignature}
               completed={signatureDone}
