@@ -78,7 +78,7 @@
 .reportTable th:nth-child(19),
 .reportTable td:nth-child(19) {
   width: 8.5%;
-  min-width: 78px;
+  min-width: 85px;
 }
 
 .reportTable td:nth-child(19) {
@@ -1093,8 +1093,7 @@
   line-height: 1.2;  
   white-space: nowrap;  
 }  
-  
-/* Đã ký: badge xanh, click được */  
+ 
 .kySoSigned {  
   border: none;  
   cursor: pointer;  

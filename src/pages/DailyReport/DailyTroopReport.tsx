@@ -947,7 +947,7 @@ const handleEditReport = (row: ReportRow) => {
                     await dailyReportService.createNhiemVuNgay(nhiemVuPayload);
                   }
                 } catch {
-                  // Không block nếu nhiemvungay fail
+                
                 }
               }
 
