@@ -775,6 +775,9 @@ export default function PoliticalWorkReport() {
             ? () => handleApproveReport(commanderReport!.idCongtac)
             : undefined
         }
+        approveDisabled={
+          ownReport && isChiHuy ? !signatureDone || !signatureBase64 : false
+        }
         onRefuse={
           canRefuse
             ? () => handleRefuseReportClick(commanderReport!)
