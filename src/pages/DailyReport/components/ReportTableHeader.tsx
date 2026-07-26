@@ -11,6 +11,7 @@ export default function ReportTableHeader() {
         <th rowSpan={3}>Tổng vắng</th>
         <th colSpan={14}>Quân số vắng</th>
         <th rowSpan={3}>Trạng thái</th>
+        <th rowSpan={3}>Ký số</th>
         <th rowSpan={3}>Ghi chú</th>
         <th rowSpan={3}>Thao tác</th>
       </tr>

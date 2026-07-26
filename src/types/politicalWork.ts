@@ -19,6 +19,7 @@ export interface PoliticalWorkRequest {
   thoiGianBaoCao: string;
   donVi: string;
   loaiDonBaoCao?: LoaiDonBaoCao;
+  chuKySo?: string;
 }
 
 export interface PoliticalWorkForm {
@@ -29,6 +30,7 @@ export interface PoliticalWorkForm {
   trucBanCtDangCt?: string;
   kienNghi?: string;
   donVi?: string;
+  chuKySo?: string;
 }
 
 export interface PoliticalWorkItem {
@@ -43,6 +45,7 @@ export interface PoliticalWorkItem {
   ghiChu?: string | null;
   donVi: PoliticalWorkDonVi;
   loaiDonBaoCao?: LoaiDonBaoCao;
+  chuKySo?: string;
 }
 
 export interface RefuseRequest {

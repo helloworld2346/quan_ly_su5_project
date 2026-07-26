@@ -5,10 +5,10 @@
 
 .tableShell {
   width: 100%;
-  overflow-x: auto;
-  overflow-y: auto;
-  max-height: calc(100vh - 260px);
-  -webkit-overflow-scrolling: touch;
+  overflow-x: auto;   /* giữ scroll dự phòng khi màn hình quá nhỏ */
+  overflow-y: visible;
+  max-height: none;
+
   background: var(--table-header-bg);
   border: 1px solid var(--login-border);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
@@ -16,16 +16,14 @@
 
 .reportTable {
   width: 100%;
-  min-width: 1200px;
+  min-width: 0; /* Đã sửa: cho phép co giãn tự do theo container để không dính scroll ngang */
   table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0;
 }
 
 .reportTable thead {
-  position: sticky;
-  top: 0;
-  z-index: 2;
+  position: static;
 }
 
 .reportTable th {
@@ -37,7 +35,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  padding: 14px 8px;
+  padding: 12px 2px;
   text-align: center;
   vertical-align: middle;
 }
@@ -50,30 +48,58 @@
   color: var(--login-text);
   border-right: 1px solid var(--login-border);
   border-bottom: 1px solid var(--login-border);
-  padding: 12px 8px;
+  padding: 10px 2px;
   text-align: center;
   vertical-align: middle;
   white-space: normal;
   word-wrap: break-word;
   overflow-wrap: break-word;
-  font-size: 14px;
+  font-size: 13px;
   hyphens: auto;
 }
 
+/* Tối ưu lại width các cột ít dữ liệu để nhường không gian */
 .reportTable th:first-child,
 .reportTable td:first-child {
-  width: 10%;
+  width: 6%; /* Đơn vị: giảm từ 10% xuống 6% */
 }
 
 .reportTable th:nth-child(2),
 .reportTable td:nth-child(2) {
-  width: 6%;
+  width: 4.5%; /* Tổng quân số: giảm từ 6% xuống 4.5% */
 }
 
 .reportTable th:last-child,
 .reportTable td:last-child {
-  width: 7%;
-  min-width: 60px;
+  width: 5%; /* Thao tác */
+}
+
+/* --- CỘT TRẠNG THÁI (Cột 19) --- */
+.reportTable th:nth-child(19),
+.reportTable td:nth-child(19) {
+  width: 8.5%;
+  min-width: 78px;
+}
+
+.reportTable td:nth-child(19) {
+  padding: 8px 4px;
+  white-space: nowrap;
+}
+
+.reportTable td:nth-child(19) > span {
+  max-width: 100%;
+}
+
+/* --- CỘT KÝ SỐ (Cột 20) --- */
+.reportTable th:nth-child(20),
+.reportTable td:nth-child(20) {
+  width: 8%;
+  min-width: 75px;
+}
+
+.reportTable td:nth-child(20) {
+  padding: 8px 4px;
+  white-space: nowrap;
 }
 
 .reportTable tbody tr:nth-child(odd) td {
@@ -441,73 +467,75 @@
   }
 }
 
+/* RESPONSIVE MEDIA QUERIES */
 @media (max-width: 1700px) {
   .reportTable th,
   .reportTable td {
     font-size: clamp(10px, 0.75vw, 12px);
-    padding: clamp(6px, 0.55vw, 8px) clamp(3px, 0.4vw, 5px);
-    min-width: 45px;
-  }
-
-  .reportTable th:first-child,
-  .reportTable td:first-child {
-    min-width: 60px;
+    padding: clamp(5px, 0.4vw, 7px) clamp(1px, 0.2vw, 3px);
   }
 }
 
 @media (max-width: 1600px) {
-  .reportTable {
-    min-width: 1050px;
-  }
-
   .reportTable th,
   .reportTable td {
     font-size: clamp(9px, 0.7vw, 11px);
-    padding: clamp(5px, 0.5vw, 7px) clamp(3px, 0.35vw, 4px);
-    min-width: 40px;
+    padding: clamp(4px, 0.3vw, 6px) clamp(1px, 0.2vw, 2px);
+  }
+}
+
+@media (max-width: 1366px) {
+  .reportTable th,
+  .reportTable td {
+    font-size: 10.5px;
+    padding: 6px 2px;
   }
 
   .reportTable th:first-child,
   .reportTable td:first-child {
-    min-width: 55px;
+    font-size: 10px;
   }
 
-  .reportTable th:last-child,
-  .reportTable td:last-child {
-    min-width: 50px;
+  .unitCell {
+    font-size: 10.5px;
+  }
+}
+
+@media (max-width: 1280px) {
+  .reportTable th,
+  .reportTable td {
+    font-size: 10px;
+    padding: 5px 1px;
+  }
+
+  .unitCell {
+    font-size: 10px;
   }
 }
 
 @media (max-width: 1024px) {
-  .reportTable {
-    min-width: 900px;
+  .reportTable th,
+  .reportTable td {
+    font-size: 9px;
+    padding: 4px 1px;
   }
-}
 
-.reportTable th:nth-child(19),
-.reportTable td:nth-child(19) {
-  min-width: 96px;
-  width: 96px;
-}
-
-.reportTable td:nth-child(19) {
-  padding: 10px 6px;
-  white-space: normal;
-}
-
-.reportTable td:nth-child(19) > span {
-  max-width: 100%;
+  .unitCell {
+    font-size: 9px;
+  }
 }
 
 @media (max-width: 768px) {
   .reportTable th:nth-child(19),
-  .reportTable td:nth-child(19) {
-    min-width: 82px;
-    width: 82px;
+  .reportTable td:nth-child(19),
+  .reportTable th:nth-child(20),
+  .reportTable td:nth-child(20) {
+    min-width: 65px;
   }
 
-  .reportTable td:nth-child(19) {
-    padding: 6px 4px;
+  .reportTable td:nth-child(19),
+  .reportTable td:nth-child(20) {
+    padding: 4px 2px;
   }
 }
 
@@ -909,6 +937,7 @@
   font-size: 16px;
   overscroll-behavior: contain;
 }
+
 .inlineCellInput {
   width: 100%;
   max-width: 45px;
@@ -949,7 +978,6 @@
   -moz-appearance: textfield;
   appearance: textfield;
 }
-
 
 @media (max-width: 1366px) {
   .inlineCellInput {
@@ -1044,83 +1072,48 @@
   margin-top: 8px;
 }
 
-/* Responsive cho màn hình nhỏ hơn 1366px */
-@media (max-width: 1366px) {
-  .reportTable th,
-  .reportTable td {
-    font-size: 11px;
-    padding: 8px 4px;
-    min-width: 35px;
-  }
-
-  .reportTable th:first-child,
-  .reportTable td:first-child {
-    min-width: 50px;
-    font-size: 10px;
-  }
-
-  .reportTable th:last-child,
-  .reportTable td:last-child {
-    min-width: 45px;
-  }
-
-  .unitCell {
-    font-size: 11px;
-  }
+.kySoLinkBtn {  
+  background: none;  
+  border: none;  
+  color: var(--primary-color, #2563eb);  
+  cursor: pointer;  
+  font: inherit;  
+  text-decoration: underline;  
+  padding: 0;  
 }
 
-@media (max-width: 1280px) {
-  .reportTable th,
-  .reportTable td {
-    font-size: 10px;
-    padding: 6px 3px;
-    min-width: 30px;
-  }
-
-  .reportTable th:first-child,
-  .reportTable td:first-child {
-    min-width: 45px;
-    font-size: 9px;
-  }
-
-  .reportTable th:last-child,
-  .reportTable td:last-child {
-    min-width: 40px;
-  }
-
-  .unitCell {
-    font-size: 10px;
-  }
-
-  .reportTable {
-    min-width: 850px;
-  }
-}
-
-@media (max-width: 1024px) {
-  .reportTable th,
-  .reportTable td {
-    font-size: 9px;
-    padding: 5px 2px;
-    min-width: 25px;
-  }
-
-  .reportTable th:first-child,
-  .reportTable td:first-child {
-    min-width: 40px;
-    font-size: 8px;
-  }
-
-  .reportTable th:last-child,
-  .reportTable td:last-child {
-    min-width: 35px;
-  }
-
-  .unitCell {
-    font-size: 9px;
-  }
-
-  .reportTable {
-    min-width: 750px;
-  }
+.kySoBadge {  
+  display: inline-flex;  
+  align-items: center;  
+  justify-content: center;  
+  padding: 3px 10px;  
+  border-radius: 12px;  
+  font-size: 12px;  
+  font-weight: 600;  
+  line-height: 1.2;  
+  white-space: nowrap;  
+}  
+  
+/* Đã ký: badge xanh, click được */  
+.kySoSigned {  
+  border: none;  
+  cursor: pointer;  
+  color: #15803d;  
+  background: #dcfce7;  
+  font: inherit;  
+}  
+.kySoSigned:hover {  
+  background: #bbf7d0;  
+}  
+  
+.kySoUnsigned {  
+  color: #64748b;  
+  background: #f1f5f9;  
+}  
+  
+@media (max-width: 768px) {  
+  .kySoBadge {  
+    padding: 2px 8px;  
+    font-size: 10px;  
+  }  
 }

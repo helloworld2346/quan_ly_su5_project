@@ -1,10 +1,12 @@
 import { createPortal } from "react-dom";
+import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faEllipsisVertical,
   faEye,
   faPenToSquare,
 } from "@fortawesome/free-solid-svg-icons";
+import KySoInfoModal from "../KySoInfoModal";
 import ReportStatusBadge from "../../../components/ui/ReportStatusBadge/ReportStatusBadge";
 import styles from "../DailyTroopReport.module.css";
 import type { ReportRow } from "../../../types/dailyReport";
@@ -70,6 +72,7 @@ export default function ReportTableRow({
     (row.kyhieuDonVi ?? row.tenDonVi).trim().toLowerCase() === "ch/f";
   const canEditNotSubmitted = canEditOwnNotSubmitted && isOwnChfRow;
   const canInlineEditThisRow = canInlineInputChf && isOwnChfRow;
+  const [showKySo, setShowKySo] = useState(false);
 
   const isApprovedStatus =
     row.status === "Đã_Duyệt" ||
@@ -108,144 +111,161 @@ export default function ReportTableRow({
     });
   };
 
-  if (row.notSubmitted) {
-    return (
-      <tr
-        key={row.idDonBaoCao}
-        className={
-          [
-            isConsolidatedRow
-              ? styles.consolidatedRow
-              : isParentUnit
-                ? styles.childRow
-                : "",
-            styles.notSubmittedRow,
-          ]
-            .filter(Boolean)
-            .join(" ") || undefined
-        }
-      >
-        <td className={styles.unitCell}>
-          {normalizeUnitName(row.kyhieuDonVi || row.tenDonVi)}
-        </td>
-        {isInlineEditing && inlineValue ? (
-          <>
-            <td>
-              <input
-                className={styles.inlineCellInput}
-                type="number"
-                min={0}
-                value={inlineValue.quanSoTong}
-                onFocus={handleInputFocus}
-                onChange={(e) => setInlineNumber("quanSoTong", e.target.value)}
-              />
-            </td>
-            <td>
-              <input
-                className={styles.inlineCellInput}
-                type="number"
-                min={0}
-                value={inlineValue.quanSoHienDien}
-                onFocus={handleInputFocus}
-                onChange={(e) => setInlineNumber("quanSoHienDien", e.target.value)}
-              />
-            </td>
-            <td>{Math.max(0, inlineValue.quanSoTong - inlineValue.quanSoHienDien)}</td>
-            {[
-              "hoiThaiNgoaiSuDoan",
-              "hoiThaiEF",
-              "xayDungNgoaiSuDoan",
-              "xayDungEF",
-              "choHuu",
-              "nghiTranhThu",
-              "phep",
-              "vienNgoaiSuDoan",
-              "vienEF",
-              "congTacNgoaiSuDoan",
-              "congTacSuDoan",
-              "hocSQ",
-              "hocCS",
-              "lyDoVangKhac",
-            ].map((key) => (
-              <td key={key}>
-                {key === "lyDoVangKhac" || key === "hocCS" ? (
-                  "—"
-                ) : (
-                  <input
-                    className={styles.inlineCellInput}
-                    type="number"
-                    min={0}
-                    value={inlineValue.vang[key as keyof typeof inlineValue.vang]}
-                    onFocus={handleInputFocus}
-                    onChange={(e) =>
-                      setInlineNumber(
-                        key as keyof InlineReportDraft["vang"],
-                        e.target.value,
-                      )
-                    }
-                  />
-                )}
-              </td>
-            ))}
-          </>
-        ) : (
-          Array.from({ length: 17 }).map((_, i) => <td key={i}>—</td>)
-        )}
-        <td>
-          <ReportStatusBadge status="Chưa_Nộp" />
-        </td>
-        <td>—</td>
-        <td className={styles.actionCell}>
-          {canEditNotSubmitted ? (
-            <div className={styles.actionWrapper}>
-              <button
-                type="button"
-                className={`${styles.ellipsisBtn} ${
-                  isMenuOpen ? styles.activeEllipsis : ""
-                }`}
-                aria-label="Tùy chọn thao tác"
-                onClick={(e) => onToggleMenu(e, menuKey)}
-              >
-                <FontAwesomeIcon icon={faEllipsisVertical} />
-              </button>
+if (row.notSubmitted) {
+  return (
+    <tr
+      key={row.idDonBaoCao}
+      className={
+        [
+          isConsolidatedRow
+            ? styles.consolidatedRow
+            : isParentUnit
+              ? styles.childRow
+              : "",
+          styles.notSubmittedRow,
+        ]
+          .filter(Boolean)
+          .join(" ") || undefined
+      }
+    >
+      {/* 1. Đơn vị */}
+      <td className={styles.unitCell}>
+        {normalizeUnitName(row.kyhieuDonVi || row.tenDonVi)}
+      </td>
 
-              {isMenuOpen &&
-                createPortal(
-                  <div
-                    ref={dropdownRef}
-                    className={styles.dropdownMenu}
-                    role="menu"
-                    style={{
-                      ...(menuPosition.top !== undefined
-                        ? { top: `${menuPosition.top}px` }
-                        : { bottom: `${menuPosition.bottom}px` }),
-                      left: `${menuPosition.left}px`,
-                    }}
-                    onClick={(e) => e.stopPropagation()}
+      {/* 2 -> 18. Xử lý 17 cột số liệu (Logic Inline Editing của bạn) */}
+      {isInlineEditing && inlineValue ? (
+        <>
+          <td>
+            <input
+              className={styles.inlineCellInput}
+              type="number"
+              min={0}
+              value={inlineValue.quanSoTong}
+              onFocus={handleInputFocus}
+              onChange={(e) => setInlineNumber("quanSoTong", e.target.value)}
+            />
+          </td>
+          <td>
+            <input
+              className={styles.inlineCellInput}
+              type="number"
+              min={0}
+              value={inlineValue.quanSoHienDien}
+              onFocus={handleInputFocus}
+              onChange={(e) => setInlineNumber("quanSoHienDien", e.target.value)}
+            />
+          </td>
+          <td>
+            {Math.max(0, inlineValue.quanSoTong - inlineValue.quanSoHienDien)}
+          </td>
+          {[
+            "hoiThaiNgoaiSuDoan",
+            "hoiThaiEF",
+            "xayDungNgoaiSuDoan",
+            "xayDungEF",
+            "choHuu",
+            "nghiTranhThu",
+            "phep",
+            "vienNgoaiSuDoan",
+            "vienEF",
+            "congTacNgoaiSuDoan",
+            "congTacSuDoan",
+            "hocSQ",
+            "hocCS",
+            "lyDoVangKhac",
+          ].map((key) => (
+            <td key={key}>
+              {key === "lyDoVangKhac" || key === "hocCS" ? (
+                "—"
+              ) : (
+                <input
+                  className={styles.inlineCellInput}
+                  type="number"
+                  min={0}
+                  value={
+                    inlineValue.vang[key as keyof typeof inlineValue.vang]
+                  }
+                  onFocus={handleInputFocus}
+                  onChange={(e) =>
+                    setInlineNumber(
+                      key as keyof InlineReportDraft["vang"],
+                      e.target.value,
+                    )
+                  }
+                />
+              )}
+            </td>
+          ))}
+        </>
+      ) : (
+        /* Khi chưa bấm Nhập liệu -> Hiển thị 17 dấu gạch ngang */
+        Array.from({ length: 17 }).map((_, i) => <td key={i}>—</td>)
+      )}
+
+      {/* 19. Trạng thái */}
+      <td>
+        <ReportStatusBadge status="Chưa_Nộp" />
+      </td>
+
+      {/* 20. Ký số */}
+      <td>—</td>
+
+      {/* 21. Ghi chú */}
+      <td className={styles.noteCell}>—</td>
+
+      {/* 22. Thao tác */}
+      <td className={styles.actionCell}>
+        {canEditNotSubmitted ? (
+          <div className={styles.actionWrapper}>
+            <button
+              type="button"
+              className={`${styles.ellipsisBtn} ${
+                isMenuOpen ? styles.activeEllipsis : ""
+              }`}
+              aria-label="Tùy chọn thao tác"
+              onClick={(e) => onToggleMenu(e, menuKey)}
+            >
+              <FontAwesomeIcon icon={faEllipsisVertical} />
+            </button>
+
+            {isMenuOpen &&
+              createPortal(
+                <div
+                  ref={dropdownRef}
+                  className={styles.dropdownMenu}
+                  role="menu"
+                  style={{
+                    ...(menuPosition.top !== undefined
+                      ? { top: `${menuPosition.top}px` }
+                      : { bottom: `${menuPosition.bottom}px` }),
+                    left: `${menuPosition.left}px`,
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    type="button"
+                    className={styles.menuItem}
+                    role="menuitem"
+                    onClick={() => onStartInlineInput?.(row)}
                   >
-                    <button
-                      type="button"
-                      className={styles.menuItem}
-                      role="menuitem"
-                      onClick={() => onStartInlineInput?.(row)}
-                    >
-                      <FontAwesomeIcon
-                        icon={faPenToSquare}
-                        className={styles.menuIcon}
-                      />
-                      Nhập liệu
-                    </button>
-                  </div>,
-                  document.body,
-                )}
-            </div>
-          ) : (
-            "—"
-          )}
-        </td>
-      </tr>
-    );
-  }
+                    <FontAwesomeIcon
+                      icon={faPenToSquare}
+                      className={styles.menuIcon}
+                    />
+                    Nhập liệu
+                  </button>
+                </div>,
+                document.body,
+              )}
+          </div>
+        ) : (
+          "—"
+        )}
+      </td>
+    </tr>
+  );
+}
 
   const canEdit =
     (isReporter || isChiHuyLeaf) &&
@@ -268,6 +288,27 @@ export default function ReportTableRow({
     (row.status === "Nháp" ||
       row.status === "Từ_Chối" ||
       row.status === "Từ chối");
+
+  const parseTrucSafe = (raw?: string) => {
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw) as {
+        tenNguoitruc?: string;
+        capbacNguoitruc?: string;
+        chucvuNguoitruc?: string;
+      };
+    } catch {
+      return null;
+    }
+  };
+
+  const nguoiKy = parseTrucSafe(row.rawItem.trucBanTacChien)?.tenNguoitruc
+    ? parseTrucSafe(row.rawItem.trucBanTacChien)
+    : parseTrucSafe(row.rawItem.trucBanChiHuy);
+
+  const hoTenKy = nguoiKy?.tenNguoitruc
+    ? `${nguoiKy.capbacNguoitruc ?? ""} - ${nguoiKy.tenNguoitruc}`
+    : undefined;
 
   return (
     <tr
@@ -372,6 +413,21 @@ export default function ReportTableRow({
       <td>
         <ReportStatusBadge status={row.status} />
       </td>
+      <td>
+        {row.rawItem.chuKySo ? (
+          <button
+            type="button"
+            className={`${styles.kySoBadge} ${styles.kySoSigned}`}
+            onClick={() => setShowKySo(true)}
+          >
+            Đã ký
+          </button>
+        ) : (
+          <span className={`${styles.kySoBadge} ${styles.kySoUnsigned}`}>
+            Chưa ký
+          </span>
+        )}
+      </td>
       <td className={styles.noteCell}>{row.ghiChu}</td>
       <td className={styles.actionCell}>
         {hideActionMenu ? (
@@ -442,6 +498,16 @@ export default function ReportTableRow({
           </div>
         )}
       </td>
+      {showKySo &&
+        createPortal(
+          <KySoInfoModal
+            chuKySo={row.rawItem.chuKySo}
+            chucVu={nguoiKy?.chucvuNguoitruc}
+            hoTen={hoTenKy}
+            onClose={() => setShowKySo(false)}
+          />,
+          document.body,
+        )}
     </tr>
   );
 }

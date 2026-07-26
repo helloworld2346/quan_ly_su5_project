@@ -35,10 +35,24 @@
   color: var(--modal-btn-draft-text);
 }
 
-@media (max-width: 768px) {
-  .badge {
-    padding: 3px 8px;
-    font-size: 10px;
-    border-radius: 10px;
-  }
+@media (max-width: 1366px) {  
+  .badge {  
+    font-size: 11px;  
+    padding: 3px 9px;  
+  }  
+}  
+  
+@media (max-width: 1024px) {  
+  .badge {  
+    font-size: 11px;  
+    padding: 3px 8px;  
+  }  
+}  
+  
+@media (max-width: 768px) {  
+  .badge {  
+    font-size: 10px;  
+    padding: 3px 8px;  
+    border-radius: 10px;  
+  }  
 }

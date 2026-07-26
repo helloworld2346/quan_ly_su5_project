@@ -7,6 +7,7 @@ import TroopDetailModal from "./TroopDetailModal";
 import CreateReportModal from "./CreateReportModal";
 import RefuseDialog from "../../components/ui/RefuseDialog/RefuseDialog";
 import CaTrucInfoCard from "../../components/ui/CaTrucInfoCard/CaTrucInfoCard";
+import KySoCard from "../../components/ui/KySoCard/KySoCard";
 
 import { dailyReportService } from "../../services/dailyReport/dailyReportService";
 import { useAuth } from "../../context/useAuth";
@@ -116,6 +117,11 @@ const [inlineDraft, setInlineDraft] = useState<{
     (isTacChien && (isTrungDoan || isSuDoan)) ||
     (isNoiVu && isTieuDoan && !isDbOrEb);
 
+  const [signatureBase64, setSignatureBase64] = useState<string | undefined>(
+    undefined,
+  );
+  const [signatureDone, setSignatureDone] = useState(false);
+
   const {
     reportData,
     parentReportData,
@@ -223,6 +229,50 @@ const [inlineDraft, setInlineDraft] = useState<{
     preferDutyShiftForCaTruc: useDutyShiftForCaTruc,
   });
 
+  const handleCompleteSignature = async () => {
+    // Chưa có báo cáo (đang tạo mới): chỉ set cờ, chữ ký sẽ gửi kèm khi createReport
+    if (!ownReport?.idDonBaoCao || !signatureBase64) {
+      setSignatureDone(true);
+      return;
+    }
+
+    const raw = ownReport.rawItem;
+    try {
+      await dailyReportService.updateReport(ownReport.idDonBaoCao, {
+        quanSoTong: raw.quanSoTong,
+        quanSoHienDien: raw.quanSoHienDien,
+        quanSoVang: raw.quanSoVang,
+        thoiGianBaoCao: raw.thoiGianBaoCao,
+        thongTinVang: raw.thongTinVang,
+        chiTietVang: raw.chiTietVang,
+        trucBanChiHuy: raw.trucBanChiHuy,
+        trucBanTacChien: raw.trucBanTacChien,
+        tinhHinhHoatDong: raw.tinhHinhHoatDong,
+        account: account?.idTaiKhoan ?? "",
+        donVi: raw.donVi.maDonVi,
+        chuKySo: signatureBase64,
+      });
+      setSignatureDone(true);
+      showSuccess("Ký số thành công");
+      await fetchReports();
+    } catch (error) {
+      handleApiError(error, {
+        showError,
+        errorMessage: "Không thể lưu chữ ký",
+      });
+    }
+  };
+
+    const [prevReportId, setPrevReportId] = useState<string | undefined>(
+      ownReport?.idDonBaoCao,
+    );
+    if (ownReport?.idDonBaoCao !== prevReportId) {
+      setPrevReportId(ownReport?.idDonBaoCao);
+      const saved = ownReport?.rawItem?.chuKySo;
+      setSignatureBase64(saved ?? undefined);
+      setSignatureDone(Boolean(saved));
+    }
+
   const { isReporter, canApprove, canRefuse, canSubmit, canRecall } =
     useReportPermissions(
       userRole,
@@ -327,6 +377,10 @@ const handleSaveInlineInput = async () => {
 
     setActiveMenuUnit(menuKey);
   };
+
+  const nguoiBaoCao = trucInfoFromReport?.trucBanTacChien?.tenNguoitruc
+    ? trucInfoFromReport.trucBanTacChien
+    : trucInfoFromReport?.trucChiHuy;
 
   useEffect(() => {
     function handleGlobalClose(event: Event) {
@@ -632,6 +686,7 @@ const handleEditReport = (row: ReportRow) => {
             ? () => handleApproveReport(commanderReport!.idDonBaoCao)
             : undefined
         }
+        approveDisabled={isChiHuy ? !signatureDone || !signatureBase64 : false}
         onRefuse={
           canRefuse
             ? () => handleRefuseReportClick(commanderReport!)
@@ -644,6 +699,7 @@ const handleEditReport = (row: ReportRow) => {
               ? () => handleSubmitReport(ownReport!.idDonBaoCao)
               : undefined
         }
+        submitDisabled={isChiHuy ? !signatureDone || !signatureBase64 : false}
         onRecall={
           canRecall
             ? () => handleRecallReport(ownReport!.idDonBaoCao)
@@ -741,6 +797,21 @@ const handleEditReport = (row: ReportRow) => {
         />
       )}
 
+      {isChiHuy && (
+        <KySoCard
+          chucVu="Người báo cáo"
+          hoTen={
+            nguoiBaoCao?.tenNguoitruc
+              ? `${nguoiBaoCao.capbacNguoitruc} - ${nguoiBaoCao.tenNguoitruc}`
+              : undefined
+          }
+          signature={ownReport?.rawItem?.chuKySo}
+          onSign={setSignatureBase64}
+          onComplete={handleCompleteSignature}
+          completed={signatureDone}
+        />
+      )}
+
       {selectedReportRow && (
         <TroopDetailModal
           unit={normalizeUnitName(
@@ -785,8 +856,10 @@ const handleEditReport = (row: ReportRow) => {
           onClose={() => setShowCreateModal(false)}
           onSubmit={async (payload, detailData) => {
             try {
-              const res = await dailyReportService.createReport(payload);
-
+              const res = await dailyReportService.createReport({
+                ...payload,
+                chuKySo: signatureBase64,
+              });
               if (detailData && res.Result?.idDonBaoCao) {
                 try {
                   await dailyReportService.createNhiemVuNgay({
@@ -851,6 +924,7 @@ const handleEditReport = (row: ReportRow) => {
                 tinhHinhHoatDong: payload.tinhHinhHoatDong,
                 account: account?.idTaiKhoan ?? "",
                 donVi: account?.donVi?.maDonVi ?? "",
+                chuKySo: signatureBase64,
               });
 
               if (detailData) {
@@ -905,7 +979,10 @@ const handleEditReport = (row: ReportRow) => {
           consolidatedAbsentRows={consolidatedData.absentRows}
           onSubmit={async (payload, detailData) => {
             try {
-              const res = await dailyReportService.createReport(payload);
+              const res = await dailyReportService.createReport({
+                ...payload,
+                chuKySo: signatureBase64,
+              });
 
               if (detailData && res.Result?.idDonBaoCao) {
                 try {

@@ -67,6 +67,7 @@ export default function ReportTotalRow({
       <td>{formatNum(displayTotals.lyDoVangKhac)}</td>
       <td></td>
       <td></td>
+      <td></td>
       <td className={styles.actionCell}>
         {isParentUnit && hasConsolidatedData && (
           <div className={styles.actionWrapper}>
