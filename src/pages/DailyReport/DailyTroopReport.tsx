@@ -69,7 +69,7 @@ export default function DailyTroopReport() {
   );
   const [editNhiemVuId, setEditNhiemVuId] = useState<string | null>(null);
 
-  const [nhiemVuData] = useState<NhiemVuNgay | null>(null);
+const [nhiemVuData, setNhiemVuData] = useState<NhiemVuNgay | null>(null);
   const [cheNhiemVuData, setCheNhiemVuData] = useState<NhiemVuNgay | null>(
     null,
   );
@@ -470,6 +470,30 @@ const handleSaveInlineInput = async () => {
       }
     })();
   }, [parentOwnReportData]);
+
+  useEffect(() => {
+    void (async () => {
+      if (isParentUnit || !maDonViCurrent) {
+        return;
+      }
+
+      const ownRow = reportData.find((row) => row.donVi === maDonViCurrent);
+
+      if (!ownRow?.idDonBaoCao) {
+        setNhiemVuData(null);
+        return;
+      }
+
+      try {
+        const res = await dailyReportService.getNhiemVuNgayByDonBaoCao(
+          ownRow.idDonBaoCao,
+        );
+        setNhiemVuData((res.Result ?? null) as NhiemVuNgay | null);
+      } catch {
+        setNhiemVuData(null);
+      }
+    })();
+  }, [reportData, maDonViCurrent, isParentUnit, reportDate]);
 
   useEffect(() => {
     let cancelled = false;
