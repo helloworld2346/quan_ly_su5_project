@@ -395,6 +395,7 @@ export function buildDisplayTotals(displayRows: ReportRow[]): DisplayTotals {
 export function buildCaTrucInfo(args: {
   isParentUnit: boolean;
   isTacChien: boolean;
+  isTrungDoan?: boolean;
   preferDutyShift?: boolean;
   parentReportData: ReportRow | null;
   parentOwnReportData: ReportRow | null;
@@ -404,6 +405,7 @@ export function buildCaTrucInfo(args: {
   const {
     isParentUnit,
     isTacChien,
+    isTrungDoan = false,
     preferDutyShift = false,
     parentReportData,
     parentOwnReportData,
@@ -429,6 +431,12 @@ export function buildCaTrucInfo(args: {
   if (preferDutyShift) return dutyShiftInfo;
 
   if (isParentUnit) {
+    if (isTrungDoan) {
+      return parentReportData?.rawItem?.caTruc
+        ? (parentReportData.rawItem.caTruc as CaTrucInfo)
+        : null;
+    }
+
     if (parentReportData) return parentReportData.rawItem.caTruc as CaTrucInfo;
 
     if (parentOwnReportData?.rawItem?.caTruc) {
@@ -447,15 +455,23 @@ export function buildCaTrucInfo(args: {
 
 export function buildTrucInfoFromReport(args: {
   isParentUnit: boolean;
+  isTrungDoan?: boolean;
   parentReportData: ReportRow | null;
   parentOwnReportData: ReportRow | null;
   reportData: ReportRow[];
 }) {
-  const { isParentUnit, parentReportData, parentOwnReportData, reportData } =
-    args;
+  const {
+    isParentUnit,
+    isTrungDoan = false,
+    parentReportData,
+    parentOwnReportData,
+    reportData,
+  } = args;
 
   const currentReport = isParentUnit
-    ? (parentReportData ?? parentOwnReportData)
+    ? isTrungDoan
+      ? parentReportData
+      : (parentReportData ?? parentOwnReportData)
     : reportData.length > 0
       ? reportData[0]
       : null;

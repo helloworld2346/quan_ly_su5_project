@@ -67,11 +67,14 @@ export default function ReportTableRow({
 }: Props) {
   const menuKey = isConsolidatedRow ? `parent-${row.idDonBaoCao}` : row.donVi;
   const isMenuOpen = activeMenuUnit === menuKey;
-  const isOwnChfRow =
-    row.donVi === maDonViCurrent &&
-    (row.kyhieuDonVi ?? row.tenDonVi).trim().toLowerCase() === "ch/f";
-  const canEditNotSubmitted = canEditOwnNotSubmitted && isOwnChfRow;
-  const canInlineEditThisRow = canInlineInputChf && isOwnChfRow;
+const unitSymbol = (row.kyhieuDonVi ?? row.tenDonVi).trim().toLowerCase();
+
+const isOwnCommandRow =
+  row.donVi === maDonViCurrent &&
+  (unitSymbol === "ch/f" || unitSymbol === "ch/e");
+
+const canEditNotSubmitted = canEditOwnNotSubmitted && isOwnCommandRow;
+const canInlineEditThisRow = canInlineInputChf && isOwnCommandRow;
   const [showKySo, setShowKySo] = useState(false);
 
   const isApprovedStatus =
@@ -80,7 +83,7 @@ export default function ReportTableRow({
     row.status === "Ä Ã£_Duyá»‡t" ||
     row.status === "Ä Ã£ duyá»‡t";
 
-  const hideActionMenu = canInlineInputChf && isOwnChfRow && isApprovedStatus;
+  const hideActionMenu = canInlineInputChf && isOwnCommandRow && isApprovedStatus;
 
   const isInlineEditing = inlineEditingRowId === row.idDonBaoCao;
   const inlineValue = inlineDraft;

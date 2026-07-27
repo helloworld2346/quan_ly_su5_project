@@ -112,6 +112,8 @@ const [inlineDraft, setInlineDraft] = useState<{
   const isTieuDoan = capDonVi === "TIEU_DOAN";
   const isSuDoan = capDonVi === "SU_DOAN";
   const useDutyShiftForCaTruc = isTacChien && isSuDoan;
+  const useInlineOwnCommandReport = isTacChien && (isSuDoan || isTrungDoan);
+
   const isParentUnit =
     isAdmin ||
     (isTacChien && (isTrungDoan || isSuDoan)) ||
@@ -336,14 +338,14 @@ const handleSaveInlineInput = async () => {
       });
     }
 
-    showSuccess("Lưu báo cáo CH/f thành công");
+    showSuccess("Lưu báo cáo thành công");
     setInlineEditingRowId(null);
     setInlineDraft(null);
     await fetchReports();
   } catch (error) {
     handleApiError(error, {
       showError,
-      errorMessage: "Không thể lưu báo cáo CH/f",
+      errorMessage: "Không thể lưu báo cáo",
     });
   }
 };
@@ -594,7 +596,13 @@ const handleSaveInlineInput = async () => {
   };
 
 const handleEditReport = (row: ReportRow) => {
-  if (useDutyShiftForCaTruc && (row.kyhieuDonVi ?? row.tenDonVi) === "CH/f") {
+  const unitSymbol = (row.kyhieuDonVi ?? row.tenDonVi).trim().toLowerCase();
+
+  if (
+    useInlineOwnCommandReport &&
+    row.donVi === maDonViCurrent &&
+    (unitSymbol === "ch/f" || unitSymbol === "ch/e")
+  ) {
     handleStartInlineInput(row);
     return;
   }
@@ -630,12 +638,12 @@ const handleEditReport = (row: ReportRow) => {
     isReporter,
     isTacChien,
     isChiHuyLeaf,
-    canEditOwnNotSubmitted: useDutyShiftForCaTruc,
+   canEditOwnNotSubmitted: useInlineOwnCommandReport,
     maDonViCurrent,
     activeMenuUnit,
     menuPosition,
     dropdownRef,
-    canInlineInputChf: useDutyShiftForCaTruc,
+   canInlineInputChf: useInlineOwnCommandReport,
     inlineEditingRowId,
     inlineDraft: inlineDraft ?? undefined,
     onStartInlineInput: handleStartInlineInput,
@@ -655,9 +663,9 @@ const handleEditReport = (row: ReportRow) => {
         onQueryChange={setQuery}
         reportDate={reportDate}
         onReportDateChange={setReportDate}
-        onAddReport={
-          canAddReport && !useDutyShiftForCaTruc ? handleAddReport : undefined
-        }
+       onAddReport={
+  canAddReport && !useInlineOwnCommandReport ? handleAddReport : undefined
+}
         onConsolidate={
           isParentUnit && !shouldHideConsolidatedSections
             ? handleConsolidate
@@ -710,9 +718,11 @@ const handleEditReport = (row: ReportRow) => {
         isPastDate={isPastDate}
         hasReport={checkIfDateHasReport}
         showExport={isTacChien && capDonVi === "SU_DOAN"}
-        onSaveInline={
-          useDutyShiftForCaTruc && inlineEditingRowId ? handleSaveInlineInput : undefined
-        }
+       onSaveInline={
+  useInlineOwnCommandReport && inlineEditingRowId
+    ? handleSaveInlineInput
+    : undefined
+}
         inlineSaveDisabled={!inlineDraft}
       />
 
