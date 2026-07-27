@@ -46,6 +46,7 @@ type Props = {
   status?: string;
   isChiHuy?: boolean;
   showUnitColumn?: boolean;
+  labelSecond?: string;
 };
 
 export default function TroopDetailModal({
@@ -57,14 +58,15 @@ export default function TroopDetailModal({
   status,
   isChiHuy,
   showUnitColumn = false,
+  labelSecond = "Trực ban tác chiến",
 }: Props) {
   const parsedTrucChiHuy = parseTruc(trucBanChiHuy);
   const parsedTrucBanTacChien = parseTruc(trucBanTacChien);
 
-  const trucItems = [
-    { label: "Trực chỉ huy", data: parsedTrucChiHuy },
-    { label: "Trực ban tác chiến", data: parsedTrucBanTacChien },
-  ];
+ const trucItems = [
+  { label: "Trực chỉ huy", data: parsedTrucChiHuy },
+  { label: labelSecond, data: parsedTrucBanTacChien },
+];
 
   return (
     <ModalShell

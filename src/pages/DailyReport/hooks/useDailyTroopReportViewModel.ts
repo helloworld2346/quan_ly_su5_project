@@ -223,6 +223,7 @@ export function useDailyTroopReportViewModel(
 }),
     [
       isParentUnit,
+      isTrungDoan,
       isTacChien,
       preferDutyShiftForCaTruc,
       parentReportData,
@@ -234,14 +235,20 @@ export function useDailyTroopReportViewModel(
 
   const trucInfoFromReport = useMemo(
     () =>
- buildTrucInfoFromReport({
-  isParentUnit,
-  isTrungDoan,
-  parentReportData,
-  parentOwnReportData,
-  reportData,
-}),
-    [isParentUnit, parentReportData, parentOwnReportData, reportData],
+      buildTrucInfoFromReport({
+        isParentUnit,
+        isTrungDoan,
+        parentReportData,
+        parentOwnReportData,
+        reportData,
+      }),
+    [
+      isParentUnit,
+      parentReportData,
+      parentOwnReportData,
+      reportData,
+      isTrungDoan,
+    ],
   );
 
   const currentEditingReport = useMemo(() => {
