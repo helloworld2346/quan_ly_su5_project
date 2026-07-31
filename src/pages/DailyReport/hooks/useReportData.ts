@@ -120,7 +120,7 @@ export function useReportData({
           setParentOwnReportData(null);
         }
 
-        if (isTrungDoan || isTieuDoan) {
+        if (isTrungDoan || isTieuDoan || isSuDoan) {
           try {
             const consRes = await dailyReportService.searchReportByUnitAndDate(
               maDonViCurrent,

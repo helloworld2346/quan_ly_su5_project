@@ -72,6 +72,11 @@ export default function ReportTableRow({
   const isOwnCommandRow =
     row.donVi === maDonViCurrent &&
     (unitSymbol === "ch/f" || unitSymbol === "ch/e");
+  
+  const displayUnitName =
+    row.loaiDonBaoCao === "TONG_HOP" && unitSymbol === "ch/f"
+      ? "f5"
+      : normalizeUnitName(row.kyhieuDonVi || row.tenDonVi);
 
   const canEditNotSubmitted = canEditOwnNotSubmitted && isOwnCommandRow;
   const canInlineEditThisRow = canInlineInputChf && isOwnCommandRow;
@@ -132,10 +137,7 @@ export default function ReportTableRow({
             .join(" ") || undefined
         }
       >
-        {/* 1. Đơn vị */}
-        <td className={styles.unitCell}>
-          {normalizeUnitName(row.kyhieuDonVi || row.tenDonVi)}
-        </td>
+        <td className={styles.unitCell}>{displayUnitName}</td>
 
         {/* 2 -> 18. Xử lý 17 cột số liệu (Logic Inline Editing của bạn) */}
         {isInlineEditing && inlineValue ? (
@@ -330,9 +332,8 @@ export default function ReportTableRow({
           .join(" ") || undefined
       }
     >
-      <td className={styles.unitCell}>
-        {normalizeUnitName(row.kyhieuDonVi || row.tenDonVi)}
-      </td>
+      <td className={styles.unitCell}>{displayUnitName}</td>
+
       {isInlineEditing && inlineValue ? (
         <>
           <td>

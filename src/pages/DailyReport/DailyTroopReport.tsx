@@ -289,6 +289,19 @@ export default function DailyTroopReport() {
       childUnits.length > 0,
       isDbOrEb,
     );
+
+  const reportForSubmit =
+    isTacChien && isSuDoan && parentReportData ? parentReportData : ownReport;
+
+  const canSubmitReport =
+    isTacChien && isSuDoan
+      ? Boolean(
+          reportForSubmit &&
+          !reportForSubmit.notSubmitted &&
+          reportForSubmit.status === "Nháp",
+        )
+      : canSubmit;
+  
   const handleStartInlineInput = (row: ReportRow) => {
     setActiveMenuUnit(null);
     setInlineEditingRowId(row.idDonBaoCao);
@@ -734,8 +747,8 @@ export default function DailyTroopReport() {
         onSubmit={
           shouldHideDraftAndUnsubmitted
             ? undefined
-            : canSubmit
-              ? () => handleSubmitReport(ownReport!.idDonBaoCao)
+            : canSubmitReport
+              ? () => handleSubmitReport(reportForSubmit!.idDonBaoCao)
               : undefined
         }
         submitDisabled={isChiHuy ? !signatureDone || !signatureBase64 : false}
