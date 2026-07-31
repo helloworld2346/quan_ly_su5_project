@@ -20,6 +20,7 @@ export function usePoliticalWorkData({
   isDbOrEb,
   isPoliticalOffice,
   isChiHuyTrungDoan,
+  isChiHuySuDoan,
   capDonVi,
   reportDate,
   showError,
@@ -35,6 +36,7 @@ export function usePoliticalWorkData({
   isDbOrEb?: boolean;
   isPoliticalOffice?: boolean;
   isChiHuyTrungDoan?: boolean;
+  isChiHuySuDoan?: boolean;
   reportDate: string;
   showError: (msg: string) => void;
   submitMaDonVi?: string;
@@ -54,7 +56,7 @@ export function usePoliticalWorkData({
   const { childUnits, currentUnit } = useChildUnits(
     maDonViCurrent,
     isParentUnit,
-    isChiHuyTrungDoan,
+    isChiHuyTrungDoan || isChiHuySuDoan,
   );
 
   const showErrorRef = useRef(showError);
@@ -433,12 +435,18 @@ export function usePoliticalWorkData({
           setReportData([]);
         }
 
-        const bctUnit = childUnits.find(
-          (u) =>
-            (u.kyhieuDonvi ?? "").toLowerCase().includes("bct") ||
-            (u.tenDonvi ?? "").toLowerCase().includes("ban chính trị"),
-        );
-        const consMaDonVi = bctUnit?.maDonVi ?? maDonViCurrent;
+        const consUnit = isChiHuySuDoan
+          ? childUnits.find(
+              (u) =>
+                (u.kyhieuDonvi ?? "").toLowerCase().includes("pct") ||
+                (u.tenDonvi ?? "").toLowerCase().includes("chính trị"),
+            )
+          : childUnits.find(
+              (u) =>
+                (u.kyhieuDonvi ?? "").toLowerCase().includes("bct") ||
+                (u.tenDonvi ?? "").toLowerCase().includes("ban chính trị"),
+            );
+        const consMaDonVi = consUnit?.maDonVi ?? maDonViCurrent;
         try {
           const consRes = await politicalWorkService.getByDonVi(
             consMaDonVi,
@@ -474,6 +482,7 @@ export function usePoliticalWorkData({
     isTieuDoan,
     isDbOrEb,
     isPoliticalOffice,
+    isChiHuySuDoan,
     reportDate,
     submitMaDonVi,
     childUnits,
