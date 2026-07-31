@@ -873,6 +873,10 @@ export default function DailyTroopReport() {
           trucBanTacChien={selectedReportRow.rawItem.trucBanTacChien}
           status={selectedReportRow.status}
           isChiHuy={isChiHuy}
+          labelSecond={
+  capDonVi === "DAI_DOI" ? "Trực ban nội vụ" : "Trực ban tác chiến"
+}
+
         />
       )}
 
