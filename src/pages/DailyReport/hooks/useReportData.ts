@@ -37,11 +37,9 @@ export function useReportData({
   showError: (msg: string) => void;
 }) {
   const [reportData, setReportData] = useState<ReportRow[]>([]);
-  // e4 (TONG_HOP)
   const [parentReportData, setParentReportData] = useState<ReportRow | null>(
     null,
   );
-  // CH/e hoặc CH/f (DON_VI của chính đơn vị cha)
   const [parentOwnReportData, setParentOwnReportData] =
     useState<ReportRow | null>(null);
   const [loading, setLoading] = useState(false);
@@ -68,10 +66,7 @@ export function useReportData({
     try {
       let response;
       if (isParentUnit) {
-        // danh sách báo cáo các đơn vị con
         if (isTrungDoan || isSuDoan) {
-          // trung đoàn / sư đoàn: con lá (đại đội/ban/PTM/PCT...) -> DON_VI,
-          // con tổng hợp (tiểu đoàn/trung đoàn) -> TONG_HOP, gộp lại
           const [donViRes, tongHopRes] = await Promise.all([
             dailyReportService.searchChildrenReports(
               maDonViCurrent,
@@ -103,7 +98,6 @@ export function useReportData({
             Result: Array.from(merged.values()),
           };
         } else {
-          // cấp khác: con -> DON_VI
           response = await dailyReportService.searchChildrenReports(
             maDonViCurrent,
             reportDate,
@@ -111,7 +105,6 @@ export function useReportData({
           );
         }
 
-        // báo cáo DON_VI của chính đơn vị cha: CH/e (trung đoàn) / CH/f (sư đoàn)
         try {
           const ownRes = await dailyReportService.searchReportByUnitAndDate(
             maDonViCurrent,
@@ -127,7 +120,6 @@ export function useReportData({
           setParentOwnReportData(null);
         }
 
-        // báo cáo TONG_HOP (e4) - trung đoàn và tiểu đoàn
         if (isTrungDoan || isTieuDoan) {
           try {
             const consRes = await dailyReportService.searchReportByUnitAndDate(
@@ -148,7 +140,7 @@ export function useReportData({
         }
       } else {
         const loaiChiHuy =
-          isChiHuy && (isTrungDoan || (isTieuDoan && !isDbOrEb))
+          isChiHuy && (isSuDoan || isTrungDoan || (isTieuDoan && !isDbOrEb))
             ? "TONG_HOP"
             : "DON_VI";
         response = await dailyReportService.searchReportByUnitAndDate(

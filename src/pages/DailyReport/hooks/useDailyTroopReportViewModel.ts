@@ -211,16 +211,16 @@ export function useDailyTroopReportViewModel(
 
   const caTrucInfo = useMemo(
     () =>
-  buildCaTrucInfo({
-  isParentUnit,
-  isTacChien,
-  isTrungDoan,
-  preferDutyShift: preferDutyShiftForCaTruc,
-  parentReportData,
-  parentOwnReportData,
-  reportData,
-  caTrucFromApi,
-}),
+      buildCaTrucInfo({
+        isParentUnit,
+        isTacChien,
+        isTrungDoan,
+        preferDutyShift: preferDutyShiftForCaTruc,
+        parentReportData,
+        parentOwnReportData,
+        reportData,
+        caTrucFromApi,
+      }),
     [
       isParentUnit,
       isTrungDoan,
@@ -388,8 +388,7 @@ export function useDailyTroopReportViewModel(
     shouldHideDraftAndUnsubmitted,
   ]);
 
-  const shouldHideConsolidatedSections =
-    isAdmin || (isTacChien && capDonVi === "SU_DOAN");
+  const shouldHideConsolidatedSections = isAdmin;
 
   const showTotalRow = isParentUnit;
 
