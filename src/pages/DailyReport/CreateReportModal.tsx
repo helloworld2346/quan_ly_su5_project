@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import styles from "./CreateReportModal.module.css";
 import DailyReportDetailStep from "./DailyReportDetailStep";
 import type { DetailStepData } from "./DailyReportDetailStep";
@@ -373,19 +373,18 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
     setAbsentRows((prev) => [...prev, newRow]);
   };
 
-  const handleUpdateRow = (
-    id: string,
-    field: keyof AbsentRow,
-    value: string,
-  ) => {
-    setAbsentRows((prev) =>
-      prev.map((row) => (row.id === id ? { ...row, [field]: value } : row)),
-    );
-  };
+  const handleUpdateRow = useCallback(
+    (id: string, field: keyof AbsentRow, value: string) => {
+      setAbsentRows((prev) =>
+        prev.map((row) => (row.id === id ? { ...row, [field]: value } : row)),
+      );
+    },
+    [],
+  );
 
-  const handleRemoveRow = (id: string) => {
+  const handleRemoveRow = useCallback((id: string) => {
     setAbsentRows((prev) => prev.filter((row) => row.id !== id));
-  };
+  }, []);
 
   const doLoadYesterday = async (yesterday: string) => {
     setIsLoadingYesterday(true);
