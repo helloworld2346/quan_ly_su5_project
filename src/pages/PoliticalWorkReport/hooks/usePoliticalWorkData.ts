@@ -101,15 +101,11 @@ export function usePoliticalWorkData({
             const isAggregating =
               child?.capDonVi === "TRUNG_DOAN" ||
               child?.capDonVi === "TIEU_DOAN";
-            // Với đơn vị lá/BAN (vd BCT): không cho TONG_HOP ghi đè DON_VI
-            if (isAggregating || !merged.has(item.donVi.maDonVi)) {
+            if (isAggregating) {
               merged.set(item.donVi.maDonVi, item);
             }
           }
         }
-        // TBTC F5 & PCT: mỗi trung đoàn con hiển thị báo cáo TONG_HOP do BCT
-        // của chính trung đoàn đó tổng hợp (lưu tại mã BCT - cháu của F5/PCT).
-        // BCT là con trực tiếp của trung đoàn -> lấy qua getByDonViCha(mã trung đoàn).
         if (isSuDoan || isPoliticalOffice) {
           const trungDoanChildren = childUnits.filter(
             (u) => u.capDonVi === "TRUNG_DOAN",
