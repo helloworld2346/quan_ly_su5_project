@@ -389,9 +389,7 @@ export default function DailyTroopReport() {
     setActiveMenuUnit(menuKey);
   };
 
-  const nguoiBaoCao = trucInfoFromReport?.trucBanTacChien?.tenNguoitruc
-    ? trucInfoFromReport.trucBanTacChien
-    : trucInfoFromReport?.trucChiHuy;
+  const nguoiBaoCao = trucInfoFromReport?.trucChiHuy;
 
   useEffect(() => {
     function handleGlobalClose(event: Event) {
@@ -874,9 +872,8 @@ export default function DailyTroopReport() {
           status={selectedReportRow.status}
           isChiHuy={isChiHuy}
           labelSecond={
-  capDonVi === "DAI_DOI" ? "Trực ban nội vụ" : "Trực ban tác chiến"
-}
-
+            capDonVi === "DAI_DOI" ? "Trực ban nội vụ" : "Trực ban tác chiến"
+          }
         />
       )}
 
