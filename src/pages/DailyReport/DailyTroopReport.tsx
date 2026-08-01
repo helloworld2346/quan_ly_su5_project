@@ -12,7 +12,11 @@ import KySoCard from "../../components/ui/KySoCard/KySoCard";
 import { dailyReportService } from "../../services/dailyReport/dailyReportService";
 import { useAuth } from "../../context/useAuth";
 import { useToast } from "../../context/useToast";
-import type { EditModalData, ReportRow, VangChiTiet } from "../../types/dailyReport";
+import type {
+  EditModalData,
+  ReportRow,
+  VangChiTiet,
+} from "../../types/dailyReport";
 import type { NhiemVuNgay } from "../../services/dailyReport/dailyReportService";
 import type { DetailStepData } from "./DailyReportDetailStep";
 import { handleApiError } from "../../utils/errorHandler";
@@ -69,7 +73,7 @@ export default function DailyTroopReport() {
   );
   const [editNhiemVuId, setEditNhiemVuId] = useState<string | null>(null);
 
-const [nhiemVuData, setNhiemVuData] = useState<NhiemVuNgay | null>(null);
+  const [nhiemVuData, setNhiemVuData] = useState<NhiemVuNgay | null>(null);
   const [cheNhiemVuData, setCheNhiemVuData] = useState<NhiemVuNgay | null>(
     null,
   );
@@ -82,16 +86,17 @@ const [nhiemVuData, setNhiemVuData] = useState<NhiemVuNgay | null>(null);
   >([]);
   const [openNhiemVuId, setOpenNhiemVuId] = useState<string | null>(null);
 
-  // Inline editing state
-  const [inlineEditingRowId, setInlineEditingRowId] = useState<string | null>(null);
-const [inlineDraft, setInlineDraft] = useState<{
-  reportId: string;
-  isNew: boolean;
-  quanSoTong: number;
-  quanSoHienDien: number;
-  vang: VangChiTiet;
-  ghiChu: string;
-} | null>(null);
+  const [inlineEditingRowId, setInlineEditingRowId] = useState<string | null>(
+    null,
+  );
+  const [inlineDraft, setInlineDraft] = useState<{
+    reportId: string;
+    isNew: boolean;
+    quanSoTong: number;
+    quanSoHienDien: number;
+    vang: VangChiTiet;
+    ghiChu: string;
+  } | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
@@ -265,15 +270,15 @@ const [inlineDraft, setInlineDraft] = useState<{
     }
   };
 
-    const [prevReportId, setPrevReportId] = useState<string | undefined>(
-      ownReport?.idDonBaoCao,
-    );
-    if (ownReport?.idDonBaoCao !== prevReportId) {
-      setPrevReportId(ownReport?.idDonBaoCao);
-      const saved = ownReport?.rawItem?.chuKySo;
-      setSignatureBase64(saved ?? undefined);
-      setSignatureDone(Boolean(saved));
-    }
+  const [prevReportId, setPrevReportId] = useState<string | undefined>(
+    ownReport?.idDonBaoCao,
+  );
+  if (ownReport?.idDonBaoCao !== prevReportId) {
+    setPrevReportId(ownReport?.idDonBaoCao);
+    const saved = ownReport?.rawItem?.chuKySo;
+    setSignatureBase64(saved ?? undefined);
+    setSignatureDone(Boolean(saved));
+  }
 
   const { isReporter, canApprove, canRefuse, canSubmit, canRecall } =
     useReportPermissions(
@@ -284,71 +289,88 @@ const [inlineDraft, setInlineDraft] = useState<{
       childUnits.length > 0,
       isDbOrEb,
     );
-const handleStartInlineInput = (row: ReportRow) => {
-  setActiveMenuUnit(null);
-  setInlineEditingRowId(row.idDonBaoCao);
-  setInlineDraft({
-    reportId: row.idDonBaoCao,
-    isNew: Boolean(row.notSubmitted),
-    quanSoTong: row.quanSoTong || 0,
-    quanSoHienDien: row.quanSoHienDien || 0,
-    vang: { ...row.vang },
-    ghiChu: row.ghiChu || "",
-  });
-};
 
-const handleSaveInlineInput = async () => {
-  if (!inlineDraft || !maDonViCurrent) return;
+  const reportForSubmit =
+    isTacChien && isSuDoan && parentReportData ? parentReportData : ownReport;
 
-  const quanSoTong = inlineDraft.quanSoTong;
-  const quanSoHienDien = inlineDraft.quanSoHienDien;
-  const quanSoVang = Math.max(0, quanSoTong - quanSoHienDien);
-
-  // Validate: tổng các cột quân số vắng phải bằng tổng vắng tính toán
-  const tongVangNhap = Object.values(inlineDraft.vang).reduce((sum, val) => sum + (val || 0), 0);
-  if (tongVangNhap !== quanSoVang) {
-    showError(`Tổng số quân vắng nhập vào (${tongVangNhap}) phải bằng tổng vắng (${quanSoVang})`);
-    return;
-  }
-
-  const basePayload = {
-    quanSoTong,
-    quanSoHienDien,
-    quanSoVang,
-    thoiGianBaoCao: new Date(`${reportDate}T12:00:00.000Z`).toISOString(),
-    thongTinVang: JSON.stringify(inlineDraft.vang),
-    chiTietVang: JSON.stringify([]),
-    trucBanChiHuy: JSON.stringify(caTrucInfo?.trucChiHuy ?? {}),
-    trucBanTacChien: JSON.stringify(caTrucInfo?.trucBanTacChien ?? {}),
-    tinhHinhHoatDong: JSON.stringify({}),
+  const canSubmitReport =
+    isTacChien && isSuDoan
+      ? Boolean(
+          reportForSubmit &&
+          !reportForSubmit.notSubmitted &&
+          reportForSubmit.status === "Nháp",
+        )
+      : canSubmit;
+  
+  const handleStartInlineInput = (row: ReportRow) => {
+    setActiveMenuUnit(null);
+    setInlineEditingRowId(row.idDonBaoCao);
+    setInlineDraft({
+      reportId: row.idDonBaoCao,
+      isNew: Boolean(row.notSubmitted),
+      quanSoTong: row.quanSoTong || 0,
+      quanSoHienDien: row.quanSoHienDien || 0,
+      vang: { ...row.vang },
+      ghiChu: row.ghiChu || "",
+    });
   };
 
-  try {
-    if (inlineDraft.isNew) {
-      await dailyReportService.createReport({
-        ...basePayload,
-        donVi: maDonViCurrent,
-        loaiDonBaoCao: "DON_VI",
-      });
-    } else {
-      await dailyReportService.updateReport(inlineDraft.reportId, {
-        ...basePayload,
-        account: account?.idTaiKhoan ?? "",
-        donVi: maDonViCurrent,
-      });
+  const handleSaveInlineInput = async () => {
+    if (!inlineDraft || !maDonViCurrent) return;
+
+    const quanSoTong = inlineDraft.quanSoTong;
+    const quanSoHienDien = inlineDraft.quanSoHienDien;
+    const quanSoVang = Math.max(0, quanSoTong - quanSoHienDien);
+
+    const tongVangNhap = Object.values(inlineDraft.vang).reduce(
+      (sum, val) => sum + (val || 0),
+      0,
+    );
+    if (tongVangNhap !== quanSoVang) {
+      showError(
+        `Tổng số quân vắng nhập vào (${tongVangNhap}) phải bằng tổng vắng (${quanSoVang})`,
+      );
+      return;
     }
 
-    showSuccess("Lưu báo cáo thành công");
-    setInlineEditingRowId(null);
-    setInlineDraft(null);
-    await fetchReports();
-  } catch (error) {
-    handleApiError(error, {
-      showError,
-      errorMessage: "Không thể lưu báo cáo",
-    });
-  }
-};
+    const basePayload = {
+      quanSoTong,
+      quanSoHienDien,
+      quanSoVang,
+      thoiGianBaoCao: new Date(`${reportDate}T12:00:00.000Z`).toISOString(),
+      thongTinVang: JSON.stringify(inlineDraft.vang),
+      chiTietVang: JSON.stringify([]),
+      trucBanChiHuy: JSON.stringify(caTrucInfo?.trucChiHuy ?? {}),
+      trucBanTacChien: JSON.stringify(caTrucInfo?.trucBanTacChien ?? {}),
+      tinhHinhHoatDong: JSON.stringify({}),
+    };
+
+    try {
+      if (inlineDraft.isNew) {
+        await dailyReportService.createReport({
+          ...basePayload,
+          donVi: maDonViCurrent,
+          loaiDonBaoCao: "DON_VI",
+        });
+      } else {
+        await dailyReportService.updateReport(inlineDraft.reportId, {
+          ...basePayload,
+          account: account?.idTaiKhoan ?? "",
+          donVi: maDonViCurrent,
+        });
+      }
+
+      showSuccess("Lưu báo cáo thành công");
+      setInlineEditingRowId(null);
+      setInlineDraft(null);
+      await fetchReports();
+    } catch (error) {
+      handleApiError(error, {
+        showError,
+        errorMessage: "Không thể lưu báo cáo",
+      });
+    }
+  };
 
   const handleToggleMenu = (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -380,9 +402,7 @@ const handleSaveInlineInput = async () => {
     setActiveMenuUnit(menuKey);
   };
 
-  const nguoiBaoCao = trucInfoFromReport?.trucBanTacChien?.tenNguoitruc
-    ? trucInfoFromReport.trucBanTacChien
-    : trucInfoFromReport?.trucChiHuy;
+  const nguoiBaoCao = trucInfoFromReport?.trucChiHuy;
 
   useEffect(() => {
     function handleGlobalClose(event: Event) {
@@ -619,25 +639,23 @@ const handleSaveInlineInput = async () => {
     await fetchReports();
   };
 
-const handleEditReport = (row: ReportRow) => {
-  const unitSymbol = (row.kyhieuDonVi ?? row.tenDonVi).trim().toLowerCase();
+  const handleEditReport = (row: ReportRow) => {
+    const unitSymbol = (row.kyhieuDonVi ?? row.tenDonVi).trim().toLowerCase();
 
-  if (
-    useInlineOwnCommandReport &&
-    row.donVi === maDonViCurrent &&
-    (unitSymbol === "ch/f" || unitSymbol === "ch/e")
-  ) {
-    handleStartInlineInput(row);
-    return;
-  }
+    if (
+      useInlineOwnCommandReport &&
+      row.donVi === maDonViCurrent &&
+      (unitSymbol === "ch/f" || unitSymbol === "ch/e")
+    ) {
+      handleStartInlineInput(row);
+      return;
+    }
 
-  setEditModalData({ reportId: row.idDonBaoCao, ngayBaoCao: reportDate });
-  setActiveMenuUnit(null);
-};
-
-  const handleExportWord = () => {
-  
+    setEditModalData({ reportId: row.idDonBaoCao, ngayBaoCao: reportDate });
+    setActiveMenuUnit(null);
   };
+
+  const handleExportWord = () => {};
 
   const handleExportExcel = async () => {
     const { exportTroopReportToExcel } =
@@ -662,12 +680,12 @@ const handleEditReport = (row: ReportRow) => {
     isReporter,
     isTacChien,
     isChiHuyLeaf,
-   canEditOwnNotSubmitted: useInlineOwnCommandReport,
+    canEditOwnNotSubmitted: useInlineOwnCommandReport,
     maDonViCurrent,
     activeMenuUnit,
     menuPosition,
     dropdownRef,
-   canInlineInputChf: useInlineOwnCommandReport,
+    canInlineInputChf: useInlineOwnCommandReport,
     inlineEditingRowId,
     inlineDraft: inlineDraft ?? undefined,
     onStartInlineInput: handleStartInlineInput,
@@ -687,9 +705,11 @@ const handleEditReport = (row: ReportRow) => {
         onQueryChange={setQuery}
         reportDate={reportDate}
         onReportDateChange={setReportDate}
-       onAddReport={
-  canAddReport && !useInlineOwnCommandReport ? handleAddReport : undefined
-}
+        onAddReport={
+          canAddReport && !useInlineOwnCommandReport
+            ? handleAddReport
+            : undefined
+        }
         onConsolidate={
           isParentUnit && !shouldHideConsolidatedSections
             ? handleConsolidate
@@ -727,8 +747,8 @@ const handleEditReport = (row: ReportRow) => {
         onSubmit={
           shouldHideDraftAndUnsubmitted
             ? undefined
-            : canSubmit
-              ? () => handleSubmitReport(ownReport!.idDonBaoCao)
+            : canSubmitReport
+              ? () => handleSubmitReport(reportForSubmit!.idDonBaoCao)
               : undefined
         }
         submitDisabled={isChiHuy ? !signatureDone || !signatureBase64 : false}
@@ -742,11 +762,11 @@ const handleEditReport = (row: ReportRow) => {
         isPastDate={isPastDate}
         hasReport={checkIfDateHasReport}
         showExport={isTacChien && capDonVi === "SU_DOAN"}
-       onSaveInline={
-  useInlineOwnCommandReport && inlineEditingRowId
-    ? handleSaveInlineInput
-    : undefined
-}
+        onSaveInline={
+          useInlineOwnCommandReport && inlineEditingRowId
+            ? handleSaveInlineInput
+            : undefined
+        }
         inlineSaveDisabled={!inlineDraft}
       />
 
@@ -865,9 +885,8 @@ const handleEditReport = (row: ReportRow) => {
           status={selectedReportRow.status}
           isChiHuy={isChiHuy}
           labelSecond={
-  capDonVi === "DAI_DOI" ? "Trực ban nội vụ" : "Trực ban tác chiến"
-}
-
+            capDonVi === "DAI_DOI" ? "Trực ban nội vụ" : "Trực ban tác chiến"
+          }
         />
       )}
 
@@ -985,7 +1004,7 @@ const handleEditReport = (row: ReportRow) => {
                     await dailyReportService.createNhiemVuNgay(nhiemVuPayload);
                   }
                 } catch {
-                
+                  ///
                 }
               }
 

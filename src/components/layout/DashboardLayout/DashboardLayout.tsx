@@ -65,7 +65,9 @@ function TopBarActions({ isDark, onToggleTheme }: TopBarActionsProps) {
     <div className={styles.topBarRight}>
       {reportStatus && (
         <span className={styles.reportStatusWrap}>
-          <span className={styles.reportStatusLabel}>Báo cáo thống kê quân số hôm nay:</span>
+          <span className={styles.reportStatusLabel}>
+            Báo cáo thống kê quân số hôm nay:
+          </span>
           <ReportStatusBadge status={reportStatus} />
         </span>
       )}

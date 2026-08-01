@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import styles from "./CreateReportModal.module.css";
 import DailyReportDetailStep from "./DailyReportDetailStep";
 import type { DetailStepData } from "./DailyReportDetailStep";
@@ -138,6 +138,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   const { showWarning } = useToast();
   const [step, setStep] = useState(1);
   const [detailData, setDetailData] = useState<DetailStepData | null>(null);
+  const [detailVersion, setDetailVersion] = useState(0);
   const [validationError, setValidationError] = useState("");
 
   const [nhiemVuInitialData, setNhiemVuInitialData] = useState<{
@@ -372,19 +373,18 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
     setAbsentRows((prev) => [...prev, newRow]);
   };
 
-  const handleUpdateRow = (
-    id: string,
-    field: keyof AbsentRow,
-    value: string,
-  ) => {
-    setAbsentRows((prev) =>
-      prev.map((row) => (row.id === id ? { ...row, [field]: value } : row)),
-    );
-  };
+  const handleUpdateRow = useCallback(
+    (id: string, field: keyof AbsentRow, value: string) => {
+      setAbsentRows((prev) =>
+        prev.map((row) => (row.id === id ? { ...row, [field]: value } : row)),
+      );
+    },
+    [],
+  );
 
-  const handleRemoveRow = (id: string) => {
+  const handleRemoveRow = useCallback((id: string) => {
     setAbsentRows((prev) => prev.filter((row) => row.id !== id));
-  };
+  }, []);
 
   const doLoadYesterday = async (yesterday: string) => {
     setIsLoadingYesterday(true);
@@ -395,6 +395,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
         consolidatedAbsentRows ? "TONG_HOP" : "DON_VI",
       );
       if (res.success && res.Result) {
+        // 1) Danh sách quân nhân vắng (giữ nguyên logic cũ)
         if (res.Result.chiTietVang) {
           const rows = JSON.parse(res.Result.chiTietVang) as AbsentRow[];
           if (rows.length > 0) {
@@ -405,6 +406,40 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
         } else {
           showWarning("Hôm qua không có quân nhân vắng.");
         }
+
+        // 2) Thông tin trực chỉ huy / trực ban
+        if (res.Result.trucBanChiHuy) {
+          setTrucChiHuy(parseTrucNguoi(res.Result.trucBanChiHuy));
+        }
+        if (res.Result.trucBanTacChien) {
+          setTrucBanTacChien(parseTrucNguoi(res.Result.trucBanTacChien));
+        }
+
+        // 3) Nhiệm vụ ngày (tình hình hoạt động) từ báo cáo hôm qua
+        if (res.Result.idDonBaoCao) {
+          try {
+            const nvRes = await dailyReportService.getNhiemVuNgayByDonBaoCao(
+              res.Result.idDonBaoCao,
+            );
+            const nv = nvRes.Result;
+            if (nv) {
+              setDetailData({
+                securityStatus: nv.nhiemVuPhandoi ?? "unsafe",
+                incidentStatus: nv.noiDungDotXuat ? "yes" : "no",
+                incidentDetail: nv.noiDungDotXuat ?? "",
+                advantageStatus: nv.noiDungUuDiem ? "yes" : "no",
+                advantageDetail: nv.noiDungUuDiem ?? "",
+                disadvantageStatus: nv.noiDungKhuyetDiem ? "yes" : "no",
+                disadvantageDetail: nv.noiDungKhuyetDiem ?? "",
+                pendingTaskStatus: nv.noiDungCanGiaiQuyet ? "yes" : "no",
+                pendingDetail: nv.noiDungCanGiaiQuyet ?? "",
+              });
+              setDetailVersion((v) => v + 1);
+            }
+          } catch {
+            // Không block nếu không lấy được nhiệm vụ ngày
+          }
+        }
       } else {
         showWarning(`Không tìm thấy báo cáo ngày ${yesterday}.`);
       }
@@ -414,7 +449,6 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       setIsLoadingYesterday(false);
     }
   };
-
   const handleLoadYesterday = async () => {
     if (!maDonViCurrent) return;
     const d = new Date(ngayBaoCao);
@@ -605,7 +639,11 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
               />
               <hr className={styles.divider} />
               <TrucNguoiFormSection
-                title={isTacChien || isConsolidation ? "Trực ban tác chiến" : "Trực ban nội vụ"}
+                title={
+                  isTacChien || isConsolidation
+                    ? "Trực ban tác chiến"
+                    : "Trực ban nội vụ"
+                }
                 value={trucBanTacChien}
                 onChange={setTrucBanTacChien}
                 capBacOptions={capBacTacChienOptions}
@@ -660,11 +698,13 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
             <div className={styles.stepPanel}>
               <DailyReportDetailStep
                 key={
-                  initialDetailData
+                  (initialDetailData
                     ? JSON.stringify(initialDetailData)
-                    : (nhiemVuInitialData?.idNhiemvuNgay ?? "new")
+                    : (nhiemVuInitialData?.idNhiemvuNgay ?? "new")) +
+                  `-${detailVersion}`
                 }
                 initialData={
+                  detailData ??
                   initialDetailData ??
                   (nhiemVuInitialData
                     ? {

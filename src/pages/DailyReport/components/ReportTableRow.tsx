@@ -67,14 +67,19 @@ export default function ReportTableRow({
 }: Props) {
   const menuKey = isConsolidatedRow ? `parent-${row.idDonBaoCao}` : row.donVi;
   const isMenuOpen = activeMenuUnit === menuKey;
-const unitSymbol = (row.kyhieuDonVi ?? row.tenDonVi).trim().toLowerCase();
+  const unitSymbol = (row.kyhieuDonVi ?? row.tenDonVi).trim().toLowerCase();
 
-const isOwnCommandRow =
-  row.donVi === maDonViCurrent &&
-  (unitSymbol === "ch/f" || unitSymbol === "ch/e");
+  const isOwnCommandRow =
+    row.donVi === maDonViCurrent &&
+    (unitSymbol === "ch/f" || unitSymbol === "ch/e");
+  
+  const displayUnitName =
+    row.loaiDonBaoCao === "TONG_HOP" && unitSymbol === "ch/f"
+      ? "f5"
+      : normalizeUnitName(row.kyhieuDonVi || row.tenDonVi);
 
-const canEditNotSubmitted = canEditOwnNotSubmitted && isOwnCommandRow;
-const canInlineEditThisRow = canInlineInputChf && isOwnCommandRow;
+  const canEditNotSubmitted = canEditOwnNotSubmitted && isOwnCommandRow;
+  const canInlineEditThisRow = canInlineInputChf && isOwnCommandRow;
   const [showKySo, setShowKySo] = useState(false);
 
   const isApprovedStatus =
@@ -83,7 +88,8 @@ const canInlineEditThisRow = canInlineInputChf && isOwnCommandRow;
     row.status === "Ä Ã£_Duyá»‡t" ||
     row.status === "Ä Ã£ duyá»‡t";
 
-  const hideActionMenu = canInlineInputChf && isOwnCommandRow && isApprovedStatus;
+  const hideActionMenu =
+    canInlineInputChf && isOwnCommandRow && isApprovedStatus;
 
   const isInlineEditing = inlineEditingRowId === row.idDonBaoCao;
   const inlineValue = inlineDraft;
@@ -114,161 +120,160 @@ const canInlineEditThisRow = canInlineInputChf && isOwnCommandRow;
     });
   };
 
-if (row.notSubmitted) {
-  return (
-    <tr
-      key={row.idDonBaoCao}
-      className={
-        [
-          isConsolidatedRow
-            ? styles.consolidatedRow
-            : isParentUnit
-              ? styles.childRow
-              : "",
-          styles.notSubmittedRow,
-        ]
-          .filter(Boolean)
-          .join(" ") || undefined
-      }
-    >
-      {/* 1. Đơn vị */}
-      <td className={styles.unitCell}>
-        {normalizeUnitName(row.kyhieuDonVi || row.tenDonVi)}
-      </td>
+  if (row.notSubmitted) {
+    return (
+      <tr
+        key={row.idDonBaoCao}
+        className={
+          [
+            isConsolidatedRow
+              ? styles.consolidatedRow
+              : isParentUnit
+                ? styles.childRow
+                : "",
+            styles.notSubmittedRow,
+          ]
+            .filter(Boolean)
+            .join(" ") || undefined
+        }
+      >
+        <td className={styles.unitCell}>{displayUnitName}</td>
 
-      {/* 2 -> 18. Xử lý 17 cột số liệu (Logic Inline Editing của bạn) */}
-      {isInlineEditing && inlineValue ? (
-        <>
-          <td>
-            <input
-              className={styles.inlineCellInput}
-              type="number"
-              min={0}
-              value={inlineValue.quanSoTong}
-              onFocus={handleInputFocus}
-              onChange={(e) => setInlineNumber("quanSoTong", e.target.value)}
-            />
-          </td>
-          <td>
-            <input
-              className={styles.inlineCellInput}
-              type="number"
-              min={0}
-              value={inlineValue.quanSoHienDien}
-              onFocus={handleInputFocus}
-              onChange={(e) => setInlineNumber("quanSoHienDien", e.target.value)}
-            />
-          </td>
-          <td>
-            {Math.max(0, inlineValue.quanSoTong - inlineValue.quanSoHienDien)}
-          </td>
-          {[
-            "hoiThaiNgoaiSuDoan",
-            "hoiThaiEF",
-            "xayDungNgoaiSuDoan",
-            "xayDungEF",
-            "choHuu",
-            "nghiTranhThu",
-            "phep",
-            "vienNgoaiSuDoan",
-            "vienEF",
-            "congTacNgoaiSuDoan",
-            "congTacSuDoan",
-            "hocSQ",
-            "hocCS",
-            "lyDoVangKhac",
-          ].map((key) => (
-            <td key={key}>
-              {key === "lyDoVangKhac" || key === "hocCS" ? (
-                "—"
-              ) : (
-                <input
-                  className={styles.inlineCellInput}
-                  type="number"
-                  min={0}
-                  value={
-                    inlineValue.vang[key as keyof typeof inlineValue.vang]
-                  }
-                  onFocus={handleInputFocus}
-                  onChange={(e) =>
-                    setInlineNumber(
-                      key as keyof InlineReportDraft["vang"],
-                      e.target.value,
-                    )
-                  }
-                />
-              )}
+        {/* 2 -> 18. Xử lý 17 cột số liệu (Logic Inline Editing của bạn) */}
+        {isInlineEditing && inlineValue ? (
+          <>
+            <td>
+              <input
+                className={styles.inlineCellInput}
+                type="number"
+                min={0}
+                value={inlineValue.quanSoTong}
+                onFocus={handleInputFocus}
+                onChange={(e) => setInlineNumber("quanSoTong", e.target.value)}
+              />
             </td>
-          ))}
-        </>
-      ) : (
-        /* Khi chưa bấm Nhập liệu -> Hiển thị 17 dấu gạch ngang */
-        Array.from({ length: 17 }).map((_, i) => <td key={i}>—</td>)
-      )}
-
-      {/* 19. Trạng thái */}
-      <td>
-        <ReportStatusBadge status="Chưa_Nộp" />
-      </td>
-
-      {/* 20. Ký số */}
-      <td>—</td>
-
-      {/* 21. Ghi chú */}
-      <td className={styles.noteCell}>—</td>
-
-      {/* 22. Thao tác */}
-      <td className={styles.actionCell}>
-        {canEditNotSubmitted ? (
-          <div className={styles.actionWrapper}>
-            <button
-              type="button"
-              className={`${styles.ellipsisBtn} ${
-                isMenuOpen ? styles.activeEllipsis : ""
-              }`}
-              aria-label="Tùy chọn thao tác"
-              onClick={(e) => onToggleMenu(e, menuKey)}
-            >
-              <FontAwesomeIcon icon={faEllipsisVertical} />
-            </button>
-
-            {isMenuOpen &&
-              createPortal(
-                <div
-                  ref={dropdownRef}
-                  className={styles.dropdownMenu}
-                  role="menu"
-                  style={{
-                    ...(menuPosition.top !== undefined
-                      ? { top: `${menuPosition.top}px` }
-                      : { bottom: `${menuPosition.bottom}px` }),
-                    left: `${menuPosition.left}px`,
-                  }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <button
-                    type="button"
-                    className={styles.menuItem}
-                    role="menuitem"
-                    onClick={() => onStartInlineInput?.(row)}
-                  >
-                    <FontAwesomeIcon
-                      icon={faPenToSquare}
-                      className={styles.menuIcon}
-                    />
-                    Nhập liệu
-                  </button>
-                </div>,
-                document.body,
-              )}
-          </div>
+            <td>
+              <input
+                className={styles.inlineCellInput}
+                type="number"
+                min={0}
+                value={inlineValue.quanSoHienDien}
+                onFocus={handleInputFocus}
+                onChange={(e) =>
+                  setInlineNumber("quanSoHienDien", e.target.value)
+                }
+              />
+            </td>
+            <td>
+              {Math.max(0, inlineValue.quanSoTong - inlineValue.quanSoHienDien)}
+            </td>
+            {[
+              "hoiThaiNgoaiSuDoan",
+              "hoiThaiEF",
+              "xayDungNgoaiSuDoan",
+              "xayDungEF",
+              "choHuu",
+              "nghiTranhThu",
+              "phep",
+              "vienNgoaiSuDoan",
+              "vienEF",
+              "congTacNgoaiSuDoan",
+              "congTacSuDoan",
+              "hocSQ",
+              "hocCS",
+              "lyDoVangKhac",
+            ].map((key) => (
+              <td key={key}>
+                {key === "lyDoVangKhac" || key === "hocCS" ? (
+                  "—"
+                ) : (
+                  <input
+                    className={styles.inlineCellInput}
+                    type="number"
+                    min={0}
+                    value={
+                      inlineValue.vang[key as keyof typeof inlineValue.vang]
+                    }
+                    onFocus={handleInputFocus}
+                    onChange={(e) =>
+                      setInlineNumber(
+                        key as keyof InlineReportDraft["vang"],
+                        e.target.value,
+                      )
+                    }
+                  />
+                )}
+              </td>
+            ))}
+          </>
         ) : (
-          "—"
+          /* Khi chưa bấm Nhập liệu -> Hiển thị 17 dấu gạch ngang */
+          Array.from({ length: 17 }).map((_, i) => <td key={i}>—</td>)
         )}
-      </td>
-    </tr>
-  );
-}
+
+        {/* 19. Trạng thái */}
+        <td>
+          <ReportStatusBadge status="Chưa_Nộp" />
+        </td>
+
+        {/* 20. Ký số */}
+        <td>—</td>
+
+        {/* 21. Ghi chú */}
+        <td className={styles.noteCell}>—</td>
+
+        {/* 22. Thao tác */}
+        <td className={styles.actionCell}>
+          {canEditNotSubmitted ? (
+            <div className={styles.actionWrapper}>
+              <button
+                type="button"
+                className={`${styles.ellipsisBtn} ${
+                  isMenuOpen ? styles.activeEllipsis : ""
+                }`}
+                aria-label="Tùy chọn thao tác"
+                onClick={(e) => onToggleMenu(e, menuKey)}
+              >
+                <FontAwesomeIcon icon={faEllipsisVertical} />
+              </button>
+
+              {isMenuOpen &&
+                createPortal(
+                  <div
+                    ref={dropdownRef}
+                    className={styles.dropdownMenu}
+                    role="menu"
+                    style={{
+                      ...(menuPosition.top !== undefined
+                        ? { top: `${menuPosition.top}px` }
+                        : { bottom: `${menuPosition.bottom}px` }),
+                      left: `${menuPosition.left}px`,
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button
+                      type="button"
+                      className={styles.menuItem}
+                      role="menuitem"
+                      onClick={() => onStartInlineInput?.(row)}
+                    >
+                      <FontAwesomeIcon
+                        icon={faPenToSquare}
+                        className={styles.menuIcon}
+                      />
+                      Nhập liệu
+                    </button>
+                  </div>,
+                  document.body,
+                )}
+            </div>
+          ) : (
+            "—"
+          )}
+        </td>
+      </tr>
+    );
+  }
 
   const canEdit =
     (isReporter || isChiHuyLeaf) &&
@@ -305,9 +310,7 @@ if (row.notSubmitted) {
     }
   };
 
-  const nguoiKy = parseTrucSafe(row.rawItem.trucBanTacChien)?.tenNguoitruc
-    ? parseTrucSafe(row.rawItem.trucBanTacChien)
-    : parseTrucSafe(row.rawItem.trucBanChiHuy);
+  const nguoiKy = parseTrucSafe(row.rawItem.trucBanChiHuy);
 
   const hoTenKy = nguoiKy?.tenNguoitruc
     ? `${nguoiKy.capbacNguoitruc ?? ""} - ${nguoiKy.tenNguoitruc}`
@@ -329,9 +332,8 @@ if (row.notSubmitted) {
           .join(" ") || undefined
       }
     >
-      <td className={styles.unitCell}>
-        {normalizeUnitName(row.kyhieuDonVi || row.tenDonVi)}
-      </td>
+      <td className={styles.unitCell}>{displayUnitName}</td>
+
       {isInlineEditing && inlineValue ? (
         <>
           <td>
@@ -351,10 +353,14 @@ if (row.notSubmitted) {
               min={0}
               value={inlineValue.quanSoHienDien}
               onFocus={handleInputFocus}
-              onChange={(e) => setInlineNumber("quanSoHienDien", e.target.value)}
+              onChange={(e) =>
+                setInlineNumber("quanSoHienDien", e.target.value)
+              }
             />
           </td>
-          <td>{Math.max(0, inlineValue.quanSoTong - inlineValue.quanSoHienDien)}</td>
+          <td>
+            {Math.max(0, inlineValue.quanSoTong - inlineValue.quanSoHienDien)}
+          </td>
           {[
             "hoiThaiNgoaiSuDoan",
             "hoiThaiEF",
@@ -469,12 +475,18 @@ if (row.notSubmitted) {
                       role="menuitem"
                       onClick={() => onViewDetail(row)}
                     >
-                      <FontAwesomeIcon icon={faEye} className={styles.menuIcon} />
+                      <FontAwesomeIcon
+                        icon={faEye}
+                        className={styles.menuIcon}
+                      />
                       Xem chi tiết
                     </button>
                   )}
 
-                  {(canInlineEditThisRow || canEdit || canEditParent || canEditOwn) && (
+                  {(canInlineEditThisRow ||
+                    canEdit ||
+                    canEditParent ||
+                    canEditOwn) && (
                     <button
                       type="button"
                       className={styles.menuItem}

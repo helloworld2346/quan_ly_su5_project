@@ -51,15 +51,16 @@ export function useReportPermissions<T extends ApprovableRow>(
     }, [isReporter, selfApprove, isChiHuyLeaf, isSelfReporter, ownReport]);
 
     const canRecall = useMemo(() => {
+      const chiHuyLeafCanRecall = isChiHuyLeaf && selfApprove;
       if (
-        (!isReporter && !selfApprove && !isSelfReporter) ||
+        (!isReporter && !chiHuyLeafCanRecall && !isSelfReporter) ||
         !ownReport ||
         ownReport.notSubmitted
       ) {
         return false;
       }
       return ownReport.status === "Chờ_Duyệt";
-    }, [isReporter, selfApprove, isSelfReporter, ownReport]);
+    }, [isReporter, selfApprove, isChiHuyLeaf, isSelfReporter, ownReport]);
 
   return {
     isChiHuy,

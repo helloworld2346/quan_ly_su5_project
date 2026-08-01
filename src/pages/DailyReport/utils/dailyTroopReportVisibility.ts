@@ -35,7 +35,12 @@ export function shouldHideDraftAndUnsubmittedForCommander(args: {
   const { isChiHuy, capDonVi, accountDonVi } = args;
 
   if (!isChiHuy) return false;
-  if (capDonVi !== "TRUNG_DOAN" && capDonVi !== "TIEU_DOAN") return false;
+  if (
+    capDonVi !== "TRUNG_DOAN" &&
+    capDonVi !== "TIEU_DOAN" &&
+    capDonVi !== "SU_DOAN"
+  )
+    return false;
 
   return !isDbOrEbUnit(accountDonVi);
 }
