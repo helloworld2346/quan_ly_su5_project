@@ -1,0 +1,41 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 20px;
+  background: var(--info-field-bg, #cfe9da);
+  border: 1px solid var(--info-field-border, #7fb095);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px var(--shadow-color, rgba(0, 0, 0, 0.1));
+  min-width: 210px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+}
+
+.row > * + * {
+  margin-left: 10px;
+}
+
+.divider {
+  height: 1px;
+  width: 100%;
+  margin: 8px 0;
+  background: var(--info-field-border, #7fb095);
+  opacity: 0.5;
+}
+
+.icon {
+  color: var(--primary-color, #1f5c3f);
+  font-size: 15px;
+  width: 16px;
+  text-align: center;
+}
+
+.text {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--login-text, #1a2e24);
+  white-space: nowrap;
+}
