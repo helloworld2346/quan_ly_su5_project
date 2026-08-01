@@ -255,9 +255,11 @@ export default function CreateReport({
       onClose={handleClose}
       closeOnOverlayClick={false}
       title={
-        initialData
-          ? "Cập nhật báo cáo hoạt động"
-          : "Tạo báo cáo hoạt động CTĐ,CTCT"
+        consolidating
+          ? "Tổng hợp báo cáo hoạt động CTĐ,CTCT"
+          : initialData
+            ? "Cập nhật báo cáo hoạt động CTĐ,CTCT"
+            : "Tạo báo cáo hoạt động CTĐ,CTCT"
       }
       footer={footer}
     >
