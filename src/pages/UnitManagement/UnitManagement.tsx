@@ -656,7 +656,7 @@ export default function UnitManagement() {
             <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
               <div className={styles.modalHeader}>
                 <p className={styles.modalTitle}>
-                  Cập nhật quân số
+                  Cập nhật thông tin đơn vị
                   {editingUnit ? ` — ${editingUnit.tenDonvi}` : ""}
                 </p>
                 <button
