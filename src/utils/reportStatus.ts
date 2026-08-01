@@ -12,6 +12,7 @@ export function getReportStatusLabel(status: string): string {
     Chờ_Duyệt: "Chờ duyệt",
     Đã_Duyệt: "Đã duyệt",
     Từ_Chối: "Từ chối",
+    Chưa_Nộp: "Chưa nộp",
   };
   return map[normalizeReportStatus(status)] ?? status.replace(/_/g, " ");
 }
