@@ -1,4 +1,4 @@
-  import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
   import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
   import { faUserCog } from "@fortawesome/free-solid-svg-icons";
@@ -12,6 +12,7 @@
   import QuanSoForm from "./components/QuanSoForm";
   import PasswordForm from "./components/PasswordForm";
   import ThemeCard from "./components/ThemeCard";
+  import DateTimeWidget from "./DateTimeWidget";
   import Skeleton from "../../components/ui/Skeleton/Skeleton";
   import { useMinLoading } from "../../hooks/useMinLoading";
 
@@ -149,6 +150,7 @@
               Xem và quản lý thông tin tài khoản của bạn
             </p>
           </div>
+          <DateTimeWidget />
         </div>
 
         <div className={styles.layout}>

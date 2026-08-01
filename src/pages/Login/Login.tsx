@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import type { FormEvent } from "react";
 import type { AxiosError } from "axios";
+import { ShieldCheckIcon } from "@heroicons/react/24/outline";
 
 import styles from "./Login.module.css";
 
@@ -16,9 +17,11 @@ import { loginValidation } from "../../utils/validation";
 
 import logo from "../../assets/images/logo-su5.png";
 import loginBg from "../../assets/images/login-bg-dongson.png";
+import loginFooter from "../../assets/images/login-footer.png";
 
 const pageStyle = {
   "--login-bg": `url(${loginBg})`,
+  "--login-footer": `url(${loginFooter})`,
 } as React.CSSProperties;
 
 type Props = {
@@ -100,9 +103,14 @@ export default function Login({ onSuccess }: Props) {
 
         <div className={styles.divider} role="presentation" />
 
-        <h1 id="login-title" className={styles.title}>
-          Đăng nhập
-        </h1>
+        <div className={styles.welcome}>
+          <h1 id="login-title" className={styles.welcomeTitle}>
+            Chào mừng trở lại!
+          </h1>
+          <p className={styles.welcomeDesc}>
+            Vui lòng đăng nhập để tiếp tục sử dụng hệ thống
+          </p>
+        </div>
 
         {error && <p className={styles.error}>{error}</p>}
 
@@ -133,6 +141,14 @@ export default function Login({ onSuccess }: Props) {
             disabled={loading}
           />
         </form>
+
+
+        <footer className={styles.security}>
+          <div className={styles.securityIcon}>
+            <ShieldCheckIcon className={styles.securitySvg} />
+          </div>
+          <span>Hệ thống được bảo mật theo tiêu chuẩn Quân đội</span>
+        </footer>
       </section>
     </main>
   );
