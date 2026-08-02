@@ -86,69 +86,37 @@ export async function exportTroopReportToExcel({
   };
   ws.getCell(2, rightStart).alignment = { horizontal: "center" };
 
+  setMerged(ws, 1, 1, 1, 2, "SƯ ĐOÀN 5");
+  ws.getCell(1, 1).font = { name: FONT, bold: true, size: 14 };
+  ws.getCell(1, 1).alignment = { horizontal: "center", vertical: "middle" };
+
   setMerged(ws, 3, rightStart, 3, COLUMN_COUNT, formatPlace(reportDate));
   ws.getCell(3, rightStart).font = { name: FONT, italic: true, size: 14 };
   ws.getCell(3, rightStart).alignment = { horizontal: "center" };
 
-  setMerged(
-    ws,
-    4,
-    1,
-    4,
-    COLUMN_COUNT,
-    `MẬT KHẨU: ${(matkhau ?? "").toUpperCase()}`,
-  );
-  ws.getCell(4, 1).font = { name: FONT, bold: true, size: 18 };
-  ws.getCell(4, 1).alignment = { horizontal: "center", vertical: "middle" };
-  ws.getRow(4).height = 24;
+  ws.getRow(4).height = 10;
 
   setMerged(
     ws,
     5,
     1,
     5,
-    COLUMN_COUNT,
-    `Trực chỉ huy: ${formatTruc(trucChiHuy)}`,
-  );
-  ws.getCell(5, 1).font = { name: FONT, size: 14 };
-  ws.getCell(5, 1).alignment = { horizontal: "center", vertical: "middle" };
-
-  setMerged(
-    ws,
-    6,
-    1,
-    6,
-    COLUMN_COUNT,
-    `Trực ban tác chiến: ${formatTruc(trucBanTacChien)}`,
-  );
-  ws.getCell(6, 1).font = { name: FONT, size: 14 };
-  ws.getCell(6, 1).alignment = { horizontal: "center", vertical: "middle" };
-
-  setMerged(
-    ws,
-    7,
-    1,
-    7,
     COLUMN_COUNT,
     `BÁO CÁO THỐNG KÊ QUÂN SỐ (Ngày ${formatDate(reportDate)})`,
   );
-  ws.getCell(7, 1).font = {
+  ws.getCell(5, 1).font = {
     name: FONT,
     bold: true,
     size: 16,
-    color: { argb: COLOR.WHITE },
   };
-  ws.getCell(7, 1).alignment = { horizontal: "center", vertical: "middle" };
-  ws.getCell(7, 1).fill = {
-    type: "pattern",
-    pattern: "solid",
-    fgColor: { argb: COLOR.TITLE_FILL },
-  };
-  ws.getRow(7).height = 26;
+  ws.getCell(5, 1).alignment = { horizontal: "center", vertical: "middle" };
+  ws.getRow(5).height = 26;
 
-  const r1 = 8;
-  const r2 = 9;
-  const r3 = 10;
+  ws.getRow(6).height = 6;
+
+  const r1 = 7;
+  const r2 = 8;
+  const r3 = 9;
 
   setMerged(ws, r1, 1, r3, 1, "Đơn vị");
   setMerged(ws, r1, 2, r3, 2, "Tổng quân số");
@@ -226,6 +194,53 @@ export async function exportTroopReportToExcel({
   }
 
   rowIdx = explainStartRow + EXPLAIN_LINES;
+
+  // Cuối file: MẬT KHẨU / Trực chỉ huy / Trực ban tác chiến
+  const passwordRow = rowIdx;
+  setMerged(
+    ws,
+    passwordRow,
+    1,
+    passwordRow,
+    COLUMN_COUNT,
+    `MẬT KHẨU: ${(matkhau ?? "").toUpperCase()}`,
+  );
+  ws.getCell(passwordRow, 1).font = { name: FONT, bold: true, size: 18 };
+  ws.getCell(passwordRow, 1).alignment = {
+    horizontal: "center",
+    vertical: "middle",
+  };
+  ws.getRow(passwordRow).height = 24;
+
+  const chiHuyRow = passwordRow + 1;
+  setMerged(
+    ws,
+    chiHuyRow,
+    1,
+    chiHuyRow,
+    COLUMN_COUNT,
+    `Trực chỉ huy: ${formatTruc(trucChiHuy)}`,
+  );
+  ws.getCell(chiHuyRow, 1).font = { name: FONT, size: 14 };
+  ws.getCell(chiHuyRow, 1).alignment = {
+    horizontal: "center",
+    vertical: "middle",
+  };
+
+  const tacChienRow = passwordRow + 2;
+  setMerged(
+    ws,
+    tacChienRow,
+    1,
+    tacChienRow,
+    COLUMN_COUNT,
+    `Trực ban tác chiến: ${formatTruc(trucBanTacChien)}`,
+  );
+  ws.getCell(tacChienRow, 1).font = { name: FONT, size: 14 };
+  ws.getCell(tacChienRow, 1).alignment = {
+    horizontal: "center",
+    vertical: "middle",
+  };
 
   ws.getColumn(1).width = 12;
   for (let c = 2; c <= COLUMN_COUNT; c++) ws.getColumn(c).width = 12;
