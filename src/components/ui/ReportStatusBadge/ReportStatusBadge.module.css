@@ -36,8 +36,13 @@
 }
 
 .returned {  
-  background: var(--btn-recall-bg);  
-  color: var(--btn-recall-fg);  
+  background: var(--btn-refuse-bg);  
+  color: var(--btn-refuse-fg);  
+}  
+  
+.needUpdate {  
+  background: #fff4e5;  
+  color: #b45309;  
 }
 
 @media (max-width: 1366px) {  

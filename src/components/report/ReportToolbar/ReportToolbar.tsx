@@ -39,6 +39,7 @@ type Props = {
   showExport?: boolean;
   onSaveInline?: () => void;
   inlineSaveDisabled?: boolean;
+  onReturn?: () => void;
 };
 
 function todayIsoDate() {
@@ -72,6 +73,7 @@ export default function ReportToolbar({
   hasReport = false,
   showExport = false,
   onSaveInline,
+  onReturn,
   inlineSaveDisabled = false,
 }: Props) {
   const dateId = useId();
@@ -171,6 +173,17 @@ export default function ReportToolbar({
           >
             <FontAwesomeIcon icon={faBan} className={styles.addIcon} />
             Từ chối
+          </button>
+        )}
+
+        {onReturn && (
+          <button
+            type="button"
+            className={`${styles.actionBtn} ${styles.recallBtn}`}
+            onClick={onReturn}
+          >
+            <FontAwesomeIcon icon={faRotateLeft} className={styles.addIcon} />
+            Trả về
           </button>
         )}
 
