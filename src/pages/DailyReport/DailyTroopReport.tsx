@@ -47,7 +47,6 @@ import {
   faUserGroup,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
 import StatCard from "../../components/ui/StatCard/StatCard";
 
 export default function DailyTroopReport() {
@@ -68,6 +67,9 @@ export default function DailyTroopReport() {
     left: number;
   }>({ top: 0, left: 0 });
   const [showConsolidatedDetail, setShowConsolidatedDetail] = useState(false);
+  const [dialogAction, setDialogAction] = useState<"refuse" | "return">(
+    "refuse",
+  );
   const [editNhiemVuData, setEditNhiemVuData] = useState<DetailStepData | null>(
     null,
   );
@@ -191,6 +193,7 @@ export default function DailyTroopReport() {
     handleRecallReport,
     handleRefuseReportClick,
     handleRefuseConfirm,
+    handleReturnConfirm,
     handleRefuseCancel,
   } = useReportActions({ showSuccess, showError, fetchReports });
 
@@ -696,6 +699,10 @@ export default function DailyTroopReport() {
       setActiveMenuUnit(null);
     },
     onEditReport: handleEditReport,
+    onReturnReport: (row: ReportRow) => {
+      setDialogAction("return");
+      handleRefuseReportClick(row);
+    },
   };
 
   return (
@@ -741,7 +748,10 @@ export default function DailyTroopReport() {
         approveDisabled={isChiHuy ? !signatureDone || !signatureBase64 : false}
         onRefuse={
           canRefuse
-            ? () => handleRefuseReportClick(commanderReport!)
+            ? () => {
+                setDialogAction("refuse");
+                handleRefuseReportClick(commanderReport!);
+              }
             : undefined
         }
         onSubmit={
@@ -1076,7 +1086,9 @@ export default function DailyTroopReport() {
       <RefuseDialog
         isOpen={showRefuseDialog}
         unitName={refuseUnitName}
-        onConfirm={handleRefuseConfirm}
+        onConfirm={
+          dialogAction === "return" ? handleReturnConfirm : handleRefuseConfirm
+        }
         onCancel={handleRefuseCancel}
       />
     </section>

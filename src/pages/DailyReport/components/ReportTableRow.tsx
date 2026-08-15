@@ -5,6 +5,7 @@ import {
   faEllipsisVertical,
   faEye,
   faPenToSquare,
+  faRotateLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import KySoInfoModal from "../KySoInfoModal";
 import ReportStatusBadge from "../../../components/ui/ReportStatusBadge/ReportStatusBadge";
@@ -42,6 +43,8 @@ type Props = {
   onToggleMenu: (e: React.MouseEvent<HTMLButtonElement>, key: string) => void;
   onViewDetail: (row: ReportRow) => void;
   onEditReport: (row: ReportRow) => void;
+  onReturnReport?: (row: ReportRow) => void;
+  canReturnRow?: boolean;
 };
 
 export default function ReportTableRow({
@@ -64,6 +67,8 @@ export default function ReportTableRow({
   onToggleMenu,
   onViewDetail,
   onEditReport,
+  onReturnReport,
+  canReturnRow = false,
 }: Props) {
   const menuKey = isConsolidatedRow ? `parent-${row.idDonBaoCao}` : row.donVi;
   const isMenuOpen = activeMenuUnit === menuKey;
@@ -72,7 +77,7 @@ export default function ReportTableRow({
   const isOwnCommandRow =
     row.donVi === maDonViCurrent &&
     (unitSymbol === "ch/f" || unitSymbol === "ch/e");
-  
+
   const displayUnitName =
     row.loaiDonBaoCao === "TONG_HOP" && unitSymbol === "ch/f"
       ? "f5"
@@ -505,6 +510,20 @@ export default function ReportTableRow({
                         className={styles.menuIcon}
                       />
                       Chỉnh sửa
+                    </button>
+                  )}
+                  {canReturnRow && onReturnReport && (
+                    <button
+                      type="button"
+                      className={styles.menuItem}
+                      role="menuitem"
+                      onClick={() => onReturnReport(row)}
+                    >
+                      <FontAwesomeIcon
+                        icon={faRotateLeft}
+                        className={styles.menuIcon}
+                      />
+                      Trả về
                     </button>
                   )}
                 </div>,

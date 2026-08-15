@@ -254,7 +254,7 @@ export default function DutyShifts() {
       );
       closeModal();
     } catch {
-      
+      // 
     } finally {
       setSaving(false);
     }
