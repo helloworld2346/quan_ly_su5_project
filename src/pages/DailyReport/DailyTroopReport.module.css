@@ -28,10 +28,10 @@
 
 .reportTable th {
   background: var(--table-header-bg);
-  color: #fff;
+  color: #ffffff;
   border-right: 1px solid var(--login-border);
   border-bottom: 1px solid var(--login-border);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -54,8 +54,9 @@
   white-space: normal;
   word-wrap: break-word;
   overflow-wrap: break-word;
-  font-size: 15px;
+  font-size: 16px;
   hyphens: auto;
+  font-weight: 700;
 }
 
 /* Tối ưu lại width các cột ít dữ liệu để nhường không gian */
