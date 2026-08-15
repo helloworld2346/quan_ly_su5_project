@@ -344,3 +344,36 @@ export type EditModalData = {
   ngayBaoCao: string;
   idNhiemvuNgay?: string;
 };
+
+export interface TraVeRequest {
+  idDonBaoCao: string;
+  ghiChu: string;
+}
+
+export interface TraVeResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  result: {
+    idDonBaoCao: string;
+    quanSoTong: number;
+    quanSoHienDien: number;
+    quanSoVang: number;
+    ghiChu: string;
+    chiTietVang: string;
+    trucBanChiHuy: string;
+    trucBanTacChien: string;
+    status: string;
+    chuKySo: string;
+    thoiGianBaoCao: string;
+    loaiDonBaoCao: LoaiDonBaoCao;
+    thongTinVang: string;
+    caTruc: CaTrucInfo;
+    donVi: {
+      maDonVi: string;
+      tenDonvi: string;
+      kyhieuDonvi?: string;
+      capDonVi?: string;
+    };
+  };
+}

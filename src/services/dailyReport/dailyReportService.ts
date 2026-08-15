@@ -10,6 +10,8 @@ import type {
   SearchReportResponse,
   SearchChildrenResponse,
   SearchByRangeResponse,
+  TraVeRequest,
+  TraVeResponse,
 } from "../../types/dailyReport";
 export interface NhiemVuNgay {
   idNhiemvuNgay: string;
@@ -222,6 +224,11 @@ export const dailyReportService = {
 
   updateNhiemVuNgay: async (id: string, payload: CreateNhiemVuNgayRequest) => {
     const response = await api.put(`/nhiemvungay/${id}`, payload);
+    return response.data;
+  },
+
+  returnReport: async (payload: TraVeRequest): Promise<TraVeResponse> => {
+    const response = await api.put<TraVeResponse>("/donbaocao/return", payload);
     return response.data;
   },
 };

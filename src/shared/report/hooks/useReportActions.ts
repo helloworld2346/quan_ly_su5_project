@@ -6,6 +6,10 @@ export interface ReportActionService {
   submitReport: (id: string) => Promise<unknown>;
   recallReport: (id: string) => Promise<unknown>;
   refuseReport: (id: string, payload: { ghiChu: string }) => Promise<unknown>;
+  returnReport?: (payload: {
+    idDonBaoCao: string;
+    ghiChu: string;
+  }) => Promise<unknown>;
 }
 
 function notifyReportDataChanged() {
@@ -99,6 +103,27 @@ export function useReportActions<TRow>({
     }
   };
 
+  const handleReturnConfirm = async (reason: string) => {
+    if (!refuseReportId || !service.returnReport) return;
+    try {
+      await service.returnReport({
+        idDonBaoCao: refuseReportId,
+        ghiChu: reason,
+      });
+      showSuccess("Trả về báo cáo thành công");
+      setShowRefuseDialog(false);
+      setRefuseReportId(null);
+      setRefuseUnitName("");
+      fetchReports();
+      notifyReportDataChanged();
+    } catch (error) {
+      handleApiError(error, {
+        showError,
+        errorMessage: "Không thể trả về báo cáo",
+      });
+    }
+  };
+
   const handleRefuseCancel = () => {
     setShowRefuseDialog(false);
     setRefuseReportId(null);
@@ -114,5 +139,6 @@ export function useReportActions<TRow>({
     handleRefuseReportClick,
     handleRefuseConfirm,
     handleRefuseCancel,
+    handleReturnConfirm,
   };
 }

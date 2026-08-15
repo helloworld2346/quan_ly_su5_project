@@ -35,6 +35,11 @@
   color: var(--modal-btn-draft-text);
 }
 
+.returned {  
+  background: var(--btn-recall-bg);  
+  color: var(--btn-recall-fg);  
+}
+
 @media (max-width: 1366px) {  
   .badge {  
     font-size: 11px;  
