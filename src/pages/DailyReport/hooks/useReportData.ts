@@ -230,6 +230,7 @@ export function useReportData({
         lyDoVang: m.lyDoVang as keyof VangChiTiet,
         ghiChu: m.ghiChu,
         kyhieuDonVi: r.kyhieuDonVi,
+        kyhieuDayDu: m.kyhieuDayDu || r.kyhieuDayDu,
       })),
     );
     return {

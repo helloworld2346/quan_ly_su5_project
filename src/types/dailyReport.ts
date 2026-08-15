@@ -319,6 +319,7 @@ export interface ChiTietVangQuanNhan {
   donvi: string;
   ghiChu: string;
   kyhieuDonVi?: string;
+  kyhieuDayDu?: string;
 }
 
 export interface ReportRow {
@@ -326,6 +327,7 @@ export interface ReportRow {
   donVi: string;
   tenDonVi: string;
   kyhieuDonVi?: string;
+  kyhieuDayDu?: string;
   quanSoTong: number;
   quanSoHienDien: number;
   quanSoVang: number;

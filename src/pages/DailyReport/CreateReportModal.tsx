@@ -517,7 +517,9 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
     });
 
     const donViKyHieu =
-      initialData?.donVi?.kyhieuDonvi || donVi?.kyhieuDonvi || "";  
+      initialData?.donVi?.kyhieuDonvi || donVi?.kyhieuDonvi || "";
+    const donViKyHieuDayDu =
+      initialData?.donVi?.kyhieuDayDu || donVi?.kyhieuDayDu || "";
 
     const payload: CreateReportRequest = {
       quanSoTong: tongQuanSo,
@@ -527,7 +529,11 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       chiTietVang: JSON.stringify(
         consolidatedAbsentRows
           ? absentRows
-          : absentRows.map((r) => ({ ...r, kyhieuDonVi: donViKyHieu })), 
+          : absentRows.map((r) => ({
+              ...r,
+              kyhieuDonVi: donViKyHieu,
+              kyhieuDayDu: donViKyHieuDayDu,
+            })),
       ),
       thongTinVang: JSON.stringify(thongTinVangObj),
       donVi: initialData?.donVi?.maDonVi || maDonViCurrent || "",

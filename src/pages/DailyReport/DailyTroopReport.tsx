@@ -900,7 +900,11 @@ export default function DailyTroopReport() {
             rank: m.capBac,
             position: m.chucVu,
             reason: m.lyDoVang,
-            unitName: m.kyhieuDonVi || selectedReportRow.kyhieuDonVi,
+            unitName:
+              m.kyhieuDayDu ||
+              selectedReportRow.kyhieuDayDu ||
+              m.kyhieuDonVi ||
+              selectedReportRow.kyhieuDonVi,
             note: m.ghiChu,
           }))}
           onClose={() => setSelectedReportRow(null)}
@@ -924,7 +928,7 @@ export default function DailyTroopReport() {
             rank: r.capBac,
             position: r.chucVu,
             reason: r.lyDoVang,
-            unitName: r.kyhieuDonVi,
+            unitName: r.kyhieuDayDu || r.kyhieuDonVi,
             note: r.ghiChu,
           }))}
           onClose={() => setShowConsolidatedDetail(false)}
