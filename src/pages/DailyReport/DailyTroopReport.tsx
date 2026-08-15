@@ -871,12 +871,14 @@ export default function DailyTroopReport() {
           unit={normalizeUnitName(
             selectedReportRow.kyhieuDonVi || selectedReportRow.tenDonVi,
           )}
+          showUnitColumn
           members={selectedReportRow.chiTietVangList.map((m) => ({
             id: m.id,
             name: m.hoTen,
             rank: m.capBac,
             position: m.chucVu,
             reason: m.lyDoVang,
+            unitName: m.donvi, // đơn vị con của từng quân nhân
             note: m.ghiChu,
           }))}
           onClose={() => setSelectedReportRow(null)}

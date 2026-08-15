@@ -149,8 +149,8 @@ export default function QuanSoForm({
           <FontAwesomeIcon icon={faUsers} className={styles.cardHeaderIcon} />
           <h2 className={styles.cardTitle}>
             {isTacChienParent
-              ? `Quân số biên chế ${chLabel} — ${donVi.tenDonvi}`
-              : `Quân số biên chế — ${donVi.tenDonvi}`}
+              ? `Quân số biên chế ${chLabel}`
+              : `Quân số biên chế `}
           </h2>
         </div>
 
@@ -227,7 +227,7 @@ export default function QuanSoForm({
               className={styles.cardHeaderIcon}
             />
             <h2 className={styles.cardTitle}>
-              Quân số cộng dồn toàn {capLabel} (gồm {chLabel})
+              Quân số toàn {capLabel}
             </h2>
           </div>
 
