@@ -878,7 +878,7 @@ export default function DailyTroopReport() {
             rank: m.capBac,
             position: m.chucVu,
             reason: m.lyDoVang,
-            unitName: m.kyhieuDonVi,
+            unitName: m.kyhieuDonVi || selectedReportRow.kyhieuDonVi,
             note: m.ghiChu,
           }))}
           onClose={() => setSelectedReportRow(null)}
