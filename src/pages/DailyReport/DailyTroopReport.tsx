@@ -48,6 +48,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import StatCard from "../../components/ui/StatCard/StatCard";
+import { isApprovedStatus } from "../../utils/reportStatus";
 
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
@@ -304,7 +305,7 @@ export default function DailyTroopReport() {
           reportForSubmit.status === "Nháp",
         )
       : canSubmit;
-  
+
   const handleStartInlineInput = (row: ReportRow) => {
     setActiveMenuUnit(null);
     setInlineEditingRowId(row.idDonBaoCao);
@@ -700,10 +701,10 @@ export default function DailyTroopReport() {
     },
     onEditReport: handleEditReport,
     onReturnReport: (row: ReportRow) => {
+      setActiveMenuUnit(null);
       setDialogAction("return");
       handleRefuseReportClick(row);
     },
-    canReturnRow: isParentUnit,
   };
 
   return (
@@ -751,6 +752,16 @@ export default function DailyTroopReport() {
           canRefuse
             ? () => {
                 setDialogAction("refuse");
+                handleRefuseReportClick(commanderReport!);
+              }
+            : undefined
+        }
+        onReturn={
+          isParentUnit &&
+          commanderReport &&
+          isApprovedStatus(commanderReport.status)
+            ? () => {
+                setDialogAction("return");
                 handleRefuseReportClick(commanderReport!);
               }
             : undefined
@@ -1087,6 +1098,7 @@ export default function DailyTroopReport() {
       <RefuseDialog
         isOpen={showRefuseDialog}
         unitName={refuseUnitName}
+        variant={dialogAction === "return" ? "return" : "refuse"}
         onConfirm={
           dialogAction === "return" ? handleReturnConfirm : handleRefuseConfirm
         }

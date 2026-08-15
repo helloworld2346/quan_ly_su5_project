@@ -13,6 +13,7 @@ import styles from "../DailyTroopReport.module.css";
 import type { ReportRow } from "../../../types/dailyReport";
 import { normalizeUnitName } from "../../../utils/reportUtils";
 import { formatNum } from "../../../utils/reportUtils";
+import { isApprovedStatus as isApprovedStatusFn } from "../../../utils/reportStatus";
 
 type InlineReportDraft = {
   reportId: string;
@@ -68,7 +69,6 @@ export default function ReportTableRow({
   onViewDetail,
   onEditReport,
   onReturnReport,
-  canReturnRow = false,
 }: Props) {
   const menuKey = isConsolidatedRow ? `parent-${row.idDonBaoCao}` : row.donVi;
   const isMenuOpen = activeMenuUnit === menuKey;
@@ -512,20 +512,23 @@ export default function ReportTableRow({
                       Chỉnh sửa
                     </button>
                   )}
-                  {canReturnRow && isApprovedStatus && onReturnReport && (
-                    <button
-                      type="button"
-                      className={styles.menuItem}
-                      role="menuitem"
-                      onClick={() => onReturnReport(row)}
-                    >
-                      <FontAwesomeIcon
-                        icon={faRotateLeft}
-                        className={styles.menuIcon}
-                      />
-                      Trả về
-                    </button>
-                  )}
+                  {isParentUnit &&
+                    onReturnReport &&
+                    isApprovedStatusFn(row.status) &&
+                    row.loaiDonBaoCao === "DON_VI" && (
+                      <button
+                        type="button"
+                        className={styles.menuItem}
+                        role="menuitem"
+                        onClick={() => onReturnReport(row)}
+                      >
+                        <FontAwesomeIcon
+                          icon={faRotateLeft}
+                          className={styles.menuIcon}
+                        />
+                        Trả về
+                      </button>
+                    )}
                 </div>,
                 document.body,
               )}
