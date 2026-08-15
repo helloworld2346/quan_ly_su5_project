@@ -68,7 +68,12 @@ export type ReportItemInput = {
   ghiChu?: string | null;
   trucBanChiHuy?: string;
   trucBanTacChien?: string;
-  donVi: { maDonVi: string; tenDonvi: string; kyhieuDonvi?: string };
+  donVi: {
+    maDonVi: string;
+    tenDonvi: string;
+    kyhieuDonvi?: string;
+    kyhieuDayDu?: string;
+  };
   caTruc: CaTrucInfo;
   tinhHinhHoatDong?: string;
   loaiDonBaoCao?: LoaiDonBaoCao;
