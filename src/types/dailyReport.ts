@@ -109,6 +109,7 @@ export interface CreateReportResponse {
       maDonVi: string;
       tenDonvi: string;
       kyhieuDonvi?: string;
+      kyhieuDayDu?: string;
     };
     caTruc: CaTrucInfo;
     tinhHinhHoatDong?: string;
@@ -150,6 +151,7 @@ export interface UpdateReportResponse {
       maDonVi: string;
       tenDonvi: string;
       kyhieuDonvi?: string;
+      kyhieuDayDu?: string;
     };
     caTruc: CaTrucInfo;
     tinhHinhHoatDong?: string;
@@ -173,6 +175,7 @@ export interface ApproveResponse {
       maDonVi: string;
       tenDonvi: string;
       kyhieuDonvi?: string;
+      kyhieuDayDu?: string;
     };
     caTruc: CaTrucInfo;
   };
@@ -199,6 +202,7 @@ export interface RefuseResponse {
       maDonVi: string;
       tenDonvi: string;
       kyhieuDonvi?: string;
+      kyhieuDayDu?: string;
     };
     caTruc: CaTrucInfo;
   };
@@ -224,6 +228,7 @@ export interface SearchReportResponse {
       maDonVi: string;
       tenDonvi: string;
       kyhieuDonvi?: string;
+      kyhieuDayDu?: string;
     };
     caTruc: CaTrucInfo;
   };
@@ -250,6 +255,7 @@ export interface SearchChildrenResponse {
       maDonVi: string;
       tenDonvi: string;
       kyhieuDonvi?: string;
+      kyhieuDayDu?: string;
     };
     caTruc: CaTrucInfo;
   }>;
