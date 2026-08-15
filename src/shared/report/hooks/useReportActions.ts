@@ -6,7 +6,7 @@ export interface ReportActionService {
   submitReport: (id: string) => Promise<unknown>;
   recallReport: (id: string) => Promise<unknown>;
   refuseReport: (id: string, payload: { ghiChu: string }) => Promise<unknown>;
-  returnReport?: (payload: {
+  returnReport: (payload: {
     idDonBaoCao: string;
     ghiChu: string;
   }) => Promise<unknown>;
@@ -104,7 +104,7 @@ export function useReportActions<TRow>({
   };
 
   const handleReturnConfirm = async (reason: string) => {
-    if (!refuseReportId || !service.returnReport) return;
+    if (!refuseReportId) return;
     try {
       await service.returnReport({
         idDonBaoCao: refuseReportId,
@@ -138,7 +138,7 @@ export function useReportActions<TRow>({
     handleRecallReport,
     handleRefuseReportClick,
     handleRefuseConfirm,
-    handleRefuseCancel,
     handleReturnConfirm,
+    handleRefuseCancel,
   };
 }

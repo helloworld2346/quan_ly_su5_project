@@ -167,7 +167,7 @@ export default function TroopDetailModal({
                     <th>Họ và tên</th>
                     <th>Cấp bậc</th>
                     <th>Chức vụ</th>
-                    {showUnitColumn && <th>Ký hiệu đơn vị</th>}
+                    {showUnitColumn && <th>Đơn vị</th>}
                     <th>Lý do vắng</th>
                     <th>Ghi chú chi tiết</th>
                   </tr>

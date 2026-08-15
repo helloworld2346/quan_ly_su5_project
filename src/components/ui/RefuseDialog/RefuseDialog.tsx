@@ -9,6 +9,7 @@ type Props = {
   unitName: string;
   onConfirm: (reason: string) => void;
   onCancel: () => void;
+  variant?: "refuse" | "return";
 };
 
 export default function RefuseDialog({
@@ -16,9 +17,13 @@ export default function RefuseDialog({
   unitName,
   onConfirm,
   onCancel,
+  variant = "refuse",
 }: Props) {
   const [reason, setReason] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const isReturn = variant === "return";
+  const actionLabel = isReturn ? "Trả về" : "Từ chối";
 
   useEffect(() => {
     if (isOpen && textareaRef.current) {
@@ -69,22 +74,25 @@ export default function RefuseDialog({
         </div>
 
         <h2 id="dialog-title" className={styles.title}>
-          Từ chối báo cáo
+          {isReturn ? "Trả về báo cáo" : "Từ chối báo cáo"}
         </h2>
 
         <p className={styles.message}>
-          Bạn có chắc chắn muốn từ chối báo cáo của đơn vị {unitName}?
+          Bạn có chắc chắn muốn {isReturn ? "trả về" : "từ chối"} báo cáo của
+          đơn vị {unitName}?
         </p>
 
         <div className={styles.formGroup}>
-          <label htmlFor="refuse-reason">Lý do từ chối:</label>
+          <label htmlFor="refuse-reason">
+            Lý do {actionLabel.toLowerCase()}:
+          </label>
           <textarea
             id="refuse-reason"
             ref={textareaRef}
             className={styles.textarea}
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            placeholder="Nhập lý do từ chối..."
+            placeholder={`Nhập lý do ${actionLabel.toLowerCase()}...`}
             rows={4}
           />
         </div>
@@ -103,7 +111,7 @@ export default function RefuseDialog({
             onClick={handleSubmit}
             disabled={!reason.trim()}
           >
-            Từ chối
+            {actionLabel}
           </button>
         </div>
       </div>
