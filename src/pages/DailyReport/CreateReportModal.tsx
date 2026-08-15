@@ -516,12 +516,19 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       }
     });
 
+    const donViKyHieu =
+      initialData?.donVi?.kyhieuDonvi || donVi?.kyhieuDonvi || "";  
+
     const payload: CreateReportRequest = {
       quanSoTong: tongQuanSo,
       quanSoHienDien: quanSoHienDien,
       quanSoVang: quanSoVang,
       thoiGianBaoCao: new Date(`${ngayBaoCao}T12:00:00.000Z`).toISOString(),
-      chiTietVang: JSON.stringify(absentRows),
+      chiTietVang: JSON.stringify(
+        consolidatedAbsentRows
+          ? absentRows
+          : absentRows.map((r) => ({ ...r, kyhieuDonVi: donViKyHieu })), 
+      ),
       thongTinVang: JSON.stringify(thongTinVangObj),
       donVi: initialData?.donVi?.maDonVi || maDonViCurrent || "",
       trucBanChiHuy: JSON.stringify(trucChiHuy),

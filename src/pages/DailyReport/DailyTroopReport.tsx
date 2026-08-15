@@ -878,7 +878,7 @@ export default function DailyTroopReport() {
             rank: m.capBac,
             position: m.chucVu,
             reason: m.lyDoVang,
-            unitName: m.donvi, // đơn vị con của từng quân nhân
+            unitName: m.kyhieuDonVi,
             note: m.ghiChu,
           }))}
           onClose={() => setSelectedReportRow(null)}
