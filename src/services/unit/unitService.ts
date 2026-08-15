@@ -6,6 +6,8 @@ import type {
   UpdateDonViResponse,
   CreateDonViRequest,
   CreateDonViResponse,
+  QuanSoBienCheResult,
+  QuanSoBienCheResponse,
 } from "../../types/account";
 
 export const donviService = {
@@ -30,5 +32,12 @@ export const donviService = {
       data,
     );
     return response.data;
+  },
+
+  getQuanSoBienChe: async (maDonVi: string): Promise<QuanSoBienCheResult> => {
+    const response = await api.get<QuanSoBienCheResponse>(
+      `/donvi/${maDonVi}/quansobienche`,
+    );
+    return response.data.Result;
   },
 };

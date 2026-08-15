@@ -36,7 +36,7 @@ export interface Account {
   tenChucnang?: string[];
   chucNangThem?: string[];
   chucNangBo?: string[];
-}  
+}
 
 export interface UpdateChucNangRequest {
   chucNangThem: string[];
@@ -153,4 +153,20 @@ export interface DeleteRoleResponse {
   code: number;
   message: string;
   Result: string;
+}
+
+export interface QuanSoBienCheResult {
+  maDonVi: string;
+  tenDonvi: string;
+  quanSoTong: number;
+  quanSoHsqBs: number;
+  quanSoSiQuan: number;
+  quanSoQncn: number;
+}
+
+export interface QuanSoBienCheResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  Result: QuanSoBienCheResult;
 }

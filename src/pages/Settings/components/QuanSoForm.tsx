@@ -11,7 +11,7 @@ import { donviService } from "../../../services/unit/unitService";
 import { useToast } from "../../../context/useToast";
 import { useAuth } from "../../../context/useAuth";
 import { normalizeRoleName, formatNum } from "../../../utils/reportUtils";
-import type { DonVi } from "../../../types/account";
+import type { DonVi, QuanSoBienCheResult } from "../../../types/account";  
 
 import NumberStepper from "../../../components/ui/NumberStepper/NumberStepper";
 import ConfirmDialog from "../../../components/ui/ConfirmDialog/ConfirmDialog";
@@ -22,12 +22,14 @@ import styles from "../Settings.module.css";
 type Props = {
   donVi: DonVi;
   childUnits?: DonVi[];
+  quanSoBienChe?: QuanSoBienCheResult | null;
   onUpdated: (unit: DonVi) => void;
-};
+};  
 
 export default function QuanSoForm({
   donVi,
   childUnits = [],
+  quanSoBienChe = null,
   onUpdated,
 }: Props) {
   const { showError, showSuccess } = useToast();
@@ -48,8 +50,15 @@ export default function QuanSoForm({
   const chLabel = donVi.capDonVi === "TRUNG_DOAN" ? "CH/e" : "CH/f";
   const capLabel = donVi.capDonVi === "TRUNG_DOAN" ? "Trung đoàn" : "Sư đoàn";
 
-  // Tổng biên chế CHỈ của các đơn vị con (seed = 0, KHÔNG cộng CH/f ở đây)
   const childAgg = useMemo(() => {
+    if (quanSoBienChe) {
+      return {
+        siQuan: quanSoBienChe.quanSoSiQuan - donVi.quanSoSiQuan,
+        qncn: quanSoBienChe.quanSoQncn - donVi.quanSoQncn,
+        hsqBs: quanSoBienChe.quanSoHsqBs - donVi.quanSoHsqBs,
+      };
+    }
+    // fallback: cộng tay từ childUnits nếu API chưa có
     return childUnits.reduce(
       (acc, c) => ({
         siQuan: acc.siQuan + c.quanSoSiQuan,
@@ -58,7 +67,7 @@ export default function QuanSoForm({
       }),
       { siQuan: 0, qncn: 0, hsqBs: 0 },
     );
-  }, [childUnits]);
+  }, [quanSoBienChe, childUnits, donVi]);
 
   const initSiQuan = isAggregatedOnly ? childAgg.siQuan : donVi.quanSoSiQuan;
   const initQncn = isAggregatedOnly ? childAgg.qncn : donVi.quanSoQncn;
@@ -74,10 +83,15 @@ export default function QuanSoForm({
     [quanSoSiQuan, quanSoHsqBs, quanSoQncn],
   );
 
-  // Tổng toàn Sư đoàn = biên chế CH/f (đang chỉnh) + tổng các đơn vị con
-  const suDoanSiQuan = quanSoSiQuan + childAgg.siQuan;
-  const suDoanQncn = quanSoQncn + childAgg.qncn;
-  const suDoanHsqBs = quanSoHsqBs + childAgg.hsqBs;
+  const suDoanSiQuan = quanSoBienChe
+    ? quanSoBienChe.quanSoSiQuan
+    : quanSoSiQuan + childAgg.siQuan;
+  const suDoanQncn = quanSoBienChe
+    ? quanSoBienChe.quanSoQncn
+    : quanSoQncn + childAgg.qncn;
+  const suDoanHsqBs = quanSoBienChe
+    ? quanSoBienChe.quanSoHsqBs
+    : quanSoHsqBs + childAgg.hsqBs;
   const suDoanTong = suDoanSiQuan + suDoanQncn + suDoanHsqBs;
 
   const hasUnsavedChanges =
@@ -226,9 +240,7 @@ export default function QuanSoForm({
               icon={faLayerGroup}
               className={styles.cardHeaderIcon}
             />
-            <h2 className={styles.cardTitle}>
-              Quân số toàn {capLabel}
-            </h2>
+            <h2 className={styles.cardTitle}>Quân số toàn {capLabel}</h2>
           </div>
 
           <div className={styles.statGrid}>
