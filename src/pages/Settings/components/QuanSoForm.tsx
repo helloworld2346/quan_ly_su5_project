@@ -69,9 +69,21 @@ export default function QuanSoForm({
     );
   }, [quanSoBienChe, childUnits, donVi]);
 
-  const initSiQuan = isAggregatedOnly ? childAgg.siQuan : donVi.quanSoSiQuan;
-  const initQncn = isAggregatedOnly ? childAgg.qncn : donVi.quanSoQncn;
-  const initHsqBs = isAggregatedOnly ? childAgg.hsqBs : donVi.quanSoHsqBs;
+  const initSiQuan = isAggregatedOnly
+    ? quanSoBienChe
+      ? quanSoBienChe.quanSoSiQuan
+      : childAgg.siQuan
+    : donVi.quanSoSiQuan;
+  const initQncn = isAggregatedOnly
+    ? quanSoBienChe
+      ? quanSoBienChe.quanSoQncn
+      : childAgg.qncn
+    : donVi.quanSoQncn;
+  const initHsqBs = isAggregatedOnly
+    ? quanSoBienChe
+      ? quanSoBienChe.quanSoHsqBs
+      : childAgg.hsqBs
+    : donVi.quanSoHsqBs;
 
   const [quanSoSiQuan, setQuanSoSiQuan] = useState(initSiQuan);
   const [quanSoQncn, setQuanSoQncn] = useState(initQncn);
