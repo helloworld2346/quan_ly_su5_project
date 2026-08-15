@@ -53,6 +53,7 @@ export interface AbsentRow {
   ghiChu: string;
   tenDonVi?: string;
   kyhieuDonVi?: string;
+  kyhieuDayDu?: string;
 }
 
 export type ReportItemInput = {
@@ -375,6 +376,7 @@ export interface TraVeResponse {
       maDonVi: string;
       tenDonvi: string;
       kyhieuDonvi?: string;
+      kyhieuDayDu?: string;
       capDonVi?: string;
     };
   };
