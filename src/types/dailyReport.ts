@@ -52,6 +52,7 @@ export interface AbsentRow {
   lyDoVang: keyof VangChiTiet;
   ghiChu: string;
   tenDonVi?: string;
+  kyhieuDonVi?: string;
 }
 
 export type ReportItemInput = {
@@ -317,6 +318,7 @@ export interface ChiTietVangQuanNhan {
   lyDoVang: string;
   donvi: string;
   ghiChu: string;
+  kyhieuDonVi?: string;
 }
 
 export interface ReportRow {

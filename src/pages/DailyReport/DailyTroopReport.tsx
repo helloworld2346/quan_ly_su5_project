@@ -902,7 +902,7 @@ export default function DailyTroopReport() {
             rank: r.capBac,
             position: r.chucVu,
             reason: r.lyDoVang,
-            unitName: normalizeUnitName(r.tenDonVi),
+            unitName: r.kyhieuDonVi,
             note: r.ghiChu,
           }))}
           onClose={() => setShowConsolidatedDetail(false)}
