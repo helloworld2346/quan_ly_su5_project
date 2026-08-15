@@ -165,9 +165,9 @@ export default function TroopDetailModal({
                   <tr>
                     <th>STT</th>
                     <th>Họ và tên</th>
-                    {showUnitColumn && <th>Tên đơn vị</th>}
                     <th>Cấp bậc</th>
                     <th>Chức vụ</th>
+                    {showUnitColumn && <th>Tên đơn vị</th>}
                     <th>Lý do vắng</th>
                     <th>Ghi chú chi tiết</th>
                   </tr>
@@ -177,11 +177,11 @@ export default function TroopDetailModal({
                     <tr key={m.id || i}>
                       <td>{i + 1}</td>
                       <td className={styles.nameCell}>{m.name}</td>
+                      <td>{m.rank}</td>
+                      <td>{m.position}</td>
                       {showUnitColumn && (
                         <td>{normalizeUnitName(m.unitName) || "—"}</td>
                       )}
-                      <td>{m.rank}</td>
-                      <td>{m.position}</td>
                       <td>{LY_DO_VANG_MAP[m.reason] || m.reason}</td>
                       <td>{m.note || "—"}</td>
                     </tr>
