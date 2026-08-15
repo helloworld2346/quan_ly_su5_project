@@ -891,7 +891,9 @@ export default function DailyTroopReport() {
       {selectedReportRow && (
         <TroopDetailModal
           unit={normalizeUnitName(
-            selectedReportRow.kyhieuDonVi || selectedReportRow.tenDonVi,
+            selectedReportRow.kyhieuDayDu ||
+              selectedReportRow.kyhieuDonVi ||
+              selectedReportRow.tenDonVi,
           )}
           showUnitColumn
           members={selectedReportRow.chiTietVangList.map((m) => ({
