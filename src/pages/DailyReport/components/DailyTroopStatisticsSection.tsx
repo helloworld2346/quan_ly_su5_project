@@ -15,22 +15,22 @@ type SharedRowProps = {
   canEditOwnNotSubmitted?: boolean;
   canInlineInputChf?: boolean;
   inlineEditingRowId?: string | null;
- inlineDraft?: {
-  reportId: string;
-  isNew: boolean;
-  quanSoTong: number;
-  quanSoHienDien: number;
-  vang: ReportRow["vang"];
-  ghiChu: string;
-};
-onInlineDraftChange?: (draft: {
-  reportId: string;
-  isNew: boolean;
-  quanSoTong: number;
-  quanSoHienDien: number;
-  vang: ReportRow["vang"];
-  ghiChu: string;
-}) => void;
+  inlineDraft?: {
+    reportId: string;
+    isNew: boolean;
+    quanSoTong: number;
+    quanSoHienDien: number;
+    vang: ReportRow["vang"];
+    ghiChu: string;
+  };
+  onInlineDraftChange?: (draft: {
+    reportId: string;
+    isNew: boolean;
+    quanSoTong: number;
+    quanSoHienDien: number;
+    vang: ReportRow["vang"];
+    ghiChu: string;
+  }) => void;
   maDonViCurrent: string | undefined;
   activeMenuUnit: string | null;
   menuPosition: { top?: number; bottom?: number; left: number };
@@ -38,6 +38,8 @@ onInlineDraftChange?: (draft: {
   onToggleMenu: (e: MouseEvent<HTMLButtonElement>, key: string) => void;
   onViewDetail: (row: ReportRow) => void;
   onEditReport: (row: ReportRow) => void;
+  onReturnReport?: (row: ReportRow) => void;
+  canReturnRow?: boolean;
 };
 
 type ConsolidatedData = {

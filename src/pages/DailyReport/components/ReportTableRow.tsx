@@ -512,7 +512,7 @@ export default function ReportTableRow({
                       Chỉnh sửa
                     </button>
                   )}
-                  {canReturnRow && onReturnReport && (
+                  {canReturnRow && isApprovedStatus && onReturnReport && (
                     <button
                       type="button"
                       className={styles.menuItem}

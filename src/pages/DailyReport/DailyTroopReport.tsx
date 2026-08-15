@@ -703,6 +703,7 @@ export default function DailyTroopReport() {
       setDialogAction("return");
       handleRefuseReportClick(row);
     },
+    canReturnRow: isParentUnit,
   };
 
   return (
