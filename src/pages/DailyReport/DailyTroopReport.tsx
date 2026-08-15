@@ -196,7 +196,7 @@ export default function DailyTroopReport() {
     handleRefuseConfirm,
     handleReturnConfirm,
     handleRefuseCancel,
-  } = useReportActions({ showSuccess, showError, fetchReports });
+  } = useReportActions({ showSuccess, showError, fetchReports, reportDate });
 
   const {
     ownReport,

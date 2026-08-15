@@ -231,4 +231,17 @@ export const dailyReportService = {
     const response = await api.put<TraVeResponse>("/donbaocao/return", payload);
     return response.data;
   },
+
+  draftReport: async (
+    maDonVi: string,
+    lyDo: string,
+    ngayLoc: string,
+  ): Promise<RefuseResponse> => {
+    const response = await api.put<RefuseResponse>(
+      `/donbaocao/draft/${maDonVi}`,
+      null,
+      { params: { lyDo, ngayLoc } },
+    );
+    return response.data;
+  },
 };
