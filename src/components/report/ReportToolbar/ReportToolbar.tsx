@@ -24,6 +24,7 @@ type Props = {
   onApprove?: () => void;
   approveDisabled?: boolean;
   onRefuse?: () => void;
+  onReturn?: () => void;
   onSubmit?: () => void;
   submitDisabled?: boolean;
   onRecall?: () => void;
@@ -39,7 +40,6 @@ type Props = {
   showExport?: boolean;
   onSaveInline?: () => void;
   inlineSaveDisabled?: boolean;
-  onReturn?: () => void;
 };
 
 function todayIsoDate() {
@@ -179,7 +179,7 @@ export default function ReportToolbar({
         {onReturn && (
           <button
             type="button"
-            className={`${styles.actionBtn} ${styles.recallBtn}`}
+            className={`${styles.actionBtn} ${styles.refuseBtn}`}
             onClick={onReturn}
           >
             <FontAwesomeIcon icon={faRotateLeft} className={styles.addIcon} />
