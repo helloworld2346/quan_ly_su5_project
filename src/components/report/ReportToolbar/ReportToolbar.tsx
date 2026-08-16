@@ -32,7 +32,6 @@ type Props = {
   onExportExcel?: () => void;
   onAddReport?: () => void;
   onConsolidate?: () => void;
-  onReconsolidate?: () => void;
   consolidateDisabled?: boolean;
   consolidateLabel?: string;
   maxDate?: string;
@@ -40,6 +39,7 @@ type Props = {
   isPastDate?: boolean;
   showExport?: boolean;
   onSaveInline?: () => void;
+  onReconsolidate?: () => void;
   inlineSaveDisabled?: boolean;
 };
 
@@ -67,7 +67,6 @@ export default function ReportToolbar({
   onExportExcel,
   onAddReport,
   onConsolidate,
-  onReconsolidate,
   consolidateDisabled = false,
   consolidateLabel = "Tổng hợp báo cáo",
   maxDate = todayIsoDate(),
@@ -75,6 +74,7 @@ export default function ReportToolbar({
   hasReport = false,
   showExport = false,
   onSaveInline,
+  onReconsolidate,
   onReturn,
   inlineSaveDisabled = false,
 }: Props) {
@@ -125,7 +125,6 @@ export default function ReportToolbar({
             {consolidateLabel}
           </button>
         )}
-
         {onSubmit && (
           <button
             type="button"

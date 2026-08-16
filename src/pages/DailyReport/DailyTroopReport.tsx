@@ -743,9 +743,9 @@ export default function DailyTroopReport() {
         }
         onReconsolidate={
           isParentUnit &&
-          commanderReport &&
-          commanderReport.loaiDonBaoCao === "TONG_HOP" &&
-          isNeedUpdateStatus(commanderReport.status)
+          parentReportData &&
+          parentReportData.loaiDonBaoCao === "TONG_HOP" &&
+          isNeedUpdateStatus(parentReportData.status)
             ? handleReconsolidate
             : undefined
         }
