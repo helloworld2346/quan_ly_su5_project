@@ -778,15 +778,9 @@ export default function DailyTroopReport() {
             consolidatedData.submittedCount < totalRequiredCount)
         }
         consolidateLabel={
-          parentReportData !== null
-            ? "Đã tổng hợp"
-            : childUnits.length > 0 &&
-                consolidatedData &&
-                consolidatedData.submittedCount < totalRequiredCount
-              ? `Chưa đủ (${consolidatedData.submittedCount ?? 0}/${totalRequiredCount} đơn vị)`
-              : consolidatedData && consolidatedData.submittedCount > 0
-                ? `Tổng hợp (${consolidatedData.submittedCount}/${totalRequiredCount} đơn vị)`
-                : "Chưa có báo cáo con"
+          consolidatedData
+            ? `Tổng hợp (${consolidatedData.directSubmittedCount}/${totalRequiredCount} đơn vị)`
+            : "Chưa có báo cáo con"
         }
         onApprove={
           canApprove

@@ -258,7 +258,7 @@ export function useReportData({
   const consolidatedData = useMemo(() => {
     if (!isParentUnit || reportData.length === 0) return null;
 
-    // Trung đoàn: gộp thêm CH/e; Sư đoàn: gộp thêm CH/f (báo cáo DON_VI của chính đơn vị)
+    // Trung đoàn: gộp thêm CH/e; Sư đoàn: gộp thêm CH/f
     const allReports =
       (isTrungDoan || isSuDoan) && parentOwnReportData
         ? [...reportData, parentOwnReportData]
@@ -289,6 +289,25 @@ export function useReportData({
         kyhieuDayDu: m.kyhieuDayDu || r.kyhieuDayDu,
       })),
     );
+
+    // Chỉ đếm con TRỰC TIẾP (loại bỏ cháu do nested fetch gộp vào reportData)
+    const directChildIds = new Set(childUnits.map((u) => u.maDonVi));
+    const directChildRows = reportData.filter((r) =>
+      directChildIds.has(r.donVi),
+    );
+    const directSubmittedChildren = directChildRows.filter(
+      (r) => r.status !== "Chưa_Nộp" && r.status !== "Chưa nộp",
+    );
+    // +1 cho CH/e (trung đoàn) hoặc CH/f (sư đoàn) nếu đã nộp
+    const ownSubmitted =
+      (isTrungDoan || isSuDoan) &&
+      parentOwnReportData &&
+      parentOwnReportData.status !== "Chưa_Nộp" &&
+      parentOwnReportData.status !== "Chưa nộp"
+        ? 1
+        : 0;
+    const directSubmittedCount = directSubmittedChildren.length + ownSubmitted;
+
     return {
       quanSoTong,
       quanSoVang,
@@ -296,9 +315,17 @@ export function useReportData({
       thongTinVang,
       absentRows,
       submittedCount: submittedReports.length,
+      directSubmittedCount,
       totalCount: allReports.length,
     };
-  }, [isParentUnit, isTrungDoan, isSuDoan, parentOwnReportData, reportData]);
+  }, [
+    isParentUnit,
+    isTrungDoan,
+    isSuDoan,
+    parentOwnReportData,
+    reportData,
+    childUnits,
+  ]);
 
   return {
     reportData,
