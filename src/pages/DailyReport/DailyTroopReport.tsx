@@ -331,6 +331,13 @@ export default function DailyTroopReport() {
       0,
     );
     const quanSoHienDien = Math.max(0, quanSoTong - quanSoVang);
+    if (quanSoTong <= quanSoVang) {
+      showError(
+        `Tổng số quân vắng nhập vào (${quanSoTong}) phải bằng tổng vắng (${quanSoVang})`,
+      );
+      return;
+    }
+
 
     const basePayload = {
       quanSoTong,
