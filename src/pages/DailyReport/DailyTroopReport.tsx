@@ -772,10 +772,10 @@ export default function DailyTroopReport() {
         }
         consolidateDisabled={
           !consolidatedData ||
-          consolidatedData.submittedCount === 0 ||
+          consolidatedData.directSubmittedCount === 0 ||
           parentReportData !== null ||
           (childUnits.length > 0 &&
-            consolidatedData.submittedCount < totalRequiredCount)
+            consolidatedData.directSubmittedCount < totalRequiredCount)
         }
         consolidateLabel={
           consolidatedData
