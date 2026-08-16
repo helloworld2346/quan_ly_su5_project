@@ -64,105 +64,108 @@ export function useReportData({
     setLoading(true);
     try {
       let response;
-     if (isParentUnit) {
-  if (isTrungDoan || isSuDoan) {
-    const [donViRes, tongHopRes] = await Promise.all([
-      dailyReportService.searchChildrenReports(
-        maDonViCurrent,
-        reportDate,
-        "DON_VI",
-      ),
-      dailyReportService.searchChildrenReports(
-        maDonViCurrent,
-        reportDate,
-        "TONG_HOP",
-      ),
-    ]);
-
-    const merged = new Map<string, ReportItemInput>();
-
-    if (donViRes.success && donViRes.Result) {
-      for (const item of donViRes.Result) {
-        merged.set(item.donVi.maDonVi, item);
-      }
-    }
-
-    // TONG_HOP phải merge sau DON_VI để các dòng như e4/e5/e271 hoặc d15
-    // hiển thị báo cáo tổng hợp thay vì bị coi là chưa nộp.
-    if (tongHopRes.success && tongHopRes.Result) {
-      for (const item of tongHopRes.Result) {
-        merged.set(item.donVi.maDonVi, item);
-      }
-    }
-
-    const directChildren = [
-      ...(donViRes.success && donViRes.Result ? donViRes.Result : []),
-      ...(tongHopRes.success && tongHopRes.Result ? tongHopRes.Result : []),
-    ];
-
-    const uniqueChildUnitIds = Array.from(
-      new Set(directChildren.map((item) => item.donVi.maDonVi)),
-    );
-
-    const nestedResults = await Promise.all(
-      uniqueChildUnitIds.map(async (childMaDonVi) => {
-        try {
-          const [childDonViRes, childTongHopRes] = await Promise.all([
+      if (isParentUnit) {
+        if (isTrungDoan || isSuDoan) {
+          const [donViRes, tongHopRes] = await Promise.all([
             dailyReportService.searchChildrenReports(
-              childMaDonVi,
+              maDonViCurrent,
               reportDate,
               "DON_VI",
             ),
             dailyReportService.searchChildrenReports(
-              childMaDonVi,
+              maDonViCurrent,
               reportDate,
               "TONG_HOP",
             ),
           ]);
 
-          return { childDonViRes, childTongHopRes };
-        } catch {
-          return { childDonViRes: null, childTongHopRes: null };
+          const merged = new Map<string, ReportItemInput>();
+
+          if (donViRes.success && donViRes.Result) {
+            for (const item of donViRes.Result) {
+              merged.set(item.donVi.maDonVi, item);
+            }
+          }
+
+          // TONG_HOP phải merge sau DON_VI để các dòng như e4/e5/e271 hoặc d15
+          // hiển thị báo cáo tổng hợp thay vì bị coi là chưa nộp.
+          if (tongHopRes.success && tongHopRes.Result) {
+            for (const item of tongHopRes.Result) {
+              merged.set(item.donVi.maDonVi, item);
+            }
+          }
+
+          const directChildren = [
+            ...(donViRes.success && donViRes.Result ? donViRes.Result : []),
+            ...(tongHopRes.success && tongHopRes.Result
+              ? tongHopRes.Result
+              : []),
+          ];
+
+          const uniqueChildUnitIds = Array.from(
+            new Set(directChildren.map((item) => item.donVi.maDonVi)),
+          );
+
+          const nestedResults = await Promise.all(
+            uniqueChildUnitIds.map(async (childMaDonVi) => {
+              try {
+                const [childDonViRes, childTongHopRes] = await Promise.all([
+                  dailyReportService.searchChildrenReports(
+                    childMaDonVi,
+                    reportDate,
+                    "DON_VI",
+                  ),
+                  dailyReportService.searchChildrenReports(
+                    childMaDonVi,
+                    reportDate,
+                    "TONG_HOP",
+                  ),
+                ]);
+
+                return { childDonViRes, childTongHopRes };
+              } catch {
+                return { childDonViRes: null, childTongHopRes: null };
+              }
+            }),
+          );
+
+          for (const { childDonViRes, childTongHopRes } of nestedResults) {
+            if (childDonViRes?.success && childDonViRes.Result) {
+              for (const item of childDonViRes.Result) {
+                merged.set(item.donVi.maDonVi, item);
+              }
+            }
+
+            // Merge sau cùng để d1/d2/d3/d15... lấy bản TONG_HOP nếu có.
+            if (childTongHopRes?.success && childTongHopRes.Result) {
+              for (const item of childTongHopRes.Result) {
+                merged.set(item.donVi.maDonVi, item);
+              }
+            }
+          }
+
+          response = {
+            ...donViRes,
+            success:
+              donViRes.success ||
+              tongHopRes.success ||
+              nestedResults.some(
+                ({ childDonViRes, childTongHopRes }) =>
+                  Boolean(childDonViRes?.success) ||
+                  Boolean(childTongHopRes?.success),
+              ),
+            Result: Array.from(merged.values()),
+          };
+        } else {
+          response = await dailyReportService.searchChildrenReports(
+            maDonViCurrent,
+            reportDate,
+            "DON_VI",
+          );
         }
-      }),
-    );
 
-    for (const { childDonViRes, childTongHopRes } of nestedResults) {
-      if (childDonViRes?.success && childDonViRes.Result) {
-        for (const item of childDonViRes.Result) {
-          merged.set(item.donVi.maDonVi, item);
-        }
-      }
-
-      // Merge sau cùng để d1/d2/d3/d15... lấy bản TONG_HOP nếu có.
-      if (childTongHopRes?.success && childTongHopRes.Result) {
-        for (const item of childTongHopRes.Result) {
-          merged.set(item.donVi.maDonVi, item);
-        }
-      }
-    }
-
-    response = {
-      ...donViRes,
-      success:
-        donViRes.success ||
-        tongHopRes.success ||
-        nestedResults.some(
-          ({ childDonViRes, childTongHopRes }) =>
-            Boolean(childDonViRes?.success) || Boolean(childTongHopRes?.success),
-        ),
-      Result: Array.from(merged.values()),
-    };
-  } else {
-    response = await dailyReportService.searchChildrenReports(
-      maDonViCurrent,
-      reportDate,
-      "DON_VI",
-    );
-  }
-
-  try {
-    const ownRes = await dailyReportService.searchReportByUnitAndDate(
+        try {
+          const ownRes = await dailyReportService.searchReportByUnitAndDate(
             maDonViCurrent,
             reportDate,
             "DON_VI",
@@ -265,7 +268,10 @@ export function useReportData({
         : reportData;
 
     const submittedReports = allReports.filter(
-      (r) => r.status !== "Chưa_Nộp" && r.status !== "Chưa nộp",
+      (r) =>
+        r.status !== "Chưa_Nộp" &&
+        r.status !== "Chưa nộp" &&
+        r.status !== "Nháp",
     );
     const quanSoTong = submittedReports.reduce(
       (sum, r) => sum + r.quanSoTong,
@@ -296,14 +302,17 @@ export function useReportData({
       directChildIds.has(r.donVi),
     );
     const directSubmittedChildren = directChildRows.filter(
-      (r) => r.status !== "Chưa_Nộp" && r.status !== "Chưa nộp",
+      (r) =>
+        r.status !== "Chưa_Nộp" &&
+        r.status !== "Chưa nộp" &&
+        r.status !== "Nháp",
     );
-    // +1 cho CH/e (trung đoàn) hoặc CH/f (sư đoàn) nếu đã nộp
     const ownSubmitted =
       (isTrungDoan || isSuDoan) &&
       parentOwnReportData &&
       parentOwnReportData.status !== "Chưa_Nộp" &&
-      parentOwnReportData.status !== "Chưa nộp"
+      parentOwnReportData.status !== "Chưa nộp" &&
+      parentOwnReportData.status !== "Nháp"
         ? 1
         : 0;
     const directSubmittedCount = directSubmittedChildren.length + ownSubmitted;
