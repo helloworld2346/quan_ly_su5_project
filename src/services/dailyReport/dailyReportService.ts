@@ -244,4 +244,16 @@ export const dailyReportService = {
     );
     return response.data;
   },
+
+  returnTongHop: async (
+    maDonVi: string,
+    ngayBaoCao: string,
+  ): Promise<unknown> => {
+    const response = await api.put(
+      `/donbaocao/returnTonghop/${maDonVi}`,
+      {},
+      { params: { ngayBaoCao } },
+    );
+    return response.data;
+  },
 };

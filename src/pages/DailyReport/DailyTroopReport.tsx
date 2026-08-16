@@ -48,7 +48,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import StatCard from "../../components/ui/StatCard/StatCard";
-import { isApprovedStatus } from "../../utils/reportStatus";
+import { isApprovedStatus, isNeedUpdateStatus } from "../../utils/reportStatus";
 
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
@@ -707,6 +707,23 @@ export default function DailyTroopReport() {
     },
   };
 
+  const handleReconsolidate = async () => {
+    if (!maDonViCurrent) return;
+    const [y, m, d] = reportDate.split("-");
+    const ngayBaoCao = y && m && d ? `${d}/${m}/${y}` : reportDate;
+    try {
+      await dailyReportService.returnTongHop(maDonViCurrent, ngayBaoCao);
+      showSuccess("Tổng hợp lại báo cáo thành công");
+      fetchReports();
+      window.dispatchEvent(new CustomEvent("report-data-changed"));
+    } catch (error) {
+      handleApiError(error, {
+        showError,
+        errorMessage: "Không thể tổng hợp lại báo cáo",
+      });
+    }
+  };
+
   return (
     <section className={styles.report} aria-labelledby="dashboard-page-heading">
       <ReportToolbar
@@ -722,6 +739,14 @@ export default function DailyTroopReport() {
         onConsolidate={
           isParentUnit && !shouldHideConsolidatedSections
             ? handleConsolidate
+            : undefined
+        }
+        onReconsolidate={
+          isParentUnit &&
+          commanderReport &&
+          commanderReport.loaiDonBaoCao === "TONG_HOP" &&
+          isNeedUpdateStatus(commanderReport.status)
+            ? handleReconsolidate
             : undefined
         }
         consolidateDisabled={
