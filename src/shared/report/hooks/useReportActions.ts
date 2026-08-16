@@ -6,11 +6,11 @@ export interface ReportActionService {
   submitReport: (id: string) => Promise<unknown>;
   recallReport: (id: string) => Promise<unknown>;
   refuseReport: (id: string, payload: { ghiChu: string }) => Promise<unknown>;
-  returnReport: (payload: {
+  returnReport?: (payload: {
     idDonBaoCao: string;
     ghiChu: string;
   }) => Promise<unknown>;
-  draftReport: (
+  draftReport?: (
     maDonVi: string,
     lyDo: string,
     ngayLoc: string,
@@ -124,8 +124,10 @@ const handleRefuseReportClick = (row: TRow) => {
     if (!refuseReportId) return;
     try {
       if (returnLoai === "DON_VI" && returnMaDonVi && returnNgayLoc) {
+        if (!service.draftReport) return;
         await service.draftReport(returnMaDonVi, reason, returnNgayLoc);
       } else {
+        if (!service.returnReport) return;
         await service.returnReport({
           idDonBaoCao: refuseReportId,
           ghiChu: reason,
