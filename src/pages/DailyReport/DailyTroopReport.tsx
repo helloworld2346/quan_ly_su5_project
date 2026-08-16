@@ -119,12 +119,14 @@ export default function DailyTroopReport() {
   const isTieuDoan = capDonVi === "TIEU_DOAN";
   const isSuDoan = capDonVi === "SU_DOAN";
   const useDutyShiftForCaTruc = isTacChien && isSuDoan;
-  const useInlineOwnCommandReport = isTacChien && (isSuDoan || isTrungDoan);
+  const useInlineOwnCommandReport =
+  (isTacChien || isChiHuy) && (isSuDoan || isTrungDoan);
 
   const isParentUnit =
-    isAdmin ||
-    (isTacChien && (isTrungDoan || isSuDoan)) ||
-    (isNoiVu && isTieuDoan && !isDbOrEb);
+  isAdmin ||
+  (isTacChien && (isTrungDoan || isSuDoan)) ||
+  (isChiHuy && (isTrungDoan || isSuDoan)) ||
+  (isNoiVu && isTieuDoan && !isDbOrEb);
 
   const [signatureBase64, setSignatureBase64] = useState<string | undefined>(
     undefined,
@@ -143,10 +145,11 @@ export default function DailyTroopReport() {
     fetchReports,
   } = useReportData({
     maDonViCurrent,
-    isParentUnit:
-      isAdmin ||
-      (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
-      (isNoiVu && capDonVi === "TIEU_DOAN" && !isDbOrEb),
+   isParentUnit:
+  isAdmin ||
+  (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
+  (isChiHuy && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
+  (isNoiVu && capDonVi === "TIEU_DOAN" && !isDbOrEb),
     isTacChien,
     isChiHuy,
     capDonVi,
@@ -154,7 +157,7 @@ export default function DailyTroopReport() {
     kyHieuDonVi,
     isDbOrEb,
     showError,
-  });
+  }); 
 
   const bienCheTongTrungDoan = useMemo(() => {
     if (capDonVi !== "TRUNG_DOAN") return undefined;
@@ -772,7 +775,7 @@ export default function DailyTroopReport() {
         onExportExcel={handleExportExcel}
         isPastDate={isPastDate}
         hasReport={checkIfDateHasReport}
-        showExport={isTacChien && capDonVi === "SU_DOAN"}
+        showExport={(isTacChien || isChiHuy) && capDonVi === "SU_DOAN"}
         onSaveInline={
           useInlineOwnCommandReport && inlineEditingRowId
             ? handleSaveInlineInput

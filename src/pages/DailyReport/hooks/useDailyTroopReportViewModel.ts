@@ -110,10 +110,11 @@ export function useDailyTroopReportViewModel(
     preferDutyShiftForCaTruc = false,
   } = args;
 
-  const isParentUnit =
-    isAdmin ||
-    (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
-    (isNoiVu && capDonVi === "TIEU_DOAN" && !isDbOrEb);
+const isParentUnit =
+  isAdmin ||
+  (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
+  (isChiHuy && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
+  (isNoiVu && capDonVi === "TIEU_DOAN" && !isDbOrEb);
 
   const isChiHuyLeaf = isChiHuy && childUnits.length === 0;
 
@@ -152,10 +153,11 @@ export function useDailyTroopReportViewModel(
     reportData,
   ]);
 
-  const canAddReport =
-    !shouldHideDraftAndUnsubmitted &&
-    (isChiHuyLeaf ||
-      (isTacChien && (capDonVi === "SU_DOAN" || capDonVi === "TRUNG_DOAN")));
+ const canAddReport =
+  !shouldHideDraftAndUnsubmitted &&
+  (isChiHuyLeaf ||
+    (isTacChien && (capDonVi === "SU_DOAN" || capDonVi === "TRUNG_DOAN")) ||
+    (isChiHuy && (capDonVi === "SU_DOAN" || capDonVi === "TRUNG_DOAN")));
 
   const isPastDate = isPastDateForReport();
 

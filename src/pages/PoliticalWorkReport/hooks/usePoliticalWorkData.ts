@@ -52,19 +52,20 @@ export function usePoliticalWorkData({
   const [loading, setLoading] = useState(false);
 
   const [dutyReport, setDutyReport] = useState<PoliticalWorkRow | null>(null);
+const isSuDoan = capDonVi === "SU_DOAN";
 
-  const { childUnits, currentUnit } = useChildUnits(
-    maDonViCurrent,
-    isParentUnit,
-    isChiHuyTrungDoan || isChiHuySuDoan,
-  );
+const { childUnits, currentUnit } = useChildUnits(
+  maDonViCurrent,
+  isParentUnit,
+  isChiHuyTrungDoan || isChiHuySuDoan || (isParentUnit && isSuDoan),
+);
 
   const showErrorRef = useRef(showError);
   useEffect(() => {
     showErrorRef.current = showError;
   }, [showError]);
 
-  const isSuDoan = capDonVi === "SU_DOAN";
+ 
 
   const fetchReports = useCallback(async () => {
     if (!maDonViCurrent) return;
@@ -106,6 +107,49 @@ export function usePoliticalWorkData({
             }
           }
         }
+
+        if (isChiHuyTrungDoan) {
+  const tieuDoanChildren = childUnits.filter(
+    (u) => u.capDonVi === "TIEU_DOAN",
+  );
+
+  const nestedResults = await Promise.all(
+    tieuDoanChildren.map(async (td) => {
+      try {
+        const [childDonViRes, childTongHopRes] = await Promise.all([
+          politicalWorkService.getByDonViCha(
+            td.maDonVi,
+            reportDate,
+            "DON_VI",
+          ),
+          politicalWorkService.getByDonViCha(
+            td.maDonVi,
+            reportDate,
+            "TONG_HOP",
+          ),
+        ]);
+        return { childDonViRes, childTongHopRes };
+      } catch {
+        return { childDonViRes: null, childTongHopRes: null };
+      }
+    }),
+  );
+
+  for (const { childDonViRes, childTongHopRes } of nestedResults) {
+    if (childDonViRes?.success && childDonViRes.Result) {
+      for (const item of childDonViRes.Result) {
+        merged.set(item.donVi.maDonVi, item);
+      }
+    }
+
+    if (childTongHopRes?.success && childTongHopRes.Result) {
+      for (const item of childTongHopRes.Result) {
+        merged.set(item.donVi.maDonVi, item);
+      }
+    }
+  }
+}
+
         if (isSuDoan || isPoliticalOffice) {
           const trungDoanChildren = childUnits.filter(
             (u) => u.capDonVi === "TRUNG_DOAN",

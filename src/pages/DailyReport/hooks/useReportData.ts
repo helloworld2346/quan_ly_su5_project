@@ -36,6 +36,9 @@ export function useReportData({
   isDbOrEb: boolean;
   showError: (msg: string) => void;
 }) {
+  const isTrungDoan = capDonVi === "TRUNG_DOAN";
+  const isSuDoan = capDonVi === "SU_DOAN";
+  const isTieuDoan = capDonVi === "TIEU_DOAN";
   const [reportData, setReportData] = useState<ReportRow[]>([]);
   const [parentReportData, setParentReportData] = useState<ReportRow | null>(
     null,
@@ -51,10 +54,6 @@ export function useReportData({
   );
   const donViQuanSoTong = currentUnit?.quanSoTong ?? 0;
 
-  const isTrungDoan = capDonVi === "TRUNG_DOAN";
-  const isSuDoan = capDonVi === "SU_DOAN";
-  const isTieuDoan = capDonVi === "TIEU_DOAN";
-
   const showErrorRef = useRef(showError);
   useEffect(() => {
     showErrorRef.current = showError;
@@ -66,37 +65,94 @@ export function useReportData({
     try {
       let response;
       if (isParentUnit) {
-        if (isTrungDoan || isSuDoan) {
-          const [donViRes, tongHopRes] = await Promise.all([
-            dailyReportService.searchChildrenReports(
-              maDonViCurrent,
-              reportDate,
-              "DON_VI",
-            ),
-            dailyReportService.searchChildrenReports(
-              maDonViCurrent,
-              reportDate,
-              "TONG_HOP",
-            ),
-          ]);
+       if (isChiHuy && (isSuDoan || isTrungDoan)) {
+          // Với ch_f5 cấp sư đoàn, cần lấy báo cáo từ tất cả đơn vị con (bao gồm đơn vị con của các trung đoàn)
+          if (isChiHuy && isSuDoan) {
+            // Lấy báo cáo từ tất cả các đơn vị con trực tiếp (các trung đoàn)
+            const [donViRes, tongHopRes] = await Promise.all([
+              dailyReportService.searchChildrenReports(
+                maDonViCurrent,
+                reportDate,
+                "DON_VI",
+              ),
+              dailyReportService.searchChildrenReports(
+                maDonViCurrent,
+                reportDate,
+                "TONG_HOP",
+              ),
+            ]);
 
-          const merged = new Map<string, ReportItemInput>();
-          if (donViRes.success && donViRes.Result) {
-            for (const item of donViRes.Result) {
-              merged.set(item.donVi.maDonVi, item);
+            const merged = new Map<string, ReportItemInput>();
+            if (donViRes.success && donViRes.Result) {
+              for (const item of donViRes.Result) {
+                merged.set(item.donVi.maDonVi, item);
+              }
             }
-          }
-          if (tongHopRes.success && tongHopRes.Result) {
-            for (const item of tongHopRes.Result) {
-              merged.set(item.donVi.maDonVi, item);
+            if (tongHopRes.success && tongHopRes.Result) {
+              for (const item of tongHopRes.Result) {
+                merged.set(item.donVi.maDonVi, item);
+              }
             }
-          }
 
-          response = {
-            ...donViRes,
-            success: donViRes.success || tongHopRes.success,
-            Result: Array.from(merged.values()),
-          };
+            // Lấy thêm báo cáo từ các đơn vị con của các trung đoàn
+            if (donViRes.success && donViRes.Result) {
+              for (const item of donViRes.Result) {
+                // Với mỗi trung đoàn, lấy báo cáo từ các đơn vị con của nó
+                try {
+                  const childDonViRes = await dailyReportService.searchChildrenReports(
+                    item.donVi.maDonVi,
+                    reportDate,
+                    "DON_VI",
+                  );
+                  if (childDonViRes.success && childDonViRes.Result) {
+                    for (const childItem of childDonViRes.Result) {
+                      merged.set(childItem.donVi.maDonVi, childItem);
+                    }
+                  }
+                } catch {
+                  // Bỏ qua nếu không lấy được báo cáo từ đơn vị con
+                }
+              }
+            }
+
+            response = {
+              ...donViRes,
+              success: donViRes.success || tongHopRes.success,
+              Result: Array.from(merged.values()),
+            };
+          } else {
+            // Logic gốc cho tb_f5 và các trường hợp khác
+            const [donViRes, tongHopRes] = await Promise.all([
+              dailyReportService.searchChildrenReports(
+                maDonViCurrent,
+                reportDate,
+                "DON_VI",
+              ),
+              dailyReportService.searchChildrenReports(
+                maDonViCurrent,
+                reportDate,
+                "TONG_HOP",
+              ),
+            ]);
+
+            const merged = new Map<string, ReportItemInput>();
+            if (donViRes.success && donViRes.Result) {
+              for (const item of donViRes.Result) {
+                merged.set(item.donVi.maDonVi, item);
+              }
+            }
+            if (tongHopRes.success && tongHopRes.Result) {
+              for (const item of tongHopRes.Result) {
+                merged.set(item.donVi.maDonVi, item);
+              }
+            }
+
+            response = {
+              ...donViRes,
+              success: donViRes.success || tongHopRes.success,
+              Result: Array.from(merged.values()),
+            };
+          }
         } else {
           response = await dailyReportService.searchChildrenReports(
             maDonViCurrent,
