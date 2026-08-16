@@ -515,7 +515,8 @@ export default function ReportTableRow({
                   {isParentUnit &&
                     onReturnReport &&
                     isApprovedStatusFn(row.status) &&
-                    row.loaiDonBaoCao === "DON_VI" && (
+                    (row.loaiDonBaoCao === "DON_VI" ||
+                      row.loaiDonBaoCao === "TONG_HOP") && (
                       <button
                         type="button"
                         className={styles.menuItem}
