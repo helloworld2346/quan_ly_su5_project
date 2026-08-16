@@ -818,7 +818,7 @@ export default function DailyTroopReport() {
         }
         submitDisabled={isChiHuy ? !signatureDone || !signatureBase64 : false}
         onRecall={
-          canRecall
+          canRecall && !(isChiHuy && isSuDoan)
             ? () => handleRecallReport(ownReport!.idDonBaoCao)
             : undefined
         }

@@ -525,12 +525,6 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       });
     }
 
-    absentRows.forEach((row) => {
-      if (row.lyDoVang in thongTinVangObj) {
-        thongTinVangObj[row.lyDoVang]++;
-      }
-    });
-
     const donViKyHieu =
       initialData?.donVi?.kyhieuDonvi || donVi?.kyhieuDonvi || "";
     const donViKyHieuDayDu =
