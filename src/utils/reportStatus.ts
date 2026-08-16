@@ -21,12 +21,12 @@ export function getReportStatusLabel(status: string): string {
     Chờ_Duyệt: "Chờ duyệt",
     Đã_Duyệt: "Đã duyệt",
     Từ_Chối: "Từ chối",
-    Chưa_Nộp: "Chưa nộp",
-    Trả_Về: "Trả về",
+    Trả_Về: "Cần cập nhật",
     Cần_Cập_Nhật: "Cần cập nhật",
+    Chưa_Nộp: "Chưa nộp",
   };
   return map[normalizeReportStatus(status)] ?? status.replace(/_/g, " ");
-}  
+}
 
 export function isPendingStatus(status: string) {
   return normalizeReportStatus(status) === "Chờ_Duyệt";

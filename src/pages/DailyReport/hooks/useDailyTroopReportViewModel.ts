@@ -413,7 +413,7 @@ const isParentUnit =
     showTotalRow,
     totalRequiredCount:
       childUnits.filter((u) => u.kyhieuDonvi !== "CH/e").length +
-      (isTrungDoan ? 1 : 0),
+      (isTrungDoan || capDonVi === "SU_DOAN" ? 1 : 0),
     consolidatedData,
   };
 }

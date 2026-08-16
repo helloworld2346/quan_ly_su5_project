@@ -10,6 +10,11 @@ export interface ReportActionService {
     idDonBaoCao: string;
     ghiChu: string;
   }) => Promise<unknown>;
+  draftReport: (
+    maDonVi: string,
+    lyDo: string,
+    ngayLoc: string,
+  ) => Promise<unknown>;
 }
 
 function notifyReportDataChanged() {
@@ -20,6 +25,9 @@ export function useReportActions<TRow>({
   service,
   getId,
   getUnitName,
+  getMaDonVi,
+  getNgayLoc,
+  getLoaiDonBaoCao,
   showSuccess,
   showError,
   fetchReports,
@@ -27,6 +35,9 @@ export function useReportActions<TRow>({
   service: ReportActionService;
   getId: (row: TRow) => string;
   getUnitName: (row: TRow) => string;
+  getMaDonVi?: (row: TRow) => string;
+  getNgayLoc?: (row: TRow) => string;
+  getLoaiDonBaoCao?: (row: TRow) => string;
   showSuccess: (msg: string) => void;
   showError: (msg: string) => void;
   fetchReports: () => void;
@@ -34,6 +45,9 @@ export function useReportActions<TRow>({
   const [showRefuseDialog, setShowRefuseDialog] = useState(false);
   const [refuseReportId, setRefuseReportId] = useState<string | null>(null);
   const [refuseUnitName, setRefuseUnitName] = useState("");
+  const [returnMaDonVi, setReturnMaDonVi] = useState<string | null>(null);
+  const [returnNgayLoc, setReturnNgayLoc] = useState<string | null>(null);
+  const [returnLoai, setReturnLoai] = useState<string | null>(null);
 
   const handleApproveReport = async (reportId: string) => {
     try {
@@ -79,11 +93,14 @@ export function useReportActions<TRow>({
     }
   };
 
-  const handleRefuseReportClick = (row: TRow) => {
-    setRefuseReportId(getId(row));
-    setRefuseUnitName(getUnitName(row));
-    setShowRefuseDialog(true);
-  };
+const handleRefuseReportClick = (row: TRow) => {
+  setRefuseReportId(getId(row));
+  setRefuseUnitName(getUnitName(row));
+  setReturnMaDonVi(getMaDonVi ? getMaDonVi(row) : null);
+  setReturnNgayLoc(getNgayLoc ? getNgayLoc(row) : null);
+  setReturnLoai(getLoaiDonBaoCao ? getLoaiDonBaoCao(row) : null);
+  setShowRefuseDialog(true);
+};
 
   const handleRefuseConfirm = async (reason: string) => {
     if (!refuseReportId) return;
@@ -106,14 +123,21 @@ export function useReportActions<TRow>({
   const handleReturnConfirm = async (reason: string) => {
     if (!refuseReportId) return;
     try {
-      await service.returnReport({
-        idDonBaoCao: refuseReportId,
-        ghiChu: reason,
-      });
+      if (returnLoai === "DON_VI" && returnMaDonVi && returnNgayLoc) {
+        await service.draftReport(returnMaDonVi, reason, returnNgayLoc);
+      } else {
+        await service.returnReport({
+          idDonBaoCao: refuseReportId,
+          ghiChu: reason,
+        });
+      }
       showSuccess("Trả về báo cáo thành công");
       setShowRefuseDialog(false);
       setRefuseReportId(null);
       setRefuseUnitName("");
+      setReturnMaDonVi(null);
+      setReturnNgayLoc(null);
+      setReturnLoai(null);
       fetchReports();
       notifyReportDataChanged();
     } catch (error) {

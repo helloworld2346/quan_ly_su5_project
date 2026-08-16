@@ -39,6 +39,7 @@ type Props = {
   isPastDate?: boolean;
   showExport?: boolean;
   onSaveInline?: () => void;
+  onReconsolidate?: () => void;
   inlineSaveDisabled?: boolean;
 };
 
@@ -73,6 +74,7 @@ export default function ReportToolbar({
   hasReport = false,
   showExport = false,
   onSaveInline,
+  onReconsolidate,
   onReturn,
   inlineSaveDisabled = false,
 }: Props) {
@@ -123,7 +125,6 @@ export default function ReportToolbar({
             {consolidateLabel}
           </button>
         )}
-
         {onSubmit && (
           <button
             type="button"
@@ -187,6 +188,16 @@ export default function ReportToolbar({
           </button>
         )}
 
+        {onReconsolidate && (
+          <button
+            type="button"
+            className={`${styles.actionBtn} ${styles.consolidateBtn}`}
+            onClick={onReconsolidate}
+          >
+            <FontAwesomeIcon icon={faLayerGroup} className={styles.addIcon} />
+            Tổng hợp lại
+          </button>
+        )}
         {onSaveInline && (
           <button
             type="button"

@@ -80,15 +80,18 @@ export async function exportTroopReportToExcel({
   ws.getCell(2, rightStart).font = {
     name: FONT,
     bold: true,
-    italic: true,
     size: 14,
     underline: true,
   };
   ws.getCell(2, rightStart).alignment = { horizontal: "center" };
 
-  setMerged(ws, 1, 1, 1, 2, "SƯ ĐOÀN 5");
+  setMerged(ws, 1, 1, 1, 2, "QUÂN KHU 7");
   ws.getCell(1, 1).font = { name: FONT, bold: true, size: 14 };
   ws.getCell(1, 1).alignment = { horizontal: "center", vertical: "middle" };
+
+  setMerged(ws, 2, 1, 2, 2, "SƯ ĐOÀN 5");
+  ws.getCell(2, 1).font = { name: FONT, bold: true, size: 14, underline: true };
+  ws.getCell(2, 1).alignment = { horizontal: "center", vertical: "middle" };
 
   setMerged(ws, 3, rightStart, 3, COLUMN_COUNT, formatPlace(reportDate));
   ws.getCell(3, rightStart).font = { name: FONT, italic: true, size: 14 };
@@ -102,7 +105,7 @@ export async function exportTroopReportToExcel({
     1,
     5,
     COLUMN_COUNT,
-    `BÁO CÁO THỐNG KÊ QUÂN SỐ (Ngày ${formatDate(reportDate)})`,
+    `BÁO CÁO THỐNG KÊ QUÂN SỐ`,
   );
   ws.getCell(5, 1).font = {
     name: FONT,
@@ -162,38 +165,6 @@ export async function exportTroopReportToExcel({
     COLOR.TOTAL_FILL,
   );
   rowIdx++;
-
-  const EXPLAIN_LINES = 4;
-  const explainStartRow = rowIdx;
-
-  ws.getCell(rowIdx, 1).value = "Giải trình\nquân số\nthay đổi\ntrong ngày";
-  ws.getCell(explainStartRow, 1).font = { name: FONT, bold: true, size: 12 };
-  ws.getCell(explainStartRow, 1).alignment = {
-    horizontal: "center",
-    vertical: "middle",
-    wrapText: true,
-  };
-  setMerged(
-    ws,
-    explainStartRow,
-    1,
-    explainStartRow + EXPLAIN_LINES - 1,
-    1,
-    "Giải trình quân số thay đổi trong ngày",
-  );
-
-  for (let line = 0; line < EXPLAIN_LINES; line++) {
-    const lineRow = explainStartRow + line;
-    setMerged(ws, lineRow, 2, lineRow, COLUMN_COUNT, "");
-    for (let c = 2; c <= COLUMN_COUNT; c++) {
-      ws.getCell(lineRow, c).border = {
-        bottom: { style: "dotted" },
-      };
-    }
-    ws.getRow(lineRow).height = 18;
-  }
-
-  rowIdx = explainStartRow + EXPLAIN_LINES;
 
   // Cuối file: MẬT KHẨU / Trực chỉ huy / Trực ban tác chiến
   const passwordRow = rowIdx;
@@ -329,11 +300,6 @@ function writeDataRow(
 function thinBorder(): ExcelJS.Borders {
   const s = { style: "thin" as const };
   return { top: s, left: s, bottom: s, right: s } as ExcelJS.Borders;
-}
-
-function formatDate(iso: string): string {
-  const [y, m, d] = iso.split("-");
-  return d && m && y ? `${d}/${m}/${y}` : iso;
 }
 
 function formatPlace(iso: string): string {

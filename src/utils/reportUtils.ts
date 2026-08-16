@@ -97,6 +97,7 @@ export function mapItemToRow(item: ReportItemInput): ReportRow {
     donVi: item.donVi.maDonVi,
     tenDonVi: item.donVi.tenDonvi,
     kyhieuDonVi: item.donVi.kyhieuDonvi,
+    kyhieuDayDu: item.donVi.kyhieuDayDu,
     quanSoTong: item.quanSoTong,
     quanSoHienDien: item.quanSoHienDien,
     quanSoVang: item.quanSoVang,

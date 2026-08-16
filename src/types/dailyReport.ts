@@ -53,6 +53,7 @@ export interface AbsentRow {
   ghiChu: string;
   tenDonVi?: string;
   kyhieuDonVi?: string;
+  kyhieuDayDu?: string;
 }
 
 export type ReportItemInput = {
@@ -67,7 +68,12 @@ export type ReportItemInput = {
   ghiChu?: string | null;
   trucBanChiHuy?: string;
   trucBanTacChien?: string;
-  donVi: { maDonVi: string; tenDonvi: string; kyhieuDonvi?: string };
+  donVi: {
+    maDonVi: string;
+    tenDonvi: string;
+    kyhieuDonvi?: string;
+    kyhieuDayDu?: string;
+  };
   caTruc: CaTrucInfo;
   tinhHinhHoatDong?: string;
   loaiDonBaoCao?: LoaiDonBaoCao;
@@ -108,6 +114,7 @@ export interface CreateReportResponse {
       maDonVi: string;
       tenDonvi: string;
       kyhieuDonvi?: string;
+      kyhieuDayDu?: string;
     };
     caTruc: CaTrucInfo;
     tinhHinhHoatDong?: string;
@@ -149,6 +156,7 @@ export interface UpdateReportResponse {
       maDonVi: string;
       tenDonvi: string;
       kyhieuDonvi?: string;
+      kyhieuDayDu?: string;
     };
     caTruc: CaTrucInfo;
     tinhHinhHoatDong?: string;
@@ -172,6 +180,7 @@ export interface ApproveResponse {
       maDonVi: string;
       tenDonvi: string;
       kyhieuDonvi?: string;
+      kyhieuDayDu?: string;
     };
     caTruc: CaTrucInfo;
   };
@@ -198,6 +207,7 @@ export interface RefuseResponse {
       maDonVi: string;
       tenDonvi: string;
       kyhieuDonvi?: string;
+      kyhieuDayDu?: string;
     };
     caTruc: CaTrucInfo;
   };
@@ -223,6 +233,7 @@ export interface SearchReportResponse {
       maDonVi: string;
       tenDonvi: string;
       kyhieuDonvi?: string;
+      kyhieuDayDu?: string;
     };
     caTruc: CaTrucInfo;
   };
@@ -249,6 +260,7 @@ export interface SearchChildrenResponse {
       maDonVi: string;
       tenDonvi: string;
       kyhieuDonvi?: string;
+      kyhieuDayDu?: string;
     };
     caTruc: CaTrucInfo;
   }>;
@@ -319,6 +331,7 @@ export interface ChiTietVangQuanNhan {
   donvi: string;
   ghiChu: string;
   kyhieuDonVi?: string;
+  kyhieuDayDu?: string;
 }
 
 export interface ReportRow {
@@ -326,6 +339,7 @@ export interface ReportRow {
   donVi: string;
   tenDonVi: string;
   kyhieuDonVi?: string;
+  kyhieuDayDu?: string;
   quanSoTong: number;
   quanSoHienDien: number;
   quanSoVang: number;
@@ -373,6 +387,7 @@ export interface TraVeResponse {
       maDonVi: string;
       tenDonvi: string;
       kyhieuDonvi?: string;
+      kyhieuDayDu?: string;
       capDonVi?: string;
     };
   };

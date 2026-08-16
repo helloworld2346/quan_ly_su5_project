@@ -48,6 +48,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import StatCard from "../../components/ui/StatCard/StatCard";
+import { isApprovedStatus, isNeedUpdateStatus } from "../../utils/reportStatus";
 
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
@@ -198,7 +199,7 @@ export default function DailyTroopReport() {
     handleRefuseConfirm,
     handleReturnConfirm,
     handleRefuseCancel,
-  } = useReportActions({ showSuccess, showError, fetchReports });
+  } = useReportActions({ showSuccess, showError, fetchReports, reportDate });
 
   const {
     ownReport,
@@ -307,7 +308,7 @@ export default function DailyTroopReport() {
           reportForSubmit.status === "Nháp",
         )
       : canSubmit;
-  
+
   const handleStartInlineInput = (row: ReportRow) => {
     setActiveMenuUnit(null);
     setInlineEditingRowId(row.idDonBaoCao);
@@ -703,10 +704,45 @@ export default function DailyTroopReport() {
     },
     onEditReport: handleEditReport,
     onReturnReport: (row: ReportRow) => {
+      setActiveMenuUnit(null);
       setDialogAction("return");
       handleRefuseReportClick(row);
     },
-    canReturnRow: isParentUnit,
+  };
+
+  const handleReconsolidate = async () => {
+    if (!maDonViCurrent) return;
+    const [y, m, d] = reportDate.split("-");
+    const ngayBaoCao = y && m && d ? `${d}/${m}/${y}` : reportDate;
+    try {
+      await dailyReportService.returnTongHop(maDonViCurrent, ngayBaoCao);
+
+      if (parentReportData && consolidatedData) {
+        await dailyReportService.updateReport(parentReportData.idDonBaoCao, {
+          quanSoTong: consolidatedData.quanSoTong,
+          quanSoHienDien: consolidatedData.quanSoHienDien,
+          quanSoVang: consolidatedData.quanSoVang,
+          thoiGianBaoCao: new Date(`${reportDate}T12:00:00.000Z`).toISOString(),
+          chiTietVang: JSON.stringify(consolidatedData.absentRows),
+          thongTinVang: JSON.stringify(consolidatedData.thongTinVang),
+          trucBanChiHuy: JSON.stringify(caTrucInfo?.trucChiHuy ?? {}),
+          trucBanTacChien: JSON.stringify(caTrucInfo?.trucBanTacChien ?? {}),
+          tinhHinhHoatDong: JSON.stringify({}),
+          account: account?.idTaiKhoan ?? "",
+          donVi: account?.donVi?.maDonVi ?? "",
+          chuKySo: signatureBase64,
+        });
+      }
+
+      showSuccess("Tổng hợp lại báo cáo thành công");
+      fetchReports();
+      window.dispatchEvent(new CustomEvent("report-data-changed"));
+    } catch (error) {
+      handleApiError(error, {
+        showError,
+        errorMessage: "Không thể tổng hợp lại báo cáo",
+      });
+    }
   };
 
   return (
@@ -724,6 +760,14 @@ export default function DailyTroopReport() {
         onConsolidate={
           isParentUnit && !shouldHideConsolidatedSections
             ? handleConsolidate
+            : undefined
+        }
+        onReconsolidate={
+          isParentUnit &&
+          parentReportData &&
+          parentReportData.loaiDonBaoCao === "TONG_HOP" &&
+          isNeedUpdateStatus(parentReportData.status)
+            ? handleReconsolidate
             : undefined
         }
         consolidateDisabled={
@@ -758,6 +802,16 @@ export default function DailyTroopReport() {
               }
             : undefined
         }
+        onReturn={
+          isParentUnit &&
+          commanderReport &&
+          isApprovedStatus(commanderReport.status)
+            ? () => {
+                setDialogAction("return");
+                handleRefuseReportClick(commanderReport!);
+              }
+            : undefined
+        }
         onSubmit={
           shouldHideDraftAndUnsubmitted
             ? undefined
@@ -767,7 +821,7 @@ export default function DailyTroopReport() {
         }
         submitDisabled={isChiHuy ? !signatureDone || !signatureBase64 : false}
         onRecall={
-          canRecall
+          canRecall && !(isChiHuy && isSuDoan)
             ? () => handleRecallReport(ownReport!.idDonBaoCao)
             : undefined
         }
@@ -883,7 +937,9 @@ export default function DailyTroopReport() {
       {selectedReportRow && (
         <TroopDetailModal
           unit={normalizeUnitName(
-            selectedReportRow.kyhieuDonVi || selectedReportRow.tenDonVi,
+            selectedReportRow.kyhieuDayDu ||
+              selectedReportRow.kyhieuDonVi ||
+              selectedReportRow.tenDonVi,
           )}
           showUnitColumn
           members={selectedReportRow.chiTietVangList.map((m) => ({
@@ -892,7 +948,11 @@ export default function DailyTroopReport() {
             rank: m.capBac,
             position: m.chucVu,
             reason: m.lyDoVang,
-            unitName: m.kyhieuDonVi || selectedReportRow.kyhieuDonVi,
+            unitName:
+              m.kyhieuDayDu ||
+              selectedReportRow.kyhieuDayDu ||
+              m.kyhieuDonVi ||
+              selectedReportRow.kyhieuDonVi,
             note: m.ghiChu,
           }))}
           onClose={() => setSelectedReportRow(null)}
@@ -916,7 +976,7 @@ export default function DailyTroopReport() {
             rank: r.capBac,
             position: r.chucVu,
             reason: r.lyDoVang,
-            unitName: r.kyhieuDonVi,
+            unitName: r.kyhieuDayDu || r.kyhieuDonVi,
             note: r.ghiChu,
           }))}
           onClose={() => setShowConsolidatedDetail(false)}
@@ -1050,6 +1110,8 @@ export default function DailyTroopReport() {
           maDonViCurrent={account?.donVi?.maDonVi}
           tongQuanSoBienChe={consolidatedData.quanSoTong}
           consolidatedAbsentRows={consolidatedData.absentRows}
+          consolidatedThongTinVang={consolidatedData.thongTinVang}
+          consolidatedQuanSoVang={consolidatedData.quanSoVang}
           onSubmit={async (payload, detailData) => {
             try {
               const res = await dailyReportService.createReport({
@@ -1090,6 +1152,7 @@ export default function DailyTroopReport() {
       <RefuseDialog
         isOpen={showRefuseDialog}
         unitName={refuseUnitName}
+        variant={dialogAction === "return" ? "return" : "refuse"}
         onConfirm={
           dialogAction === "return" ? handleReturnConfirm : handleRefuseConfirm
         }

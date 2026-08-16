@@ -258,9 +258,9 @@ export function useReportData({
   const consolidatedData = useMemo(() => {
     if (!isParentUnit || reportData.length === 0) return null;
 
-    // Trung đoàn: gộp thêm báo cáo DON_VI của chính trung đoàn (CH/e)
+    // Trung đoàn: gộp thêm CH/e; Sư đoàn: gộp thêm CH/f (báo cáo DON_VI của chính đơn vị)
     const allReports =
-      isTrungDoan && parentOwnReportData
+      (isTrungDoan || isSuDoan) && parentOwnReportData
         ? [...reportData, parentOwnReportData]
         : reportData;
 
@@ -286,6 +286,7 @@ export function useReportData({
         lyDoVang: m.lyDoVang as keyof VangChiTiet,
         ghiChu: m.ghiChu,
         kyhieuDonVi: r.kyhieuDonVi,
+        kyhieuDayDu: m.kyhieuDayDu || r.kyhieuDayDu,
       })),
     );
     return {
@@ -297,7 +298,7 @@ export function useReportData({
       submittedCount: submittedReports.length,
       totalCount: allReports.length,
     };
-  }, [isParentUnit, isTrungDoan, parentOwnReportData, reportData]);
+  }, [isParentUnit, isTrungDoan, isSuDoan, parentOwnReportData, reportData]);
 
   return {
     reportData,
