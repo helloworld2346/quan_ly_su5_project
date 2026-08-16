@@ -125,6 +125,13 @@ export default function ReportTableRow({
     });
   };
 
+  const inlineTongVang = inlineValue
+    ? Object.values(inlineValue.vang).reduce((s, v) => s + (v || 0), 0)
+    : 0;
+  const inlineHienDien = inlineValue
+    ? Math.max(0, inlineValue.quanSoTong - inlineTongVang)
+    : 0;
+
   if (row.notSubmitted) {
     return (
       <tr
@@ -157,21 +164,10 @@ export default function ReportTableRow({
                 onChange={(e) => setInlineNumber("quanSoTong", e.target.value)}
               />
             </td>
-            <td>
-              <input
-                className={styles.inlineCellInput}
-                type="number"
-                min={0}
-                value={inlineValue.quanSoHienDien}
-                onFocus={handleInputFocus}
-                onChange={(e) =>
-                  setInlineNumber("quanSoHienDien", e.target.value)
-                }
-              />
-            </td>
-            <td>
-              {Math.max(0, inlineValue.quanSoTong - inlineValue.quanSoHienDien)}
-            </td>
+            <td>{inlineHienDien}</td>
+
+            <td>{inlineTongVang}</td>
+
             {[
               "hoiThaiNgoaiSuDoan",
               "hoiThaiEF",
