@@ -713,6 +713,24 @@ export default function DailyTroopReport() {
     const ngayBaoCao = y && m && d ? `${d}/${m}/${y}` : reportDate;
     try {
       await dailyReportService.returnTongHop(maDonViCurrent, ngayBaoCao);
+
+      if (parentReportData && consolidatedData) {
+        await dailyReportService.updateReport(parentReportData.idDonBaoCao, {
+          quanSoTong: consolidatedData.quanSoTong,
+          quanSoHienDien: consolidatedData.quanSoHienDien,
+          quanSoVang: consolidatedData.quanSoVang,
+          thoiGianBaoCao: new Date(`${reportDate}T12:00:00.000Z`).toISOString(),
+          chiTietVang: JSON.stringify(consolidatedData.absentRows),
+          thongTinVang: JSON.stringify(consolidatedData.thongTinVang),
+          trucBanChiHuy: JSON.stringify(caTrucInfo?.trucChiHuy ?? {}),
+          trucBanTacChien: JSON.stringify(caTrucInfo?.trucBanTacChien ?? {}),
+          tinhHinhHoatDong: JSON.stringify({}),
+          account: account?.idTaiKhoan ?? "",
+          donVi: account?.donVi?.maDonVi ?? "",
+          chuKySo: signatureBase64,
+        });
+      }
+
       showSuccess("Tổng hợp lại báo cáo thành công");
       fetchReports();
       window.dispatchEvent(new CustomEvent("report-data-changed"));
