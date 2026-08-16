@@ -1107,6 +1107,8 @@ export default function DailyTroopReport() {
           maDonViCurrent={account?.donVi?.maDonVi}
           tongQuanSoBienChe={consolidatedData.quanSoTong}
           consolidatedAbsentRows={consolidatedData.absentRows}
+          consolidatedThongTinVang={consolidatedData.thongTinVang}
+          consolidatedQuanSoVang={consolidatedData.quanSoVang}
           onSubmit={async (payload, detailData) => {
             try {
               const res = await dailyReportService.createReport({

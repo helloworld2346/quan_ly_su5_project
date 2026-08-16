@@ -96,6 +96,8 @@ interface CreateReportModalProps {
   maDonViCurrent?: string;
   tongQuanSoBienChe?: number;
   consolidatedAbsentRows?: AbsentRow[];
+  consolidatedThongTinVang?: VangChiTiet;
+  consolidatedQuanSoVang?: number;
   caTrucInfo?: CaTrucInfo | null;
   isTacChien?: boolean;
   reportDate?: string;
@@ -111,6 +113,8 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   maDonViCurrent,
   tongQuanSoBienChe,
   consolidatedAbsentRows,
+  consolidatedThongTinVang,
+  consolidatedQuanSoVang,
   caTrucInfo,
   isTacChien,
   reportDate,
@@ -232,7 +236,10 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingYesterday, setPendingYesterday] = useState<string | null>(null);
 
-  const quanSoVang = absentRows.length;
+  const quanSoVang =
+    consolidatedQuanSoVang !== undefined
+      ? consolidatedQuanSoVang
+      : absentRows.length;
   const quanSoHienDien = useMemo(() => {
     const result = tongQuanSo - quanSoVang;
     return result >= 0 ? result : 0;
@@ -493,7 +500,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
 
     const currentDetailData = effectiveDetailData!;
 
-    const thongTinVangObj: VangChiTiet = {
+    const thongTinVangObj: VangChiTiet = consolidatedThongTinVang ?? {
       hoiThaiNgoaiSuDoan: 0,
       hoiThaiEF: 0,
       xayDungNgoaiSuDoan: 0,
@@ -509,6 +516,14 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       hocCS: 0,
       lyDoVangKhac: 0,
     };
+
+    if (!consolidatedThongTinVang) {
+      absentRows.forEach((row) => {
+        if (row.lyDoVang in thongTinVangObj) {
+          thongTinVangObj[row.lyDoVang]++;
+        }
+      });
+    }
 
     absentRows.forEach((row) => {
       if (row.lyDoVang in thongTinVangObj) {
