@@ -48,7 +48,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import StatCard from "../../components/ui/StatCard/StatCard";
-import { isApprovedStatus, isNeedUpdateStatus } from "../../utils/reportStatus";
+import {
+  isApprovedStatus,
+  isNeedUpdateStatus,
+  normalizeReportStatus,
+} from "../../utils/reportStatus";
 
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
@@ -710,30 +714,39 @@ export default function DailyTroopReport() {
   };
 
   const handleReconsolidate = async () => {
-    if (!maDonViCurrent) return;
+    if (!maDonViCurrent || !parentReportData) return;
     const [y, m, d] = reportDate.split("-");
     const ngayBaoCao = y && m && d ? `${d}/${m}/${y}` : reportDate;
     try {
-      await dailyReportService.returnTongHop(maDonViCurrent, ngayBaoCao);
-
-      if (parentReportData && consolidatedData) {
-        await dailyReportService.updateReport(parentReportData.idDonBaoCao, {
-          quanSoTong: consolidatedData.quanSoTong,
-          quanSoHienDien: consolidatedData.quanSoHienDien,
-          quanSoVang: consolidatedData.quanSoVang,
-          thoiGianBaoCao: new Date(`${reportDate}T12:00:00.000Z`).toISOString(),
-          chiTietVang: JSON.stringify(consolidatedData.absentRows),
-          thongTinVang: JSON.stringify(consolidatedData.thongTinVang),
-          trucBanChiHuy: JSON.stringify(caTrucInfo?.trucChiHuy ?? {}),
-          trucBanTacChien: JSON.stringify(caTrucInfo?.trucBanTacChien ?? {}),
-          tinhHinhHoatDong: JSON.stringify({}),
-          account: account?.idTaiKhoan ?? "",
-          donVi: account?.donVi?.maDonVi ?? "",
-          chuKySo: signatureBase64,
-        });
+      if (isNeedUpdateStatus(parentReportData.status)) {
+        // Bước 1: chỉ đưa báo cáo tổng hợp về "Nháp", CHƯA gộp số liệu.
+        // Trực ban trả về cho các đơn vị con sửa, con nộp lại rồi mới gộp lại.
+        await dailyReportService.returnTongHop(maDonViCurrent, ngayBaoCao);
+        showSuccess(
+          'Đã đưa báo cáo tổng hợp về nháp. Hãy trả về cho các đơn vị con cập nhật, sau đó bấm "Tổng hợp lại" để gộp số liệu mới.',
+        );
+      } else {
+        // Bước 2: status đã là "Nháp" -> gộp lại số liệu mới từ các đơn vị con.
+        if (consolidatedData) {
+          await dailyReportService.updateReport(parentReportData.idDonBaoCao, {
+            quanSoTong: consolidatedData.quanSoTong,
+            quanSoHienDien: consolidatedData.quanSoHienDien,
+            quanSoVang: consolidatedData.quanSoVang,
+            thoiGianBaoCao: new Date(
+              `${reportDate}T12:00:00.000Z`,
+            ).toISOString(),
+            chiTietVang: JSON.stringify(consolidatedData.absentRows),
+            thongTinVang: JSON.stringify(consolidatedData.thongTinVang),
+            trucBanChiHuy: JSON.stringify(caTrucInfo?.trucChiHuy ?? {}),
+            trucBanTacChien: JSON.stringify(caTrucInfo?.trucBanTacChien ?? {}),
+            tinhHinhHoatDong: JSON.stringify({}),
+            account: account?.idTaiKhoan ?? "",
+            donVi: account?.donVi?.maDonVi ?? "",
+            chuKySo: signatureBase64,
+          });
+        }
+        showSuccess("Tổng hợp lại báo cáo thành công");
       }
-
-      showSuccess("Tổng hợp lại báo cáo thành công");
       fetchReports();
       window.dispatchEvent(new CustomEvent("report-data-changed"));
     } catch (error) {
@@ -767,7 +780,8 @@ export default function DailyTroopReport() {
           parentReportData &&
           (parentReportData.isConsolidated ||
             parentReportData.loaiDonBaoCao === "TONG_HOP") &&
-          isNeedUpdateStatus(parentReportData.status)
+          (isNeedUpdateStatus(parentReportData.status) ||
+            normalizeReportStatus(parentReportData.status) === "Nháp")
             ? handleReconsolidate
             : undefined
         }
