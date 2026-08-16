@@ -296,25 +296,28 @@ export function useReportData({
       })),
     );
 
-    // Chỉ đếm con TRỰC TIẾP (loại bỏ cháu do nested fetch gộp vào reportData)
-    const directChildIds = new Set(childUnits.map((u) => u.maDonVi));
-    const directChildRows = reportData.filter((r) =>
-      directChildIds.has(r.donVi),
-    );
-    const directSubmittedChildren = directChildRows.filter(
-      (r) =>
-        r.status !== "Chưa_Nộp" &&
-        r.status !== "Chưa nộp" &&
-        r.status !== "Nháp",
-    );
-    const ownSubmitted =
-      (isTrungDoan || isSuDoan) &&
-      parentOwnReportData &&
-      parentOwnReportData.status !== "Chưa_Nộp" &&
-      parentOwnReportData.status !== "Chưa nộp" &&
-      parentOwnReportData.status !== "Nháp"
-        ? 1
-        : 0;
+    const isSubmittedStatus = (status: string) =>
+      status !== "Chưa_Nộp" && status !== "Chưa nộp" && status !== "Nháp";
+
+    const directSubmittedChildren = childUnits.filter((unit) => {
+      const isAggregatingChild =
+        (unit.capDonVi === "TRUNG_DOAN" || unit.capDonVi === "TIEU_DOAN") &&
+        (unit.donViCon?.length ?? 0) > 0;
+
+      const matched = reportData.find((r) => r.donVi === unit.maDonVi);
+      if (!matched) return false;
+      if (!isSubmittedStatus(matched.status)) return false;
+      if (isAggregatingChild && matched.loaiDonBaoCao !== "TONG_HOP")
+        return false;
+      return true;
+});
+
+    const ownSubmitted =  
+      (isTrungDoan || isSuDoan) &&  
+      parentOwnReportData &&  
+      isSubmittedStatus(parentOwnReportData.status)  
+        ? 1  
+        : 0;  
     const directSubmittedCount = directSubmittedChildren.length + ownSubmitted;
 
     return {

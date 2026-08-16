@@ -139,19 +139,11 @@ const isParentUnit =
     reportData,
   ]);
 
-  const commanderReport = useMemo(() => {
-    if (!isChiHuy) return null;
-    if (isParentUnit && isTrungDoan) return parentOwnReportData;
-    if (isParentUnit) return parentReportData;
-    return reportData.length > 0 ? reportData[0] : null;
-  }, [
-    isChiHuy,
-    isParentUnit,
-    isTrungDoan,
-    parentOwnReportData,
-    parentReportData,
-    reportData,
-  ]);
+const commanderReport = useMemo(() => {
+  if (!isChiHuy) return null;
+  if (isParentUnit) return parentReportData;
+  return reportData.length > 0 ? reportData[0] : null;
+}, [isChiHuy, isParentUnit, parentReportData, reportData]);
 
  const canAddReport =
   !shouldHideDraftAndUnsubmitted &&
