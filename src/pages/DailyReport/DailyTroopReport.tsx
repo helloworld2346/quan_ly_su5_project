@@ -326,19 +326,11 @@ export default function DailyTroopReport() {
     if (!inlineDraft || !maDonViCurrent) return;
 
     const quanSoTong = inlineDraft.quanSoTong;
-    const quanSoHienDien = inlineDraft.quanSoHienDien;
-    const quanSoVang = Math.max(0, quanSoTong - quanSoHienDien);
-
-    const tongVangNhap = Object.values(inlineDraft.vang).reduce(
+    const quanSoVang = Object.values(inlineDraft.vang).reduce(
       (sum, val) => sum + (val || 0),
       0,
     );
-    if (tongVangNhap !== quanSoVang) {
-      showError(
-        `Tổng số quân vắng nhập vào (${tongVangNhap}) phải bằng tổng vắng (${quanSoVang})`,
-      );
-      return;
-    }
+    const quanSoHienDien = Math.max(0, quanSoTong - quanSoVang);
 
     const basePayload = {
       quanSoTong,
