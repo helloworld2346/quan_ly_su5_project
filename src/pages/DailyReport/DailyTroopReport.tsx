@@ -769,6 +769,11 @@ export default function DailyTroopReport() {
             ? handleReconsolidate
             : undefined
         }
+        reconsolidateDisabled={
+          childUnits.length > 0 &&
+          (!consolidatedData ||
+            consolidatedData.directSubmittedCount < totalRequiredCount)
+        }
         consolidateDisabled={
           !consolidatedData ||
           consolidatedData.directSubmittedCount === 0 ||

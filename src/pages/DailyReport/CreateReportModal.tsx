@@ -377,7 +377,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       lyDoVang: "" as keyof VangChiTiet,
       ghiChu: "",
     };
-    setAbsentRows((prev) => [...prev, newRow]);
+    setAbsentRows((prev) => [newRow, ...prev]);
   };
 
   const handleUpdateRow = useCallback(
