@@ -64,105 +64,105 @@ export function useReportData({
     setLoading(true);
     try {
       let response;
-      if (isParentUnit) {
-       if (isChiHuy && (isSuDoan || isTrungDoan)) {
-          // Với ch_f5 cấp sư đoàn, cần lấy báo cáo từ tất cả đơn vị con (bao gồm đơn vị con của các trung đoàn)
-          if (isChiHuy && isSuDoan) {
-            // Lấy báo cáo từ tất cả các đơn vị con trực tiếp (các trung đoàn)
-            const [donViRes, tongHopRes] = await Promise.all([
-              dailyReportService.searchChildrenReports(
-                maDonViCurrent,
-                reportDate,
-                "DON_VI",
-              ),
-              dailyReportService.searchChildrenReports(
-                maDonViCurrent,
-                reportDate,
-                "TONG_HOP",
-              ),
-            ]);
+     if (isParentUnit) {
+  if (isTrungDoan || isSuDoan) {
+    const [donViRes, tongHopRes] = await Promise.all([
+      dailyReportService.searchChildrenReports(
+        maDonViCurrent,
+        reportDate,
+        "DON_VI",
+      ),
+      dailyReportService.searchChildrenReports(
+        maDonViCurrent,
+        reportDate,
+        "TONG_HOP",
+      ),
+    ]);
 
-            const merged = new Map<string, ReportItemInput>();
-            if (donViRes.success && donViRes.Result) {
-              for (const item of donViRes.Result) {
-                merged.set(item.donVi.maDonVi, item);
-              }
-            }
-            if (tongHopRes.success && tongHopRes.Result) {
-              for (const item of tongHopRes.Result) {
-                merged.set(item.donVi.maDonVi, item);
-              }
-            }
+    const merged = new Map<string, ReportItemInput>();
 
-            // Lấy thêm báo cáo từ các đơn vị con của các trung đoàn
-            if (donViRes.success && donViRes.Result) {
-              for (const item of donViRes.Result) {
-                // Với mỗi trung đoàn, lấy báo cáo từ các đơn vị con của nó
-                try {
-                  const childDonViRes = await dailyReportService.searchChildrenReports(
-                    item.donVi.maDonVi,
-                    reportDate,
-                    "DON_VI",
-                  );
-                  if (childDonViRes.success && childDonViRes.Result) {
-                    for (const childItem of childDonViRes.Result) {
-                      merged.set(childItem.donVi.maDonVi, childItem);
-                    }
-                  }
-                } catch {
-                  // Bỏ qua nếu không lấy được báo cáo từ đơn vị con
-                }
-              }
-            }
+    if (donViRes.success && donViRes.Result) {
+      for (const item of donViRes.Result) {
+        merged.set(item.donVi.maDonVi, item);
+      }
+    }
 
-            response = {
-              ...donViRes,
-              success: donViRes.success || tongHopRes.success,
-              Result: Array.from(merged.values()),
-            };
-          } else {
-            // Logic gốc cho tb_f5 và các trường hợp khác
-            const [donViRes, tongHopRes] = await Promise.all([
-              dailyReportService.searchChildrenReports(
-                maDonViCurrent,
-                reportDate,
-                "DON_VI",
-              ),
-              dailyReportService.searchChildrenReports(
-                maDonViCurrent,
-                reportDate,
-                "TONG_HOP",
-              ),
-            ]);
+    // TONG_HOP phải merge sau DON_VI để các dòng như e4/e5/e271 hoặc d15
+    // hiển thị báo cáo tổng hợp thay vì bị coi là chưa nộp.
+    if (tongHopRes.success && tongHopRes.Result) {
+      for (const item of tongHopRes.Result) {
+        merged.set(item.donVi.maDonVi, item);
+      }
+    }
 
-            const merged = new Map<string, ReportItemInput>();
-            if (donViRes.success && donViRes.Result) {
-              for (const item of donViRes.Result) {
-                merged.set(item.donVi.maDonVi, item);
-              }
-            }
-            if (tongHopRes.success && tongHopRes.Result) {
-              for (const item of tongHopRes.Result) {
-                merged.set(item.donVi.maDonVi, item);
-              }
-            }
+    const directChildren = [
+      ...(donViRes.success && donViRes.Result ? donViRes.Result : []),
+      ...(tongHopRes.success && tongHopRes.Result ? tongHopRes.Result : []),
+    ];
 
-            response = {
-              ...donViRes,
-              success: donViRes.success || tongHopRes.success,
-              Result: Array.from(merged.values()),
-            };
-          }
-        } else {
-          response = await dailyReportService.searchChildrenReports(
-            maDonViCurrent,
-            reportDate,
-            "DON_VI",
-          );
-        }
+    const uniqueChildUnitIds = Array.from(
+      new Set(directChildren.map((item) => item.donVi.maDonVi)),
+    );
 
+    const nestedResults = await Promise.all(
+      uniqueChildUnitIds.map(async (childMaDonVi) => {
         try {
-          const ownRes = await dailyReportService.searchReportByUnitAndDate(
+          const [childDonViRes, childTongHopRes] = await Promise.all([
+            dailyReportService.searchChildrenReports(
+              childMaDonVi,
+              reportDate,
+              "DON_VI",
+            ),
+            dailyReportService.searchChildrenReports(
+              childMaDonVi,
+              reportDate,
+              "TONG_HOP",
+            ),
+          ]);
+
+          return { childDonViRes, childTongHopRes };
+        } catch {
+          return { childDonViRes: null, childTongHopRes: null };
+        }
+      }),
+    );
+
+    for (const { childDonViRes, childTongHopRes } of nestedResults) {
+      if (childDonViRes?.success && childDonViRes.Result) {
+        for (const item of childDonViRes.Result) {
+          merged.set(item.donVi.maDonVi, item);
+        }
+      }
+
+      // Merge sau cùng để d1/d2/d3/d15... lấy bản TONG_HOP nếu có.
+      if (childTongHopRes?.success && childTongHopRes.Result) {
+        for (const item of childTongHopRes.Result) {
+          merged.set(item.donVi.maDonVi, item);
+        }
+      }
+    }
+
+    response = {
+      ...donViRes,
+      success:
+        donViRes.success ||
+        tongHopRes.success ||
+        nestedResults.some(
+          ({ childDonViRes, childTongHopRes }) =>
+            Boolean(childDonViRes?.success) || Boolean(childTongHopRes?.success),
+        ),
+      Result: Array.from(merged.values()),
+    };
+  } else {
+    response = await dailyReportService.searchChildrenReports(
+      maDonViCurrent,
+      reportDate,
+      "DON_VI",
+    );
+  }
+
+  try {
+    const ownRes = await dailyReportService.searchReportByUnitAndDate(
             maDonViCurrent,
             reportDate,
             "DON_VI",

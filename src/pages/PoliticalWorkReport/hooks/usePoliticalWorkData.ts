@@ -222,8 +222,6 @@ const { childUnits, currentUnit } = useChildUnits(
             setParentOwnReportData(null);
           }
 
-          // TONG_HOP do BCT tổng hợp, lưu tại chính đơn vị BCT
-          // (giống flow PCT ↔ TBTC F5). TBTC e chỉ thấy khi đã duyệt.
           const bctUnit = childUnits.find(
             (u) =>
               (u.kyhieuDonvi ?? "").toLowerCase().includes("bct") ||
