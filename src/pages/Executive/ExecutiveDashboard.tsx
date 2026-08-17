@@ -154,6 +154,7 @@ const subordinateTypesText = isTrungDoan
     const loadData = async () => {
       setLoading(true);
       setError(null);
+      setData(null);
       try {
         const result = await troopStatsService.getThongKe(
           toDateParam(selectedDate),
