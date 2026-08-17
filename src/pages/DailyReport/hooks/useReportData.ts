@@ -258,86 +258,82 @@ export function useReportData({
     void fetchCaTruc();
   }, [reportDate]);
 
-  const consolidatedData = useMemo(() => {
-    if (!isParentUnit || reportData.length === 0) return null;
+    const consolidatedData = useMemo(() => {
+      if (!isParentUnit || reportData.length === 0) return null;
 
-    // Trung đoàn: gộp thêm CH/e; Sư đoàn: gộp thêm CH/f
-    const allReports =
-      (isTrungDoan || isSuDoan) && parentOwnReportData
-        ? [...reportData, parentOwnReportData]
-        : reportData;
+      // Chỉ lấy con TRỰC TIẾP (loại bỏ cháu do nested fetch gộp vào reportData)
+      const directChildIds = new Set(childUnits.map((u) => u.maDonVi));
+      const directChildRows = reportData.filter((r) =>
+        directChildIds.has(r.donVi),
+      );
 
-    const submittedReports = allReports.filter(
-      (r) =>
-        r.status !== "Chưa_Nộp" &&
-        r.status !== "Chưa nộp" &&
-        r.status !== "Nháp",
-    );
-    const quanSoTong = submittedReports.reduce(
-      (sum, r) => sum + r.quanSoTong,
-      0,
-    );
-    const quanSoVang = submittedReports.reduce(
-      (sum, r) => sum + r.quanSoVang,
-      0,
-    );
-    const quanSoHienDien = quanSoTong - quanSoVang;
-    const thongTinVang: VangChiTiet = sumVang(submittedReports);
-    const absentRows: AbsentRow[] = submittedReports.flatMap((r) =>
-      r.chiTietVangList.map((m) => ({
-        id: generateId(),
-        hoTen: m.hoTen,
-        capBac: m.capBac,
-        chucVu: m.chucVu,
-        lyDoVang: m.lyDoVang as keyof VangChiTiet,
-        ghiChu: m.ghiChu,
-        kyhieuDonVi: r.kyhieuDonVi,
-        kyhieuDayDu: m.kyhieuDayDu || r.kyhieuDayDu,
-      })),
-    );
+      // Trung đoàn: gộp thêm CH/e; Sư đoàn: gộp thêm CH/f
+      const allReports =
+        (isTrungDoan || isSuDoan) && parentOwnReportData
+          ? [...directChildRows, parentOwnReportData]
+          : directChildRows;
 
-    const isSubmittedStatus = (status: string) =>
-      status !== "Chưa_Nộp" && status !== "Chưa nộp" && status !== "Nháp";
+      const submittedReports = allReports.filter(
+        (r) =>
+          r.status !== "Chưa_Nộp" &&
+          r.status !== "Chưa nộp" &&
+          r.status !== "Nháp",
+      );
+      const quanSoTong = submittedReports.reduce(
+        (sum, r) => sum + r.quanSoTong,
+        0,
+      );
+      const quanSoVang = submittedReports.reduce(
+        (sum, r) => sum + r.quanSoVang,
+        0,
+      );
+      const quanSoHienDien = quanSoTong - quanSoVang;
+      const thongTinVang: VangChiTiet = sumVang(submittedReports);
+      const absentRows: AbsentRow[] = submittedReports.flatMap((r) =>
+        r.chiTietVangList.map((m) => ({
+          id: generateId(),
+          hoTen: m.hoTen,
+          capBac: m.capBac,
+          chucVu: m.chucVu,
+          lyDoVang: m.lyDoVang as keyof VangChiTiet,
+          ghiChu: m.ghiChu,
+          kyhieuDonVi: r.kyhieuDonVi,
+          kyhieuDayDu: m.kyhieuDayDu || r.kyhieuDayDu,
+        })),
+      );
 
-    const directSubmittedChildren = childUnits.filter((unit) => {
-      const isAggregatingChild =
-        (unit.capDonVi === "TRUNG_DOAN" || unit.capDonVi === "TIEU_DOAN") &&
-        (unit.donViCon?.length ?? 0) > 0;
+      const ownSubmitted =
+        (isTrungDoan || isSuDoan) &&
+        parentOwnReportData &&
+        parentOwnReportData.status !== "Chưa_Nộp" &&
+        parentOwnReportData.status !== "Chưa nộp" &&
+        parentOwnReportData.status !== "Nháp"
+          ? 1
+          : 0;
+      const directSubmittedChildren = submittedReports.filter(
+        (r) => r.donVi !== parentOwnReportData?.donVi,
+      );
+      const directSubmittedCount =
+        directSubmittedChildren.length + ownSubmitted;
 
-      const matched = reportData.find((r) => r.donVi === unit.maDonVi);
-      if (!matched) return false;
-      if (!isSubmittedStatus(matched.status)) return false;
-      if (isAggregatingChild && matched.loaiDonBaoCao !== "TONG_HOP")
-        return false;
-      return true;
-});
-
-    const ownSubmitted =  
-      (isTrungDoan || isSuDoan) &&  
-      parentOwnReportData &&  
-      isSubmittedStatus(parentOwnReportData.status)  
-        ? 1  
-        : 0;  
-    const directSubmittedCount = directSubmittedChildren.length + ownSubmitted;
-
-    return {
-      quanSoTong,
-      quanSoVang,
-      quanSoHienDien,
-      thongTinVang,
-      absentRows,
-      submittedCount: submittedReports.length,
-      directSubmittedCount,
-      totalCount: allReports.length,
-    };
-  }, [
-    isParentUnit,
-    isTrungDoan,
-    isSuDoan,
-    parentOwnReportData,
-    reportData,
-    childUnits,
-  ]);
+      return {
+        quanSoTong,
+        quanSoVang,
+        quanSoHienDien,
+        thongTinVang,
+        absentRows,
+        submittedCount: submittedReports.length,
+        directSubmittedCount,
+        totalCount: allReports.length,
+      };
+    }, [
+      isParentUnit,
+      isTrungDoan,
+      isSuDoan,
+      parentOwnReportData,
+      reportData,
+      childUnits,
+    ]);
 
   return {
     reportData,

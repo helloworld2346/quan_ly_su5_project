@@ -141,29 +141,28 @@ export default function PoliticalWorkReport() {
 
   const isDbOrEb = isDbOrEbUnit(account?.donVi);
 
-const isParentUnit =
-  isAdmin ||
-  isPoliticalOffice ||
-  isBanChinhTri ||
-  (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
-  (isChiHuy && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
-  (isNoiVu && capDonVi === "TIEU_DOAN" && !isDbOrEb);
+  const isParentUnit =
+    isAdmin ||
+    isPoliticalOffice ||
+    isBanChinhTri ||
+    (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
+    (isChiHuy && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
+    (isNoiVu && capDonVi === "TIEU_DOAN" && !isDbOrEb);
 
+  const isTrungDoan = capDonVi === "TRUNG_DOAN";
+  const isTieuDoan = capDonVi === "TIEU_DOAN";
+  const isTacChienSuDoan = isTacChien && capDonVi === "SU_DOAN";
+  const isChiHuySuDoan = isChiHuy && capDonVi === "SU_DOAN";
+  const isTacChienTrungDoan = isTacChien && isTrungDoan;
+  const isChiHuyTrungDoan = isChiHuy && isTrungDoan;
 
-const isTrungDoan = capDonVi === "TRUNG_DOAN";
-const isTieuDoan = capDonVi === "TIEU_DOAN";
-const isTacChienSuDoan = isTacChien && capDonVi === "SU_DOAN";
-const isChiHuySuDoan = isChiHuy && capDonVi === "SU_DOAN";
-const isTacChienTrungDoan = isTacChien && isTrungDoan;
-const isChiHuyTrungDoan = isChiHuy && isTrungDoan;
-
-const canAddOwnReport =
-  isTacChienSuDoan ||
-  isChiHuySuDoan ||
-  isChiHuyTrungDoan ||
-  isAdmin ||
-  isPoliticalOffice ||
-  isBanChinhTri;
+  const canAddOwnReport =
+    isTacChienSuDoan ||
+    isChiHuySuDoan ||
+    isChiHuyTrungDoan ||
+    isAdmin ||
+    isPoliticalOffice ||
+    isBanChinhTri;
 
   const canExportExcel = isTacChienSuDoan;
   const {
@@ -448,7 +447,8 @@ const canAddOwnReport =
 
   const parentRow = useMemo<PoliticalWorkRow>(() => {
     // PCT và TBTC F5: giữ nhãn cứng "Sư đoàn 5" / "f5" như cũ
-    const useSuDoanLabel = isPoliticalOffice || isTacChienSuDoan;
+    const useSuDoanLabel =
+      isPoliticalOffice || isTacChienSuDoan || isChiHuySuDoan;
 
     return parentReportData
       ? {
@@ -817,7 +817,10 @@ const canAddOwnReport =
         hasReport={hasOwnReport}
         isPastDate={isPastDate}
         onConsolidate={
-          isParentUnit && !isTacChienSuDoan && !isChiHuySuDoan && !isTacChienTrungDoan
+          isParentUnit &&
+          !isTacChienSuDoan &&
+          !isChiHuySuDoan &&
+          !isTacChienTrungDoan
             ? handleConsolidate
             : undefined
         }
