@@ -21,9 +21,10 @@ import type { NhiemVuNgay } from "../../services/dailyReport/dailyReportService"
 import type { DetailStepData } from "./DailyReportDetailStep";
 import { handleApiError } from "../../utils/errorHandler";
 import {
-  todayIsoDate,
   normalizeRoleName,
   normalizeUnitName,
+  getSharedReportDate,
+  setSharedReportDate,
 } from "../../utils/reportUtils";
 
 import { useReportData } from "./hooks/useReportData";
@@ -56,7 +57,10 @@ import {
 
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
-  const [reportDate, setReportDate] = useState(todayIsoDate());
+  const [reportDate, setReportDate] = useState(getSharedReportDate());
+  useEffect(() => {
+    setSharedReportDate(reportDate);
+  }, [reportDate]);
   const [selectedReportRow, setSelectedReportRow] = useState<ReportRow | null>(
     null,
   );
@@ -125,13 +129,13 @@ export default function DailyTroopReport() {
   const isSuDoan = capDonVi === "SU_DOAN";
   const useDutyShiftForCaTruc = isTacChien && isSuDoan;
   const useInlineOwnCommandReport =
-  (isTacChien || isChiHuy) && (isSuDoan || isTrungDoan);
+    (isTacChien || isChiHuy) && (isSuDoan || isTrungDoan);
 
   const isParentUnit =
-  isAdmin ||
-  (isTacChien && (isTrungDoan || isSuDoan)) ||
-  (isChiHuy && (isTrungDoan || isSuDoan)) ||
-  (isNoiVu && isTieuDoan && !isDbOrEb);
+    isAdmin ||
+    (isTacChien && (isTrungDoan || isSuDoan)) ||
+    (isChiHuy && (isTrungDoan || isSuDoan)) ||
+    (isNoiVu && isTieuDoan && !isDbOrEb);
 
   const [signatureBase64, setSignatureBase64] = useState<string | undefined>(
     undefined,
@@ -150,11 +154,11 @@ export default function DailyTroopReport() {
     fetchReports,
   } = useReportData({
     maDonViCurrent,
-   isParentUnit:
-  isAdmin ||
-  (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
-  (isChiHuy && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
-  (isNoiVu && capDonVi === "TIEU_DOAN" && !isDbOrEb),
+    isParentUnit:
+      isAdmin ||
+      (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
+      (isChiHuy && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
+      (isNoiVu && capDonVi === "TIEU_DOAN" && !isDbOrEb),
     isTacChien,
     isChiHuy,
     capDonVi,
@@ -162,7 +166,7 @@ export default function DailyTroopReport() {
     kyHieuDonVi,
     isDbOrEb,
     showError,
-  }); 
+  });
 
   const bienCheTongTrungDoan = useMemo(() => {
     if (capDonVi !== "TRUNG_DOAN") return undefined;
@@ -341,7 +345,6 @@ export default function DailyTroopReport() {
       );
       return;
     }
-
 
     const basePayload = {
       quanSoTong,

@@ -25,9 +25,10 @@ import { useAuth } from "../../context/useAuth";
 import { useToast } from "../../context/useToast";
 import { handleApiError } from "../../utils/errorHandler";
 import {
-  todayIsoDate,
   normalizeRoleName,
   normalizeUnitName,
+  getSharedReportDate,
+  setSharedReportDate,
 } from "../../utils/reportUtils";
 import { politicalWorkService } from "../../services/politicalWork/politicalWorkService";
 
@@ -86,7 +87,10 @@ function buildConsolidatedPoliticalWork(
 
 export default function PoliticalWorkReport() {
   const [query, setQuery] = useState("");
-  const [reportDate, setReportDate] = useState(todayIsoDate());
+  const [reportDate, setReportDate] = useState(getSharedReportDate());
+  useEffect(() => {
+    setSharedReportDate(reportDate);
+  }, [reportDate]);
   const [isCreateReportOpen, setIsCreateReportOpen] = useState(false);
   const [editingRow, setEditingRow] = useState<PoliticalWorkRow | null>(null);
   const [detailRow, setDetailRow] = useState<PoliticalWorkRow | null>(null);
