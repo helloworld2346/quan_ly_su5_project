@@ -418,7 +418,7 @@ export default function PoliticalWorkReport() {
   const isPastDate = false;
 
   const hasOwnReport = isPoliticalOffice
-    ? Boolean(ownReport && !ownReport.notSubmitted)
+    ? Boolean(parentOwnReportData)
     : isBanChinhTri
       ? Boolean(parentOwnReportData)
       : isTrungDoan
