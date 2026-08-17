@@ -473,6 +473,7 @@ export default function PoliticalWorkReport() {
     currentUnit,
     isPoliticalOffice,
     isTacChienSuDoan,
+    isChiHuySuDoan,
   ]);
 
   const shouldHideDraftAndUnsubmitted =

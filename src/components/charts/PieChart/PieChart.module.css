@@ -473,11 +473,13 @@
 }  
   
 .large .legendLabel {  
-  flex: 1 1 auto;  
   min-width: 0;  
-  text-align: center;  
+  text-align: left;  
   font-size: 18px;  
   font-weight: 800;  
+  white-space: nowrap;  
+  overflow: hidden;  
+  text-overflow: ellipsis;  
 }
 
 .large .legendValue {  
@@ -490,7 +492,6 @@
 
 .large .legendPercent {  
   flex: 0 0 auto;  
-  margin-left: 12px; 
   width: auto;  
   text-align: right;  
   font-size: 17px;  
@@ -652,5 +653,25 @@
   
   .hero .centerCaption {  
     font-size: 13px;  
+  }  
+}
+
+@media (max-width: 480px) {  
+  .large .legend {  
+    padding: 12px;  
+  }  
+  .large .legendBtn {  
+    grid-template-columns: 10px 1fr 56px 52px;  
+    column-gap: 6px;  
+  }  
+  .large .legendLabel {  
+    font-size: 15px;  
+  }  
+  .large .legendValue {  
+    width: auto;  
+    font-size: 14px;  
+  }  
+  .large .legendPercent {  
+    font-size: 14px;  
   }  
 }

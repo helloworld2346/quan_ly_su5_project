@@ -607,10 +607,38 @@
   
 @media (max-width: 1280px) {  
   .featuredGrid {  
-    grid-template-columns: 180px minmax(350px, 1fr) 180px;  
+    grid-template-columns: 1fr;  
     gap: 20px;  
   }  
-}  
+  
+  .comparisonPanel,  
+  .highlightPanel {  
+    flex-direction: row;  
+    flex-wrap: wrap;  
+  }  
+  .comparisonPanel > * + *,  
+  .highlightPanel > * + * {  
+    margin-top: 0;  
+    margin-left: 12px;  
+  }  
+  
+  .comparisonList,  
+  .highlightList {  
+    flex-direction: row;  
+    flex-wrap: wrap;  
+  }  
+  .comparisonList > * + *,  
+  .highlightList > * + * {  
+    margin-top: 0;  
+    margin-left: 10px;  
+  }  
+  
+  .comparisonItem,  
+  .highlightItem {  
+    flex: 1;  
+    min-width: 180px;  
+  }  
+}
   
 @media (max-width: 1024px) {  
   .featuredGrid {  
