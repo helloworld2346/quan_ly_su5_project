@@ -23,7 +23,7 @@ type ExportArgs = {
   trucBanTacChien?: TrucNguoi | null;
   donViName?: string;
   parentUnitName?: string;
-};
+};  
 
 const COLUMN_COUNT = 18;
 const FONT = "Times New Roman";
@@ -89,14 +89,11 @@ export async function exportTroopReportToExcel({
   };
   ws.getCell(2, rightStart).alignment = { horizontal: "center" };
 
-  const topLabel = (parentUnitName?.trim() || "QUÂN KHU 7").toUpperCase();
-  const bottomLabel = (donViName?.trim() || "SƯ ĐOÀN 5").toUpperCase();
-
-  setMerged(ws, 1, 1, 1, 2, topLabel);
+  setMerged(ws, 1, 1, 1, 2, (parentUnitName ?? "Quân khu 7").toUpperCase());
   ws.getCell(1, 1).font = { name: FONT, bold: true, size: 14 };
   ws.getCell(1, 1).alignment = { horizontal: "center", vertical: "middle" };
 
-  setMerged(ws, 2, 1, 2, 2, bottomLabel);
+  setMerged(ws, 2, 1, 2, 2, (donViName ?? "Sư đoàn 5").toUpperCase());
   ws.getCell(2, 1).font = { name: FONT, bold: true, size: 14, underline: true };
   ws.getCell(2, 1).alignment = { horizontal: "center", vertical: "middle" };
 

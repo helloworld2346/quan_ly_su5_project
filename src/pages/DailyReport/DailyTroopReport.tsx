@@ -149,6 +149,7 @@ export default function DailyTroopReport() {
     loading,
     donViQuanSoTong,
     childUnits,
+    currentUnit,
     caTrucFromApi,
     consolidatedData,
     fetchReports,
@@ -681,8 +682,9 @@ export default function DailyTroopReport() {
       trucChiHuy: trucInfoFromReport?.trucChiHuy ?? caTrucInfo?.trucChiHuy,
       trucBanTacChien:
         trucInfoFromReport?.trucBanTacChien ?? caTrucInfo?.trucBanTacChien,
-      donViName: account?.donVi?.tenDonvi,
-      parentUnitName: account?.donVi?.donViCha ?? undefined,
+      donViName: currentUnit?.tenDonvi ?? account?.donVi?.tenDonvi,
+      parentUnitName:
+        currentUnit?.donViCha ?? account?.donVi?.donViCha ?? undefined,
     });
   };
 
@@ -848,7 +850,7 @@ export default function DailyTroopReport() {
         onExportExcel={handleExportExcel}
         isPastDate={isPastDate}
         hasReport={checkIfDateHasReport}
-        showExport={(isTacChien || isChiHuy) && capDonVi === "SU_DOAN"}
+        showExport={isChiHuy || (isTacChien && capDonVi === "SU_DOAN")}
         onSaveInline={
           useInlineOwnCommandReport && inlineEditingRowId
             ? handleSaveInlineInput

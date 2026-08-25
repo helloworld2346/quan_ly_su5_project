@@ -342,6 +342,7 @@ export function useReportData({
     loading,
     donViQuanSoTong,
     childUnits,
+    currentUnit,
     caTrucFromApi,
     consolidatedData,
     fetchReports,
