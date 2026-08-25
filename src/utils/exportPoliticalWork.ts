@@ -14,6 +14,8 @@ type ExportArgs = {
   reportDate: string;
   tenDonVi: string;
   quanSo: QuanSo;
+  donViName?: string;
+  parentUnitName?: string;
 };
 
 const FONT = "Times New Roman";
@@ -26,6 +28,8 @@ export async function exportPoliticalWorkToExcel({
   reportDate,
   tenDonVi,
   quanSo,
+  donViName,
+  parentUnitName,
 }: ExportArgs): Promise<void> {
   const wb = new ExcelJS.Workbook();
   const ws = wb.addWorksheet("Báo cáo CTĐ-CTCT");
@@ -53,14 +57,14 @@ export async function exportPoliticalWorkToExcel({
   ws.getColumn(5).width = 16;
   ws.getColumn(6).width = 16;
 
-  // ── Góc trên bên TRÁI (cột 1-3): Sư đoàn 5 + tên đơn vị ──
-  merge(ws, 1, 1, 1, 3, "SƯ ĐOÀN 5");
+  // ── Góc trên bên TRÁI (cột 1-3): đơn vị cha + tên đơn vị ──
+  merge(ws, 1, 1, 1, 3, (parentUnitName ?? "Sư đoàn 5").toUpperCase());
   cell(ws, 1, 1).font = { name: FONT, bold: true, size: 12 };
-  cell(ws, 1, 1).alignment = { horizontal: "center" };
+  cell(ws, 1, 1).alignment = { horizontal: "center", shrinkToFit: true };
 
-  merge(ws, 2, 1, 2, 3, (tenDonVi || "").toUpperCase());
+  merge(ws, 2, 1, 2, 3, (donViName ?? tenDonVi ?? "").toUpperCase());
   cell(ws, 2, 1).font = { name: FONT, bold: true, size: 12 };
-  cell(ws, 2, 1).alignment = { horizontal: "center" };
+  cell(ws, 2, 1).alignment = { horizontal: "center", shrinkToFit: true };
 
   // ── Góc trên bên PHẢI (cột 4-6): quốc hiệu + tiêu ngữ + địa danh/ngày ──
   merge(ws, 1, 4, 1, 6, "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM");

@@ -260,16 +260,25 @@ export default function PoliticalWorkReport() {
     setSignatureDone(Boolean(saved));
   }
 
+  // src/pages/PoliticalWorkReport/PoliticalWorkReport.tsx
   const handleExportExcel = () => {
     const row = parentReportData ?? ownReport;
     if (!row) {
       showError("Chưa có báo cáo tổng hợp để xuất!");
       return;
     }
+
+    const donViName = currentUnit?.tenDonvi ?? account?.donVi?.tenDonvi ?? "";
+    const parentUnitName =
+      currentUnit?.capDonVi === "SU_DOAN"
+        ? "QUÂN KHU 7"
+        : (currentUnit?.donViCha ?? "SƯ ĐOÀN 5");
+
     void exportPoliticalWorkToExcel({
       row,
       reportDate,
-      tenDonVi: account?.donVi?.tenDonvi ?? "",
+      tenDonVi: donViName,
+      parentUnitName,
       quanSo: {
         siQuan: account?.donVi?.quanSoSiQuan ?? 0,
         qncn: account?.donVi?.quanSoQncn ?? 0,
