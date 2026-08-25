@@ -681,6 +681,8 @@ export default function DailyTroopReport() {
       trucChiHuy: trucInfoFromReport?.trucChiHuy ?? caTrucInfo?.trucChiHuy,
       trucBanTacChien:
         trucInfoFromReport?.trucBanTacChien ?? caTrucInfo?.trucBanTacChien,
+      donViName: account?.donVi?.tenDonvi,
+      parentUnitName: account?.donVi?.donViCha ?? undefined,
     });
   };
 

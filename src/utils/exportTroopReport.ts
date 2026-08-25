@@ -21,6 +21,8 @@ type ExportArgs = {
   matkhau?: string;
   trucChiHuy?: TrucNguoi | null;
   trucBanTacChien?: TrucNguoi | null;
+  donViName?: string;
+  parentUnitName?: string;
 };
 
 const COLUMN_COUNT = 18;
@@ -43,6 +45,8 @@ export async function exportTroopReportToExcel({
   matkhau,
   trucChiHuy,
   trucBanTacChien,
+  donViName,
+  parentUnitName,
 }: ExportArgs): Promise<void> {
   const wb = new ExcelJS.Workbook();
   const ws = wb.addWorksheet("Thống kê quân số");
@@ -85,11 +89,14 @@ export async function exportTroopReportToExcel({
   };
   ws.getCell(2, rightStart).alignment = { horizontal: "center" };
 
-  setMerged(ws, 1, 1, 1, 2, "QUÂN KHU 7");
+  const topLabel = (parentUnitName?.trim() || "QUÂN KHU 7").toUpperCase();
+  const bottomLabel = (donViName?.trim() || "SƯ ĐOÀN 5").toUpperCase();
+
+  setMerged(ws, 1, 1, 1, 2, topLabel);
   ws.getCell(1, 1).font = { name: FONT, bold: true, size: 14 };
   ws.getCell(1, 1).alignment = { horizontal: "center", vertical: "middle" };
 
-  setMerged(ws, 2, 1, 2, 2, "SƯ ĐOÀN 5");
+  setMerged(ws, 2, 1, 2, 2, bottomLabel);
   ws.getCell(2, 1).font = { name: FONT, bold: true, size: 14, underline: true };
   ws.getCell(2, 1).alignment = { horizontal: "center", vertical: "middle" };
 
@@ -99,14 +106,7 @@ export async function exportTroopReportToExcel({
 
   ws.getRow(4).height = 10;
 
-  setMerged(
-    ws,
-    5,
-    1,
-    5,
-    COLUMN_COUNT,
-    `BÁO CÁO THỐNG KÊ QUÂN SỐ`,
-  );
+  setMerged(ws, 5, 1, 5, COLUMN_COUNT, `BÁO CÁO THỐNG KÊ QUÂN SỐ`);
   ws.getCell(5, 1).font = {
     name: FONT,
     bold: true,
