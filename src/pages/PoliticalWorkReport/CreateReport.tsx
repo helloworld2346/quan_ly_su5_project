@@ -12,6 +12,7 @@ import type {
 import { parseTrucNguoi, stringifyTrucNguoi } from "./utils/trucNguoi";
 import { useAuth } from "../../context/useAuth";
 import { getCapBacOptions } from "../../utils/reportUtils";
+import { isDbOrEbUnit } from "../DailyReport/utils/dailyTroopReportVisibility";
 
 interface CreateReportProps {
   open: boolean;
@@ -21,7 +22,7 @@ interface CreateReportProps {
   maDonViCurrent: string;
   reportDate: string;
   consolidating?: boolean;
-}  
+}
 
 interface ReportFormData {
   reporterName: string;
@@ -105,6 +106,7 @@ export default function CreateReport({
   const { account } = useAuth();
   const capDonVi = account?.donVi?.capDonVi;
   const isDaiDoi = capDonVi === "DAI_DOI";
+  const isDonViBo = isDbOrEbUnit(account?.donVi);
 
   const isSuDoan = capDonVi === "SU_DOAN";
 
@@ -148,7 +150,7 @@ export default function CreateReport({
   const [validationError, setValidationError] = useState("");
 
   const validateForm = (): string => {
-    if (!isDaiDoi) {
+    if (!isDaiDoi && !isDonViBo) {
       if (!formData.reporterName.trim())
         return "Vui lòng nhập họ tên trực ban nội vụ.";
       if (!formData.reporterRank.trim())
@@ -346,7 +348,7 @@ export default function CreateReport({
               placeholder="Nhập họ và tên..."
               value={formData.reporterName}
               onChange={(e) => handleChange("reporterName", e.target.value)}
-              disabled={isDaiDoi}
+              disabled={isDaiDoi || isDonViBo}
             />
           </div>
 
@@ -359,7 +361,7 @@ export default function CreateReport({
               value={formData.reporterRank}
               onChange={(v) => handleChange("reporterRank", v)}
               placeholder="Chọn cấp bậc"
-              disabled={isDaiDoi}
+              disabled={isDaiDoi || isDonViBo}
             />
           </div>
 
@@ -372,7 +374,7 @@ export default function CreateReport({
               placeholder="Nhập chức vụ..."
               value={formData.reporterPosition}
               onChange={(e) => handleChange("reporterPosition", e.target.value)}
-              disabled={isDaiDoi}
+              disabled={isDaiDoi || isDonViBo}
             />
           </div>
           <div className={styles["form-group"]}>
@@ -385,7 +387,7 @@ export default function CreateReport({
                 const val = e.target.value.replace(/[^\d+\-\s]/g, "");
                 handleChange("reporterPhone", val);
               }}
-              disabled={isDaiDoi}
+              disabled={isDaiDoi || isDonViBo}
             />
           </div>
         </div>
