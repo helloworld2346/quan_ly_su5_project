@@ -89,13 +89,21 @@ export async function exportTroopReportToExcel({
   };
   ws.getCell(2, rightStart).alignment = { horizontal: "center" };
 
-  setMerged(ws, 1, 1, 1, 2, (parentUnitName ?? "Quân khu 7").toUpperCase());
+  setMerged(ws, 1, 1, 1, 4, (parentUnitName ?? "Quân khu 7").toUpperCase());
   ws.getCell(1, 1).font = { name: FONT, bold: true, size: 14 };
-  ws.getCell(1, 1).alignment = { horizontal: "center", vertical: "middle" };
+  ws.getCell(1, 1).alignment = {
+    horizontal: "center",
+    vertical: "middle",
+    shrinkToFit: true,
+  };
 
-  setMerged(ws, 2, 1, 2, 2, (donViName ?? "Sư đoàn 5").toUpperCase());
+  setMerged(ws, 2, 1, 2, 4, (donViName ?? "Sư đoàn 5").toUpperCase());
   ws.getCell(2, 1).font = { name: FONT, bold: true, size: 14, underline: true };
-  ws.getCell(2, 1).alignment = { horizontal: "center", vertical: "middle" };
+  ws.getCell(2, 1).alignment = {
+    horizontal: "center",
+    vertical: "middle",
+    shrinkToFit: true,
+  };
 
   setMerged(ws, 3, rightStart, 3, COLUMN_COUNT, formatPlace(reportDate));
   ws.getCell(3, rightStart).font = { name: FONT, italic: true, size: 14 };
