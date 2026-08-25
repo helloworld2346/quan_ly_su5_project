@@ -48,6 +48,8 @@ import { isApprovedStatus } from "../../utils/reportStatus";
 
 import { exportPoliticalWorkToExcel } from "../../utils/exportPoliticalWork";
 
+import { donviService } from "../../services/unit/unitService";
+
 function StatusBadge({
   active,
   type = "default",
@@ -107,7 +109,7 @@ export default function PoliticalWorkReport() {
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
-  const { account } = useAuth();
+  const { account, donVi } = useAuth();
   const { showError, showSuccess } = useToast();
 
   const submitMaDonVi = account?.donVi?.maDonVi;
@@ -168,7 +170,7 @@ export default function PoliticalWorkReport() {
     isPoliticalOffice ||
     isBanChinhTri;
 
-  const canExportExcel = isTacChienSuDoan;
+  const canExportExcel = isTacChienSuDoan || isChiHuy;
   const {
     reportData,
     parentReportData,
@@ -260,33 +262,42 @@ export default function PoliticalWorkReport() {
     setSignatureDone(Boolean(saved));
   }
 
-  // src/pages/PoliticalWorkReport/PoliticalWorkReport.tsx
-  const handleExportExcel = () => {
+  const handleExportExcel = async () => {
     const row = parentReportData ?? ownReport;
     if (!row) {
       showError("Chưa có báo cáo tổng hợp để xuất!");
       return;
     }
 
-    const donViName = currentUnit?.tenDonvi ?? account?.donVi?.tenDonvi ?? "";
-    const parentUnitName =
-      currentUnit?.capDonVi === "SU_DOAN"
-        ? "QUÂN KHU 7"
-        : (currentUnit?.donViCha ?? "SƯ ĐOÀN 5");
+    const maDonVi = account?.donVi?.maDonVi;
+    let quanSo = {
+      siQuan: donVi?.quanSoSiQuan ?? 0,
+      qncn: donVi?.quanSoQncn ?? 0,
+      hsqBs: donVi?.quanSoHsqBs ?? 0,
+    };
+
+    if (maDonVi) {
+      try {
+        const qsbc = await donviService.getQuanSoBienChe(maDonVi);
+        if (qsbc) {
+          quanSo = {
+            siQuan: qsbc.quanSoSiQuan,
+            qncn: qsbc.quanSoQncn,
+            hsqBs: qsbc.quanSoHsqBs,
+          };
+        }
+      } catch {
+        // giữ nguyên fallback từ donVi
+      }
+    }
 
     void exportPoliticalWorkToExcel({
       row,
       reportDate,
-      tenDonVi: donViName,
-      parentUnitName,
-      quanSo: {
-        siQuan: account?.donVi?.quanSoSiQuan ?? 0,
-        qncn: account?.donVi?.quanSoQncn ?? 0,
-        hsqBs: account?.donVi?.quanSoHsqBs ?? 0,
-      },
+      tenDonVi: account?.donVi?.tenDonvi ?? "",
+      quanSo,
     });
   };
-
   const dutyReportForDisplay =
     (isParentUnit && parentReportData ? parentReportData : ownReport) ??
     reportForSubmit;

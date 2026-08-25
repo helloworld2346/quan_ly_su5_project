@@ -23,7 +23,7 @@ type ExportArgs = {
   trucBanTacChien?: TrucNguoi | null;
   donViName?: string;
   parentUnitName?: string;
-};  
+};
 
 const COLUMN_COUNT = 18;
 const FONT = "Times New Roman";
@@ -89,21 +89,17 @@ export async function exportTroopReportToExcel({
   };
   ws.getCell(2, rightStart).alignment = { horizontal: "center" };
 
-  setMerged(ws, 1, 1, 1, 4, (parentUnitName ?? "Quân khu 7").toUpperCase());
-  ws.getCell(1, 1).font = { name: FONT, bold: true, size: 14 };
-  ws.getCell(1, 1).alignment = {
-    horizontal: "center",
-    vertical: "middle",
-    shrinkToFit: true,
-  };
+  // ── Góc trên bên TRÁI (merge cột 1-4): đơn vị cha + đơn vị, tự nới rộng theo tên ──
+  const leftTop = (parentUnitName ?? "Quân khu 7").toUpperCase();
+  const leftBottom = (donViName ?? "Sư đoàn 5").toUpperCase();
 
-  setMerged(ws, 2, 1, 2, 4, (donViName ?? "Sư đoàn 5").toUpperCase());
+  setMerged(ws, 1, 1, 1, 4, leftTop);
+  ws.getCell(1, 1).font = { name: FONT, bold: true, size: 14 };
+  ws.getCell(1, 1).alignment = { horizontal: "center", vertical: "middle" };
+
+  setMerged(ws, 2, 1, 2, 4, leftBottom);
   ws.getCell(2, 1).font = { name: FONT, bold: true, size: 14, underline: true };
-  ws.getCell(2, 1).alignment = {
-    horizontal: "center",
-    vertical: "middle",
-    shrinkToFit: true,
-  };
+  ws.getCell(2, 1).alignment = { horizontal: "center", vertical: "middle" };
 
   setMerged(ws, 3, rightStart, 3, COLUMN_COUNT, formatPlace(reportDate));
   ws.getCell(3, rightStart).font = { name: FONT, italic: true, size: 14 };
@@ -218,7 +214,12 @@ export async function exportTroopReportToExcel({
     vertical: "middle",
   };
 
-  ws.getColumn(1).width = 12;
+  // Cột 2-18 giữ 12 để bảng số liệu gọn; cột 1 tự nới theo tên đơn vị dài nhất.
+  // Khối tên góc trái merge cột 1-4 => phần dư ngoài (cột 2-4 = 36) do cột 1 gánh.
+  const longestLeftName = Math.max(leftTop.length, leftBottom.length);
+  const neededLeftWidth = longestLeftName * 1.3;
+  const col1Width = Math.max(12, neededLeftWidth - 36);
+  ws.getColumn(1).width = col1Width;
   for (let c = 2; c <= COLUMN_COUNT; c++) ws.getColumn(c).width = 12;
 
   await ws.protect(PROTECT_PASSWORD, {
