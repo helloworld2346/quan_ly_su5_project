@@ -16,6 +16,7 @@ type ExportArgs = {
   quanSo: QuanSo;
   donViName?: string;
   parentUnitName?: string;
+  hideNoiVu?: boolean;
 };
 
 const FONT = "Times New Roman";
@@ -30,6 +31,7 @@ export async function exportPoliticalWorkToExcel({
   quanSo,
   donViName,
   parentUnitName,
+  hideNoiVu = false,
 }: ExportArgs): Promise<void> {
   const wb = new ExcelJS.Workbook();
   const ws = wb.addWorksheet("Báo cáo CTĐ-CTCT");
@@ -109,32 +111,49 @@ export async function exportPoliticalWorkToExcel({
 
   r++;
 
-  // Hai cột ký: Trực ban nội vụ | Trực ban CTĐ-CTCT
+  // Cột ký: nếu ẩn Trực ban nội vụ (đại đội / dbo) thì chỉ hiển thị
+  // cột "Trực ban CTĐ - CTCT" (căn giữa toàn bộ 6 cột).
   const noiVu = parseTrucNguoi(row.trucBanNoiVu);
   const ctd = parseTrucNguoi(row.trucBanCtDangCt);
 
-  merge(ws, r, 1, r, 3, "TRỰC BAN NỘI VỤ");
-  merge(ws, r, 4, r, 6, "TRỰC BAN CTĐ - CTCT");
-  [1, 4].forEach((c) => {
-    cell(ws, r, c).font = { name: FONT, bold: true, size: 12 };
-    cell(ws, r, c).alignment = { horizontal: "center" };
-  });
-  r++;
+  if (hideNoiVu) {  
+    merge(ws, r, 4, r, 6, "TRỰC BAN CTĐ - CTCT");  
+    cell(ws, r, 4).font = { name: FONT, bold: true, size: 12 };  
+    cell(ws, r, 4).alignment = { horizontal: "center" };  
+    r++;  
+  
+    merge(ws, r, 4, r, 6, "(Ký, ghi rõ họ tên)");  
+    cell(ws, r, 4).font = { name: FONT, italic: true, size: 11 };  
+    cell(ws, r, 4).alignment = { horizontal: "center" };  
+    r += 3;  
+  
+    merge(ws, r, 4, r, 6, formatTruc(ctd));  
+    cell(ws, r, 4).font = { name: FONT, bold: true, size: 12 };  
+    cell(ws, r, 4).alignment = { horizontal: "center" };  
+  } else {  
+    merge(ws, r, 1, r, 3, "TRỰC BAN NỘI VỤ");
+    merge(ws, r, 4, r, 6, "TRỰC BAN CTĐ - CTCT");
+    [1, 4].forEach((c) => {
+      cell(ws, r, c).font = { name: FONT, bold: true, size: 12 };
+      cell(ws, r, c).alignment = { horizontal: "center" };
+    });
+    r++;
 
-  merge(ws, r, 1, r, 3, "(Ký, ghi rõ họ tên)");
-  merge(ws, r, 4, r, 6, "(Ký, ghi rõ họ tên)");
-  [1, 4].forEach((c) => {
-    cell(ws, r, c).font = { name: FONT, italic: true, size: 11 };
-    cell(ws, r, c).alignment = { horizontal: "center" };
-  });
-  r += 3;
+    merge(ws, r, 1, r, 3, "(Ký, ghi rõ họ tên)");
+    merge(ws, r, 4, r, 6, "(Ký, ghi rõ họ tên)");
+    [1, 4].forEach((c) => {
+      cell(ws, r, c).font = { name: FONT, italic: true, size: 11 };
+      cell(ws, r, c).alignment = { horizontal: "center" };
+    });
+    r += 3;
 
-  merge(ws, r, 1, r, 3, formatTruc(noiVu));
-  merge(ws, r, 4, r, 6, formatTruc(ctd));
-  [1, 4].forEach((c) => {
-    cell(ws, r, c).font = { name: FONT, bold: true, size: 12 };
-    cell(ws, r, c).alignment = { horizontal: "center" };
-  });
+    merge(ws, r, 1, r, 3, formatTruc(noiVu));
+    merge(ws, r, 4, r, 6, formatTruc(ctd));
+    [1, 4].forEach((c) => {
+      cell(ws, r, c).font = { name: FONT, bold: true, size: 12 };
+      cell(ws, r, c).alignment = { horizontal: "center" };
+    });
+  }
 
   const buffer = await wb.xlsx.writeBuffer();
   saveAs(
