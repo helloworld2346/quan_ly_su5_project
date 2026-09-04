@@ -132,10 +132,10 @@ export default function DailyTroopReport() {
     (isTacChien || isChiHuy) && (isSuDoan || isTrungDoan);
 
   const isParentUnit =
-  isAdmin ||
-  (isTacChien && (isTrungDoan || isSuDoan)) ||
-  (isChiHuy && (isTrungDoan || isTieuDoan || isSuDoan)) ||
-  (isNoiVu && isTieuDoan && !isDbOrEb);
+    isAdmin ||
+    (isTacChien && (isTrungDoan || isSuDoan)) ||
+    (isChiHuy && (isTrungDoan || isTieuDoan || isSuDoan)) ||
+    (isNoiVu && isTieuDoan && !isDbOrEb);
 
   const [signatureBase64, setSignatureBase64] = useState<string | undefined>(
     undefined,
@@ -665,8 +665,23 @@ export default function DailyTroopReport() {
     setActiveMenuUnit(null);
   };
 
-  const handleExportWord = () => {};
-
+  const handleExportWord = async () => {
+    const { exportTroopReportToWord } =
+      await import("../../utils/exportTroopReportWord");
+    await exportTroopReportToWord({
+      displayRows,
+      displayTotals,
+      reportDate,
+      matkhau: caTrucInfo?.matkhau,
+      trucChiHuy: trucInfoFromReport?.trucChiHuy ?? caTrucInfo?.trucChiHuy,
+      trucBanTacChien:
+        trucInfoFromReport?.trucBanTacChien ?? caTrucInfo?.trucBanTacChien,
+      donViName: currentUnit?.tenDonvi ?? account?.donVi?.tenDonvi,
+      parentUnitName:
+        currentUnit?.donViCha ?? account?.donVi?.donViCha ?? undefined,
+    });
+  };
+  
   const handleExportExcel = async () => {
     const { exportTroopReportToExcel } =
       await import("../../utils/exportTroopReport");

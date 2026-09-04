@@ -302,6 +302,47 @@ export default function PoliticalWorkReport() {
       hideNoiVu: capDonVi === "DAI_DOI" || isDbOrEb,
     });
   };
+
+  const handleExportWord = async () => {
+    const row = parentReportData ?? ownReport;
+    if (!row) {
+      showError("Chưa có báo cáo tổng hợp để xuất!");
+      return;
+    }
+    const maDonVi = account?.donVi?.maDonVi;
+    let quanSo = {
+      siQuan: donVi?.quanSoSiQuan ?? 0,
+      qncn: donVi?.quanSoQncn ?? 0,
+      hsqBs: donVi?.quanSoHsqBs ?? 0,
+    };
+    if (maDonVi) {
+      try {
+        const qsbc = await donviService.getQuanSoBienChe(maDonVi);
+        if (qsbc) {
+          quanSo = {
+            siQuan: qsbc.quanSoSiQuan,
+            qncn: qsbc.quanSoQncn,
+            hsqBs: qsbc.quanSoHsqBs,
+          };
+        }
+      } catch {
+        // giữ fallback
+      }
+    }
+    const { exportPoliticalWorkToWord } =
+      await import("../../utils/exportPoliticalWorkWord");
+    await exportPoliticalWorkToWord({
+      row,
+      reportDate,
+      tenDonVi: account?.donVi?.tenDonvi ?? "",
+      quanSo,
+      donViName: currentUnit?.tenDonvi ?? account?.donVi?.tenDonvi,
+      parentUnitName:
+        currentUnit?.donViCha ?? account?.donVi?.donViCha ?? undefined,
+      hideNoiVu: capDonVi === "DAI_DOI" || isDbOrEb,
+    });
+  };
+
   const dutyReportForDisplay =
     (isParentUnit && parentReportData ? parentReportData : ownReport) ??
     reportForSubmit;
@@ -803,6 +844,7 @@ export default function PoliticalWorkReport() {
         onReportDateChange={setReportDate}
         showExport={canExportExcel}
         onExportExcel={handleExportExcel}
+        onExportWord={handleExportWord}
         onAddReport={
           (!isParentUnit ||
             canAddOwnReport ||

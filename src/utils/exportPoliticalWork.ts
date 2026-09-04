@@ -135,7 +135,7 @@ export async function exportPoliticalWorkToExcel({
     merge(ws, r, 4, r, 6, ctd.chucVu);
     cell(ws, r, 4).font = { name: FONT, size: 12 };
     cell(ws, r, 4).alignment = { horizontal: "center" };
-    r += 3;
+    r += 4; // ← đổi từ 3 thành 4 (3 dòng trống)
 
     merge(ws, r, 4, r, 6, formatCapBacTen(ctd));
     cell(ws, r, 4).font = { name: FONT, bold: true, size: 12 };
@@ -155,7 +155,7 @@ export async function exportPoliticalWorkToExcel({
       cell(ws, r, c).font = { name: FONT, size: 12 };
       cell(ws, r, c).alignment = { horizontal: "center" };
     });
-    r += 3;
+    r += 4; // ← đổi từ 3 thành 4 (3 dòng trống)
 
     merge(ws, r, 1, r, 3, formatCapBacTen(noiVu));
     merge(ws, r, 4, r, 6, formatCapBacTen(ctd));
