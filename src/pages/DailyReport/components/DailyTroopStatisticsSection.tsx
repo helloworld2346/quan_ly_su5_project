@@ -9,7 +9,7 @@ import {
 import ReportTableHeader from "./ReportTableHeader";
 import ReportTableRow from "./ReportTableRow";
 import ReportTotalRow from "./ReportTotalRow";
-import Skeleton from "../../../components/ui/Skeleton/Skeleton";  
+import Skeleton from "../../../components/ui/Skeleton/Skeleton";
 
 type SharedRowProps = {
   isParentUnit: boolean;
@@ -100,13 +100,7 @@ export default function DailyTroopStatisticsSection({
             tenDonVi: "Tổng hợp",
             kyhieuDonVi: "Tổng hợp",
           }),
-      ];
-  
-  const emptyConsolidatedRow = createEmptyReportRow({
-    idDonBaoCao: sharedRowProps.maDonViCurrent ?? "tong-hop",
-    tenDonVi: "Tổng hợp",
-    kyhieuDonVi: "Tổng hợp",
-  });
+        ];
 
   const canShowConsolidatedBlock =
     !sharedRowProps.isTacChien &&
