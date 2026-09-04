@@ -5,7 +5,7 @@
 
 .tableShell {
   width: 100%;
-  overflow-x: auto;   /* giữ scroll dự phòng khi màn hình quá nhỏ */
+  overflow-x: auto;   
   overflow-y: visible;
   max-height: none;
 
@@ -16,7 +16,7 @@
 
 .reportTable {
   width: 100%;
-  min-width: 0; /* Đã sửa: cho phép co giãn tự do theo container để không dính scroll ngang */
+  min-width: 0; 
   table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0;
@@ -59,23 +59,21 @@
   font-weight: 700;
 }
 
-/* Tối ưu lại width các cột ít dữ liệu để nhường không gian */
 .reportTable th:first-child,
 .reportTable td:first-child {
-  width: 6%; /* Đơn vị: giảm từ 10% xuống 6% */
+  width: 6%;
 }
 
 .reportTable th:nth-child(2),
 .reportTable td:nth-child(2) {
-  width: 4.5%; /* Tổng quân số: giảm từ 6% xuống 4.5% */
+  width: 4.5%;
 }
 
 .reportTable th:last-child,
 .reportTable td:last-child {
-  width: 5%; /* Thao tác */
+  width: 5%;
 }
 
-/* --- CỘT TRẠNG THÁI (Cột 19) --- */
 .reportTable th:nth-child(19),
 .reportTable td:nth-child(19) {
   width: 8.5%;
@@ -91,7 +89,6 @@
   max-width: 100%;
 }
 
-/* --- CỘT KÝ SỐ (Cột 20) --- */
 .reportTable th:nth-child(20),
 .reportTable td:nth-child(20) {
   width: 8%;
@@ -467,8 +464,7 @@
     transform: translateY(0);
   }
 }
-
-/* RESPONSIVE MEDIA QUERIES */  
+  
 @media (max-width: 1700px) {  
   .reportTable th {  
     font-size: clamp(10px, 0.75vw, 12px);  
@@ -698,8 +694,7 @@
   transform: translateY(-1px);  
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);  
 }  
-  
-/* Dải màu accent bên trái theo trạng thái */  
+ 
 .nhiemVuDetailItemAccentSuccess {  
   border-left-color: var(--btn-approve-fg);  
 }  
