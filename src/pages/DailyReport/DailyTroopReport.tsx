@@ -126,7 +126,7 @@ export default function DailyTroopReport() {
   const isParentUnit =
   isAdmin ||
   (isTacChien && (isTrungDoan || isSuDoan)) ||
-  (isChiHuy && (isTrungDoan || isSuDoan)) ||
+  (isChiHuy && (isTrungDoan || isTieuDoan || isSuDoan)) ||
   (isNoiVu && isTieuDoan && !isDbOrEb);
 
   const [signatureBase64, setSignatureBase64] = useState<string | undefined>(
@@ -146,11 +146,7 @@ export default function DailyTroopReport() {
     fetchReports,
   } = useReportData({
     maDonViCurrent,
-   isParentUnit:
-  isAdmin ||
-  (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
-  (isChiHuy && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
-  (isNoiVu && capDonVi === "TIEU_DOAN" && !isDbOrEb),
+    isParentUnit,
     isTacChien,
     isChiHuy,
     capDonVi,
@@ -888,6 +884,7 @@ export default function DailyTroopReport() {
           setShowConsolidatedDetail(true);
           setActiveMenuUnit(null);
         }}
+        childUnits={childUnits}
       />
 
       <DailyTroopNhiemVuSection

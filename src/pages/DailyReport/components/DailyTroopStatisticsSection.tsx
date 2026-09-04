@@ -1,7 +1,11 @@
 import type { MouseEvent, RefObject } from "react";
 import styles from "../DailyTroopReport.module.css";
 import type { ReportRow } from "../../../types/dailyReport";
-import type { DisplayTotals } from "../utils/dailyTroopReportHelpers";
+import type { DonVi } from "../../../types/account";
+import {
+  createEmptyReportRow,
+  type DisplayTotals,
+} from "../utils/dailyTroopReportHelpers";
 import ReportTableHeader from "./ReportTableHeader";
 import ReportTableRow from "./ReportTableRow";
 import ReportTotalRow from "./ReportTotalRow";
@@ -60,6 +64,7 @@ type Props = {
   menuPosition: { top?: number; bottom?: number; left: number };
   dropdownRef: RefObject<HTMLDivElement | null>;
   onViewConsolidatedDetail: () => void;
+  childUnits: DonVi[];
 };
 
 export default function DailyTroopStatisticsSection({
@@ -76,7 +81,27 @@ export default function DailyTroopStatisticsSection({
   menuPosition,
   dropdownRef,
   onViewConsolidatedDetail,
+  childUnits,
 }: Props) {
+  const emptyChildRows =
+    childUnits.length > 0
+      ? childUnits
+          .filter((unit) => unit.kyhieuDonvi !== "CH/e")
+          .map((unit) =>
+            createEmptyReportRow({
+              idDonBaoCao: unit.maDonVi,
+              tenDonVi: unit.tenDonvi,
+              kyhieuDonVi: unit.kyhieuDonvi,
+            }),
+          )
+      : [
+          createEmptyReportRow({
+            idDonBaoCao: sharedRowProps.maDonViCurrent ?? "tong-hop",
+            tenDonVi: "Tổng hợp",
+            kyhieuDonVi: "Tổng hợp",
+          }),
+        ];
+
   return (
     <section className={styles.sectionBlock}>
       <div className={styles.sectionCard}>
@@ -130,9 +155,16 @@ export default function DailyTroopStatisticsSection({
 
               <tbody>
                 {displayRows.length === 0 && !parentReportData ? (
-                  <tr className={styles.noReportRow}>
-                    <td colSpan={23}>Chưa có dữ liệu báo cáo</td>
-                  </tr>
+                  <>
+                    {emptyChildRows.map((row) => (
+                      <ReportTableRow
+                        key={row.idDonBaoCao}
+                        row={row}
+                        isConsolidatedRow={false}
+                        {...sharedRowProps}
+                      />
+                    ))}
+                  </>
                 ) : (
                   <>
                     {!shouldHideConsolidatedSections &&
@@ -184,9 +216,12 @@ export default function DailyTroopStatisticsSection({
                     ) : (
                       !shouldHideConsolidatedSections &&
                       canConsolidateUnit && (
-                        <tr className={styles.noConsolidatedRow}>
-                          <td colSpan={23}>Chưa có báo cáo tổng hợp</td>
-                        </tr>
+                        <ReportTableRow
+                          key="empty-parent-consolidated-report"
+                          row={emptyConsolidatedRow}
+                          isConsolidatedRow={true}
+                          {...sharedRowProps}
+                        />
                       )
                     )}
                   </>
