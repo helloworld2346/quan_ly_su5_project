@@ -296,6 +296,9 @@ export default function PoliticalWorkReport() {
       reportDate,
       tenDonVi: account?.donVi?.tenDonvi ?? "",
       quanSo,
+      donViName: currentUnit?.tenDonvi ?? account?.donVi?.tenDonvi,
+      parentUnitName:
+        currentUnit?.donViCha ?? account?.donVi?.donViCha ?? undefined,
       hideNoiVu: capDonVi === "DAI_DOI" || isDbOrEb,
     });
   };

@@ -38,6 +38,14 @@ const COLOR = {
   TOTAL_FILL: "FFFFF2CC",
 } as const;
 
+// Các đơn vị cần viết IN HOA + tên hiển thị mong muốn khi xuất
+// Khóa là tên đã chuẩn hóa (lowercase, bỏ khoảng trắng và gạch nối)
+const UPPERCASE_UNIT_LABELS: Record<string, string> = {
+  ptm: "PTM",
+  pct: "PCT",
+  phckt: "PHC-KT",
+};
+
 export async function exportTroopReportToExcel({
   displayRows,
   displayTotals,
@@ -107,7 +115,7 @@ export async function exportTroopReportToExcel({
 
   ws.getRow(4).height = 10;
 
-  setMerged(ws, 5, 1, 5, COLUMN_COUNT, `BÁO CÁO THỐNG KÊ QUÂN SỐ`);
+  setMerged(ws, 5, 1, 5, COLUMN_COUNT, `BÁO CÁO QUÂN SỐ`);
   ws.getCell(5, 1).font = {
     name: FONT,
     bold: true,
@@ -165,6 +173,10 @@ export async function exportTroopReportToExcel({
     true,
     COLOR.TOTAL_FILL,
   );
+
+  rowIdx++;
+
+  ws.getRow(rowIdx).height = 12;
   rowIdx++;
 
   // Cuối file: MẬT KHẨU / Trực chỉ huy / Trực ban tác chiến
@@ -286,7 +298,14 @@ function writeDataRow(
 ) {
   values.forEach((v, i) => {
     const cell = ws.getCell(rowIdx, i + 1);
-    cell.value = v;
+    if (typeof v === "number") {
+      cell.value = formatThousands(v);
+    } else if (i === 0) {
+      // Cột "Đơn vị": in hoa + đổi tên hiển thị nếu là ptm/pct/phc-kt
+      cell.value = formatUnitName(v);
+    } else {
+      cell.value = v;
+    }
     cell.border = thinBorder();
     cell.font = { name: FONT, bold, size: 14 };
     cell.alignment = {
@@ -320,4 +339,19 @@ function formatTruc(t?: TrucNguoi | null): string {
   return [t.capbacNguoitruc, t.tenNguoitruc, t.chucvuNguoitruc]
     .filter(Boolean)
     .join(" - ");
+}
+
+function formatThousands(n: number): string {
+  return n.toLocaleString("de-DE");
+}
+
+// In hoa toàn bộ tên đơn vị, trả về tên hiển thị mong muốn nếu thuộc nhóm ptm / pct / phc-kt
+function formatUnitName(name: string): string {
+  const normalized = name.toLowerCase().replace(/[\s-]/g, "");
+  for (const key of Object.keys(UPPERCASE_UNIT_LABELS)) {
+    if (normalized.includes(key)) {
+      return UPPERCASE_UNIT_LABELS[key];
+    }
+  }
+  return name;
 }
