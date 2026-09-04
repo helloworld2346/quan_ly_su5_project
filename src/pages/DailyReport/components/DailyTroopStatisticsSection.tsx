@@ -100,7 +100,13 @@ export default function DailyTroopStatisticsSection({
             tenDonVi: "Tổng hợp",
             kyhieuDonVi: "Tổng hợp",
           }),
-        ];
+      ];
+  
+  const emptyConsolidatedRow = createEmptyReportRow({
+    idDonBaoCao: sharedRowProps.maDonViCurrent ?? "tong-hop",
+    tenDonVi: "Tổng hợp",
+    kyhieuDonVi: "Tổng hợp",
+  });
 
   return (
     <section className={styles.sectionBlock}>

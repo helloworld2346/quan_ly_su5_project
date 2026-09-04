@@ -248,10 +248,11 @@ export const dailyReportService = {
   returnTongHop: async (
     maDonVi: string,
     ngayBaoCao: string,
+    payload: UpdateReportRequest,
   ): Promise<unknown> => {
     const response = await api.put(
       `/donbaocao/returnTonghop/${maDonVi}`,
-      {},
+      payload,
       { params: { ngayBaoCao } },
     );
     return response.data;
