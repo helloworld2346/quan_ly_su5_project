@@ -249,7 +249,7 @@ export default function DailyTroopReport() {
   });
 
   const handleCompleteSignature = async () => {
-    // Chưa có báo cáo (đang tạo mới): chỉ set cờ, chữ ký sẽ gửi kèm khi createReport
+    
     if (!ownReport?.idDonBaoCao || !signatureBase64) {
       setSignatureDone(true);
       return;
@@ -552,7 +552,6 @@ export default function DailyTroopReport() {
           ),
         ]);
 
-        // gom theo maDonVi; DON_VI làm nền, TONG_HOP chỉ ghi đè cho đơn vị tổng hợp
         const merged = new Map<string, (typeof donViRes.Result)[number]>();
 
         for (const item of donViRes.Result ?? []) {
@@ -573,7 +572,6 @@ export default function DailyTroopReport() {
             ""
           ).toLowerCase();
 
-          // trung đoàn/tiểu đoàn + PCT => lấy TONG_HOP
           const isAggregating =
             child?.capDonVi === "TRUNG_DOAN" ||
             child?.capDonVi === "TIEU_DOAN" ||
@@ -722,14 +720,13 @@ export default function DailyTroopReport() {
     const ngayBaoCao = y && m && d ? `${d}/${m}/${y}` : reportDate;
     try {
       if (isNeedUpdateStatus(parentReportData.status)) {
-        // Bước 1: chỉ đưa báo cáo tổng hợp về "Nháp", CHƯA gộp số liệu.
-        // Trực ban trả về cho các đơn vị con sửa, con nộp lại rồi mới gộp lại.
+
         await dailyReportService.returnTongHop(maDonViCurrent, ngayBaoCao);
         showSuccess(
           'Đã đưa báo cáo tổng hợp về nháp. Hãy trả về cho các đơn vị con cập nhật, sau đó bấm "Tổng hợp lại" để gộp số liệu mới.',
         );
       } else {
-        // Bước 2: status đã là "Nháp" -> gộp lại số liệu mới từ các đơn vị con.
+  
         if (consolidatedData) {
           await dailyReportService.updateReport(parentReportData.idDonBaoCao, {
             quanSoTong: consolidatedData.quanSoTong,
@@ -1098,7 +1095,7 @@ export default function DailyTroopReport() {
                     await dailyReportService.createNhiemVuNgay(nhiemVuPayload);
                   }
                 } catch {
-                  ///
+                  
                 }
               }
 
@@ -1148,7 +1145,7 @@ export default function DailyTroopReport() {
                     donBaoCao: res.Result.idDonBaoCao,
                   });
                 } catch {
-                  // Không block nếu nhiemvungay fail
+                 
                 }
               }
 
