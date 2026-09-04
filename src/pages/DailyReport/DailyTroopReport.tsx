@@ -720,8 +720,22 @@ export default function DailyTroopReport() {
     const ngayBaoCao = y && m && d ? `${d}/${m}/${y}` : reportDate;
     try {
       if (isNeedUpdateStatus(parentReportData.status)) {
-
-        await dailyReportService.returnTongHop(maDonViCurrent, ngayBaoCao);
+        // Bước 1: chỉ đưa báo cáo tổng hợp về "Nháp", CHƯA gộp số liệu.
+        const raw = parentReportData.rawItem;
+        await dailyReportService.returnTongHop(maDonViCurrent, ngayBaoCao, {
+          quanSoTong: raw.quanSoTong,
+          quanSoHienDien: raw.quanSoHienDien,
+          quanSoVang: raw.quanSoVang,
+          thoiGianBaoCao: raw.thoiGianBaoCao,
+          thongTinVang: raw.thongTinVang,
+          chiTietVang: raw.chiTietVang,
+          account: account?.idTaiKhoan ?? "",
+          donVi: raw.donVi?.maDonVi ?? maDonViCurrent,
+          trucBanChiHuy: raw.trucBanChiHuy,
+          trucBanTacChien: raw.trucBanTacChien,
+          tinhHinhHoatDong: raw.tinhHinhHoatDong,
+          chuKySo: raw.chuKySo,
+        });
         showSuccess(
           'Đã đưa báo cáo tổng hợp về nháp. Hãy trả về cho các đơn vị con cập nhật, sau đó bấm "Tổng hợp lại" để gộp số liệu mới.',
         );

@@ -9,7 +9,7 @@ import {
 import ReportTableHeader from "./ReportTableHeader";
 import ReportTableRow from "./ReportTableRow";
 import ReportTotalRow from "./ReportTotalRow";
-import Skeleton from "../../../components/ui/Skeleton/Skeleton";  
+import Skeleton from "../../../components/ui/Skeleton/Skeleton";
 
 type SharedRowProps = {
   isParentUnit: boolean;
