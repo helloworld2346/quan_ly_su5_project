@@ -59,13 +59,13 @@ export async function exportPoliticalWorkToExcel({
   ws.getColumn(5).width = 16;
   ws.getColumn(6).width = 16;
 
-  // ── Góc trên bên TRÁI (cột 1-3): đơn vị cha + tên đơn vị ──
-  merge(ws, 1, 1, 1, 3, (parentUnitName ?? "Sư đoàn 5").toUpperCase());
+  // ── Góc trên bên TRÁI (cột 1-2): đơn vị cha + tên đơn vị ──
+  merge(ws, 1, 1, 1, 2, (parentUnitName ?? "Quân khu 7").toUpperCase());
   cell(ws, 1, 1).font = { name: FONT, bold: true, size: 12 };
   cell(ws, 1, 1).alignment = { horizontal: "center", shrinkToFit: true };
 
-  merge(ws, 2, 1, 2, 3, (donViName ?? tenDonVi ?? "").toUpperCase());
-  cell(ws, 2, 1).font = { name: FONT, bold: true, size: 12 };
+  merge(ws, 2, 1, 2, 2, (donViName ?? tenDonVi ?? "Sư đoàn 5").toUpperCase());
+  cell(ws, 2, 1).font = { name: FONT, bold: true, underline: true, size: 12 };
   cell(ws, 2, 1).alignment = { horizontal: "center", shrinkToFit: true };
 
   // ── Góc trên bên PHẢI (cột 4-6): quốc hiệu + tiêu ngữ + địa danh/ngày ──
@@ -74,7 +74,7 @@ export async function exportPoliticalWorkToExcel({
   cell(ws, 1, 4).alignment = { horizontal: "center" };
 
   merge(ws, 2, 4, 2, 6, "Độc lập - Tự do - Hạnh phúc");
-  cell(ws, 2, 4).font = { name: FONT, bold: true, italic: true, size: 12 };
+  cell(ws, 2, 4).font = { name: FONT, bold: true, underline: true, size: 12 };
   cell(ws, 2, 4).alignment = { horizontal: "center" };
 
   merge(ws, 3, 4, 3, 6, formatPlace(reportDate));
@@ -83,54 +83,64 @@ export async function exportPoliticalWorkToExcel({
 
   let r = 5;
 
-  // Tiêu đề
-  merge(ws, r, 1, r, COL_COUNT, "BÁO CÁO CÔNG TÁC ĐẢNG - CÔNG TÁC CHÍNH TRỊ");
+  // Tiêu đề: 2 dòng — "BÁO CÁO" và "HOẠT ĐỘNG CÔNG TÁC ĐẢNG - CÔNG TÁC CHÍNH TRỊ"
+  merge(
+    ws,
+    r,
+    1,
+    r,
+    COL_COUNT,
+    "BÁO CÁO\nHOẠT ĐỘNG CÔNG TÁC ĐẢNG - CÔNG TÁC CHÍNH TRỊ",
+  );
   cell(ws, r, 1).font = { name: FONT, bold: true, size: 15 };
-  cell(ws, r, 1).alignment = { horizontal: "center", vertical: "middle" };
-  ws.getRow(r).height = 24;
+  cell(ws, r, 1).alignment = {
+    horizontal: "center",
+    vertical: "middle",
+    wrapText: true,
+  };
+  ws.getRow(r).height = 48;
   r += 2;
 
-  // 1. Quân số (không kẻ khung)
+  // 1. Quân số (không kẻ khung) — xếp DỌC: mỗi chỉ tiêu một hàng
   sectionTitle(ws, r, "1. Quân số");
   r++;
 
   const tong = quanSo.siQuan + quanSo.qncn + quanSo.hsqBs;
-  qsHeader(ws, r);
+  r = qsVertical(ws, r, tong, quanSo.siQuan, quanSo.qncn, quanSo.hsqBs);
   r++;
-  qsRow(ws, r, tong, quanSo.siQuan, quanSo.qncn, quanSo.hsqBs);
-  r += 2;
 
   // 2. Tình hình hoạt động
   r = textBlock(ws, r, "2. Tình hình hoạt động", row.tinhHinh);
   // 3. Kết quả
   r = textBlock(ws, r, "3. Kết quả", row.ketQua);
-  // 4. Vụ việc đột xuất (rỗng -> 2 hàng chấm)
+  // 4. Vụ việc đột xuất (rỗng -> "Không")
   r = textBlock(ws, r, "4. Vụ việc đột xuất", row.noiDungDotXuat, true);
-  // 5. Kiến nghị, đề xuất (rỗng -> 2 hàng chấm)
+  // 5. Kiến nghị, đề xuất (rỗng -> "Không")
   r = textBlock(ws, r, "5. Kiến nghị, đề xuất", row.kienNghi, true);
 
   r++;
 
-  // Cột ký: nếu ẩn Trực ban nội vụ (đại đội / dbo) thì chỉ hiển thị
-  // cột "Trực ban CTĐ - CTCT" (căn giữa toàn bộ 6 cột).
+  // Cột ký: dòng 1 = tên vai trò, dòng 2 = chức vụ, cuối = cấp bậc + họ tên.
+  // Nếu ẩn Trực ban nội vụ (đại đội / dbo) thì chỉ hiển thị
+  // cột "Trực ban CTĐ - CTCT" (nằm bên phải, cột 4-6).
   const noiVu = parseTrucNguoi(row.trucBanNoiVu);
   const ctd = parseTrucNguoi(row.trucBanCtDangCt);
 
-  if (hideNoiVu) {  
-    merge(ws, r, 4, r, 6, "TRỰC BAN CTĐ - CTCT");  
-    cell(ws, r, 4).font = { name: FONT, bold: true, size: 12 };  
-    cell(ws, r, 4).alignment = { horizontal: "center" };  
-    r++;  
-  
-    merge(ws, r, 4, r, 6, "(Ký, ghi rõ họ tên)");  
-    cell(ws, r, 4).font = { name: FONT, italic: true, size: 11 };  
-    cell(ws, r, 4).alignment = { horizontal: "center" };  
-    r += 3;  
-  
-    merge(ws, r, 4, r, 6, formatTruc(ctd));  
-    cell(ws, r, 4).font = { name: FONT, bold: true, size: 12 };  
-    cell(ws, r, 4).alignment = { horizontal: "center" };  
-  } else {  
+  if (hideNoiVu) {
+    merge(ws, r, 4, r, 6, "TRỰC BAN CTĐ - CTCT");
+    cell(ws, r, 4).font = { name: FONT, bold: true, size: 12 };
+    cell(ws, r, 4).alignment = { horizontal: "center" };
+    r++;
+
+    merge(ws, r, 4, r, 6, ctd.chucVu);
+    cell(ws, r, 4).font = { name: FONT, size: 12 };
+    cell(ws, r, 4).alignment = { horizontal: "center" };
+    r += 3;
+
+    merge(ws, r, 4, r, 6, formatCapBacTen(ctd));
+    cell(ws, r, 4).font = { name: FONT, bold: true, size: 12 };
+    cell(ws, r, 4).alignment = { horizontal: "center" };
+  } else {
     merge(ws, r, 1, r, 3, "TRỰC BAN NỘI VỤ");
     merge(ws, r, 4, r, 6, "TRỰC BAN CTĐ - CTCT");
     [1, 4].forEach((c) => {
@@ -139,16 +149,16 @@ export async function exportPoliticalWorkToExcel({
     });
     r++;
 
-    merge(ws, r, 1, r, 3, "(Ký, ghi rõ họ tên)");
-    merge(ws, r, 4, r, 6, "(Ký, ghi rõ họ tên)");
+    merge(ws, r, 1, r, 3, noiVu.chucVu);
+    merge(ws, r, 4, r, 6, ctd.chucVu);
     [1, 4].forEach((c) => {
-      cell(ws, r, c).font = { name: FONT, italic: true, size: 11 };
+      cell(ws, r, c).font = { name: FONT, size: 12 };
       cell(ws, r, c).alignment = { horizontal: "center" };
     });
     r += 3;
 
-    merge(ws, r, 1, r, 3, formatTruc(noiVu));
-    merge(ws, r, 4, r, 6, formatTruc(ctd));
+    merge(ws, r, 1, r, 3, formatCapBacTen(noiVu));
+    merge(ws, r, 4, r, 6, formatCapBacTen(ctd));
     [1, 4].forEach((c) => {
       cell(ws, r, c).font = { name: FONT, bold: true, size: 12 };
       cell(ws, r, c).alignment = { horizontal: "center" };
@@ -170,34 +180,35 @@ function sectionTitle(ws: ExcelJS.Worksheet, r: number, text: string) {
   cell(ws, r, 1).alignment = { horizontal: "left", vertical: "middle" };
 }
 
-// Quân số: KHÔNG kẻ khung
-function qsHeader(ws: ExcelJS.Worksheet, r: number) {
-  const labels = ["", "Tổng quân số", "Sĩ quan", "QNCN", "HSQ/BS", ""];
-  labels.forEach((label, i) => {
-    if (i === 0 || i === 5) return;
-    const c = cell(ws, r, i + 1);
-    c.value = label;
-    c.font = { name: FONT, bold: true, size: 12 };
-    c.alignment = { horizontal: "center", vertical: "middle" };
-  });
-}
-
-function qsRow(
+// Quân số xếp DỌC: mỗi chỉ tiêu một hàng (nhãn ở cột 2, số ở cột 3), KHÔNG kẻ khung
+function qsVertical(
   ws: ExcelJS.Worksheet,
   r: number,
   tong: number,
   sq: number,
   qncn: number,
   hsqBs: number,
-) {
-  const values = [null, tong, sq, qncn, hsqBs, null];
-  values.forEach((v, i) => {
-    if (v === null) return;
-    const c = cell(ws, r, i + 1);
-    c.value = v;
-    c.font = { name: FONT, size: 12 };
-    c.alignment = { horizontal: "center", vertical: "middle" };
+): number {
+  const items: Array<[string, number]> = [
+    ["Tổng quân số", tong],
+    ["Sĩ quan", sq],
+    ["QNCN", qncn],
+    ["HSQ/BS", hsqBs],
+  ];
+  items.forEach(([label, value]) => {
+    const lc = cell(ws, r, 2);
+    lc.value = label;
+    lc.font = { name: FONT, bold: true, size: 12 };
+    lc.alignment = { horizontal: "left", vertical: "middle" };
+
+    const vc = cell(ws, r, 3);
+    vc.value = value.toLocaleString("de-DE");
+    vc.font = { name: FONT, size: 12 };
+    vc.alignment = { horizontal: "left", vertical: "middle" };
+
+    r++;
   });
+  return r;
 }
 
 function textBlock(
@@ -205,23 +216,20 @@ function textBlock(
   r: number,
   title: string,
   content: string,
-  dottedIfEmpty = false,
+  emptyAsKhong = false,
 ): number {
   sectionTitle(ws, r, title);
   r++;
 
   const hasContent = Boolean(content && content.trim());
 
-  // Mục rỗng + cần dấu chấm -> 2 hàng chấm kéo dài hết ô
-  if (!hasContent && dottedIfEmpty) {
-    for (let i = 0; i < 2; i++) {
-      merge(ws, r, 1, r, COL_COUNT, dottedLine());
-      cell(ws, r, 1).font = { name: FONT, size: 12 };
-      cell(ws, r, 1).alignment = { horizontal: "left", vertical: "middle" };
-      ws.getRow(r).height = 20;
-      r++;
-    }
-    return r + 1;
+  // Mục rỗng + cần hiển thị "Không" -> ghi chữ "Không" thay vì dấu chấm
+  if (!hasContent && emptyAsKhong) {
+    merge(ws, r, 1, r, COL_COUNT, "Không");
+    cell(ws, r, 1).font = { name: FONT, size: 12 };
+    cell(ws, r, 1).alignment = { horizontal: "left", vertical: "middle" };
+    ws.getRow(r).height = 20;
+    return r + 2;
   }
 
   const text = hasContent ? content : "";
@@ -236,14 +244,7 @@ function textBlock(
   return r + 2;
 }
 
-// Chuỗi dấu chấm dài hơn bề rộng ô để tràn kín, không chừa khoảng trắng bên phải
-function dottedLine(): string {
-  return ".".repeat(Math.round(TOTAL_CHAR_WIDTH * 2));
-}
-
 // Ước lượng số dòng khi wrap trong vùng merge 6 cột.
-// Width cột của ExcelJS ứng với nhiều ký tự hơn con số width (font Times 12
-// hẹp hơn ký tự "0" chuẩn), nên nhân hệ số ~1.25 để không đếm dư dòng.
 function estimateLines(text: string): number {
   if (!text) return 1;
   const charsPerLine = Math.max(Math.round(TOTAL_CHAR_WIDTH * 1.25), 20);
@@ -277,10 +278,11 @@ function formatPlace(iso: string): string {
     : "Tây Ninh, ngày ..... tháng ..... năm .....";
 }
 
-function formatTruc(t: {
+// Dòng cuối khối ký: cấp bậc + họ tên (vd "Đại úy Nguyễn Minh Phi")
+function formatCapBacTen(t: {
   capBac: string;
   hoTen: string;
   chucVu: string;
 }): string {
-  return [t.capBac, t.hoTen, t.chucVu].filter(Boolean).join(" - ");
+  return [t.capBac, t.hoTen].filter(Boolean).join(" ");
 }
