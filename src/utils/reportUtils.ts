@@ -45,6 +45,33 @@ export function todayIsoDate(): string {
   ].join("-");
 }
 
+const SHARED_DATE_KEY = "shared-selected-date";
+
+export function toLocalIsoDate(d: Date): string {
+  return [
+    d.getFullYear(),
+    String(d.getMonth() + 1).padStart(2, "0"),
+    String(d.getDate()).padStart(2, "0"),
+  ].join("-");
+}
+
+export function getSharedReportDate(): string {
+  const stored = sessionStorage.getItem(SHARED_DATE_KEY);
+  if (stored && /^\d{4}-\d{2}-\d{2}$/.test(stored)) return stored;
+  return todayIsoDate();
+}
+
+export function getSharedReportDateAsDate(): Date {
+  const [y, m, d] = getSharedReportDate().split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+export function setSharedReportDate(iso: string): void {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(iso)) {
+    sessionStorage.setItem(SHARED_DATE_KEY, iso);
+  }
+}
+
 export function formatNum(value: number | null | undefined): string {
   return (value ?? 0).toLocaleString("vi-VN");
 }

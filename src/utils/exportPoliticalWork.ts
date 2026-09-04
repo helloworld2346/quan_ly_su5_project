@@ -14,6 +14,9 @@ type ExportArgs = {
   reportDate: string;
   tenDonVi: string;
   quanSo: QuanSo;
+  donViName?: string;
+  parentUnitName?: string;
+  hideNoiVu?: boolean;
 };
 
 const FONT = "Times New Roman";
@@ -26,6 +29,9 @@ export async function exportPoliticalWorkToExcel({
   reportDate,
   tenDonVi,
   quanSo,
+  donViName,
+  parentUnitName,
+  hideNoiVu = false,
 }: ExportArgs): Promise<void> {
   const wb = new ExcelJS.Workbook();
   const ws = wb.addWorksheet("Báo cáo CTĐ-CTCT");
@@ -53,14 +59,14 @@ export async function exportPoliticalWorkToExcel({
   ws.getColumn(5).width = 16;
   ws.getColumn(6).width = 16;
 
-  // ── Góc trên bên TRÁI (cột 1-3): Sư đoàn 5 + tên đơn vị ──
-  merge(ws, 1, 1, 1, 3, "SƯ ĐOÀN 5");
+  // ── Góc trên bên TRÁI (cột 1-3): đơn vị cha + tên đơn vị ──
+  merge(ws, 1, 1, 1, 3, (parentUnitName ?? "Sư đoàn 5").toUpperCase());
   cell(ws, 1, 1).font = { name: FONT, bold: true, size: 12 };
-  cell(ws, 1, 1).alignment = { horizontal: "center" };
+  cell(ws, 1, 1).alignment = { horizontal: "center", shrinkToFit: true };
 
-  merge(ws, 2, 1, 2, 3, (tenDonVi || "").toUpperCase());
+  merge(ws, 2, 1, 2, 3, (donViName ?? tenDonVi ?? "").toUpperCase());
   cell(ws, 2, 1).font = { name: FONT, bold: true, size: 12 };
-  cell(ws, 2, 1).alignment = { horizontal: "center" };
+  cell(ws, 2, 1).alignment = { horizontal: "center", shrinkToFit: true };
 
   // ── Góc trên bên PHẢI (cột 4-6): quốc hiệu + tiêu ngữ + địa danh/ngày ──
   merge(ws, 1, 4, 1, 6, "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM");
@@ -105,32 +111,49 @@ export async function exportPoliticalWorkToExcel({
 
   r++;
 
-  // Hai cột ký: Trực ban nội vụ | Trực ban CTĐ-CTCT
+  // Cột ký: nếu ẩn Trực ban nội vụ (đại đội / dbo) thì chỉ hiển thị
+  // cột "Trực ban CTĐ - CTCT" (căn giữa toàn bộ 6 cột).
   const noiVu = parseTrucNguoi(row.trucBanNoiVu);
   const ctd = parseTrucNguoi(row.trucBanCtDangCt);
 
-  merge(ws, r, 1, r, 3, "TRỰC BAN NỘI VỤ");
-  merge(ws, r, 4, r, 6, "TRỰC BAN CTĐ - CTCT");
-  [1, 4].forEach((c) => {
-    cell(ws, r, c).font = { name: FONT, bold: true, size: 12 };
-    cell(ws, r, c).alignment = { horizontal: "center" };
-  });
-  r++;
+  if (hideNoiVu) {  
+    merge(ws, r, 4, r, 6, "TRỰC BAN CTĐ - CTCT");  
+    cell(ws, r, 4).font = { name: FONT, bold: true, size: 12 };  
+    cell(ws, r, 4).alignment = { horizontal: "center" };  
+    r++;  
+  
+    merge(ws, r, 4, r, 6, "(Ký, ghi rõ họ tên)");  
+    cell(ws, r, 4).font = { name: FONT, italic: true, size: 11 };  
+    cell(ws, r, 4).alignment = { horizontal: "center" };  
+    r += 3;  
+  
+    merge(ws, r, 4, r, 6, formatTruc(ctd));  
+    cell(ws, r, 4).font = { name: FONT, bold: true, size: 12 };  
+    cell(ws, r, 4).alignment = { horizontal: "center" };  
+  } else {  
+    merge(ws, r, 1, r, 3, "TRỰC BAN NỘI VỤ");
+    merge(ws, r, 4, r, 6, "TRỰC BAN CTĐ - CTCT");
+    [1, 4].forEach((c) => {
+      cell(ws, r, c).font = { name: FONT, bold: true, size: 12 };
+      cell(ws, r, c).alignment = { horizontal: "center" };
+    });
+    r++;
 
-  merge(ws, r, 1, r, 3, "(Ký, ghi rõ họ tên)");
-  merge(ws, r, 4, r, 6, "(Ký, ghi rõ họ tên)");
-  [1, 4].forEach((c) => {
-    cell(ws, r, c).font = { name: FONT, italic: true, size: 11 };
-    cell(ws, r, c).alignment = { horizontal: "center" };
-  });
-  r += 3;
+    merge(ws, r, 1, r, 3, "(Ký, ghi rõ họ tên)");
+    merge(ws, r, 4, r, 6, "(Ký, ghi rõ họ tên)");
+    [1, 4].forEach((c) => {
+      cell(ws, r, c).font = { name: FONT, italic: true, size: 11 };
+      cell(ws, r, c).alignment = { horizontal: "center" };
+    });
+    r += 3;
 
-  merge(ws, r, 1, r, 3, formatTruc(noiVu));
-  merge(ws, r, 4, r, 6, formatTruc(ctd));
-  [1, 4].forEach((c) => {
-    cell(ws, r, c).font = { name: FONT, bold: true, size: 12 };
-    cell(ws, r, c).alignment = { horizontal: "center" };
-  });
+    merge(ws, r, 1, r, 3, formatTruc(noiVu));
+    merge(ws, r, 4, r, 6, formatTruc(ctd));
+    [1, 4].forEach((c) => {
+      cell(ws, r, c).font = { name: FONT, bold: true, size: 12 };
+      cell(ws, r, c).alignment = { horizontal: "center" };
+    });
+  }
 
   const buffer = await wb.xlsx.writeBuffer();
   saveAs(

@@ -40,6 +40,7 @@ type Props = {
   showExport?: boolean;
   onSaveInline?: () => void;
   onReconsolidate?: () => void;
+  reconsolidateDisabled?: boolean;
   inlineSaveDisabled?: boolean;
 };
 
@@ -75,6 +76,7 @@ export default function ReportToolbar({
   showExport = false,
   onSaveInline,
   onReconsolidate,
+  reconsolidateDisabled = false,
   onReturn,
   inlineSaveDisabled = false,
 }: Props) {
@@ -191,8 +193,9 @@ export default function ReportToolbar({
         {onReconsolidate && (
           <button
             type="button"
-            className={`${styles.actionBtn} ${styles.consolidateBtn}`}
+            className={`${styles.actionBtn} ${styles.consolidateBtn} ${reconsolidateDisabled ? styles.disabledBtn : ""}`}
             onClick={onReconsolidate}
+            disabled={reconsolidateDisabled}
           >
             <FontAwesomeIcon icon={faLayerGroup} className={styles.addIcon} />
             Tổng hợp lại

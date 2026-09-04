@@ -23,7 +23,11 @@ import {
 import { formatFullDate, shiftDay, toDateParam } from "../../utils/date";
 import styles from "./ExecutiveDashboard.module.css";
 import DateInputVi from "../../components/ui/DateInputVi/DateInputVi";
-
+import {
+  getSharedReportDateAsDate,
+  setSharedReportDate,
+  toLocalIsoDate,
+} from "../../utils/reportUtils";
 
 type FilterKey = "all" | SubordinateUnitType;
 
@@ -123,22 +127,27 @@ function groupDonVi(danhSach: DonViItem[], filter: FilterKey) {
 export default function ExecutiveDashboard() {
   const [filter, setFilter] = useState<FilterKey>("all");
 
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date>(() =>
+    getSharedReportDateAsDate(),
+  );
+  useEffect(() => {
+    setSharedReportDate(toLocalIsoDate(selectedDate));
+  }, [selectedDate]);
   const [data, setData] = useState<ThongKeQuanSoResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const { account } = useAuth();
   const capDonVi = account?.donVi?.capDonVi;
-  const isTrungDoan = capDonVi === "TRUNG_DOAN";  
+  const isTrungDoan = capDonVi === "TRUNG_DOAN";
 
   const filterOptions = isTrungDoan ? FILTER_OPTIONS_TD : FILTER_OPTIONS_SD;
-const capLabel = isTrungDoan ? "Trung đoàn" : "Sư đoàn";
-const capLabelUpper = isTrungDoan ? "TRUNG ĐOÀN" : "SƯ ĐOÀN";
-const tenDonVi = account?.donVi?.tenDonvi ?? capLabel;
-const subordinateTypesText = isTrungDoan
-  ? "ban, tiểu đoàn, đại đội"
-  : "phòng, trung đoàn, tiểu đoàn, đại đội";
+  const capLabel = isTrungDoan ? "Trung đoàn" : "Sư đoàn";
+  const capLabelUpper = isTrungDoan ? "TRUNG ĐOÀN" : "SƯ ĐOÀN";
+  const tenDonVi = account?.donVi?.tenDonvi ?? capLabel;
+  const subordinateTypesText = isTrungDoan
+    ? "ban, tiểu đoàn, đại đội"
+    : "phòng, trung đoàn, tiểu đoàn, đại đội";
 
   const showSkeleton = useMinLoading(loading);
 
@@ -154,6 +163,7 @@ const subordinateTypesText = isTrungDoan
     const loadData = async () => {
       setLoading(true);
       setError(null);
+      setData(null);
       try {
         const result = await troopStatsService.getThongKe(
           toDateParam(selectedDate),

@@ -309,7 +309,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       return "Điền đầy đủ Trực chỉ huy trước khi tiếp tục.";
     }
 
-    if (!isDaiDoi) {
+    if (!isDaiDoi && !isDonViBo) {
       if (
         !trucBanTacChien.tenNguoitruc.trim() ||
         !trucBanTacChien.capbacNguoitruc.trim() ||
@@ -377,7 +377,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       lyDoVang: "" as keyof VangChiTiet,
       ghiChu: "",
     };
-    setAbsentRows((prev) => [...prev, newRow]);
+    setAbsentRows((prev) => [newRow, ...prev]);
   };
 
   const handleUpdateRow = useCallback(
@@ -669,7 +669,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
                 value={trucBanTacChien}
                 onChange={setTrucBanTacChien}
                 capBacOptions={capBacTacChienOptions}
-                disabled={isDaiDoi}
+                disabled={isDaiDoi || isDonViBo}
               />
               <hr className={styles.divider} />
               <div className={styles.sectionHeader}>

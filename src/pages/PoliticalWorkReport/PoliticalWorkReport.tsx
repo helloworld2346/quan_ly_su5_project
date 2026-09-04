@@ -25,9 +25,10 @@ import { useAuth } from "../../context/useAuth";
 import { useToast } from "../../context/useToast";
 import { handleApiError } from "../../utils/errorHandler";
 import {
-  todayIsoDate,
   normalizeRoleName,
   normalizeUnitName,
+  getSharedReportDate,
+  setSharedReportDate,
 } from "../../utils/reportUtils";
 import { politicalWorkService } from "../../services/politicalWork/politicalWorkService";
 
@@ -46,6 +47,8 @@ import { useMinLoading } from "../../hooks/useMinLoading";
 import { isApprovedStatus } from "../../utils/reportStatus";
 
 import { exportPoliticalWorkToExcel } from "../../utils/exportPoliticalWork";
+
+import { donviService } from "../../services/unit/unitService";
 
 function StatusBadge({
   active,
@@ -86,7 +89,10 @@ function buildConsolidatedPoliticalWork(
 
 export default function PoliticalWorkReport() {
   const [query, setQuery] = useState("");
-  const [reportDate, setReportDate] = useState(todayIsoDate());
+  const [reportDate, setReportDate] = useState(getSharedReportDate());
+  useEffect(() => {
+    setSharedReportDate(reportDate);
+  }, [reportDate]);
   const [isCreateReportOpen, setIsCreateReportOpen] = useState(false);
   const [editingRow, setEditingRow] = useState<PoliticalWorkRow | null>(null);
   const [detailRow, setDetailRow] = useState<PoliticalWorkRow | null>(null);
@@ -103,7 +109,7 @@ export default function PoliticalWorkReport() {
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
-  const { account } = useAuth();
+  const { account, donVi } = useAuth();
   const { showError, showSuccess } = useToast();
 
   const submitMaDonVi = account?.donVi?.maDonVi;
@@ -141,31 +147,30 @@ export default function PoliticalWorkReport() {
 
   const isDbOrEb = isDbOrEbUnit(account?.donVi);
 
-const isParentUnit =
-  isAdmin ||
-  isPoliticalOffice ||
-  isBanChinhTri ||
-  (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
-  (isChiHuy && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
-  (isNoiVu && capDonVi === "TIEU_DOAN" && !isDbOrEb);
+  const isParentUnit =
+    isAdmin ||
+    isPoliticalOffice ||
+    isBanChinhTri ||
+    (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
+    (isChiHuy && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
+    (isNoiVu && capDonVi === "TIEU_DOAN" && !isDbOrEb);
 
+  const isTrungDoan = capDonVi === "TRUNG_DOAN";
+  const isTieuDoan = capDonVi === "TIEU_DOAN";
+  const isTacChienSuDoan = isTacChien && capDonVi === "SU_DOAN";
+  const isChiHuySuDoan = isChiHuy && capDonVi === "SU_DOAN";
+  const isTacChienTrungDoan = isTacChien && isTrungDoan;
+  const isChiHuyTrungDoan = isChiHuy && isTrungDoan;
 
-const isTrungDoan = capDonVi === "TRUNG_DOAN";
-const isTieuDoan = capDonVi === "TIEU_DOAN";
-const isTacChienSuDoan = isTacChien && capDonVi === "SU_DOAN";
-const isChiHuySuDoan = isChiHuy && capDonVi === "SU_DOAN";
-const isTacChienTrungDoan = isTacChien && isTrungDoan;
-const isChiHuyTrungDoan = isChiHuy && isTrungDoan;
+  const canAddOwnReport =
+    isTacChienSuDoan ||
+    isChiHuySuDoan ||
+    isChiHuyTrungDoan ||
+    isAdmin ||
+    isPoliticalOffice ||
+    isBanChinhTri;
 
-const canAddOwnReport =
-  isTacChienSuDoan ||
-  isChiHuySuDoan ||
-  isChiHuyTrungDoan ||
-  isAdmin ||
-  isPoliticalOffice ||
-  isBanChinhTri;
-
-  const canExportExcel = isTacChienSuDoan;
+  const canExportExcel = isTacChienSuDoan || isChiHuy;
   const {
     reportData,
     parentReportData,
@@ -257,24 +262,43 @@ const canAddOwnReport =
     setSignatureDone(Boolean(saved));
   }
 
-  const handleExportExcel = () => {
+  const handleExportExcel = async () => {
     const row = parentReportData ?? ownReport;
     if (!row) {
       showError("Chưa có báo cáo tổng hợp để xuất!");
       return;
     }
+
+    const maDonVi = account?.donVi?.maDonVi;
+    let quanSo = {
+      siQuan: donVi?.quanSoSiQuan ?? 0,
+      qncn: donVi?.quanSoQncn ?? 0,
+      hsqBs: donVi?.quanSoHsqBs ?? 0,
+    };
+
+    if (maDonVi) {
+      try {
+        const qsbc = await donviService.getQuanSoBienChe(maDonVi);
+        if (qsbc) {
+          quanSo = {
+            siQuan: qsbc.quanSoSiQuan,
+            qncn: qsbc.quanSoQncn,
+            hsqBs: qsbc.quanSoHsqBs,
+          };
+        }
+      } catch {
+        // giữ nguyên fallback từ donVi
+      }
+    }
+
     void exportPoliticalWorkToExcel({
       row,
       reportDate,
       tenDonVi: account?.donVi?.tenDonvi ?? "",
-      quanSo: {
-        siQuan: account?.donVi?.quanSoSiQuan ?? 0,
-        qncn: account?.donVi?.quanSoQncn ?? 0,
-        hsqBs: account?.donVi?.quanSoHsqBs ?? 0,
-      },
+      quanSo,
+      hideNoiVu: capDonVi === "DAI_DOI" || isDbOrEb,
     });
   };
-
   const dutyReportForDisplay =
     (isParentUnit && parentReportData ? parentReportData : ownReport) ??
     reportForSubmit;
@@ -415,7 +439,7 @@ const canAddOwnReport =
   const isPastDate = false;
 
   const hasOwnReport = isPoliticalOffice
-    ? Boolean(ownReport && !ownReport.notSubmitted)
+    ? Boolean(parentOwnReportData)
     : isBanChinhTri
       ? Boolean(parentOwnReportData)
       : isTrungDoan
@@ -448,7 +472,8 @@ const canAddOwnReport =
 
   const parentRow = useMemo<PoliticalWorkRow>(() => {
     // PCT và TBTC F5: giữ nhãn cứng "Sư đoàn 5" / "f5" như cũ
-    const useSuDoanLabel = isPoliticalOffice || isTacChienSuDoan;
+    const useSuDoanLabel =
+      isPoliticalOffice || isTacChienSuDoan || isChiHuySuDoan;
 
     return parentReportData
       ? {
@@ -473,6 +498,7 @@ const canAddOwnReport =
     currentUnit,
     isPoliticalOffice,
     isTacChienSuDoan,
+    isChiHuySuDoan,
   ]);
 
   const shouldHideDraftAndUnsubmitted =
@@ -817,7 +843,10 @@ const canAddOwnReport =
         hasReport={hasOwnReport}
         isPastDate={isPastDate}
         onConsolidate={
-          isParentUnit && !isTacChienSuDoan && !isChiHuySuDoan && !isTacChienTrungDoan
+          isParentUnit &&
+          !isTacChienSuDoan &&
+          !isChiHuySuDoan &&
+          !isTacChienTrungDoan
             ? handleConsolidate
             : undefined
         }

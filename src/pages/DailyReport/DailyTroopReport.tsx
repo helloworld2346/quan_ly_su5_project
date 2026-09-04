@@ -21,9 +21,10 @@ import type { NhiemVuNgay } from "../../services/dailyReport/dailyReportService"
 import type { DetailStepData } from "./DailyReportDetailStep";
 import { handleApiError } from "../../utils/errorHandler";
 import {
-  todayIsoDate,
   normalizeRoleName,
   normalizeUnitName,
+  getSharedReportDate,
+  setSharedReportDate,
 } from "../../utils/reportUtils";
 
 import { useReportData } from "./hooks/useReportData";
@@ -48,11 +49,18 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import StatCard from "../../components/ui/StatCard/StatCard";
-import { isApprovedStatus, isNeedUpdateStatus } from "../../utils/reportStatus";
+import {
+  isApprovedStatus,
+  isNeedUpdateStatus,
+  normalizeReportStatus,
+} from "../../utils/reportStatus";
 
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
-  const [reportDate, setReportDate] = useState(todayIsoDate());
+  const [reportDate, setReportDate] = useState(getSharedReportDate());
+  useEffect(() => {
+    setSharedReportDate(reportDate);
+  }, [reportDate]);
   const [selectedReportRow, setSelectedReportRow] = useState<ReportRow | null>(
     null,
   );
@@ -121,7 +129,7 @@ export default function DailyTroopReport() {
   const isSuDoan = capDonVi === "SU_DOAN";
   const useDutyShiftForCaTruc = isTacChien && isSuDoan;
   const useInlineOwnCommandReport =
-  (isTacChien || isChiHuy) && (isSuDoan || isTrungDoan);
+    (isTacChien || isChiHuy) && (isSuDoan || isTrungDoan);
 
   const isParentUnit =
   isAdmin ||
@@ -141,6 +149,7 @@ export default function DailyTroopReport() {
     loading,
     donViQuanSoTong,
     childUnits,
+    currentUnit,
     caTrucFromApi,
     consolidatedData,
     fetchReports,
@@ -154,7 +163,7 @@ export default function DailyTroopReport() {
     kyHieuDonVi,
     isDbOrEb,
     showError,
-  }); 
+  });
 
   const bienCheTongTrungDoan = useMemo(() => {
     if (capDonVi !== "TRUNG_DOAN") return undefined;
@@ -322,16 +331,14 @@ export default function DailyTroopReport() {
     if (!inlineDraft || !maDonViCurrent) return;
 
     const quanSoTong = inlineDraft.quanSoTong;
-    const quanSoHienDien = inlineDraft.quanSoHienDien;
-    const quanSoVang = Math.max(0, quanSoTong - quanSoHienDien);
-
-    const tongVangNhap = Object.values(inlineDraft.vang).reduce(
+    const quanSoVang = Object.values(inlineDraft.vang).reduce(
       (sum, val) => sum + (val || 0),
       0,
     );
-    if (tongVangNhap !== quanSoVang) {
+    const quanSoHienDien = Math.max(0, quanSoTong - quanSoVang);
+    if (quanSoTong <= quanSoVang) {
       showError(
-        `Tổng số quân vắng nhập vào (${tongVangNhap}) phải bằng tổng vắng (${quanSoVang})`,
+        `Tổng số quân vắng nhập vào (${quanSoTong}) phải bằng tổng vắng (${quanSoVang})`,
       );
       return;
     }
@@ -671,6 +678,9 @@ export default function DailyTroopReport() {
       trucChiHuy: trucInfoFromReport?.trucChiHuy ?? caTrucInfo?.trucChiHuy,
       trucBanTacChien:
         trucInfoFromReport?.trucBanTacChien ?? caTrucInfo?.trucBanTacChien,
+      donViName: currentUnit?.tenDonvi ?? account?.donVi?.tenDonvi,
+      parentUnitName:
+        currentUnit?.donViCha ?? account?.donVi?.donViCha ?? undefined,
     });
   };
 
@@ -707,30 +717,39 @@ export default function DailyTroopReport() {
   };
 
   const handleReconsolidate = async () => {
-    if (!maDonViCurrent) return;
+    if (!maDonViCurrent || !parentReportData) return;
     const [y, m, d] = reportDate.split("-");
     const ngayBaoCao = y && m && d ? `${d}/${m}/${y}` : reportDate;
     try {
-      await dailyReportService.returnTongHop(maDonViCurrent, ngayBaoCao);
-
-      if (parentReportData && consolidatedData) {
-        await dailyReportService.updateReport(parentReportData.idDonBaoCao, {
-          quanSoTong: consolidatedData.quanSoTong,
-          quanSoHienDien: consolidatedData.quanSoHienDien,
-          quanSoVang: consolidatedData.quanSoVang,
-          thoiGianBaoCao: new Date(`${reportDate}T12:00:00.000Z`).toISOString(),
-          chiTietVang: JSON.stringify(consolidatedData.absentRows),
-          thongTinVang: JSON.stringify(consolidatedData.thongTinVang),
-          trucBanChiHuy: JSON.stringify(caTrucInfo?.trucChiHuy ?? {}),
-          trucBanTacChien: JSON.stringify(caTrucInfo?.trucBanTacChien ?? {}),
-          tinhHinhHoatDong: JSON.stringify({}),
-          account: account?.idTaiKhoan ?? "",
-          donVi: account?.donVi?.maDonVi ?? "",
-          chuKySo: signatureBase64,
-        });
+      if (isNeedUpdateStatus(parentReportData.status)) {
+        // Bước 1: chỉ đưa báo cáo tổng hợp về "Nháp", CHƯA gộp số liệu.
+        // Trực ban trả về cho các đơn vị con sửa, con nộp lại rồi mới gộp lại.
+        await dailyReportService.returnTongHop(maDonViCurrent, ngayBaoCao);
+        showSuccess(
+          'Đã đưa báo cáo tổng hợp về nháp. Hãy trả về cho các đơn vị con cập nhật, sau đó bấm "Tổng hợp lại" để gộp số liệu mới.',
+        );
+      } else {
+        // Bước 2: status đã là "Nháp" -> gộp lại số liệu mới từ các đơn vị con.
+        if (consolidatedData) {
+          await dailyReportService.updateReport(parentReportData.idDonBaoCao, {
+            quanSoTong: consolidatedData.quanSoTong,
+            quanSoHienDien: consolidatedData.quanSoHienDien,
+            quanSoVang: consolidatedData.quanSoVang,
+            thoiGianBaoCao: new Date(
+              `${reportDate}T12:00:00.000Z`,
+            ).toISOString(),
+            chiTietVang: JSON.stringify(consolidatedData.absentRows),
+            thongTinVang: JSON.stringify(consolidatedData.thongTinVang),
+            trucBanChiHuy: JSON.stringify(caTrucInfo?.trucChiHuy ?? {}),
+            trucBanTacChien: JSON.stringify(caTrucInfo?.trucBanTacChien ?? {}),
+            tinhHinhHoatDong: JSON.stringify({}),
+            account: account?.idTaiKhoan ?? "",
+            donVi: account?.donVi?.maDonVi ?? "",
+            chuKySo: signatureBase64,
+          });
+        }
+        showSuccess("Tổng hợp lại báo cáo thành công");
       }
-
-      showSuccess("Tổng hợp lại báo cáo thành công");
       fetchReports();
       window.dispatchEvent(new CustomEvent("report-data-changed"));
     } catch (error) {
@@ -760,29 +779,31 @@ export default function DailyTroopReport() {
         }
         onReconsolidate={
           isParentUnit &&
+          !isChiHuy &&
           parentReportData &&
-          parentReportData.loaiDonBaoCao === "TONG_HOP" &&
-          isNeedUpdateStatus(parentReportData.status)
+          (parentReportData.isConsolidated ||
+            parentReportData.loaiDonBaoCao === "TONG_HOP") &&
+          (isNeedUpdateStatus(parentReportData.status) ||
+            normalizeReportStatus(parentReportData.status) === "Nháp")
             ? handleReconsolidate
             : undefined
         }
+        reconsolidateDisabled={
+          childUnits.length > 0 &&
+          (!consolidatedData ||
+            consolidatedData.directSubmittedCount < totalRequiredCount)
+        }
         consolidateDisabled={
           !consolidatedData ||
-          consolidatedData.submittedCount === 0 ||
+          consolidatedData.directSubmittedCount === 0 ||
           parentReportData !== null ||
           (childUnits.length > 0 &&
-            consolidatedData.submittedCount < totalRequiredCount)
+            consolidatedData.directSubmittedCount < totalRequiredCount)
         }
         consolidateLabel={
-          parentReportData !== null
-            ? "Đã tổng hợp"
-            : childUnits.length > 0 &&
-                consolidatedData &&
-                consolidatedData.submittedCount < totalRequiredCount
-              ? `Chưa đủ (${consolidatedData.submittedCount ?? 0}/${totalRequiredCount} đơn vị)`
-              : consolidatedData && consolidatedData.submittedCount > 0
-                ? `Tổng hợp (${consolidatedData.submittedCount}/${totalRequiredCount} đơn vị)`
-                : "Chưa có báo cáo con"
+          consolidatedData
+            ? `Tổng hợp (${consolidatedData.directSubmittedCount}/${totalRequiredCount} đơn vị)`
+            : "Chưa có báo cáo con"
         }
         onApprove={
           canApprove
@@ -825,7 +846,7 @@ export default function DailyTroopReport() {
         onExportExcel={handleExportExcel}
         isPastDate={isPastDate}
         hasReport={checkIfDateHasReport}
-        showExport={(isTacChien || isChiHuy) && capDonVi === "SU_DOAN"}
+        showExport={isChiHuy || (isTacChien && capDonVi === "SU_DOAN")}
         onSaveInline={
           useInlineOwnCommandReport && inlineEditingRowId
             ? handleSaveInlineInput

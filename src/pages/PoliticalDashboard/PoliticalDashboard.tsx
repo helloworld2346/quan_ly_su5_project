@@ -12,6 +12,11 @@ import { formatFullDate, shiftDay, toDateParam } from "../../utils/date";
 import "./PoliticalDashboard.css";
 import DateInputVi from "../../components/ui/DateInputVi/DateInputVi";
 import { useAuth } from "../../context/useAuth";
+import {
+  getSharedReportDateAsDate,
+  setSharedReportDate,
+  toLocalIsoDate,
+} from "../../utils/reportUtils";
 
 import {
   politicalDashboardService,
@@ -45,8 +50,12 @@ export default function PoliticalDashboard() {
   const filterOptions = isTrungDoan ? FILTER_OPTIONS_TD : FILTER_OPTIONS_SD;
 
   const [filter, setFilter] = useState<FilterKey>("all");
-  const [selectedDate, setSelectedDate] = useState<Date>(() => new Date());
-
+  const [selectedDate, setSelectedDate] = useState<Date>(() =>
+    getSharedReportDateAsDate(),
+  );
+  useEffect(() => {
+    setSharedReportDate(toLocalIsoDate(selectedDate));
+  }, [selectedDate]);
   const [dashboardData, setDashboardData] =
     useState<PoliticalDashboardResult | null>(null);
   const [loading, setLoading] = useState(false);

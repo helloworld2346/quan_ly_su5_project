@@ -21,6 +21,8 @@ type ExportArgs = {
   matkhau?: string;
   trucChiHuy?: TrucNguoi | null;
   trucBanTacChien?: TrucNguoi | null;
+  donViName?: string;
+  parentUnitName?: string;
 };
 
 const COLUMN_COUNT = 18;
@@ -43,6 +45,8 @@ export async function exportTroopReportToExcel({
   matkhau,
   trucChiHuy,
   trucBanTacChien,
+  donViName,
+  parentUnitName,
 }: ExportArgs): Promise<void> {
   const wb = new ExcelJS.Workbook();
   const ws = wb.addWorksheet("Thống kê quân số");
@@ -85,11 +89,15 @@ export async function exportTroopReportToExcel({
   };
   ws.getCell(2, rightStart).alignment = { horizontal: "center" };
 
-  setMerged(ws, 1, 1, 1, 2, "QUÂN KHU 7");
+  // ── Góc trên bên TRÁI (merge cột 1-4): đơn vị cha + đơn vị, tự nới rộng theo tên ──
+  const leftTop = (parentUnitName ?? "Quân khu 7").toUpperCase();
+  const leftBottom = (donViName ?? "Sư đoàn 5").toUpperCase();
+
+  setMerged(ws, 1, 1, 1, 4, leftTop);
   ws.getCell(1, 1).font = { name: FONT, bold: true, size: 14 };
   ws.getCell(1, 1).alignment = { horizontal: "center", vertical: "middle" };
 
-  setMerged(ws, 2, 1, 2, 2, "SƯ ĐOÀN 5");
+  setMerged(ws, 2, 1, 2, 4, leftBottom);
   ws.getCell(2, 1).font = { name: FONT, bold: true, size: 14, underline: true };
   ws.getCell(2, 1).alignment = { horizontal: "center", vertical: "middle" };
 
@@ -99,14 +107,7 @@ export async function exportTroopReportToExcel({
 
   ws.getRow(4).height = 10;
 
-  setMerged(
-    ws,
-    5,
-    1,
-    5,
-    COLUMN_COUNT,
-    `BÁO CÁO THỐNG KÊ QUÂN SỐ`,
-  );
+  setMerged(ws, 5, 1, 5, COLUMN_COUNT, `BÁO CÁO THỐNG KÊ QUÂN SỐ`);
   ws.getCell(5, 1).font = {
     name: FONT,
     bold: true,
@@ -213,7 +214,12 @@ export async function exportTroopReportToExcel({
     vertical: "middle",
   };
 
-  ws.getColumn(1).width = 12;
+  // Cột 2-18 giữ 12 để bảng số liệu gọn; cột 1 tự nới theo tên đơn vị dài nhất.
+  // Khối tên góc trái merge cột 1-4 => phần dư ngoài (cột 2-4 = 36) do cột 1 gánh.
+  const longestLeftName = Math.max(leftTop.length, leftBottom.length);
+  const neededLeftWidth = longestLeftName * 1.3;
+  const col1Width = Math.max(12, neededLeftWidth - 36);
+  ws.getColumn(1).width = col1Width;
   for (let c = 2; c <= COLUMN_COUNT; c++) ws.getColumn(c).width = 12;
 
   await ws.protect(PROTECT_PASSWORD, {
