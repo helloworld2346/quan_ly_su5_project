@@ -521,6 +521,7 @@ const { childUnits, currentUnit } = useChildUnits(
     isDbOrEb,
     isPoliticalOffice,
     isChiHuySuDoan,
+    isChiHuyTrungDoan,
     reportDate,
     submitMaDonVi,
     childUnits,
