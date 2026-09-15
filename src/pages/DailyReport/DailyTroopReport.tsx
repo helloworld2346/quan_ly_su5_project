@@ -249,7 +249,6 @@ export default function DailyTroopReport() {
   });
 
   const handleCompleteSignature = async () => {
-    
     if (!ownReport?.idDonBaoCao || !signatureBase64) {
       setSignatureDone(true);
       return;
@@ -679,7 +678,7 @@ export default function DailyTroopReport() {
         currentUnit?.donViCha ?? account?.donVi?.donViCha ?? undefined,
     });
   };
-  
+
   const handleExportExcel = async () => {
     const { exportTroopReportToExcel } =
       await import("../../utils/exportTroopReport");
@@ -755,7 +754,6 @@ export default function DailyTroopReport() {
           'Đã đưa báo cáo tổng hợp về nháp. Hãy trả về cho các đơn vị con cập nhật, sau đó bấm "Tổng hợp lại" để gộp số liệu mới.',
         );
       } else {
-  
         if (consolidatedData) {
           await dailyReportService.updateReport(parentReportData.idDonBaoCao, {
             quanSoTong: consolidatedData.quanSoTong,
@@ -1005,7 +1003,9 @@ export default function DailyTroopReport() {
           status={selectedReportRow.status}
           isChiHuy={isChiHuy}
           labelSecond={
-            capDonVi === "DAI_DOI" ? "Trực ban nội vụ" : "Trực ban tác chiến"
+            capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN"
+              ? "Trực ban tác chiến"
+              : "Trực ban nội vụ"
           }
         />
       )}
@@ -1124,7 +1124,7 @@ export default function DailyTroopReport() {
                     await dailyReportService.createNhiemVuNgay(nhiemVuPayload);
                   }
                 } catch {
-                  
+                  //
                 }
               }
 
@@ -1174,7 +1174,7 @@ export default function DailyTroopReport() {
                     donBaoCao: res.Result.idDonBaoCao,
                   });
                 } catch {
-                 
+                  //
                 }
               }
 
