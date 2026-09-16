@@ -416,8 +416,8 @@ export default function ReportTableRow({
           <td>{formatNum(row.vang.congTacNgoaiSuDoan)}</td>
           <td>{formatNum(row.vang.congTacSuDoan)}</td>
           <td>{formatNum(row.vang.hocSQ)}</td>
-          <td>{formatDashIfZero(row.vang.hocCS)}</td>
-          <td>{formatDashIfZero(row.vang.lyDoVangKhac)}</td>
+          <td>{formatNum(row.vang.hocCS)}</td>
+          <td>{formatNum(row.vang.lyDoVangKhac)}</td>
         </>
       )}
       <td>
