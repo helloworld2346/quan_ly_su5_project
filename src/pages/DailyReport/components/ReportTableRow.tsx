@@ -78,10 +78,10 @@ export default function ReportTableRow({
     row.donVi === maDonViCurrent &&
     (unitSymbol === "ch/f" || unitSymbol === "ch/e");
 
-  const displayUnitName =
-    row.loaiDonBaoCao === "TONG_HOP" && unitSymbol === "ch/f"
-      ? "f5"
-      : normalizeUnitName(row.kyhieuDonVi || row.tenDonVi);
+const displayUnitName =
+  row.loaiDonBaoCao === "TONG_HOP" && unitSymbol === "ch/f"
+    ? "f5"
+    : normalizeUnitName(row.kyhieuDonVi || row.tenDonVi);
 
   const canEditNotSubmitted = canEditOwnNotSubmitted && isOwnCommandRow;
   const canInlineEditThisRow = canInlineInputChf && isOwnCommandRow;

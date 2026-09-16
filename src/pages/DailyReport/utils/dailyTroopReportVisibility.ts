@@ -51,7 +51,7 @@ export function filterVisibleReportRows(
 ): ReportRow[] {
   if (!shouldHideDraftAndUnsubmitted) return rows;
 
-  return rows.filter((row) => !row.notSubmitted && row.status !== "Nháp");
+  return rows.filter((row) => row.notSubmitted || row.status !== "Nháp");
 }
 
 export function filterVisibleNhiemVuEntries<

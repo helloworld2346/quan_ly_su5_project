@@ -600,11 +600,14 @@ export default function PoliticalWorkReport() {
       .toLowerCase()
       .includes(keyword);
   };
-
-  const hideDraft = (rows: PoliticalWorkRow[]) =>
-    shouldHideDraftAndUnsubmitted
-      ? rows.filter((r) => !r.notSubmitted && r.status !== "Nháp")
-      : rows;
+const hideDraft = (rows: PoliticalWorkRow[]) =>
+  shouldHideDraftAndUnsubmitted
+    ? rows.filter(
+        (r) =>
+          r.notSubmitted ||
+          (r.status !== "Nháp" && r.status !== "NhÃ¡p"),
+      )
+    : rows;
 
   const filteredChildRows = hideDraft(childRows.filter(matchesQuery));
   const filteredFlatRows = hideDraft(flatRows.filter(matchesQuery));
