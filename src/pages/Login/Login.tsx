@@ -105,7 +105,7 @@ export default function Login({ onSuccess }: Props) {
 
         <div className={styles.welcome}>
           <h1 id="login-title" className={styles.welcomeTitle}>
-            Chào mừng trở lại!
+            Đăng nhập
           </h1>
           <p className={styles.welcomeDesc}>
             Vui lòng đăng nhập để tiếp tục sử dụng hệ thống
