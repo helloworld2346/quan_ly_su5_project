@@ -98,8 +98,6 @@ export default function ReportTableRow({
 
   const isInlineEditing = inlineEditingRowId === row.idDonBaoCao;
   const inlineValue = inlineDraft;
-  const formatDashIfZero = (value: number | null | undefined) =>
-    value && value > 0 ? formatNum(value) : "—";
 
   const handleInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     if (e.currentTarget.value === "0") {
