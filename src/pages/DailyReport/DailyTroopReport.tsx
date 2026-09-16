@@ -1174,7 +1174,7 @@ export default function DailyTroopReport() {
                     donBaoCao: res.Result.idDonBaoCao,
                   });
                 } catch {
-                  //
+             
                 }
               }
 
