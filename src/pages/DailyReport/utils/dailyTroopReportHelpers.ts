@@ -165,7 +165,6 @@ export function createEmptyReportRow(args: {
     notSubmitted: true,
   };
 }
-
 function normalizeText(value: unknown): string {
   return String(value ?? "").toLowerCase();
 }
