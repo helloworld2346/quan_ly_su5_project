@@ -2,21 +2,29 @@ export interface NhatKyDonVi {
   maDonVi?: string;
   tenDonvi?: string;
   kyhieuDonvi?: string;
+  capDonVi?: string;
 }
 
 export interface NhatKyVaiTro {
-  maVaiTro?: string;
+  idVaiTro?: string;
   tenVaiTro?: string;
+  tenChucnang?: string[];
 }
 
 export interface NhatKyTaiKhoan {
   idTaiKhoan?: string;
   tenDangNhap?: string;
   tenTaiKhoan?: string;
+  matKhau?: string;
   donVi?: NhatKyDonVi | null;
   vaiTro?: NhatKyVaiTro | null;
+  chucNangThem?: string[];
+  chucNangBo?: string[];
+  tenChucnang?: string[];
   createdAt?: string;
   updatedAt?: string;
+  isDeleted?: boolean;
+  deletedAt?: string | null;
   khoa?: boolean;
 }
 
@@ -29,6 +37,8 @@ export interface NhatKy {
   giaTriCu: string | null;
   giaTriMoi: string | null;
   trangThai: string;
+  uri: string | null;
+  ipAddress: string | null;
   thongBaoLoi: string | null;
   createdAt: string;
   taiKhoan: NhatKyTaiKhoan | string | null;

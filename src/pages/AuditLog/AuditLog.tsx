@@ -157,6 +157,12 @@ export default function AuditLog() {
         <td>
           <Skeleton width="90%" />
         </td>
+        <td className={styles.colUri}>
+          <Skeleton width={120} />
+        </td>
+        <td className={styles.colIp}>
+          <Skeleton width={90} />
+        </td>
         <td className={styles.colStatus}>
           <Skeleton width={80} />
         </td>
@@ -190,6 +196,8 @@ export default function AuditLog() {
       </td>
       <td className={styles.colObject}>{log.doiTuong ?? "—"}</td>
       <td>{log.moTa ?? "—"}</td>
+      <td className={styles.colUri}>{log.uri ?? "—"}</td>
+      <td className={styles.colIp}>{log.ipAddress ?? "—"}</td>
       <td className={styles.colStatus}>
         <span
           className={`${styles.badge} ${
@@ -262,6 +270,8 @@ export default function AuditLog() {
               <th className={styles.colTime}>Thời gian</th>
               <th className={styles.colObject}>Đối tượng</th>
               <th>Mô tả</th>
+              <th className={styles.colUri}>URI</th>
+              <th className={styles.colIp}>IP</th>
               <th className={styles.colStatus}>Trạng thái</th>
             </tr>
           </thead>
@@ -270,7 +280,7 @@ export default function AuditLog() {
               renderSkeletonRows(PAGE_SIZE)
             ) : logs.length === 0 ? (
               <tr>
-                <td colSpan={7} className={styles.emptyRow}>
+                <td colSpan={9} className={styles.emptyRow}>
                   {hasFilter ? "Không tìm thấy nhật ký" : "Chưa có nhật ký"}
                 </td>
               </tr>

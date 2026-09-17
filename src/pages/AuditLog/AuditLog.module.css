@@ -43,15 +43,18 @@
   align-items: center;  
   flex-shrink: 0;  
 }  
-.toolbar > * + * { margin-left: 16px; }  
+.toolbar > * + * {  
+  margin-left: 16px;  
+}  
   
 .filterGroup {  
   display: flex;  
   flex-shrink: 0;  
   min-width: 360px;  
 }  
-.filterGroup > * + * { margin-left: 12px; }  
-
+.filterGroup > * + * {  
+  margin-left: 12px;  
+}  
   
 .filterGroup > * {  
   flex: 1;  
@@ -76,9 +79,10 @@
     color 0.15s,  
     background 0.15s;  
 }  
-
-.clearBtn > * + * { margin-left: 6px; }  
-
+  
+.clearBtn > * + * {  
+  margin-left: 6px;  
+}  
   
 .clearBtn:hover {  
   border-color: var(--primary-color);  
@@ -94,12 +98,14 @@
   border: 1.5px solid var(--login-border);  
   border-radius: 14px;  
   background: var(--surface-card);  
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);  
 }  
   
 .table {  
-  width: 100%;   
-  min-width: 1040px;  
-  border-collapse: collapse;  
+  width: 100%;  
+  min-width: 1200px;  
+  border-collapse: separate;  
+  border-spacing: 0;  
   font-size: 14px;  
   table-layout: fixed;  
 }  
@@ -108,17 +114,20 @@
   position: sticky;  
   top: 0;  
   z-index: 2;  
-  background: var(--table-row-odd);  
+  background: linear-gradient(  
+    to bottom,  
+    var(--primary-a08),  
+    var(--table-row-odd)  
+  );  
   color: var(--login-text-muted);  
   font-weight: 700;  
   font-size: 12px;  
   text-transform: uppercase;  
   letter-spacing: 0.4px;  
   text-align: left;  
-  padding: 12px 16px;  
+  padding: 14px 16px;  
   border-bottom: 1.5px solid var(--login-border);  
   white-space: nowrap;  
-  box-shadow: 0 1px 0 var(--login-border);  
 }  
   
 .table tbody td {  
@@ -126,6 +135,12 @@
   border-bottom: 1px solid var(--login-border);  
   color: var(--login-text);  
   vertical-align: middle;  
+  overflow: hidden;  
+  text-overflow: ellipsis;  
+}  
+  
+.table tbody tr:nth-child(even) {  
+  background: var(--table-row-even);  
 }  
   
 .table tbody tr:last-child td {  
@@ -137,7 +152,7 @@
 }  
   
 .row:hover {  
-  background: var(--primary-a06);  
+  background: var(--primary-a08);  
 }  
   
 .colStt {  
@@ -147,30 +162,48 @@
 }  
   
 .colAccount {  
-  width: 180px;  
+  width: 170px;  
+  font-weight: 600;  
 }  
   
 .colAction {  
-  width: 170px;  
+  width: 160px;  
 }  
   
 .colTime {  
-  width: 170px;  
+  width: 150px;  
   white-space: nowrap;  
 }  
   
 .colObject {  
-  width: 140px;  
+  width: 130px;  
 }  
   
 .colDesc {  
-  width: 240px;  
+  width: 220px;  
   white-space: normal;  
   word-break: break-word;  
 }  
   
-.colStatus {  
+.colUri {  
+  width: 200px;  
+  white-space: normal;  
+  word-break: break-word;  
+  color: var(--login-text-muted);  
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;  
+  font-size: 12.5px;  
+}  
+  
+.colIp {  
   width: 130px;  
+  white-space: nowrap;  
+  color: var(--login-text-muted);  
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;  
+  font-size: 12.5px;  
+}  
+  
+.colStatus {  
+  width: 120px;  
 }  
   
 .userName {  
@@ -204,7 +237,7 @@
 .badgeLogout::before,  
 .badgeCreate::before,  
 .badgeUpdate::before,  
-.badgeUpdateFunction::before,
+.badgeUpdateFunction::before,  
 .badgeDelete::before,  
 .badgeApprove::before,  
 .badgeReject::before,  
@@ -217,7 +250,7 @@
   border-radius: 50%;  
   background: currentColor;  
   flex-shrink: 0;  
-  margin-right: 6px;
+  margin-right: 6px;  
 }  
   
 .badgeLogin {  
@@ -239,11 +272,11 @@
   background: var(--badge-update-bg);  
   color: var(--badge-update-fg);  
 }  
-
+  
 .badgeUpdateFunction {  
   background: var(--badge-updatefunction-bg);  
   color: var(--badge-updatefunction-fg);  
-}
+}  
   
 .badgeDelete {  
   background: var(--badge-delete-bg);  
@@ -281,8 +314,8 @@
 }  
   
 .badgeDanger {  
-  background: var(--badge-danger-bg);  
-  color: var(--badge-danger-fg);  
+  background: var(--badge-fail-bg);  
+  color: var(--badge-fail-fg);  
 }  
   
 .tbodyAnimate {  
@@ -293,8 +326,10 @@
   display: flex;  
   flex-direction: column;  
 }  
-.dateCell > * + * { margin-top: 2px; }
-
+.dateCell > * + * {  
+  margin-top: 2px;  
+}  
+  
 .dateMain {  
   color: var(--login-text);  
   white-space: nowrap;  
@@ -333,6 +368,9 @@
   }  
 }  
   
+/* ==========================================================================  
+   MOBILE: bảng chuyển thành card (≤768px)  
+   ========================================================================== */  
 @media (max-width: 768px) {  
   .page {  
     height: auto;  
@@ -355,9 +393,111 @@
     flex-wrap: wrap;  
   }  
   
-  /* Bảng cao cố định + cuộn dọc để header vẫn sticky trên mobile */  
   .tableWrapper {  
-    max-height: 70vh;  
+    overflow-x: visible;  
+    border: none;  
+    background: transparent;  
+    box-shadow: none;  
+  }  
+  
+  .table,  
+  .table tbody,  
+  .table tr,  
+  .table td {  
+    display: block;  
+    width: 100%;  
+  }  
+  
+  .table {  
+    min-width: 0;  
+  }  
+  
+  /* Ẩn header, dùng nhãn data-label thay thế */  
+  .table thead {  
+    position: absolute;  
+    width: 1px;  
+    height: 1px;  
+    padding: 0;  
+    margin: -1px;  
+    overflow: hidden;  
+    clip: rect(0, 0, 0, 0);  
+    white-space: nowrap;  
+    border: 0;  
+  }  
+  
+  .table tbody tr,  
+  .table tbody tr:nth-child(even) {  
+    background: var(--surface-card);  
+    border: 1.5px solid var(--login-border);  
+    border-radius: 12px;  
+    padding: 6px 4px;  
+    margin-bottom: 14px;  
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);  
+  }  
+  
+  .table tbody td {  
+    display: flex;  
+    align-items: center;  
+    justify-content: space-between;  
+    gap: 16px;  
+    width: auto;  
+    padding: 9px 14px;  
+    border-bottom: 1px dashed var(--login-border);  
+    text-align: right;  
+    white-space: normal;  
+    word-break: break-word;  
+    overflow: visible;  
+  }  
+  
+  .table tbody td:last-child {  
+    border-bottom: none;  
+  }  
+  
+  /* Nhãn tên cột ở bên trái mỗi dòng */  
+  .table tbody td::before {  
+    content: attr(data-label);  
+    font-weight: 700;  
+    font-size: 11px;  
+    text-transform: uppercase;  
+    letter-spacing: 0.4px;  
+    color: var(--login-text-muted);  
+    text-align: left;  
+    flex-shrink: 0;  
+  }  
+  
+  /* Các cột cố định width trên desktop cần reset */  
+  .colStt,  
+  .colAccount,  
+  .colAction,  
+  .colTime,  
+  .colObject,  
+  .colDesc,  
+  .colUri,  
+  .colIp,  
+  .colStatus {  
+    width: auto;  
+  }  
+  
+  .colStt {  
+    text-align: right;  
+  }  
+  
+  .colUri,  
+  .colIp {  
+    font-size: 12.5px;  
+  }  
+  
+  .dateCell {  
+    align-items: flex-end;  
+  }  
+  
+  .emptyRow {  
+    border: 1.5px solid var(--login-border);  
+    border-radius: 12px;  
+    background: var(--surface-card);  
+  }  
+  .emptyRow::before {  
+    content: none;  
   }  
 }  
   
@@ -380,12 +520,8 @@
     justify-content: center;  
   }  
   
-  .table {  
-    font-size: 13px;  
-  }  
-  
-  .table thead th,  
   .table tbody td {  
-    padding: 10px 12px;  
+    padding: 8px 12px;  
+    font-size: 13px;  
   }  
 }

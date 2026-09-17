@@ -143,10 +143,11 @@
 .body {  
   flex: 1;  
   overflow-y: auto;  
+  overflow-x: hidden;  
   min-height: 0;  
   padding: 24px;  
-  overscroll-behavior: contain;
-}  
+  overscroll-behavior: contain;  
+}
   
 .primary .body {  
   background: var(--dashboard-bg, #f8fafc); 
