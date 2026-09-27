@@ -1,0 +1,15 @@
+<service>  
+  <id>nginx</id>  
+  <name>Nginx (Quan Ly SU5)</name>  
+  <description>Nginx phuc vu frontend dist va reverse proxy toi backend</description>  
+  
+  <executable>C:\nginx\nginx.exe</executable>  
+  <workingdirectory>C:\nginx</workingdirectory>  
+  
+  <!-- Dung nginx dung cach -->  
+  <stopexecutable>C:\nginx\nginx.exe</stopexecutable>  
+  <stoparguments>-s stop</stoparguments>  
+  
+  <onfailure action="restart" delay="5 sec"/>  
+  <logmode>rotate</logmode>  
+</service>

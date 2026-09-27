@@ -1,0 +1,18 @@
+<service>  
+  <id>quanlysu5-api</id>  
+  <name>Quan Ly SU5 API</name>  
+  <description>Spring Boot backend cho he thong quan ly SU5</description>  
+  
+  <executable>java</executable>  
+  <arguments>-jar C:\quanlysu5\app.jar</arguments>  
+  <workingdirectory>C:\quanlysu5</workingdirectory>  
+  
+  <!-- Tu restart khi crash -->  
+  <onfailure action="restart" delay="5 sec"/>  
+  <onfailure action="restart" delay="10 sec"/>  
+  <resetfailure>1 hour</resetfailure>  
+  
+  <!-- Log xoay vong -->  
+  <logmode>rotate</logmode>  
+  <logpath>C:\quanlysu5\logs</logpath>  
+</service>
