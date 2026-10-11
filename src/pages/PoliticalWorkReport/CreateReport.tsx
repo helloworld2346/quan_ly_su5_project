@@ -17,7 +17,7 @@ import { isDbOrEbUnit } from "../DailyReport/utils/dailyTroopReportVisibility";
 interface CreateReportProps {
   open: boolean;
   onClose: () => void;
-  onSubmit?: (data: PoliticalWorkRequest) => void;
+  onSubmit?: (data: PoliticalWorkRequest, file?: File) => void;
   initialData: PoliticalWorkRow | null;
   maDonViCurrent: string;
   reportDate: string;
@@ -148,6 +148,7 @@ export default function CreateReport({
 
   const { showWarning } = useToast();
   const [validationError, setValidationError] = useState("");
+  const [file, setFile] = useState<File | null>(null);
 
   const validateForm = (): string => {
     if (!isDaiDoi && !isDonViBo) {
@@ -182,6 +183,7 @@ export default function CreateReport({
 
   const handleClose = () => {
     setValidationError("");
+    setFile(null);
     onClose();
   };
 
@@ -215,7 +217,7 @@ export default function CreateReport({
       donVi: maDonViCurrent,
       loaiDonBaoCao: consolidating ? "TONG_HOP" : "DON_VI",
     };
-    onSubmit?.(payload);
+    onSubmit?.(payload, file ?? undefined);
   };
 
   if (!open) return null;
@@ -530,6 +532,20 @@ export default function CreateReport({
             </div>
           </div>
         )}
+      </section>
+      <section className={styles["report-section"]}>
+        <h3 className={styles["section-title"]}>Tệp đính kèm</h3>
+        <div className={styles["form-group"]}>
+          <input
+            type="file"
+            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+          />
+          {initialData?.rawItem?.tenFile && !file && (
+            <div className={styles["textarea-counter"]}>
+              Tệp hiện tại: {initialData.rawItem.tenFile}
+            </div>
+          )}
+        </div>
       </section>
     </ModalShell>
   );

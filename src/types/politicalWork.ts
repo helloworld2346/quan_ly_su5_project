@@ -46,6 +46,9 @@ export interface PoliticalWorkItem {
   donVi: PoliticalWorkDonVi;
   loaiDonBaoCao?: LoaiDonBaoCao;
   chuKySo?: string;
+  tenFile?: string;
+  duongDanFile?: string;
+  updatedAt?: string;
 }
 
 export interface RefuseRequest {

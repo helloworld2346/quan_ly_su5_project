@@ -10,10 +10,19 @@ import type {
 export const politicalWorkService = {
   createReport: async (
     payload: PoliticalWorkRequest,
+    file?: File,
   ): Promise<PoliticalWorkSingleResponse> => {
+    const formData = new FormData();
+    formData.append(
+      "data",
+      new Blob([JSON.stringify(payload)], { type: "application/json" }),
+    );
+    if (file) formData.append("file", file);
+
     const response = await api.post<PoliticalWorkSingleResponse>(
       "/ctdangct",
-      payload,
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } },
     );
     return response.data;
   },

@@ -661,11 +661,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
               />
               <hr className={styles.divider} />
               <TrucNguoiFormSection
-                title={
-                  isTacChien || isConsolidation
-                    ? "Trực ban tác chiến"
-                    : "Trực ban nội vụ"
-                }
+                title={isTacChien ? "Trực ban tác chiến" : "Trực ban nội vụ"}
                 value={trucBanTacChien}
                 onChange={setTrucBanTacChien}
                 capBacOptions={capBacTacChienOptions}
