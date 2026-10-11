@@ -535,17 +535,74 @@ export default function CreateReport({
       </section>
       <section className={styles["report-section"]}>
         <h3 className={styles["section-title"]}>Tệp đính kèm</h3>
-        <div className={styles["form-group"]}>
+
+        <label className={styles["file-dropzone"]}>
           <input
             type="file"
+            className={styles["file-input-hidden"]}
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
           />
-          {initialData?.rawItem?.tenFile && !file && (
-            <div className={styles["textarea-counter"]}>
-              Tệp hiện tại: {initialData.rawItem.tenFile}
-            </div>
-          )}
-        </div>
+          <span className={styles["file-dropzone-icon"]} aria-hidden>
+            <svg
+              width="26"
+              height="26"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+          </span>
+          <span className={styles["file-dropzone-text"]}>
+            <strong>Nhấn để chọn tệp</strong> hoặc kéo thả vào đây
+          </span>
+          <span className={styles["file-dropzone-hint"]}>
+            Hỗ trợ tệp PDF, ảnh, Word…
+          </span>
+        </label>
+
+        {file && (
+          <div className={styles["file-chip"]}>
+            <span className={styles["file-chip-icon"]} aria-hidden>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+              </svg>
+            </span>
+            <span className={styles["file-chip-name"]}>{file.name}</span>
+            <span className={styles["file-chip-size"]}>
+              {(file.size / 1024).toFixed(0)} KB
+            </span>
+            <button
+              type="button"
+              className={styles["file-chip-remove"]}
+              onClick={() => setFile(null)}
+              aria-label="Xoá tệp"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
+        {initialData?.rawItem?.tenFile && !file && (
+          <div className={styles["file-current"]}>
+            Tệp hiện tại: <strong>{initialData.rawItem.tenFile}</strong>
+          </div>
+        )}
       </section>
     </ModalShell>
   );
