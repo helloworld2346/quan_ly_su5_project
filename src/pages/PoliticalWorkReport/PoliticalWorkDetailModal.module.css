@@ -171,3 +171,72 @@
   white-space: pre-wrap;
   word-break: break-word;
 }
+
+.iconFile { background-color: var(--btn-excel-bg); color: var(--primary-color); }  
+  
+.fileCard {  
+  display: flex;  
+  align-items: center;  
+  gap: 12px;  
+  padding: 12px 14px;  
+  border: 1px solid var(--border-color);  
+  border-radius: 12px;  
+  background-color: var(--btn-excel-bg);  
+  max-width: 100%;  
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;  
+}  
+  
+.fileCard:hover {  
+  border-color: var(--primary-color);  
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);  
+}  
+  
+.fileCardIcon {  
+  display: inline-flex;  
+  align-items: center;  
+  justify-content: center;  
+  width: 40px;  
+  height: 40px;  
+  flex-shrink: 0;  
+  border-radius: 10px;  
+  background-color: var(--surface-card);  
+  color: var(--primary-color);  
+}  
+  
+.fileCardInfo {  
+  display: flex;  
+  flex-direction: column;  
+  min-width: 0;  
+  flex: 1;  
+}  
+  
+.fileCardName {  
+  font-size: 14px;  
+  font-weight: 700;  
+  color: var(--text-dark);  
+  white-space: nowrap;  
+  overflow: hidden;  
+  text-overflow: ellipsis;  
+}  
+  
+.fileCardHint {  
+  font-size: 12px;  
+  color: var(--on-surface-muted);  
+  margin-top: 2px;  
+}  
+  
+.fileCardBtn {  
+  flex-shrink: 0;  
+  padding: 8px 16px;  
+  border: none;  
+  border-radius: 8px;  
+  background-color: var(--primary-color);  
+  color: var(--text-white);  
+  font-size: 13px;  
+  font-weight: 600;  
+  cursor: pointer;  
+  transition: opacity 0.15s ease;  
+}  
+  
+.fileCardBtn:hover { opacity: 0.9; }  
+.fileCardBtn:disabled { opacity: 0.6; cursor: default; }

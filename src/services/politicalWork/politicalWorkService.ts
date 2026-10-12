@@ -125,4 +125,11 @@ export const politicalWorkService = {
     );
     return response.data;
   },
+
+  downloadFile: async (idCongtac: string): Promise<Blob> => {
+    const response = await api.get(`/ctdangct/download/${idCongtac}`, {
+      responseType: "blob",
+    });
+    return response.data as Blob;
+  },
 };

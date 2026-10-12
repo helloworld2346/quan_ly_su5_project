@@ -1,9 +1,12 @@
+import { useState } from "react";
 import ModalShell from "../../components/ui/ModalShell/ModalShell";
 import styles from "./PoliticalWorkDetailModal.module.css";
 import ReportStatusBadge from "../../components/ui/ReportStatusBadge/ReportStatusBadge";
 import type { PoliticalWorkRow } from "../../types/politicalWork";
 import { parseTrucNguoi } from "./utils/trucNguoi";
 import { normalizeUnitName } from "../../utils/reportUtils";
+import { politicalWorkService } from "../../services/politicalWork/politicalWorkService";
+import { useToast } from "../../context/useToast";
 
 type Props = {
   row: PoliticalWorkRow;
@@ -14,7 +17,36 @@ export default function PoliticalWorkDetailModal({ row, onClose }: Props) {
   const noiVu = parseTrucNguoi(row.trucBanNoiVu);
   const ctd = parseTrucNguoi(row.trucBanCtDangCt);
 
- const unitLabel = normalizeUnitName(row.kyhieuDonVi || row.tenDonVi || row.donVi);
+  const unitLabel = normalizeUnitName(
+    row.kyhieuDonVi || row.tenDonVi || row.donVi,
+  );
+
+  const tenFile = row.rawItem?.tenFile;
+  const hasFile = Boolean(tenFile || row.rawItem?.duongDanFile);
+
+  const [downloading, setDownloading] = useState(false);
+  const { showError } = useToast();
+
+  const handleDownload = async () => {
+    if (!row.idCongtac) return;
+    try {
+      setDownloading(true);
+      // LƯU Ý: cần xác nhận đường dẫn endpoint tải file với backend.
+      const blob = await politicalWorkService.downloadFile(row.idCongtac);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = tenFile || "tep-dinh-kem";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      showError("Không tải được tệp đính kèm");
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   return (
     <ModalShell
@@ -125,7 +157,7 @@ export default function PoliticalWorkDetailModal({ row, onClose }: Props) {
           </div>
         </div>
       </div>
-      
+
       <div className={styles.timelineContainer}>
         <div className={styles.timelineItem}>
           <div className={styles.timelineLeft}>
@@ -214,6 +246,7 @@ export default function PoliticalWorkDetailModal({ row, onClose }: Props) {
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
               </svg>
             </div>
+            <div className={styles.timelineLine}></div>
           </div>
           <div className={styles.timelineRight}>
             <h3 className={styles.sectionTitle}>Kiến nghị, đề xuất</h3>
@@ -224,6 +257,57 @@ export default function PoliticalWorkDetailModal({ row, onClose }: Props) {
                   ? row.kienNghi
                   : "Không có"}
             </p>
+          </div>
+        </div>
+
+        <div className={styles.timelineItem}>
+          <div className={styles.timelineLeft}>
+            <div className={`${styles.timelineIcon} ${styles.iconFile}`}>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                className={styles.svgIconSmall}
+              >
+                <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+              </svg>
+            </div>
+          </div>
+          <div className={styles.timelineRight}>
+            <h3 className={styles.sectionTitle}>Tệp đính kèm</h3>
+            {hasFile ? (
+              <div className={styles.fileCard}>
+                <span className={styles.fileCardIcon} aria-hidden>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    className={styles.svgIconSmall}
+                  >
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                  </svg>
+                </span>
+                <div className={styles.fileCardInfo}>
+                  <span className={styles.fileCardName}>
+                    {tenFile || "Tệp đính kèm"}
+                  </span>
+                  <span className={styles.fileCardHint}>Nhấn để tải xuống</span>
+                </div>
+                <button
+                  type="button"
+                  className={styles.fileCardBtn}
+                  onClick={handleDownload}
+                  disabled={downloading}
+                >
+                  {downloading ? "Đang tải…" : "Tải xuống"}
+                </button>
+              </div>
+            ) : (
+              <p className={styles.sectionText}>Không có tệp đính kèm</p>
+            )}
           </div>
         </div>
       </div>
