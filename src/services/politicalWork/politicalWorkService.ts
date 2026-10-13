@@ -10,22 +10,36 @@ import type {
 export const politicalWorkService = {
   createReport: async (
     payload: PoliticalWorkRequest,
-    file?: File,
+    // TODO(file-attach): bật lại khi backend hỗ trợ upload/download
+    // file?: File,
   ): Promise<PoliticalWorkSingleResponse> => {
-    const formData = new FormData();
-    formData.append(
-      "data",
-      new Blob([JSON.stringify(payload)], { type: "application/json" }),
-    );
-    if (file) formData.append("file", file);
+    // TODO(file-attach): multipart form-data
+    // const formData = new FormData();
+    // formData.append(
+    //   "data",
+    //   new Blob([JSON.stringify(payload)], { type: "application/json" }),
+    // );
+    // if (file) formData.append("file", file);
+    // const response = await api.post<PoliticalWorkSingleResponse>(
+    //   "/ctdangct",
+    //   formData,
+    //   { headers: { "Content-Type": "multipart/form-data" } },
+    // );
 
     const response = await api.post<PoliticalWorkSingleResponse>(
       "/ctdangct",
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } },
+      payload,
     );
     return response.data;
   },
+
+  // TODO(file-attach): bật lại khi backend có endpoint tải file
+  // downloadFile: async (idCongtac: string): Promise<Blob> => {
+  //   const response = await api.get(`/ctdangct/download/${idCongtac}`, {
+  //     responseType: "blob",
+  //   });
+  //   return response.data;
+  // },
 
   updateReport: async (
     idPoliticalWork: string,
