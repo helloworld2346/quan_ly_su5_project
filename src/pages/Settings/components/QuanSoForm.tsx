@@ -11,7 +11,7 @@ import { donviService } from "../../../services/unit/unitService";
 import { useToast } from "../../../context/useToast";
 import { useAuth } from "../../../context/useAuth";
 import { normalizeRoleName, formatNum } from "../../../utils/reportUtils";
-import type { DonVi, QuanSoBienCheResult } from "../../../types/account";  
+import type { DonVi, QuanSoBienCheResult } from "../../../types/account";
 
 import NumberStepper from "../../../components/ui/NumberStepper/NumberStepper";
 import ConfirmDialog from "../../../components/ui/ConfirmDialog/ConfirmDialog";
@@ -24,7 +24,7 @@ type Props = {
   childUnits?: DonVi[];
   quanSoBienChe?: QuanSoBienCheResult | null;
   onUpdated: (unit: DonVi) => void;
-};  
+};
 
 export default function QuanSoForm({
   donVi,

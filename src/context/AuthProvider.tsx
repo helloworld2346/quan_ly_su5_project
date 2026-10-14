@@ -271,17 +271,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   }, [account?.donVi?.maDonVi]);
 
-  const refreshAccount = useCallback(async () => {
-    setLoading(true);
-    await fetchData();
-  }, [fetchData]);
-
   const clearAuth = useCallback(() => {
     setAccount(null);
     setDonVi(null);
     setRoles([]);
     setLoading(false);
   }, []);
+
+  const refreshAccount = useCallback(async () => {
+    setLoading(true);
+    await fetchData();
+  }, [fetchData]);
 
   return (
     <AuthContext.Provider
