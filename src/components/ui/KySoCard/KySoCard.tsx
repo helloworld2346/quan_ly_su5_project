@@ -53,7 +53,9 @@ export default function KySoCard({
           </button>
           <button
             type="button"
-            className={styles.completeBtn}
+            className={`${styles.completeBtn} ${
+              completed ? styles.completeBtnDone : styles.completeBtnPending
+            }`}
             onClick={onComplete}
             disabled={!preview || completed}
           >

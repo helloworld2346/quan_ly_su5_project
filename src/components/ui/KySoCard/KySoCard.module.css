@@ -118,3 +118,30 @@
     gap: 16px;  
   }  
 }
+
+.completeBtn {  
+  border: 1px solid transparent;  
+  color: #fff;  
+  transition: background-color 0.2s ease, border-color 0.2s ease;  
+}  
+  
+/* Chưa ký / chưa hoàn thành: màu đỏ */  
+.completeBtnPending {  
+  background: var(--dialog-danger-bg, #dc2626);  
+  border-color: var(--dialog-danger-bg, #dc2626);  
+}  
+  
+.completeBtnPending:not(:disabled):hover {  
+  filter: brightness(0.92);  
+}  
+  
+/* Đã ký số + hoàn thành: màu xanh */  
+.completeBtnDone {  
+  background: var(--primary-color);  
+  border-color: var(--primary-color);  
+}  
+  
+.completeBtn:disabled {  
+  opacity: 0.55;  
+  cursor: not-allowed;  
+}
