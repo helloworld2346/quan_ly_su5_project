@@ -115,8 +115,8 @@ const isParentUnit =
   (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
   (isChiHuy &&
     (capDonVi === "TRUNG_DOAN" ||
-      capDonVi === "TIEU_DOAN" ||
-      capDonVi === "SU_DOAN")) ||
+      capDonVi === "SU_DOAN" ||
+      (capDonVi === "TIEU_DOAN" && !isDbOrEb))) ||
   (isNoiVu && capDonVi === "TIEU_DOAN" && !isDbOrEb);
 
   const isChiHuyLeaf = isChiHuy && childUnits.length === 0;

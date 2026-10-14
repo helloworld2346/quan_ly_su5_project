@@ -194,11 +194,7 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
     ].join("-");
   });
 
-  const [tongQuanSo] = useState<number>(() => {
-    if (initialData?.quanSoTong) return initialData.quanSoTong;
-    if (tongQuanSoBienChe) return tongQuanSoBienChe;
-    return 0;
-  });
+  const tongQuanSo = tongQuanSoBienChe || initialData?.quanSoTong || 0;
 
   const [absentRows, setAbsentRows] = useState<AbsentRow[]>(() => {
     if (consolidatedAbsentRows && consolidatedAbsentRows.length > 0) {

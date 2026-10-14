@@ -134,7 +134,7 @@ export default function DailyTroopReport() {
   const isParentUnit =
     isAdmin ||
     (isTacChien && (isTrungDoan || isSuDoan)) ||
-    (isChiHuy && (isTrungDoan || isTieuDoan || isSuDoan)) ||
+    (isChiHuy && (isTrungDoan || isSuDoan || (isTieuDoan && !isDbOrEb))) ||
     (isNoiVu && isTieuDoan && !isDbOrEb);
 
   const [signatureBase64, setSignatureBase64] = useState<string | undefined>(
@@ -1174,7 +1174,7 @@ export default function DailyTroopReport() {
                     donBaoCao: res.Result.idDonBaoCao,
                   });
                 } catch {
-             
+                  //
                 }
               }
 
