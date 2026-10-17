@@ -242,20 +242,33 @@ export function useReportData({
   useInitialFetch(fetchReports);
   useReportDataChangedListener(fetchReports);
 
+  const fetchCaTruc = useCallback(async () => {
+    try {
+      const res = await dutyService.getCaTrucByDate(reportDate);
+      const caTruc = res.success && res.Result ? res.Result : null;
+      setCaTrucFromApi(caTruc);
+      return caTruc;
+    } catch {
+      setCaTrucFromApi(null);
+      return null;
+    }
+  }, [reportDate]);
+
   useEffect(() => {
-    const fetchCaTruc = async () => {
+    let active = true;
+    (async () => {
       try {
         const res = await dutyService.getCaTrucByDate(reportDate);
-        if (res.success && res.Result) {
-          setCaTrucFromApi(res.Result);
-        } else {
-          setCaTrucFromApi(null);
+        if (active) {
+          setCaTrucFromApi(res.success && res.Result ? res.Result : null);
         }
       } catch {
-        setCaTrucFromApi(null);
+        if (active) setCaTrucFromApi(null);
       }
+    })();
+    return () => {
+      active = false;
     };
-    void fetchCaTruc();
   }, [reportDate]);
 
   const consolidatedData = useMemo(() => {
@@ -360,5 +373,6 @@ export function useReportData({
     caTrucFromApi,
     consolidatedData,
     fetchReports,
+    refetchCaTruc: fetchCaTruc,
   };
 }

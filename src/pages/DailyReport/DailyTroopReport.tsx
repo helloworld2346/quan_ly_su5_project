@@ -151,6 +151,7 @@ export default function DailyTroopReport() {
     childUnits,
     currentUnit,
     caTrucFromApi,
+    refetchCaTruc,
     consolidatedData,
     fetchReports,
   } = useReportData({
@@ -616,7 +617,7 @@ export default function DailyTroopReport() {
     childUnits,
   ]);
 
-  const handleAddReport = () => {
+  const handleAddReport = async () => {
     if (isPastDate) {
       showError("Không thể tạo báo cáo cho ngày trong quá khứ!");
       return;
@@ -627,14 +628,18 @@ export default function DailyTroopReport() {
       return;
     }
 
-    if (isTacChien && !caTrucFromApi) {
+    // caTrucFromApi fetch async nên có thể chưa load xong lúc click;
+    // chủ động refetch rồi mới quyết định báo lỗi
+    const caTruc = caTrucFromApi ?? (await refetchCaTruc());
+
+    if (isTacChien && !caTruc) {
       showError(
         "Chưa có ca trực cho ngày này. Vui lòng tạo ca trực trước khi tạo báo cáo!",
       );
       return;
     }
 
-    if (!isTacChien && !caTrucFromApi) {
+    if (!isTacChien && !caTruc) {
       showError("Trực ban tác chiến chưa tạo ca trực, vui lòng quay lại sau!");
       return;
     }
@@ -1174,7 +1179,7 @@ export default function DailyTroopReport() {
                     donBaoCao: res.Result.idDonBaoCao,
                   });
                 } catch {
-                  //
+                  ////
                 }
               }
 
