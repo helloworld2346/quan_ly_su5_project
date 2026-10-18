@@ -51,7 +51,7 @@ export default function FilePreviewModal({
       active = false;
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
-  }, [idCongtac, tenFile, showError]);
+  }, [idCongtac, tenFile]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDownload = () => {
     if (!url) return;
