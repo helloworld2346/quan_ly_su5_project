@@ -5,8 +5,7 @@ import ReportStatusBadge from "../../components/ui/ReportStatusBadge/ReportStatu
 import type { PoliticalWorkRow } from "../../types/politicalWork";
 import { parseTrucNguoi } from "./utils/trucNguoi";
 import { normalizeUnitName } from "../../utils/reportUtils";
-import { politicalWorkService } from "../../services/politicalWork/politicalWorkService";
-import { useToast } from "../../context/useToast";
+import FilePreviewModal from "./FilePreviewModal";
 
 type Props = {
   row: PoliticalWorkRow;
@@ -23,41 +22,7 @@ export default function PoliticalWorkDetailModal({ row, onClose }: Props) {
 
   const tenFile = row.rawItem?.tenFile;
   const hasFile = Boolean(tenFile || row.rawItem?.duongDanFile);
-
-  const [downloading, setDownloading] = useState(false);
-  const { showError, showSuccess } = useToast();
-
-  const handleDownload = async () => {
-    if (!row.idCongtac) return;
-    try {
-      setDownloading(true);
-      const blob = await politicalWorkService.downloadFile(row.idCongtac);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = tenFile || "tep-dinh-kem";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    } catch {
-      showError("Không tải được tệp đính kèm");
-    } finally {
-      setDownloading(false);
-    }
-  };
-
-  const handleDeleteFile = async () => {
-    const id = row.rawItem?.idCongtac;
-    if (!id) return;
-    try {
-      await politicalWorkService.deleteFile(id);
-      showSuccess("Đã xoá tệp đính kèm");
-      onClose();  
-    } catch {
-      showError("Không thể xoá tệp đính kèm");
-    }
-  };
+  const [showPreview, setShowPreview] = useState(false);
 
   return (
     <ModalShell
@@ -288,7 +253,11 @@ export default function PoliticalWorkDetailModal({ row, onClose }: Props) {
           <div className={styles.timelineRight}>
             <h3 className={styles.sectionTitle}>Tệp đính kèm</h3>
             {hasFile ? (
-              <div className={styles.fileCard}>
+              <button
+                type="button"
+                className={styles.fileCard}
+                onClick={() => setShowPreview(true)}
+              >
                 <span className={styles.fileCardIcon} aria-hidden>
                   <svg
                     viewBox="0 0 24 24"
@@ -305,30 +274,23 @@ export default function PoliticalWorkDetailModal({ row, onClose }: Props) {
                   <span className={styles.fileCardName}>
                     {tenFile || "Tệp đính kèm"}
                   </span>
-                  <span className={styles.fileCardHint}>Nhấn để tải xuống</span>
+                  <span className={styles.fileCardHint}>Nhấn để xem trước</span>
                 </div>
-                <button
-                  type="button"
-                  className={styles.fileCardBtn}
-                  onClick={handleDownload}
-                  disabled={downloading}
-                >
-                  {downloading ? "Đang tải..." : "Tải xuống"}
-                </button>
-                <button
-                  type="button"
-                  className={styles.fileCardBtnDanger}
-                  onClick={handleDeleteFile}
-                >
-                  Xoá tệp
-                </button>
-              </div>
+                <span className={styles.fileCardBtn}>Xem</span>
+              </button>
             ) : (
               <p className={styles.sectionText}>Không có tệp đính kèm</p>
             )}
           </div>
         </div>
       </div>
+      {showPreview && row.idCongtac && (
+        <FilePreviewModal
+          idCongtac={row.idCongtac}
+          tenFile={tenFile || "tep-dinh-kem"}
+          onClose={() => setShowPreview(false)}
+        />
+      )}
     </ModalShell>
   );
 }
