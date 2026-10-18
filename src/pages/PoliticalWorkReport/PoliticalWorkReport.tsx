@@ -1175,10 +1175,11 @@ const hideDraft = (rows: PoliticalWorkRow[]) =>
         onSubmit={async (payload, file) => {
           try {
             if (editingRow) {
-              await politicalWorkService.updateReport(editingRow.idCongtac, {
-                ...payload,
-                chuKySo: signatureBase64,
-              });
+              await politicalWorkService.updateReport(
+                editingRow.idCongtac,
+                { ...payload, chuKySo: signatureBase64 },
+                file,
+              );
               showSuccess("Cập nhật báo cáo (nháp) thành công");
             } else {
               await politicalWorkService.createReport(

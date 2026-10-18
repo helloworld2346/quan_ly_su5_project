@@ -27,17 +27,6 @@ export const politicalWorkService = {
     return response.data;
   },
 
-  downloadFile: async (idCongtac: string): Promise<Blob> => {
-    const response = await api.get(`/ctdangct/${idCongtac}/file`, {
-      responseType: "blob",
-    });
-    return response.data as Blob;
-  },
-
-  deleteFile: async (idCongtac: string): Promise<void> => {
-    await api.delete(`/ctdangct/${idCongtac}/file`);
-  },
-
   updateReport: async (
     idPoliticalWork: string,
     payload: PoliticalWorkForm,
@@ -54,6 +43,22 @@ export const politicalWorkService = {
       `/ctdangct/${idPoliticalWork}`,
       formData,
       { headers: { "Content-Type": "multipart/form-data" } },
+    );
+    return response.data;
+  },
+
+  downloadFile: async (idCongtac: string): Promise<Blob> => {
+    const response = await api.get(`/ctdangct/${idCongtac}/file`, {
+      responseType: "blob",
+    });
+    return response.data;
+  },
+
+  deleteFile: async (
+    idCongtac: string,
+  ): Promise<PoliticalWorkSingleResponse> => {
+    const response = await api.delete<PoliticalWorkSingleResponse>(
+      `/ctdangct/${idCongtac}/file`,
     );
     return response.data;
   },

@@ -30,6 +30,8 @@ export interface PoliticalWorkForm {
   trucBanCtDangCt?: string;
   kienNghi?: string;
   donVi?: string;
+  thoiGianBaoCao?: string;
+  loaiDonBaoCao?: LoaiDonBaoCao;
   chuKySo?: string;
 }
 

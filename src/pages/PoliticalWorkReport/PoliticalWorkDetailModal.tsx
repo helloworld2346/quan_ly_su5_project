@@ -25,7 +25,7 @@ export default function PoliticalWorkDetailModal({ row, onClose }: Props) {
   const hasFile = Boolean(tenFile || row.rawItem?.duongDanFile);
 
   const [downloading, setDownloading] = useState(false);
-  const { showError } = useToast();
+  const { showError, showSuccess } = useToast();
 
   const handleDownload = async () => {
     if (!row.idCongtac) return;
@@ -44,6 +44,18 @@ export default function PoliticalWorkDetailModal({ row, onClose }: Props) {
       showError("Không tải được tệp đính kèm");
     } finally {
       setDownloading(false);
+    }
+  };
+
+  const handleDeleteFile = async () => {
+    const id = row.rawItem?.idCongtac;
+    if (!id) return;
+    try {
+      await politicalWorkService.deleteFile(id);
+      showSuccess("Đã xoá tệp đính kèm");
+      onClose();  
+    } catch {
+      showError("Không thể xoá tệp đính kèm");
     }
   };
 
@@ -301,7 +313,14 @@ export default function PoliticalWorkDetailModal({ row, onClose }: Props) {
                   onClick={handleDownload}
                   disabled={downloading}
                 >
-                  {downloading ? "Đang tải…" : "Tải xuống"}
+                  {downloading ? "Đang tải..." : "Tải xuống"}
+                </button>
+                <button
+                  type="button"
+                  className={styles.fileCardBtnDanger}
+                  onClick={handleDeleteFile}
+                >
+                  Xoá tệp
                 </button>
               </div>
             ) : (
