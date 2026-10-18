@@ -1193,6 +1193,7 @@ export default function DailyTroopReport() {
               });
             }
           }}
+          isTacChien={isTacChien}
           caTrucInfo={caTrucInfo}
           reportDate={reportDate}
         />
