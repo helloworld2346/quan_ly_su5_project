@@ -8,43 +8,43 @@ import type {
 } from "../../types/politicalWork";
 
 export const politicalWorkService = {
-  createReport: async (
-    payload: PoliticalWorkRequest,
-    file?: File,
-  ): Promise<PoliticalWorkSingleResponse> => {
-    const formData = new FormData();
-    formData.append(
-      "data",
-      new Blob([JSON.stringify(payload)], { type: "application/json" }),
-    );
-    if (file) formData.append("file", file);
-
-    const response = await api.post<PoliticalWorkSingleResponse>(
-      "/ctdangct",
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } },
-    );
-    return response.data;
-  },
-
-  updateReport: async (
-    idPoliticalWork: string,
-    payload: PoliticalWorkForm,
-    file?: File,
-  ): Promise<PoliticalWorkSingleResponse> => {
-    const formData = new FormData();
-    formData.append(
-      "data",
-      new Blob([JSON.stringify(payload)], { type: "application/json" }),
-    );
-    if (file) formData.append("file", file);
-
-    const response = await api.put<PoliticalWorkSingleResponse>(
-      `/ctdangct/${idPoliticalWork}`,
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } },
-    );
-    return response.data;
+  createReport: async (  
+    payload: PoliticalWorkRequest,  
+    file?: File,  
+  ): Promise<PoliticalWorkSingleResponse> => {  
+    const formData = new FormData();  
+    formData.append(  
+      "data",  
+      new Blob([JSON.stringify(payload)], { type: "application/json" }),  
+    );  
+    if (file) formData.append("file", file);  
+  
+    const response = await api.post<PoliticalWorkSingleResponse>(  
+      "/ctdangct",  
+      formData,  
+      { headers: { "Content-Type": "multipart/form-data" } },  
+    );  
+    return response.data;  
+  },  
+  
+  updateReport: async (  
+    idPoliticalWork: string,  
+    payload: PoliticalWorkForm,  
+    file?: File,  
+  ): Promise<PoliticalWorkSingleResponse> => {  
+    const formData = new FormData();  
+    formData.append(  
+      "data",  
+      new Blob([JSON.stringify(payload)], { type: "application/json" }),  
+    );  
+    if (file) formData.append("file", file);  
+  
+    const response = await api.put<PoliticalWorkSingleResponse>(  
+      `/ctdangct/${idPoliticalWork}`,  
+      formData,  
+      { headers: { "Content-Type": "multipart/form-data" } },  
+    );  
+    return response.data;  
   },
 
   downloadFile: async (idCongtac: string): Promise<Blob> => {
