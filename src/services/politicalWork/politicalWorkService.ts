@@ -10,44 +10,50 @@ import type {
 export const politicalWorkService = {
   createReport: async (
     payload: PoliticalWorkRequest,
-    // TODO(file-attach): bật lại khi backend hỗ trợ upload/download
-    // file?: File,
+    file?: File,
   ): Promise<PoliticalWorkSingleResponse> => {
-    // TODO(file-attach): multipart form-data
-    // const formData = new FormData();
-    // formData.append(
-    //   "data",
-    //   new Blob([JSON.stringify(payload)], { type: "application/json" }),
-    // );
-    // if (file) formData.append("file", file);
-    // const response = await api.post<PoliticalWorkSingleResponse>(
-    //   "/ctdangct",
-    //   formData,
-    //   { headers: { "Content-Type": "multipart/form-data" } },
-    // );
+    const formData = new FormData();
+    formData.append(
+      "data",
+      new Blob([JSON.stringify(payload)], { type: "application/json" }),
+    );
+    if (file) formData.append("file", file);
 
     const response = await api.post<PoliticalWorkSingleResponse>(
       "/ctdangct",
-      payload,
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } },
     );
     return response.data;
   },
 
-  // TODO(file-attach): bật lại khi backend có endpoint tải file
-  // downloadFile: async (idCongtac: string): Promise<Blob> => {
-  //   const response = await api.get(`/ctdangct/download/${idCongtac}`, {
-  //     responseType: "blob",
-  //   });
-  //   return response.data;
-  // },
+  downloadFile: async (idCongtac: string): Promise<Blob> => {
+    const response = await api.get(`/ctdangct/${idCongtac}/file`, {
+      responseType: "blob",
+    });
+    return response.data as Blob;
+  },
+
+  deleteFile: async (idCongtac: string): Promise<void> => {
+    await api.delete(`/ctdangct/${idCongtac}/file`);
+  },
 
   updateReport: async (
     idPoliticalWork: string,
     payload: PoliticalWorkForm,
+    file?: File,
   ): Promise<PoliticalWorkSingleResponse> => {
+    const formData = new FormData();
+    formData.append(
+      "data",
+      new Blob([JSON.stringify(payload)], { type: "application/json" }),
+    );
+    if (file) formData.append("file", file);
+
     const response = await api.put<PoliticalWorkSingleResponse>(
       `/ctdangct/${idPoliticalWork}`,
-      payload,
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } },
     );
     return response.data;
   },
@@ -138,12 +144,5 @@ export const politicalWorkService = {
       payload,
     );
     return response.data;
-  },
-
-  downloadFile: async (idCongtac: string): Promise<Blob> => {
-    const response = await api.get(`/ctdangct/download/${idCongtac}`, {
-      responseType: "blob",
-    });
-    return response.data as Blob;
   },
 };

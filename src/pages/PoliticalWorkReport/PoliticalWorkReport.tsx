@@ -1172,8 +1172,7 @@ const hideDraft = (rows: PoliticalWorkRow[]) =>
         maDonViCurrent={submitMaDonVi ?? ""}
         reportDate={reportDate}
         consolidating={consolidating}
-        // onSubmit={async (payload, file) => { // TODO(file-attach)
-        onSubmit={async (payload) => {
+        onSubmit={async (payload, file) => {
           try {
             if (editingRow) {
               await politicalWorkService.updateReport(editingRow.idCongtac, {
@@ -1182,14 +1181,10 @@ const hideDraft = (rows: PoliticalWorkRow[]) =>
               });
               showSuccess("Cập nhật báo cáo (nháp) thành công");
             } else {
-              // await politicalWorkService.createReport( // TODO(file-attach)
-              //   { ...payload, chuKySo: signatureBase64 },
-              //   file,
-              // );
-              await politicalWorkService.createReport({
-                ...payload,
-                chuKySo: signatureBase64,
-              });
+              await politicalWorkService.createReport(
+                { ...payload, chuKySo: signatureBase64 },
+                file,
+              );
               showSuccess(
                 consolidating
                   ? "Tổng hợp và lưu báo cáo thành công"

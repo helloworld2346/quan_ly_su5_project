@@ -31,7 +31,6 @@ export default function PoliticalWorkDetailModal({ row, onClose }: Props) {
     if (!row.idCongtac) return;
     try {
       setDownloading(true);
-      // LƯU Ý: cần xác nhận đường dẫn endpoint tải file với backend.
       const blob = await politicalWorkService.downloadFile(row.idCongtac);
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");

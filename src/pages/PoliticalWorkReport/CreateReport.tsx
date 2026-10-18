@@ -17,9 +17,7 @@ import { isDbOrEbUnit } from "../DailyReport/utils/dailyTroopReportVisibility";
 interface CreateReportProps {
   open: boolean;
   onClose: () => void;
-  // TODO(file-attach): thêm lại tham số file khi bật đính kèm
-  // onSubmit?: (data: PoliticalWorkRequest, file?: File) => void;
-  onSubmit?: (data: PoliticalWorkRequest) => void;
+  onSubmit?: (data: PoliticalWorkRequest, file?: File) => void;
   initialData: PoliticalWorkRow | null;
   maDonViCurrent: string;
   reportDate: string;
@@ -150,8 +148,7 @@ export default function CreateReport({
 
   const { showWarning } = useToast();
   const [validationError, setValidationError] = useState("");
-  // TODO(file-attach): state file đính kèm
-  // const [file, setFile] = useState<File | null>(null);
+  const [file, setFile] = useState<File | null>(null);
 
   const validateForm = (): string => {
     if (!isDaiDoi && !isDonViBo) {
@@ -186,7 +183,7 @@ export default function CreateReport({
 
   const handleClose = () => {
     setValidationError("");
-    // setFile(null); // TODO(file-attach)
+    setFile(null);
     onClose();
   };
 
@@ -220,8 +217,7 @@ export default function CreateReport({
       donVi: maDonViCurrent,
       loaiDonBaoCao: consolidating ? "TONG_HOP" : "DON_VI",
     };
-    // onSubmit?.(payload, file ?? undefined); // TODO(file-attach)
-    onSubmit?.(payload);
+    onSubmit?.(payload, file ?? undefined);
   };
 
   if (!open) return null;
@@ -306,7 +302,6 @@ export default function CreateReport({
             <label>
               Chức vụ <span className={styles["required-mark"]}>*</span>
             </label>
-            {/* Sử dụng ?? undefined để clean kiểu dữ liệu của capDonVi */}
             {getCtdChucVuOptions(capDonVi ?? undefined).length > 0 ? (
               <CustomSelect
                 options={getCtdChucVuOptions(capDonVi ?? undefined)}
@@ -537,7 +532,7 @@ export default function CreateReport({
           </div>
         )}
       </section>
-      {/* <section className={styles["report-section"]}>
+      <section className={styles["report-section"]}>
         <h3 className={styles["section-title"]}>Tệp đính kèm</h3>
 
         <label className={styles["file-dropzone"]}>
@@ -607,7 +602,7 @@ export default function CreateReport({
             Tệp hiện tại: <strong>{initialData.rawItem.tenFile}</strong>
           </div>
         )}
-      </section> */}
+      </section>
     </ModalShell>
   );
 }
