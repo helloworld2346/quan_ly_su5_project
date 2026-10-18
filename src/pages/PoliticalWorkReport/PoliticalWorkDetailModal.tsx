@@ -258,7 +258,18 @@ export default function PoliticalWorkDetailModal({ row, onClose }: Props) {
                 className={styles.fileCard}
                 onClick={() => setShowPreview(true)}
               >
-                <span className={styles.fileCardIcon} aria-hidden>
+                <span className={styles.fileExtBadge}>
+                  {(tenFile?.split(".").pop() || "file")
+                    .toUpperCase()
+                    .slice(0, 4)}
+                </span>
+                <span className={styles.fileCardInfo}>
+                  <span className={styles.fileCardName}>
+                    {tenFile || "Tệp đính kèm"}
+                  </span>
+                  <span className={styles.fileCardHint}>Nhấn để xem trước</span>
+                </span>
+                <span className={styles.fileCardAction} aria-hidden>
                   <svg
                     viewBox="0 0 24 24"
                     fill="none"
@@ -266,17 +277,11 @@ export default function PoliticalWorkDetailModal({ row, onClose }: Props) {
                     strokeWidth="2"
                     className={styles.svgIconSmall}
                   >
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                    <polyline points="14 2 14 8 20 8" />
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
                   </svg>
+                  <span>Xem</span>
                 </span>
-                <div className={styles.fileCardInfo}>
-                  <span className={styles.fileCardName}>
-                    {tenFile || "Tệp đính kèm"}
-                  </span>
-                  <span className={styles.fileCardHint}>Nhấn để xem trước</span>
-                </div>
-                <span className={styles.fileCardBtn}>Xem</span>
               </button>
             ) : (
               <p className={styles.sectionText}>Không có tệp đính kèm</p>

@@ -38,9 +38,27 @@ export default function FilePreviewModal({
       try {
         const blob = await politicalWorkService.downloadFile(idCongtac);
         if (!active) return;
-        objectUrl = URL.createObjectURL(blob);
+
+        const ext = tenFile.split(".").pop()?.toLowerCase() ?? "";
+        const mimeByExt: Record<string, string> = {
+          pdf: "application/pdf",
+          png: "image/png",
+          jpg: "image/jpeg",
+          jpeg: "image/jpeg",
+          gif: "image/gif",
+          webp: "image/webp",
+          bmp: "image/bmp",
+        };
+        const correctType =
+          mimeByExt[ext] || blob.type || "application/octet-stream";
+        const typedBlob =
+          blob.type === correctType
+            ? blob
+            : new Blob([blob], { type: correctType });
+
+        objectUrl = URL.createObjectURL(typedBlob);
         setUrl(objectUrl);
-        setKind(getPreviewKind(tenFile, blob.type));
+        setKind(getPreviewKind(tenFile, correctType));
       } catch {
         if (active) showError("Không tải được tệp đính kèm");
       } finally {

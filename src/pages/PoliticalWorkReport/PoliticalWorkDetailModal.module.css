@@ -178,29 +178,41 @@
   display: flex;  
   align-items: center;  
   gap: 12px;  
-  padding: 12px 14px;  
+  width: 100%;  
+  padding: 10px 12px;  
   border: 1px solid var(--border-color);  
   border-radius: 12px;  
-  background-color: var(--btn-excel-bg);  
-  max-width: 100%;  
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;  
+  background-color: var(--surface-card);  
+  text-align: left;  
+  cursor: pointer;  
+  transition:  
+    border-color 0.15s ease,  
+    box-shadow 0.15s ease,  
+    transform 0.15s ease;  
 }  
   
 .fileCard:hover {  
   border-color: var(--primary-color);  
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);  
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);  
+  transform: translateY(-1px);  
 }  
   
-.fileCardIcon {  
+.fileCard:active { transform: translateY(0); }  
+  
+.fileExtBadge {  
   display: inline-flex;  
   align-items: center;  
   justify-content: center;  
-  width: 40px;  
-  height: 40px;  
+  width: 46px;  
+  height: 46px;  
   flex-shrink: 0;  
   border-radius: 10px;  
-  background-color: var(--surface-card);  
+  background-color: var(--btn-excel-bg);  
   color: var(--primary-color);  
+  font-size: 11px;  
+  font-weight: 800;  
+  letter-spacing: 0.5px;  
+  text-transform: uppercase;  
 }  
   
 .fileCardInfo {  
@@ -208,11 +220,12 @@
   flex-direction: column;  
   min-width: 0;  
   flex: 1;  
+  gap: 2px;  
 }  
   
 .fileCardName {  
   font-size: 14px;  
-  font-weight: 700;  
+  font-weight: 600;  
   color: var(--text-dark);  
   white-space: nowrap;  
   overflow: hidden;  
@@ -222,37 +235,23 @@
 .fileCardHint {  
   font-size: 12px;  
   color: var(--on-surface-muted);  
-  margin-top: 2px;  
 }  
   
-.fileCardBtn {  
+.fileCardAction {  
+  display: inline-flex;  
+  align-items: center;  
+  gap: 6px;  
   flex-shrink: 0;  
-  padding: 8px 16px;  
-  border: none;  
+  padding: 7px 12px;  
   border-radius: 8px;  
+  background-color: var(--btn-excel-bg);  
+  color: var(--primary-color);  
+  font-size: 13px;  
+  font-weight: 600;  
+  transition: background-color 0.15s ease, color 0.15s ease;  
+}  
+  
+.fileCard:hover .fileCardAction {  
   background-color: var(--primary-color);  
   color: var(--text-white);  
-  font-size: 13px;  
-  font-weight: 600;  
-  cursor: pointer;  
-  transition: opacity 0.15s ease;  
-}  
-  
-.fileCardBtn:hover { opacity: 0.9; }  
-.fileCardBtn:disabled { opacity: 0.6; cursor: default; }
-
-.fileCardBtnDanger {  
-  padding: 8px 14px;  
-  border-radius: 8px;  
-  border: 1px solid var(--dialog-danger-bg, #dc2626);  
-  background: transparent;  
-  color: var(--dialog-danger-bg, #dc2626);  
-  font-size: 13px;  
-  font-weight: 600;  
-  cursor: pointer;  
-}  
-  
-.fileCardBtnDanger:hover {  
-  background: var(--dialog-danger-bg, #dc2626);  
-  color: #fff;  
 }
