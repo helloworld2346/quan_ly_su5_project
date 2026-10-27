@@ -325,34 +325,28 @@ const commanderReport = useMemo(() => {
             (unit.capDonVi === "TRUNG_DOAN" || unit.capDonVi === "TIEU_DOAN") &&
             (unit.donViCon?.length ?? 0) > 0;
 
-          // Ưu tiên đơn TONG_HOP cho đơn vị tổng hợp, fallback đơn bất kỳ
-          const childReportRow =
-            (isAggregatingChild
-              ? reportData.find(
-                  (row) =>
-                    row.donVi === unit.maDonVi &&
-                    row.loaiDonBaoCao === "TONG_HOP",
-                )
-              : null) ??
-            reportData.find((row) => row.donVi === unit.maDonVi) ??
-            null;
-
-          const matched = nhiemVuList.find((item) => {
+          const unitNhiemVuItems = nhiemVuList.filter((item) => {
             const itemDonVi = item.donVi.toLowerCase();
-            const matchUnit =
+            return (
               itemDonVi === (unit.kyhieuDonvi ?? "").toLowerCase() ||
               itemDonVi === unit.tenDonvi.toLowerCase() ||
-              itemDonVi === unit.maDonVi.toLowerCase();
-            if (!matchUnit) return false;
-            if (
-              isAggregatingChild &&
-              childReportRow?.loaiDonBaoCao === "TONG_HOP" &&
-              item.loaiDonBaoCao &&
-              item.loaiDonBaoCao !== "TONG_HOP"
-            )
-              return false;
-            return true;
+              itemDonVi === unit.maDonVi.toLowerCase()
+            );
           });
+          const matched = isAggregatingChild
+            ? (unitNhiemVuItems.find(
+                (item) => item.loaiDonBaoCao === "TONG_HOP",
+              ) ?? unitNhiemVuItems[0])
+            : unitNhiemVuItems[0];
+
+          const unitRows = reportData.filter(
+            (row) => row.donVi === unit.maDonVi,
+          );
+          const childReportRow = isAggregatingChild
+            ? (unitRows.find((row) => row.loaiDonBaoCao === "TONG_HOP") ?? null)
+            : (unitRows.find((row) => !row.notSubmitted) ??
+              unitRows[0] ??
+              null);
 
           entries.push({
             id: unit.maDonVi,

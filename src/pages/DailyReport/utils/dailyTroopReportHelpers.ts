@@ -333,15 +333,18 @@ export function buildDisplayRows(args: {
   ).filter((unit) => unit.kyhieuDonvi !== "CH/e");
 
   const childRows = visibleChildUnits.map((unit) => {
-    const matched = filtered.find((row) => row.donVi === unit.maDonVi);
     const isAggregatingChild =
       (unit.capDonVi === "TRUNG_DOAN" || unit.capDonVi === "TIEU_DOAN") &&
       (unit.donViCon?.length ?? 0) > 0;
 
-    if (
-      matched &&
-      (!isAggregatingChild || matched.loaiDonBaoCao === "TONG_HOP")
-    ) {
+    const matched = isAggregatingChild
+      ? filtered.find(
+          (row) =>
+            row.donVi === unit.maDonVi && row.loaiDonBaoCao === "TONG_HOP",
+        )
+      : filtered.find((row) => row.donVi === unit.maDonVi);
+
+    if (matched) {
       return { ...matched, notSubmitted: false };
     }
 
