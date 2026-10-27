@@ -21,10 +21,7 @@ export const dutyService = {
   createTrucChiHuy: async (
     payload: TrucNguoiPayload,
   ): Promise<TrucNguoiResponse> => {
-    const res = await api.post<TrucNguoiResponse>(
-      "/truc-chi-huy",
-      payload,
-    );
+    const res = await api.post<TrucNguoiResponse>("/truc-chi-huy", payload);
     return res.data;
   },
 
@@ -61,17 +58,12 @@ export const dutyService = {
   createCaTruc: async (
     payload: CaTrucPayload,
   ): Promise<CaTrucCreateResponse> => {
-    const res = await api.post<CaTrucCreateResponse>(
-      "/ca-truc",
-      payload,
-    );
+    const res = await api.post<CaTrucCreateResponse>("/ca-truc", payload);
     return res.data;
   },
 
   getCaTruc: async (idCatruc: string): Promise<CaTrucDetailResponse> => {
-    const res = await api.get<CaTrucDetailResponse>(
-      `/ca-truc/${idCatruc}`,
-    );
+    const res = await api.get<CaTrucDetailResponse>(`/ca-truc/${idCatruc}`);
     return res.data;
   },
 
@@ -100,14 +92,21 @@ export const dutyService = {
   },
 
   getAllTrucBanTacChien: async (): Promise<NguoiTrucListResponse> => {
-    const res = await api.get<NguoiTrucListResponse>(
-      "/truc-ban-tac-chien",
-    );
+    const res = await api.get<NguoiTrucListResponse>("/truc-ban-tac-chien");
     return res.data;
   },
 
-  getAllCaTruc: async (): Promise<CaTrucListResponse> => {
-    const res = await api.get<CaTrucListResponse>("/ca-truc");
+  getAllCaTruc: async (
+    tuNgay?: string,
+    denNgay?: string,
+  ): Promise<CaTrucListResponse> => {
+    const params = new URLSearchParams();
+    if (tuNgay) params.set("tuNgay", tuNgay);
+    if (denNgay) params.set("denNgay", denNgay);
+    const qs = params.toString();
+    const res = await api.get<CaTrucListResponse>(
+      `/ca-truc${qs ? `?${qs}` : ""}`,
+    );
     return res.data;
   },
 
@@ -134,9 +133,7 @@ export const dutyService = {
   },
 
   deleteTrucChiHuy: async (id: string): Promise<TrucNguoiResponse> => {
-    const res = await api.delete<TrucNguoiResponse>(
-      `/truc-chi-huy/${id}`,
-    );
+    const res = await api.delete<TrucNguoiResponse>(`/truc-chi-huy/${id}`);
     return res.data;
   },
 

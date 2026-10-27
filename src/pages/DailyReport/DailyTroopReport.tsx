@@ -92,6 +92,7 @@ export default function DailyTroopReport() {
     Array<{
       maDonVi: string;
       donVi: string;
+      loaiDonBaoCao: row.loaiDonBaoCao;
       data: NhiemVuNgay;
     }>
   >([]);

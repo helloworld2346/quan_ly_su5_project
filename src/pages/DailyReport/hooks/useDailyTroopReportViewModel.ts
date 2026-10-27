@@ -28,6 +28,7 @@ export type { NhiemVuSummary, NhiemVuEntry, ConsolidatedData };
 export type NhiemVuListItem = {
   maDonVi: string;
   donVi: string;
+  loaiDonBaoCao?: string;
   data: NhiemVuNgay;
 };
 
@@ -320,17 +321,38 @@ const commanderReport = useMemo(() => {
       childUnits
         .filter((unit) => unit.kyhieuDonvi !== "CH/e")
         .forEach((unit) => {
+          const isAggregatingChild =
+            (unit.capDonVi === "TRUNG_DOAN" || unit.capDonVi === "TIEU_DOAN") &&
+            (unit.donViCon?.length ?? 0) > 0;
+
+          // Ưu tiên đơn TONG_HOP cho đơn vị tổng hợp, fallback đơn bất kỳ
+          const childReportRow =
+            (isAggregatingChild
+              ? reportData.find(
+                  (row) =>
+                    row.donVi === unit.maDonVi &&
+                    row.loaiDonBaoCao === "TONG_HOP",
+                )
+              : null) ??
+            reportData.find((row) => row.donVi === unit.maDonVi) ??
+            null;
+
           const matched = nhiemVuList.find((item) => {
             const itemDonVi = item.donVi.toLowerCase();
-            return (
+            const matchUnit =
               itemDonVi === (unit.kyhieuDonvi ?? "").toLowerCase() ||
               itemDonVi === unit.tenDonvi.toLowerCase() ||
-              itemDonVi === unit.maDonVi.toLowerCase()
-            );
+              itemDonVi === unit.maDonVi.toLowerCase();
+            if (!matchUnit) return false;
+            if (
+              isAggregatingChild &&
+              childReportRow?.loaiDonBaoCao === "TONG_HOP" &&
+              item.loaiDonBaoCao &&
+              item.loaiDonBaoCao !== "TONG_HOP"
+            )
+              return false;
+            return true;
           });
-
-          const childReportRow =
-            reportData.find((row) => row.donVi === unit.maDonVi) ?? null;
 
           entries.push({
             id: unit.maDonVi,

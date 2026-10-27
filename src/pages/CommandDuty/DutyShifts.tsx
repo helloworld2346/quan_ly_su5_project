@@ -99,20 +99,35 @@ export default function DutyShifts() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    const load = async () => {
-      setLoading(true);
+    const loadNguoiTruc = async () => {
       try {
-        const [shiftsRes, chiHuyRes, tacChienRes] = await Promise.all([
-          dutyService.getAllCaTruc(),
+        const [chiHuyRes, tacChienRes] = await Promise.all([
           dutyService.getAllTrucChiHuy(),
           dutyService.getAllTrucBanTacChien(),
         ]);
+        setChiHuyList(chiHuyRes.Result ?? []);
+        setTacChienList(tacChienRes.Result ?? []);
+      } catch {
+        showError("Không thể tải danh sách người trực");
+      }
+    };
+    void loadNguoiTruc();
+  }, [showError]);
+
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      try {
+        const month = String(filterMonthNum).padStart(2, "0");
+        const lastDay = new Date(filterYear, filterMonthNum, 0).getDate();
+        const tuNgay = `${filterYear}-${month}-01`;
+        const denNgay = `${filterYear}-${month}-${String(lastDay).padStart(2, "0")}`;
+
+        const shiftsRes = await dutyService.getAllCaTruc(tuNgay, denNgay);
         const sorted = [...(shiftsRes.Result ?? [])].sort((a, b) =>
           b.ngaytruc.localeCompare(a.ngaytruc),
         );
         setShiftList(sorted);
-        setChiHuyList(chiHuyRes.Result ?? []);
-        setTacChienList(tacChienRes.Result ?? []);
       } catch {
         showError("Không thể tải danh sách ca trực");
       } finally {
@@ -120,7 +135,7 @@ export default function DutyShifts() {
       }
     };
     void load();
-  }, [showError]);
+  }, [filterYear, filterMonthNum, showError]);
 
   const filterPrefix = `${filterYear}-${String(filterMonthNum).padStart(2, "0")}`;
 
@@ -254,7 +269,7 @@ export default function DutyShifts() {
       );
       closeModal();
     } catch {
-      // 
+      //
     } finally {
       setSaving(false);
     }
