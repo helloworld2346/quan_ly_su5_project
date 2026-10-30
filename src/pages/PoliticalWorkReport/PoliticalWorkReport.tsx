@@ -11,6 +11,7 @@ import {
   faTriangleExclamation,
   faEllipsisVertical,
   faPenToSquare,
+  faPaperclip,
 } from "@fortawesome/free-solid-svg-icons";
 import { shouldHideDraftAndUnsubmittedForCommander } from "../DailyReport/utils/dailyTroopReportVisibility";
 import ReportToolbar from "../../components/report/ReportToolbar";
@@ -49,6 +50,7 @@ import { isApprovedStatus } from "../../utils/reportStatus";
 import { exportPoliticalWorkToExcel } from "../../utils/exportPoliticalWork";
 
 import { donviService } from "../../services/unit/unitService";
+import FilePreviewModal from "./FilePreviewModal";
 
 function StatusBadge({
   active,
@@ -96,6 +98,10 @@ export default function PoliticalWorkReport() {
   const [isCreateReportOpen, setIsCreateReportOpen] = useState(false);
   const [editingRow, setEditingRow] = useState<PoliticalWorkRow | null>(null);
   const [detailRow, setDetailRow] = useState<PoliticalWorkRow | null>(null);
+  const [previewFile, setPreviewFile] = useState<{
+    idCongtac: string;
+    tenFile: string;
+  } | null>(null);
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState<{
     top?: number;
@@ -716,6 +722,22 @@ const hideDraft = (rows: PoliticalWorkRow[]) =>
         </td>
         <td className={styles["political-text-cell"]}>
           <span className={styles["political-clamp"]}>{row.tinhHinh}</span>
+          {row.rawItem?.tenFile && (
+            <button
+              type="button"
+              className={styles["political-file-link"]}
+              onClick={(e) => {
+                e.stopPropagation();
+                setPreviewFile({
+                  idCongtac: row.idCongtac,
+                  tenFile: row.rawItem!.tenFile!,
+                });
+              }}
+            >
+              <FontAwesomeIcon icon={faPaperclip} />
+              <span>{row.rawItem!.tenFile}</span>
+            </button>
+          )}
         </td>
         <td className={styles["political-text-cell"]}>
           <span className={styles["political-clamp"]}>{row.ketQua}</span>
@@ -1232,6 +1254,13 @@ const hideDraft = (rows: PoliticalWorkRow[]) =>
             />
           );
         })()}
+      {previewFile && (
+        <FilePreviewModal
+          idCongtac={previewFile.idCongtac}
+          tenFile={previewFile.tenFile}
+          onClose={() => setPreviewFile(null)}
+        />
+      )}
     </section>
   );
 }
