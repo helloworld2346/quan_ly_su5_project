@@ -159,7 +159,6 @@ export default function DailyTroopReport() {
     maDonViCurrent,
     isParentUnit,
     isTacChien,
-    isChiHuy,
     capDonVi,
     reportDate,
     kyHieuDonVi,
@@ -506,10 +505,7 @@ export default function DailyTroopReport() {
     void (async () => {
       if (!maDonViCurrent) return;
       const ownRow = isParentUnit
-        ? reportData.find(
-            (row) =>
-              row.donVi === maDonViCurrent && row.loaiDonBaoCao === "TONG_HOP",
-          )
+        ? (parentReportData ?? parentOwnReportData)
         : reportData.find((row) => row.donVi === maDonViCurrent);
 
       if (!ownRow?.idDonBaoCao) {
@@ -526,8 +522,14 @@ export default function DailyTroopReport() {
         setNhiemVuData(null);
       }
     })();
-  }, [reportData, maDonViCurrent, isParentUnit, reportDate]);
-
+  }, [
+    reportData,
+    parentReportData,
+    parentOwnReportData,
+    maDonViCurrent,
+    isParentUnit,
+    reportDate,
+  ]);
   useEffect(() => {
     let cancelled = false;
 
@@ -640,6 +642,49 @@ export default function DailyTroopReport() {
               noiDungUuDiem: ownNv.noiDungUuDiem,
               noiDungKhuyetDiem: ownNv.noiDungKhuyetDiem,
               noiDungCanGiaiQuyet: ownNv.noiDungCanGiaiQuyet,
+            },
+          });
+        }
+
+        const missingRows = reportData.filter(
+          (row) =>
+            row.idDonBaoCao &&
+            !row.notSubmitted &&
+            row.donVi !== maDonViCurrent &&
+            !list.some(
+              (l) =>
+                l.maDonVi === row.donVi &&
+                l.loaiDonBaoCao === (row.loaiDonBaoCao ?? "DON_VI"),
+            ),
+        );
+
+        const fetched = await Promise.all(
+          missingRows.map(async (row) => {
+            try {
+              const res = await dailyReportService.getNhiemVuNgayByDonBaoCao(
+                row.idDonBaoCao,
+              );
+              return res?.Result ? { row, nv: res.Result } : null;
+            } catch {
+              return null;
+            }
+          }),
+        );
+
+        for (const f of fetched) {
+          if (!f || cancelled) continue;
+          const unit = childUnits.find((u) => u.maDonVi === f.row.donVi);
+          list.push({
+            maDonVi: f.row.donVi,
+            donVi: unit?.kyhieuDonvi ?? f.row.kyhieuDonVi ?? "",
+            loaiDonBaoCao: f.row.loaiDonBaoCao ?? "DON_VI",
+            data: {
+              idNhiemvuNgay: f.nv.idNhiemvuNgay,
+              nhiemVuPhandoi: f.nv.nhiemVuPhandoi,
+              noiDungDotXuat: f.nv.noiDungDotXuat,
+              noiDungUuDiem: f.nv.noiDungUuDiem,
+              noiDungKhuyetDiem: f.nv.noiDungKhuyetDiem,
+              noiDungCanGiaiQuyet: f.nv.noiDungCanGiaiQuyet,
             },
           });
         }

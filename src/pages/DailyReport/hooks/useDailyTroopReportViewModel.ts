@@ -79,6 +79,7 @@ function getNhiemVuReportStatusLabel(row: ReportRow | null | undefined) {
 
   if (normalized === "Chờ_Duyệt") return "Chờ duyệt";
   if (normalized === "Đã_Duyệt") return "Đã duyệt";
+  if (normalized === "Nháp" && !row?.notSubmitted) return "Nháp";
   return "Chưa nộp";
 }
 

@@ -8,6 +8,7 @@ import type {
   VangChiTiet,
   ReportRow,
   ReportItemInput,
+  LoaiDonBaoCao,
 } from "../../../types/dailyReport";
 import type { CaTrucDetail } from "../../../types/duty";
 import { generateId } from "../../../utils/uuid";
@@ -20,7 +21,6 @@ export type { ReportRow };
 export function useReportData({
   maDonViCurrent,
   isParentUnit,
-  isChiHuy,
   capDonVi,
   reportDate,
   isDbOrEb,
@@ -29,7 +29,6 @@ export function useReportData({
   maDonViCurrent: string | undefined;
   isParentUnit: boolean;
   isTacChien: boolean;
-  isChiHuy: boolean;
   capDonVi?: string | null;
   reportDate: string;
   kyHieuDonVi: string | null;
@@ -86,12 +85,12 @@ export function useReportData({
               merged.set(item.donVi.maDonVi, item);
             }
           }
-
-          // TONG_HOP phải merge sau DON_VI để các dòng như e4/e5/e271 hoặc d15
-          // hiển thị báo cáo tổng hợp thay vì bị coi là chưa nộp.
           if (tongHopRes.success && tongHopRes.Result) {
             for (const item of tongHopRes.Result) {
-              merged.set(item.donVi.maDonVi, item);
+              merged.set(item.donVi.maDonVi, {
+                ...item,
+                loaiDonBaoCao: "TONG_HOP" as LoaiDonBaoCao,
+              });
             }
           }
 
@@ -136,10 +135,12 @@ export function useReportData({
               }
             }
 
-            // Merge sau cùng để d1/d2/d3/d15... lấy bản TONG_HOP nếu có.
             if (childTongHopRes?.success && childTongHopRes.Result) {
               for (const item of childTongHopRes.Result) {
-                merged.set(item.donVi.maDonVi, item);
+                merged.set(item.donVi.maDonVi, {
+                  ...item,
+                  loaiDonBaoCao: "TONG_HOP" as LoaiDonBaoCao,
+                });
               }
             }
           }
@@ -165,41 +166,42 @@ export function useReportData({
         }
 
         try {
+          const isAggregatingSelf =
+            (isTrungDoan || isSuDoan || isTieuDoan) && !isDbOrEb;
+          const loaiOwn: LoaiDonBaoCao = isAggregatingSelf
+            ? "TONG_HOP"
+            : "DON_VI";
+
           const ownRes = await dailyReportService.searchReportByUnitAndDate(
             maDonViCurrent,
             reportDate,
-            "DON_VI",
+            loaiOwn,
           );
-          setParentOwnReportData(
+          const ownRow =
             ownRes.success && ownRes.Result
-              ? mapItemToRow(ownRes.Result)
-              : null,
-          );
-        } catch {
-          setParentOwnReportData(null);
-        }
+              ? {
+                  ...mapItemToRow(ownRes.Result),
+                  loaiDonBaoCao: loaiOwn,
+                }
+              : null;
+          setParentOwnReportData(ownRow);
 
-        if (isTrungDoan || isTieuDoan || isSuDoan) {
-          try {
-            const consRes = await dailyReportService.searchReportByUnitAndDate(
-              maDonViCurrent,
-              reportDate,
-              "TONG_HOP",
-            );
+          if (isTrungDoan || isTieuDoan || isSuDoan) {
             setParentReportData(
-              consRes.success && consRes.Result
-                ? { ...mapItemToRow(consRes.Result), isConsolidated: true }
-                : null,
+              ownRow ? { ...ownRow, isConsolidated: true } : null,
             );
-          } catch {
+          } else {
             setParentReportData(null);
           }
-        } else {
-          setParentReportData(null);
+        } catch {
+          setParentOwnReportData(null);
+          if (isTrungDoan || isTieuDoan || isSuDoan) {
+            setParentReportData(null);
+          }
         }
       } else {
         const loaiChiHuy =
-          isChiHuy && (isSuDoan || isTrungDoan || (isTieuDoan && !isDbOrEb))
+          isSuDoan || isTrungDoan || (isTieuDoan && !isDbOrEb)
             ? "TONG_HOP"
             : "DON_VI";
         response = await dailyReportService.searchReportByUnitAndDate(
@@ -231,7 +233,6 @@ export function useReportData({
   }, [
     maDonViCurrent,
     isParentUnit,
-    isChiHuy,
     isSuDoan,
     isTrungDoan,
     isTieuDoan,

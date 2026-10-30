@@ -59,5 +59,9 @@ export function filterVisibleNhiemVuEntries<
 >(entries: T[], shouldHideDraftAndUnsubmitted: boolean): T[] {
   if (!shouldHideDraftAndUnsubmitted) return entries;
 
-  return entries.filter((item) => item.reportStatusLabel !== "Chưa nộp");
+  return entries.filter(
+    (item) =>
+      item.reportStatusLabel !== "Chưa nộp" &&
+      item.reportStatusLabel !== "Nháp",
+  );
 }
