@@ -155,13 +155,27 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   } | null>(null);
 
   useEffect(() => {
-    if (!initialData?.idDonBaoCao) return;
-    void dailyReportService
-      .getNhiemVuNgayByDonBaoCao(initialData.idDonBaoCao)
-      .then((res) => {
-        if (res.Result) setNhiemVuInitialData(res.Result);
-      })
-      .catch(() => {});
+    let cancelled = false;
+
+    const load = async () => {
+      if (!initialData?.idDonBaoCao) {
+        if (!cancelled) setNhiemVuInitialData(null);
+        return;
+      }
+      try {
+        const res = await dailyReportService.getNhiemVuNgayByDonBaoCao(
+          initialData.idDonBaoCao,
+        );
+        if (!cancelled) setNhiemVuInitialData(res.Result ?? null);
+      } catch {
+        if (!cancelled) setNhiemVuInitialData(null);
+      }
+    };
+
+    void load();
+    return () => {
+      cancelled = true;
+    };
   }, [initialData?.idDonBaoCao]);
 
   const detailFromInitialData = useMemo<DetailStepData | null>(() => {
@@ -545,7 +559,9 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       trucBanChiHuy: JSON.stringify(trucChiHuy),
       trucBanTacChien: JSON.stringify(trucBanTacChien),
       tinhHinhHoatDong: JSON.stringify(currentDetailData),
-      loaiDonBaoCao: consolidatedAbsentRows ? "TONG_HOP" : "DON_VI",
+      loaiDonBaoCao:
+        initialData?.loaiDonBaoCao ??
+        (consolidatedAbsentRows ? "TONG_HOP" : "DON_VI"),
     };
 
     onSubmit(payload, currentDetailData);
@@ -554,6 +570,8 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   const handleCloseModal = () => {
     setStep(1);
     setDetailData(null);
+    setDetailVersion(0);
+    setNhiemVuInitialData(null);
     setValidationError("");
     setConfirmOpen(false);
     setPendingYesterday(null);

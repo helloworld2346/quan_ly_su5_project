@@ -504,11 +504,13 @@ export default function DailyTroopReport() {
 
   useEffect(() => {
     void (async () => {
-      if (isParentUnit || !maDonViCurrent) {
-        return;
-      }
-
-      const ownRow = reportData.find((row) => row.donVi === maDonViCurrent);
+      if (!maDonViCurrent) return;
+      const ownRow = isParentUnit
+        ? reportData.find(
+            (row) =>
+              row.donVi === maDonViCurrent && row.loaiDonBaoCao === "TONG_HOP",
+          )
+        : reportData.find((row) => row.donVi === maDonViCurrent);
 
       if (!ownRow?.idDonBaoCao) {
         setNhiemVuData(null);
@@ -540,7 +542,12 @@ export default function DailyTroopReport() {
       }
 
       try {
-        const [donViRes, tongHopRes] = await Promise.all([
+        const ownTongHopRow = reportData.find(
+          (row) =>
+            row.donVi === maDonViCurrent && row.loaiDonBaoCao === "TONG_HOP",
+        );
+
+        const [donViRes, tongHopRes, ownRes] = await Promise.all([
           dailyReportService.searchNhiemVuNgayChildrenByDonVi(
             maDonViCurrent,
             reportDate,
@@ -551,12 +558,26 @@ export default function DailyTroopReport() {
             reportDate,
             "TONG_HOP",
           ),
+          ownTongHopRow?.idDonBaoCao
+            ? dailyReportService.getNhiemVuNgayByDonBaoCao(
+                ownTongHopRow.idDonBaoCao,
+              )
+            : Promise.resolve(null),
         ]);
 
-        const merged = new Map<string, (typeof donViRes.Result)[number]>();
+        const merged = new Map<
+          string,
+          {
+            item: (typeof donViRes.Result)[number];
+            loaiDonBaoCao: ReportRow["loaiDonBaoCao"];
+          }
+        >();
 
         for (const item of donViRes.Result ?? []) {
-          merged.set(item.donViResponse.maDonVi, item);
+          merged.set(item.donViResponse.maDonVi, {
+            item,
+            loaiDonBaoCao: "DON_VI" as ReportRow["loaiDonBaoCao"],
+          });
         }
 
         for (const item of tongHopRes.Result ?? []) {
@@ -580,22 +601,48 @@ export default function DailyTroopReport() {
             tenDonvi.includes("chính trị");
 
           if (isAggregating || !merged.has(ma)) {
-            merged.set(ma, item);
+            merged.set(ma, {
+              item,
+              loaiDonBaoCao: "TONG_HOP" as ReportRow["loaiDonBaoCao"],
+            });
           }
         }
 
-        const list = Array.from(merged.values()).map((item) => ({
-          maDonVi: item.donViResponse.maDonVi,
-          donVi: item.donViResponse.kyhieuDonvi || "",
-          data: {
-            idNhiemvuNgay: item.idNhiemvuNgay,
-            nhiemVuPhandoi: item.nhiemVuPhandoi,
-            noiDungDotXuat: item.noiDungDotXuat,
-            noiDungUuDiem: item.noiDungUuDiem,
-            noiDungKhuyetDiem: item.noiDungKhuyetDiem,
-            noiDungCanGiaiQuyet: item.noiDungCanGiaiQuyet,
-          },
-        }));
+        const list = Array.from(merged.values()).map(
+          ({ item, loaiDonBaoCao }) => ({
+            maDonVi: item.donViResponse.maDonVi,
+            donVi: item.donViResponse.kyhieuDonvi || "",
+            loaiDonBaoCao,
+            data: {
+              idNhiemvuNgay: item.idNhiemvuNgay,
+              nhiemVuPhandoi: item.nhiemVuPhandoi,
+              noiDungDotXuat: item.noiDungDotXuat,
+              noiDungUuDiem: item.noiDungUuDiem,
+              noiDungKhuyetDiem: item.noiDungKhuyetDiem,
+              noiDungCanGiaiQuyet: item.noiDungCanGiaiQuyet,
+            },
+          }),
+        );
+
+        const ownNv = ownRes?.Result;
+        if (ownNv) {
+          const ownUnit =
+            childUnits.find((u) => u.maDonVi === maDonViCurrent) ??
+            account?.donVi;
+          list.push({
+            maDonVi: maDonViCurrent,
+            donVi: ownUnit?.kyhieuDonvi ?? account?.donVi?.kyhieuDonvi ?? "",
+            loaiDonBaoCao: "TONG_HOP",
+            data: {
+              idNhiemvuNgay: ownNv.idNhiemvuNgay,
+              nhiemVuPhandoi: ownNv.nhiemVuPhandoi,
+              noiDungDotXuat: ownNv.noiDungDotXuat,
+              noiDungUuDiem: ownNv.noiDungUuDiem,
+              noiDungKhuyetDiem: ownNv.noiDungKhuyetDiem,
+              noiDungCanGiaiQuyet: ownNv.noiDungCanGiaiQuyet,
+            },
+          });
+        }
 
         if (!cancelled) setNhiemVuList(list);
       } catch {
@@ -616,6 +663,8 @@ export default function DailyTroopReport() {
     isTieuDoan,
     isSuDoan,
     childUnits,
+    reportData,
+    account?.donVi,
   ]);
 
   const handleAddReport = async () => {
@@ -629,8 +678,6 @@ export default function DailyTroopReport() {
       return;
     }
 
-    // caTrucFromApi fetch async nên có thể chưa load xong lúc click;
-    // chủ động refetch rồi mới quyết định báo lỗi
     const caTruc = caTrucFromApi ?? (await refetchCaTruc());
 
     if (isTacChien && !caTruc) {
@@ -1122,15 +1169,27 @@ export default function DailyTroopReport() {
 
                 try {
                   if (editNhiemVuId) {
-                    await dailyReportService.updateNhiemVuNgay(
-                      editNhiemVuId,
-                      nhiemVuPayload,
-                    );
+                    try {
+                      await dailyReportService.updateNhiemVuNgay(
+                        editNhiemVuId,
+                        nhiemVuPayload,
+                      );
+                    } catch (error) {
+                      const status = (error as AxiosError)?.response?.status;
+                      if (status === 404) {
+                        // Nhiệm vụ ngày không tồn tại trên server → tạo mới
+                        await dailyReportService.createNhiemVuNgay(
+                          nhiemVuPayload,
+                        );
+                      } else {
+                        throw error;
+                      }
+                    }
                   } else {
                     await dailyReportService.createNhiemVuNgay(nhiemVuPayload);
                   }
                 } catch {
-                  //
+                  showError("Cập nhật nội dung thất bại, vui lòng thử lại");
                 }
               }
 
@@ -1179,8 +1238,19 @@ export default function DailyTroopReport() {
                     noiDungCanGiaiQuyet: detailData.pendingDetail,
                     donBaoCao: res.Result.idDonBaoCao,
                   });
-                } catch {
-                  ////
+                } catch (error) {
+                  const status = (error as AxiosError)?.response?.status;
+                  if (status === 404) {
+                    showError(
+                      "Chưa có ca trực cho ngày này. Vui lòng tạo ca trực trước!",
+                    );
+                    return;
+                  }
+                  handleApiError(error, {
+                    showError,
+                    errorMessage: "Không thể tạo nhiệm vụ ngày",
+                  });
+                  return;
                 }
               }
 

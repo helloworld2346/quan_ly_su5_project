@@ -119,6 +119,7 @@ export interface CreateReportResponse {
     caTruc: CaTrucInfo;
     tinhHinhHoatDong?: string;
     chuKySo?: string;
+    loaiDonBaoCao?: "DON_VI" | "TONG_HOP";
   };
 }
 
