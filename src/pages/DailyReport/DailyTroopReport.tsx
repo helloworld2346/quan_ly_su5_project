@@ -842,7 +842,6 @@ export default function DailyTroopReport() {
     const ngayBaoCao = y && m && d ? `${d}/${m}/${y}` : reportDate;
     try {
       if (isNeedUpdateStatus(parentReportData.status)) {
-        // Bước 1: chỉ đưa báo cáo tổng hợp về "Nháp", CHƯA gộp số liệu.
         const raw = parentReportData.rawItem;
         await dailyReportService.returnTongHop(maDonViCurrent, ngayBaoCao, {
           quanSoTong: raw.quanSoTong,
@@ -891,6 +890,10 @@ export default function DailyTroopReport() {
       });
     }
   };
+
+  const isEditingTongHop =  
+  currentEditingReport?.loaiDonBaoCao === "TONG_HOP" ||  
+  parentReportData?.idDonBaoCao === editModalData?.reportId;
 
   return (
     <section className={styles.report} aria-labelledby="dashboard-page-heading">
@@ -986,7 +989,6 @@ export default function DailyTroopReport() {
         }
         inlineSaveDisabled={!inlineDraft}
       />
-
       <div className={styles["daily-stats-grid"]}>
         <StatCard
           tone="green"
@@ -1019,7 +1021,6 @@ export default function DailyTroopReport() {
           value={displayTotals.vangHSQBS}
         />
       </div>
-
       <DailyTroopStatisticsSection
         loading={showSkeleton}
         displayRows={displayRows}
@@ -1039,13 +1040,11 @@ export default function DailyTroopReport() {
         }}
         childUnits={childUnits}
       />
-
       <DailyTroopNhiemVuSection
         nhiemVuEntries={nhiemVuEntries}
         openNhiemVuId={openNhiemVuId}
         setOpenNhiemVuId={setOpenNhiemVuId}
       />
-
       {caTrucInfo && (
         <CaTrucInfoCard
           ngaytruc={caTrucInfo.ngaytruc ?? ""}
@@ -1068,7 +1067,6 @@ export default function DailyTroopReport() {
           }
         />
       )}
-
       {isChiHuy && (
         <KySoCard
           chucVu="Người báo cáo"
@@ -1083,7 +1081,6 @@ export default function DailyTroopReport() {
           completed={signatureDone}
         />
       )}
-
       {selectedReportRow && (
         <TroopDetailModal
           unit={normalizeUnitName(
@@ -1117,7 +1114,6 @@ export default function DailyTroopReport() {
           }
         />
       )}
-
       {showConsolidatedDetail && consolidatedData && (
         <TroopDetailModal
           unit="Tổng hợp tất cả đơn vị"
@@ -1134,7 +1130,6 @@ export default function DailyTroopReport() {
           onClose={() => setShowConsolidatedDetail(false)}
         />
       )}
-
       {showCreateModal && (
         <CreateReportModal
           isOpen={showCreateModal}
@@ -1188,7 +1183,6 @@ export default function DailyTroopReport() {
           reportDate={reportDate}
         />
       )}
-
       {editModalData && (
         <CreateReportModal
           isOpen={Boolean(editModalData)}
@@ -1209,6 +1203,7 @@ export default function DailyTroopReport() {
                 tinhHinhHoatDong: payload.tinhHinhHoatDong,
                 account: account?.idTaiKhoan ?? "",
                 donVi: account?.donVi?.maDonVi ?? "",
+                loaiDonBaoCao: isEditingTongHop ? "TONG_HOP" : "DON_VI",
                 chuKySo: signatureBase64,
               });
 
@@ -1232,7 +1227,6 @@ export default function DailyTroopReport() {
                     } catch (error) {
                       const status = (error as AxiosError)?.response?.status;
                       if (status === 404) {
-                        // Nhiệm vụ ngày không tồn tại trên server → tạo mới
                         await dailyReportService.createNhiemVuNgay(
                           nhiemVuPayload,
                         );
@@ -1259,8 +1253,27 @@ export default function DailyTroopReport() {
             }
           }}
           maDonViCurrent={account?.donVi?.maDonVi}
-          tongQuanSoBienChe={donViQuanSoTong || undefined}
+          tongQuanSoBienChe={
+            isEditingTongHop && consolidatedData
+              ? consolidatedData.quanSoTong
+              : donViQuanSoTong || undefined
+          }
           bienCheTong={bienCheTongTrungDoan}
+          consolidatedAbsentRows={
+            isEditingTongHop && consolidatedData
+              ? consolidatedData.absentRows
+              : undefined
+          }
+          consolidatedThongTinVang={
+            isEditingTongHop && consolidatedData
+              ? consolidatedData.thongTinVang
+              : undefined
+          }
+          consolidatedQuanSoVang={
+            isEditingTongHop && consolidatedData
+              ? consolidatedData.quanSoVang
+              : undefined
+          }
           caTrucInfo={caTrucInfo}
           isTacChien={isTacChien}
           reportDate={reportDate}
@@ -1324,7 +1337,6 @@ export default function DailyTroopReport() {
           reportDate={reportDate}
         />
       )}
-
       <RefuseDialog
         isOpen={showRefuseDialog}
         unitName={refuseUnitName}

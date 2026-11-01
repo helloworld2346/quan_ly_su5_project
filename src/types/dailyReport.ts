@@ -136,6 +136,7 @@ export interface UpdateReportRequest {
   trucBanTacChien?: string;
   tinhHinhHoatDong?: string;
   chuKySo?: string;
+  loaiDonBaoCao?: "DON_VI" | "TONG_HOP";
 }
 
 export interface UpdateReportResponse {
