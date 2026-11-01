@@ -202,8 +202,7 @@ export default function DailyTroopStatisticsSection({
                       )}
 
                     {canShowConsolidatedBlock &&
-                      parentReportData &&
-                      parentReportData.status !== "Nháp" && (
+                      parentReportData && (
                         <>
                           <tr className={styles.separatorRow}>
                             <td colSpan={23}>Báo cáo tổng hợp</td>

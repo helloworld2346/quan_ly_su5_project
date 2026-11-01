@@ -852,11 +852,13 @@ export default function DailyTroopReport() {
           chiTietVang: raw.chiTietVang,
           account: account?.idTaiKhoan ?? "",
           donVi: raw.donVi?.maDonVi ?? maDonViCurrent,
+          loaiDonBaoCao: "TONG_HOP",
           trucBanChiHuy: raw.trucBanChiHuy,
           trucBanTacChien: raw.trucBanTacChien,
           tinhHinhHoatDong: raw.tinhHinhHoatDong,
           chuKySo: raw.chuKySo,
         });
+
         showSuccess(
           'Đã đưa báo cáo tổng hợp về nháp. Hãy trả về cho các đơn vị con cập nhật, sau đó bấm "Tổng hợp lại" để gộp số liệu mới.',
         );
@@ -871,11 +873,12 @@ export default function DailyTroopReport() {
             ).toISOString(),
             chiTietVang: JSON.stringify(consolidatedData.absentRows),
             thongTinVang: JSON.stringify(consolidatedData.thongTinVang),
+            loaiDonBaoCao: "TONG_HOP",
             trucBanChiHuy: JSON.stringify(caTrucInfo?.trucChiHuy ?? {}),
             trucBanTacChien: JSON.stringify(caTrucInfo?.trucBanTacChien ?? {}),
             tinhHinhHoatDong: JSON.stringify({}),
             account: account?.idTaiKhoan ?? "",
-            donVi: account?.donVi?.maDonVi ?? "",
+            donVi: parentReportData.rawItem?.donVi?.maDonVi ?? maDonViCurrent,
             chuKySo: signatureBase64,
           });
         }
@@ -891,9 +894,9 @@ export default function DailyTroopReport() {
     }
   };
 
-  const isEditingTongHop =  
-  currentEditingReport?.loaiDonBaoCao === "TONG_HOP" ||  
-  parentReportData?.idDonBaoCao === editModalData?.reportId;
+  const isEditingTongHop =
+    currentEditingReport?.loaiDonBaoCao === "TONG_HOP" ||
+    parentReportData?.idDonBaoCao === editModalData?.reportId;
 
   return (
     <section className={styles.report} aria-labelledby="dashboard-page-heading">
