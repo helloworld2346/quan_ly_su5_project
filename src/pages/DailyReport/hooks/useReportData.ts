@@ -1,3 +1,4 @@
+// src/pages/DailyReport/hooks/useReportData.ts
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { dailyReportService } from "../../../services/dailyReport/dailyReportService";
 import { dutyService } from "../../../services/duty/dutyService";
@@ -165,28 +166,46 @@ export function useReportData({
           );
         }
 
-        try {
-          const isAggregatingSelf =
-            (isTrungDoan || isSuDoan || isTieuDoan) && !isDbOrEb;
-          const loaiOwn: LoaiDonBaoCao = isAggregatingSelf
-            ? "TONG_HOP"
-            : "DON_VI";
+        const isAggregatingSelf =
+          (isTrungDoan || isSuDoan || isTieuDoan) && !isDbOrEb;
 
+        try {
           const ownRes = await dailyReportService.searchReportByUnitAndDate(
             maDonViCurrent,
             reportDate,
-            loaiOwn,
+            "DON_VI",
           );
           const ownRow =
             ownRes.success && ownRes.Result
               ? {
                   ...mapItemToRow(ownRes.Result),
-                  loaiDonBaoCao: loaiOwn,
+                  loaiDonBaoCao: "DON_VI" as LoaiDonBaoCao,
                 }
               : null;
           setParentOwnReportData(ownRow);
 
-          if (isTrungDoan || isTieuDoan || isSuDoan) {
+          if (isAggregatingSelf) {
+            try {
+              const tongHopRes =
+                await dailyReportService.searchReportByUnitAndDate(
+                  maDonViCurrent,
+                  reportDate,
+                  "TONG_HOP",
+                );
+              const tongHopRow =
+                tongHopRes.success && tongHopRes.Result
+                  ? {
+                      ...mapItemToRow(tongHopRes.Result),
+                      loaiDonBaoCao: "TONG_HOP" as LoaiDonBaoCao,
+                      isConsolidated: true,
+                    }
+                  : null;
+              setParentReportData(tongHopRow);
+            } catch {
+              setParentReportData(null);
+            }
+          } else if (isTrungDoan || isTieuDoan || isSuDoan) {
+            // Tiểu đoàn db/eb: đơn của chính nó chính là đơn tổng hợp hiển thị
             setParentReportData(
               ownRow ? { ...ownRow, isConsolidated: true } : null,
             );
@@ -195,9 +214,7 @@ export function useReportData({
           }
         } catch {
           setParentOwnReportData(null);
-          if (isTrungDoan || isTieuDoan || isSuDoan) {
-            setParentReportData(null);
-          }
+          setParentReportData(null);
         }
       } else {
         const loaiChiHuy =
