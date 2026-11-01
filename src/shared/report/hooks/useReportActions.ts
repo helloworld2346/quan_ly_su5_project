@@ -14,6 +14,7 @@ export interface ReportActionService {
     maDonVi: string,
     lyDo: string,
     ngayLoc: string,
+    loaiDonBaoCao?: "DON_VI" | "TONG_HOP",
   ) => Promise<unknown>;
 }
 
@@ -47,7 +48,9 @@ export function useReportActions<TRow>({
   const [refuseUnitName, setRefuseUnitName] = useState("");
   const [returnMaDonVi, setReturnMaDonVi] = useState<string | null>(null);
   const [returnNgayLoc, setReturnNgayLoc] = useState<string | null>(null);
-  const [returnLoai, setReturnLoai] = useState<string | null>(null);
+  const [returnLoai, setReturnLoai] = useState<"DON_VI" | "TONG_HOP" | null>(
+    null,
+  );
 
   const handleApproveReport = async (reportId: string) => {
     try {
@@ -93,14 +96,21 @@ export function useReportActions<TRow>({
     }
   };
 
-const handleRefuseReportClick = (row: TRow) => {
-  setRefuseReportId(getId(row));
-  setRefuseUnitName(getUnitName(row));
-  setReturnMaDonVi(getMaDonVi ? getMaDonVi(row) : null);
-  setReturnNgayLoc(getNgayLoc ? getNgayLoc(row) : null);
-  setReturnLoai(getLoaiDonBaoCao ? getLoaiDonBaoCao(row) : null);
-  setShowRefuseDialog(true);
-};
+  const handleRefuseReportClick = (row: TRow) => {
+    setRefuseReportId(getId(row));
+    setRefuseUnitName(getUnitName(row));
+    setReturnMaDonVi(getMaDonVi ? getMaDonVi(row) : null);
+    setReturnNgayLoc(getNgayLoc ? getNgayLoc(row) : null);
+    const rawLoai = getLoaiDonBaoCao ? getLoaiDonBaoCao(row) : null;
+    setReturnLoai(
+      rawLoai === "TONG_HOP"
+        ? "TONG_HOP"
+        : rawLoai === "DON_VI"
+          ? "DON_VI"
+          : null,
+    );
+    setShowRefuseDialog(true);
+  };
 
   const handleRefuseConfirm = async (reason: string) => {
     if (!refuseReportId) return;
@@ -123,15 +133,23 @@ const handleRefuseReportClick = (row: TRow) => {
   const handleReturnConfirm = async (reason: string) => {
     if (!refuseReportId) return;
     try {
-      if (returnLoai === "DON_VI" && returnMaDonVi && returnNgayLoc) {
-        if (!service.draftReport) return;
-        await service.draftReport(returnMaDonVi, reason, returnNgayLoc);
-      } else {
-        if (!service.returnReport) return;
+      const hasRealReportId =
+        !!refuseReportId && refuseReportId !== returnMaDonVi;
+
+      if (hasRealReportId && service.returnReport) {
         await service.returnReport({
           idDonBaoCao: refuseReportId,
           ghiChu: reason,
         });
+      } else if (returnMaDonVi && returnNgayLoc && service.draftReport) {
+        await service.draftReport(
+          returnMaDonVi,
+          reason,
+          returnNgayLoc,
+          returnLoai ?? "DON_VI",
+        );
+      } else {
+        return;
       }
       showSuccess("Trả về báo cáo thành công");
       setShowRefuseDialog(false);
@@ -154,6 +172,9 @@ const handleRefuseReportClick = (row: TRow) => {
     setShowRefuseDialog(false);
     setRefuseReportId(null);
     setRefuseUnitName("");
+    setReturnMaDonVi(null);
+    setReturnNgayLoc(null);
+    setReturnLoai(null);
   };
 
   return {

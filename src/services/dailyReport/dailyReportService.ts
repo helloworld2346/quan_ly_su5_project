@@ -236,11 +236,18 @@ export const dailyReportService = {
     maDonVi: string,
     lyDo: string,
     ngayLoc: string,
+    loaiDonBaoCao?: "DON_VI" | "TONG_HOP",
   ): Promise<RefuseResponse> => {
     const response = await api.put<RefuseResponse>(
       `/donbaocao/draft/${maDonVi}`,
       null,
-      { params: { lyDo, ngayLoc } },
+      {
+        params: {
+          lyDo,
+          ngayLoc,
+          ...(loaiDonBaoCao ? { loaiDonBaoCao } : {}),
+        },
+      },
     );
     return response.data;
   },

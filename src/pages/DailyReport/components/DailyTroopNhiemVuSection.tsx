@@ -14,7 +14,7 @@ export default function DailyTroopNhiemVuSection({
   openNhiemVuId,
   setOpenNhiemVuId,
 }: Props) {
-  const isSingle = nhiemVuEntries.length === 1;
+  const [ownEntry, ...childEntries] = nhiemVuEntries;
   const openItem =
     nhiemVuEntries.find((item) => item.id === openNhiemVuId) ?? null;
 
@@ -34,9 +34,7 @@ export default function DailyTroopNhiemVuSection({
           <div className={styles.sectionTitleGroup}>
             <span className={styles.sectionKicker}>II</span>
             <div>
-              <h2 className={styles.sectionTitle}>
-                HOẠT ĐỘNG TRONG NGÀY
-              </h2>
+              <h2 className={styles.sectionTitle}>HOẠT ĐỘNG TRONG NGÀY</h2>
               <div className={styles.sectionSubTitle}>
                 Nội dung nhiệm vụ, đột xuất, ưu điểm, khuyết điểm và việc cần
                 giải quyết
@@ -45,61 +43,61 @@ export default function DailyTroopNhiemVuSection({
           </div>
         </div>
 
-        {nhiemVuEntries.length === 0 && (
-          <div className={styles.emptyState}>
-            <p>Chưa có dữ liệu báo cáo</p>
-          </div>
+        {nhiemVuEntries.length === 0 && (  
+          <div className={styles.emptyState}>  
+            <p>Chưa có dữ liệu báo cáo</p>  
+          </div>  
+        )}  
+  
+        {ownEntry && (  
+          <div className={styles.nhiemVuSingle}>  
+            <div className={styles.nhiemVuSingleHeader}>  
+              <span className={styles.nhiemVuSingleTitle}>  
+                {ownEntry.title}  
+              </span>  
+              <span  
+                className={`${styles.nhiemVuCardStatus} ${  
+                  ownEntry.reportStatusLabel === "Đã duyệt"  
+                    ? styles.nhiemVuCardStatusApproved  
+                    : styles.nhiemVuCardStatusPending  
+                }`}  
+              >  
+                {ownEntry.reportStatusLabel}  
+              </span>  
+            </div>  
+            <NhiemVuAccordionItem  
+              label={ownEntry.title}  
+              data={ownEntry.data}  
+            />  
+          </div>  
+        )}  
+  
+        {childEntries.length > 0 && (  
+          <div className={styles.nhiemVuGrid}>  
+            {childEntries.map((item) => (  
+              <button  
+                key={item.id}  
+                type="button"  
+                className={styles.nhiemVuCard}  
+                onClick={() => setOpenNhiemVuId(item.id)}  
+              >  
+                <span className={styles.nhiemVuCardTitle}>{item.title}</span>  
+                <span  
+                  className={`${styles.nhiemVuCardStatus} ${  
+                    item.reportStatusLabel === "Đã duyệt"  
+                      ? styles.nhiemVuCardStatusApproved  
+                      : styles.nhiemVuCardStatusPending  
+                  }`}  
+                >  
+                  {item.reportStatusLabel}  
+                </span>  
+              </button>  
+            ))}  
+          </div>  
         )}
+        </div>
 
-        {isSingle && (
-          <div className={styles.nhiemVuSingle}>
-            <div className={styles.nhiemVuSingleHeader}>
-              <span className={styles.nhiemVuSingleTitle}>
-                {nhiemVuEntries[0].title}
-              </span>
-              <span
-                className={`${styles.nhiemVuCardStatus} ${
-                  nhiemVuEntries[0].reportStatusLabel === "Đã duyệt"
-                    ? styles.nhiemVuCardStatusApproved
-                    : styles.nhiemVuCardStatusPending
-                }`}
-              >
-                {nhiemVuEntries[0].reportStatusLabel}
-              </span>
-            </div>
-            <NhiemVuAccordionItem
-              label={nhiemVuEntries[0].title}
-              data={nhiemVuEntries[0].data}
-            />
-          </div>
-        )}
-
-        {nhiemVuEntries.length > 1 && (
-          <div className={styles.nhiemVuGrid}>
-            {nhiemVuEntries.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                className={styles.nhiemVuCard}
-                onClick={() => setOpenNhiemVuId(item.id)}
-              >
-                <span className={styles.nhiemVuCardTitle}>{item.title}</span>
-                <span
-                  className={`${styles.nhiemVuCardStatus} ${
-                    item.reportStatusLabel === "Đã duyệt"
-                      ? styles.nhiemVuCardStatusApproved
-                      : styles.nhiemVuCardStatusPending
-                  }`}
-                >
-                  {item.reportStatusLabel}
-                </span>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {!isSingle && openItem && (
+      {openItem && (
         <div
           className={styles.nhiemVuModalOverlay}
           onClick={() => setOpenNhiemVuId(null)}
