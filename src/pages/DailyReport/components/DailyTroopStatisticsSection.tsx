@@ -103,9 +103,7 @@ export default function DailyTroopStatisticsSection({
         ];
 
   const canShowConsolidatedBlock =
-    !sharedRowProps.isTacChien &&
-    !shouldHideConsolidatedSections &&
-    canConsolidateUnit;
+    !shouldHideConsolidatedSections && canConsolidateUnit;
 
   return (
     <section className={styles.sectionBlock}>
@@ -203,21 +201,21 @@ export default function DailyTroopStatisticsSection({
                         />
                       )}
 
-                    {/* separator + dòng e4 (TONG_HOP) giữ nguyên như cũ */}
-                    {canShowConsolidatedBlock && (
-                      <tr className={styles.separatorRow}>
-                        <td colSpan={23}>Báo cáo tổng hợp</td>
-                      </tr>
-                    )}
-
-                    {canShowConsolidatedBlock && parentReportData ? (
-                      <ReportTableRow
-                        key={`parent-${parentReportData.idDonBaoCao}`}
-                        row={parentReportData}
-                        isConsolidatedRow={true}
-                        {...sharedRowProps}
-                      />
-                    ) : null}
+                    {canShowConsolidatedBlock &&
+                      parentReportData &&
+                      parentReportData.status !== "Nháp" && (
+                        <>
+                          <tr className={styles.separatorRow}>
+                            <td colSpan={23}>Báo cáo tổng hợp</td>
+                          </tr>
+                          <ReportTableRow
+                            key={`parent-${parentReportData.idDonBaoCao}`}
+                            row={parentReportData}
+                            isConsolidatedRow={true}
+                            {...sharedRowProps}
+                          />
+                        </>
+                      )}
                   </>
                 )}
               </tbody>

@@ -302,17 +302,27 @@ export default function DailyTroopReport() {
       isDbOrEb,
     );
 
-  const reportForSubmit =
-    isTacChien && isSuDoan && parentReportData ? parentReportData : ownReport;
+  const isDraftRow = (r: ReportRow | null | undefined): r is ReportRow =>
+    !!r && !r.notSubmitted && r.status === "Nháp";
+
+  const reportForSubmit: ReportRow | null =
+    isTacChien && isSuDoan && parentReportData
+      ? parentReportData
+      : isParentUnit && (isTrungDoan || isTieuDoan)
+        ? isDraftRow(parentReportData)
+          ? parentReportData
+          : isDraftRow(parentOwnReportData)
+            ? parentOwnReportData
+            : null
+        : ownReport;
 
   const canSubmitReport =
     isTacChien && isSuDoan
-      ? Boolean(
-          reportForSubmit &&
-          !reportForSubmit.notSubmitted &&
-          reportForSubmit.status === "Nháp",
-        )
-      : canSubmit;
+      ? isDraftRow(reportForSubmit)
+      : isParentUnit && (isTrungDoan || isTieuDoan)
+        ? (isReporter || canSubmit || isDraftRow(parentOwnReportData)) &&
+          isDraftRow(reportForSubmit)
+        : canSubmit;
 
   const handleStartInlineInput = (row: ReportRow) => {
     setActiveMenuUnit(null);
