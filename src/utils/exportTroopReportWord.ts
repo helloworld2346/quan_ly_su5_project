@@ -227,35 +227,29 @@ export async function exportTroopReportToWord({
         continue;
       }
 
-      const lines: [string, string | undefined][] = [
-        [
-          "Tình hình an ninh",
-          d.securityStatus === "safe" ? "An toàn" : "Không an toàn",
-        ],
-        [
-          "Nội dung đột xuất",
-          d.incidentStatus === "yes" ? d.incidentDetail : undefined,
-        ],
-        [
-          "Ưu điểm",
-          d.advantageStatus === "yes" ? d.advantageDetail : undefined,
-        ],
-        [
-          "Khuyết điểm",
-          d.disadvantageStatus === "yes" ? d.disadvantageDetail : undefined,
-        ],
-        [
-          "Nội dung cần giải quyết",
-          d.pendingStatus === "yes" ? d.pendingDetail : undefined,
-        ],
+      const lines: string[] = [
+        `Nhiệm vụ các phân đội đóng quân canh phòng và các phân đội khác: ${
+          d.securityStatus === "safe"
+            ? "✓ Đảm bảo an toàn"
+            : "✕ Không đảm bảo an toàn"
+        }`,
+        `Những việc đột xuất xảy ra: ${
+          d.incidentStatus === "yes" ? "⚠ Có phát sinh" : "✓ Không phát sinh"
+        }${d.incidentStatus === "yes" && d.incidentDetail ? ` — ${d.incidentDetail}` : ""}`,
+        `Ưu điểm: ${
+          d.advantageStatus === "yes" ? "✓ Có" : "— Không có"
+        }${d.advantageStatus === "yes" && d.advantageDetail ? ` — ${d.advantageDetail}` : ""}`,
+        `Khuyết điểm: ${
+          d.disadvantageStatus === "yes" ? "✕ Có" : "✓ Không có"
+        }${d.disadvantageStatus === "yes" && d.disadvantageDetail ? ` — ${d.disadvantageDetail}` : ""}`,
+        `Những việc cần tiếp tục giải quyết: ${
+          d.pendingStatus === "yes" ? "⚠ Cần xử lý" : "✓ Không có"
+        }${d.pendingStatus === "yes" && d.pendingDetail ? ` — ${d.pendingDetail}` : ""}`,
       ];
 
-      for (const [label, content] of lines) {
-        if (!content) continue;
+      for (const text of lines) {
         nhiemVuParagraphs.push(
-          left(
-            new TextRun({ text: `${label}: ${content}`, font: FONT, size: 24 }),
-          ),
+          left(new TextRun({ text, font: FONT, size: 24 })),
         );
       }
       nhiemVuParagraphs.push(empty());

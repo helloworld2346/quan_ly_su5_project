@@ -249,6 +249,11 @@ export default function DailyTroopReport() {
     preferDutyShiftForCaTruc: useDutyShiftForCaTruc,
   });
 
+  const nhiemVuEntriesForExport = useMemo(
+    () => nhiemVuEntries.filter((e) => e.id === maDonViCurrent),
+    [nhiemVuEntries, maDonViCurrent],
+  );
+
   const handleCompleteSignature = async () => {
     if (!ownReport?.idDonBaoCao || !signatureBase64) {
       setSignatureDone(true);
@@ -784,7 +789,7 @@ export default function DailyTroopReport() {
       donViName: currentUnit?.tenDonvi ?? account?.donVi?.tenDonvi,
       parentUnitName:
         currentUnit?.donViCha ?? account?.donVi?.donViCha ?? undefined,
-      nhiemVuEntries,
+      nhiemVuEntries: nhiemVuEntriesForExport,
     });
   };
 
@@ -802,7 +807,7 @@ export default function DailyTroopReport() {
       donViName: currentUnit?.tenDonvi ?? account?.donVi?.tenDonvi,
       parentUnitName:
         currentUnit?.donViCha ?? account?.donVi?.donViCha ?? undefined,
-      nhiemVuEntries,
+      nhiemVuEntries: nhiemVuEntriesForExport,
     });
   };
 

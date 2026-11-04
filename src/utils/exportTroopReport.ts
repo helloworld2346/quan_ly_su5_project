@@ -6,7 +6,7 @@ import {
   totalsToExportCells,
 } from "../pages/DailyReport/utils/dailyTroopReportHelpers";
 import type { DisplayTotals } from "../pages/DailyReport/utils/dailyTroopReportHelpers";
-import type { NhiemVuEntry } from "../pages/DailyReport/dailyTroopReportTypes";  
+import type { NhiemVuEntry } from "../pages/DailyReport/dailyTroopReportTypes";
 
 type TrucNguoi = {
   tenNguoitruc?: string;
@@ -201,212 +201,227 @@ export async function exportTroopReportToExcel({
     ws.getRow(rowIdx).height = 22;
     rowIdx++;
 
-    for (const entry of nhiemVuEntries) {  
-  setMerged(ws, rowIdx, 1, rowIdx, COLUMN_COUNT, entry.title);  
-  const unitCell = ws.getCell(rowIdx, 1);  
-  unitCell.font = { name: FONT, bold: true, size: 14 };  
-  unitCell.alignment = { horizontal: "left", vertical: "middle" };  
-  unitCell.border = thinBorder();  
-  rowIdx++;  
-  
-  const d = entry.data;  
-  if (!d) continue;  
-  
-  const lines: [string, string | undefined][] = [  
-    ["Tình hình an ninh", d.securityStatus === "safe" ? "An toàn" : "Không an toàn"],  
-    ["Nội dung đột xuất", d.incidentStatus === "yes" ? d.incidentDetail : undefined],  
-    ["Ưu điểm", d.advantageStatus === "yes" ? d.advantageDetail : undefined],  
-    ["Khuyết điểm", d.disadvantageStatus === "yes" ? d.disadvantageDetail : undefined],  
-    ["Nội dung cần giải quyết", d.pendingStatus === "yes" ? d.pendingDetail : undefined],  
-  ];  
-  
-  for (const [label, content] of lines) {  
-    if (!content) continue;  
-    setMerged(ws, rowIdx, 1, rowIdx, COLUMN_COUNT, `${label}: ${content}`);  
-    const c = ws.getCell(rowIdx, 1);  
-    c.font = { name: FONT, size: 14 };  
-    c.alignment = { horizontal: "left", vertical: "middle", wrapText: true };  
-    c.border = thinBorder();  
-    rowIdx++;  
-  }  
-}
+    for (const entry of nhiemVuEntries) {
+      setMerged(ws, rowIdx, 1, rowIdx, COLUMN_COUNT, entry.title);
+      const unitCell = ws.getCell(rowIdx, 1);
+      unitCell.font = { name: FONT, bold: true, size: 14 };
+      unitCell.alignment = { horizontal: "left", vertical: "middle" };
+      unitCell.border = thinBorder();
+      rowIdx++;
 
-  ws.getRow(rowIdx).height = 12;
-  rowIdx++;
+      const d = entry.data;
+      if (!d) continue;
 
-  const passwordRow = rowIdx;
-  setMerged(
-    ws,
-    passwordRow,
-    1,
-    passwordRow,
-    COLUMN_COUNT,
-    `MẬT KHẨU: ${(matkhau ?? "").toUpperCase()}`,
-  );
-  ws.getCell(passwordRow, 1).font = { name: FONT, bold: true, size: 18 };
-  ws.getCell(passwordRow, 1).alignment = {
-    horizontal: "center",
-    vertical: "middle",
-  };
-  ws.getRow(passwordRow).height = 24;
+      const lines: string[] = [
+        `Nhiệm vụ các phân đội đóng quân canh phòng và các phân đội khác: ${
+          d.securityStatus === "safe"
+            ? "✓ Đảm bảo an toàn"
+            : "✕ Không đảm bảo an toàn"
+        }`,
+        `Những việc đột xuất xảy ra: ${
+          d.incidentStatus === "yes" ? "⚠ Có phát sinh" : "✓ Không phát sinh"
+        }${d.incidentStatus === "yes" && d.incidentDetail ? ` — ${d.incidentDetail}` : ""}`,
+        `Ưu điểm: ${
+          d.advantageStatus === "yes" ? "✓ Có" : "— Không có"
+        }${d.advantageStatus === "yes" && d.advantageDetail ? ` — ${d.advantageDetail}` : ""}`,
+        `Khuyết điểm: ${
+          d.disadvantageStatus === "yes" ? "✕ Có" : "✓ Không có"
+        }${d.disadvantageStatus === "yes" && d.disadvantageDetail ? ` — ${d.disadvantageDetail}` : ""}`,
+        `Những việc cần tiếp tục giải quyết: ${
+          d.pendingStatus === "yes" ? "⚠ Cần xử lý" : "✓ Không có"
+        }${d.pendingStatus === "yes" && d.pendingDetail ? ` — ${d.pendingDetail}` : ""}`,
+      ];
 
-  const chiHuyRow = passwordRow + 1;
-  setMerged(
-    ws,
-    chiHuyRow,
-    1,
-    chiHuyRow,
-    COLUMN_COUNT,
-    `Trực chỉ huy: ${formatTruc(trucChiHuy)}`,
-  );
-  ws.getCell(chiHuyRow, 1).font = { name: FONT, size: 14 };
-  ws.getCell(chiHuyRow, 1).alignment = {
-    horizontal: "center",
-    vertical: "middle",
-  };
-
-  const tacChienRow = passwordRow + 2;
-  setMerged(
-    ws,
-    tacChienRow,
-    1,
-    tacChienRow,
-    COLUMN_COUNT,
-    `Trực ban tác chiến: ${formatTruc(trucBanTacChien)}`,
-  );
-  ws.getCell(tacChienRow, 1).font = { name: FONT, size: 14 };
-  ws.getCell(tacChienRow, 1).alignment = {
-    horizontal: "center",
-    vertical: "middle",
-  };
-
-  // Cột 2-18 giữ 12 để bảng số liệu gọn; cột 1 tự nới theo tên đơn vị dài nhất.
-  // Khối tên góc trái merge cột 1-4 => phần dư ngoài (cột 2-4 = 36) do cột 1 gánh.
-  const longestLeftName = Math.max(leftTop.length, leftBottom.length);
-  const neededLeftWidth = longestLeftName * 1.3;
-  const col1Width = Math.max(12, neededLeftWidth - 36);
-  ws.getColumn(1).width = col1Width;
-  for (let c = 2; c <= COLUMN_COUNT; c++) ws.getColumn(c).width = 12;
-
-  await ws.protect(PROTECT_PASSWORD, {
-    selectLockedCells: true,
-    selectUnlockedCells: true,
-    formatCells: false,
-    insertRows: false,
-    deleteRows: false,
-    sort: false,
-  });
-
-  const buffer = await wb.xlsx.writeBuffer();
-  saveAs(
-    new Blob([buffer], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    }),
-    `ThongKeQuanSo_${reportDate}.xlsx`,
-  );
-}
-
-function setMerged(
-  ws: ExcelJS.Worksheet,
-  r1: number,
-  c1: number,
-  r2: number,
-  c2: number,
-  value: string,
-) {
-  ws.mergeCells(r1, c1, r2, c2);
-  ws.getCell(r1, c1).value = value;
-}
-
-function styleHeaderRange(ws: ExcelJS.Worksheet, from: number, to: number) {
-  for (let r = from; r <= to; r++) {
-    for (let c = 1; c <= COLUMN_COUNT; c++) {
-      const cell = ws.getCell(r, c);
-      cell.font = {
-        name: FONT,
-        bold: true,
-        size: 14,
-        color: { argb: COLOR.WHITE },
-      };
-      cell.alignment = {
-        horizontal: "center",
-        vertical: "middle",
-        wrapText: true,
-      };
-      cell.border = thinBorder();
-      cell.fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: COLOR.HEADER_FILL },
-      };
+      for (const text of lines) {
+        setMerged(ws, rowIdx, 1, rowIdx, COLUMN_COUNT, text);
+        const c = ws.getCell(rowIdx, 1);
+        c.font = { name: FONT, size: 14 };
+        c.alignment = {
+          horizontal: "left",
+          vertical: "middle",
+          wrapText: true,
+        };
+        c.border = thinBorder();
+        rowIdx++;
+      }
     }
-  }
-}
 
-function writeDataRow(
-  ws: ExcelJS.Worksheet,
-  rowIdx: number,
-  values: (string | number)[],
-  bold = false,
-  fillArgb?: string,
-) {
-  values.forEach((v, i) => {
-    const cell = ws.getCell(rowIdx, i + 1);
-    if (typeof v === "number") {
-      cell.value = formatThousands(v);
-    } else if (i === 0) {
-      // Cột "Đơn vị": in hoa + đổi tên hiển thị nếu là ptm/pct/phc-kt
-      cell.value = formatUnitName(v);
-    } else {
-      cell.value = v;
-    }
-    cell.border = thinBorder();
-    cell.font = { name: FONT, bold, size: 14 };
-    cell.alignment = {
+    ws.getRow(rowIdx).height = 12;
+    rowIdx++;
+
+    const passwordRow = rowIdx;
+    setMerged(
+      ws,
+      passwordRow,
+      1,
+      passwordRow,
+      COLUMN_COUNT,
+      `MẬT KHẨU: ${(matkhau ?? "").toUpperCase()}`,
+    );
+    ws.getCell(passwordRow, 1).font = { name: FONT, bold: true, size: 18 };
+    ws.getCell(passwordRow, 1).alignment = {
       horizontal: "center",
       vertical: "middle",
     };
-    if (fillArgb) {
-      cell.fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: fillArgb },
+    ws.getRow(passwordRow).height = 24;
+
+    const chiHuyRow = passwordRow + 1;
+    setMerged(
+      ws,
+      chiHuyRow,
+      1,
+      chiHuyRow,
+      COLUMN_COUNT,
+      `Trực chỉ huy: ${formatTruc(trucChiHuy)}`,
+    );
+    ws.getCell(chiHuyRow, 1).font = { name: FONT, size: 14 };
+    ws.getCell(chiHuyRow, 1).alignment = {
+      horizontal: "center",
+      vertical: "middle",
+    };
+
+    const tacChienRow = passwordRow + 2;
+    setMerged(
+      ws,
+      tacChienRow,
+      1,
+      tacChienRow,
+      COLUMN_COUNT,
+      `Trực ban tác chiến: ${formatTruc(trucBanTacChien)}`,
+    );
+    ws.getCell(tacChienRow, 1).font = { name: FONT, size: 14 };
+    ws.getCell(tacChienRow, 1).alignment = {
+      horizontal: "center",
+      vertical: "middle",
+    };
+
+    // Cột 2-18 giữ 12 để bảng số liệu gọn; cột 1 tự nới theo tên đơn vị dài nhất.
+    // Khối tên góc trái merge cột 1-4 => phần dư ngoài (cột 2-4 = 36) do cột 1 gánh.
+    const longestLeftName = Math.max(leftTop.length, leftBottom.length);
+    const neededLeftWidth = longestLeftName * 1.3;
+    const col1Width = Math.max(12, neededLeftWidth - 36);
+    ws.getColumn(1).width = col1Width;
+    for (let c = 2; c <= COLUMN_COUNT; c++) ws.getColumn(c).width = 12;
+
+    await ws.protect(PROTECT_PASSWORD, {
+      selectLockedCells: true,
+      selectUnlockedCells: true,
+      formatCells: false,
+      insertRows: false,
+      deleteRows: false,
+      sort: false,
+    });
+
+    const buffer = await wb.xlsx.writeBuffer();
+    saveAs(
+      new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      }),
+      `ThongKeQuanSo_${reportDate}.xlsx`,
+    );
+  }
+
+  function setMerged(
+    ws: ExcelJS.Worksheet,
+    r1: number,
+    c1: number,
+    r2: number,
+    c2: number,
+    value: string,
+  ) {
+    ws.mergeCells(r1, c1, r2, c2);
+    ws.getCell(r1, c1).value = value;
+  }
+
+  function styleHeaderRange(ws: ExcelJS.Worksheet, from: number, to: number) {
+    for (let r = from; r <= to; r++) {
+      for (let c = 1; c <= COLUMN_COUNT; c++) {
+        const cell = ws.getCell(r, c);
+        cell.font = {
+          name: FONT,
+          bold: true,
+          size: 14,
+          color: { argb: COLOR.WHITE },
+        };
+        cell.alignment = {
+          horizontal: "center",
+          vertical: "middle",
+          wrapText: true,
+        };
+        cell.border = thinBorder();
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: COLOR.HEADER_FILL },
+        };
+      }
+    }
+  }
+
+  function writeDataRow(
+    ws: ExcelJS.Worksheet,
+    rowIdx: number,
+    values: (string | number)[],
+    bold = false,
+    fillArgb?: string,
+  ) {
+    values.forEach((v, i) => {
+      const cell = ws.getCell(rowIdx, i + 1);
+      if (typeof v === "number") {
+        cell.value = formatThousands(v);
+      } else if (i === 0) {
+        // Cột "Đơn vị": in hoa + đổi tên hiển thị nếu là ptm/pct/phc-kt
+        cell.value = formatUnitName(v);
+      } else {
+        cell.value = v;
+      }
+      cell.border = thinBorder();
+      cell.font = { name: FONT, bold, size: 14 };
+      cell.alignment = {
+        horizontal: "center",
+        vertical: "middle",
       };
-    }
-  });
-}
-
-function thinBorder(): ExcelJS.Borders {
-  const s = { style: "thin" as const };
-  return { top: s, left: s, bottom: s, right: s } as ExcelJS.Borders;
-}
-
-function formatPlace(iso: string): string {
-  const [y, m, d] = iso.split("-");
-  return d && m && y
-    ? `Tây Ninh, ngày ${d} tháng ${m} năm ${y}`
-    : "Tây Ninh, ngày ..... tháng ..... năm .....";
-}
-
-function formatTruc(t?: TrucNguoi | null): string {
-  if (!t) return "";
-  return [t.capbacNguoitruc, t.tenNguoitruc, t.chucvuNguoitruc]
-    .filter(Boolean)
-    .join(" - ");
-}
-
-function formatThousands(n: number): string {
-  return n.toLocaleString("de-DE");
-}
-
-// In hoa toàn bộ tên đơn vị, trả về tên hiển thị mong muốn nếu thuộc nhóm ptm / pct / phc-kt
-function formatUnitName(name: string): string {
-  const normalized = name.toLowerCase().replace(/[\s-]/g, "");
-  for (const key of Object.keys(UPPERCASE_UNIT_LABELS)) {
-    if (normalized.includes(key)) {
-      return UPPERCASE_UNIT_LABELS[key];
-    }
+      if (fillArgb) {
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: fillArgb },
+        };
+      }
+    });
   }
-  return name;
-}
+
+  function thinBorder(): ExcelJS.Borders {
+    const s = { style: "thin" as const };
+    return { top: s, left: s, bottom: s, right: s } as ExcelJS.Borders;
   }
+
+  function formatPlace(iso: string): string {
+    const [y, m, d] = iso.split("-");
+    return d && m && y
+      ? `Tây Ninh, ngày ${d} tháng ${m} năm ${y}`
+      : "Tây Ninh, ngày ..... tháng ..... năm .....";
+  }
+
+  function formatTruc(t?: TrucNguoi | null): string {
+    if (!t) return "";
+    return [t.capbacNguoitruc, t.tenNguoitruc, t.chucvuNguoitruc]
+      .filter(Boolean)
+      .join(" - ");
+  }
+
+  function formatThousands(n: number): string {
+    return n.toLocaleString("de-DE");
+  }
+
+  // In hoa toàn bộ tên đơn vị, trả về tên hiển thị mong muốn nếu thuộc nhóm ptm / pct / phc-kt
+  function formatUnitName(name: string): string {
+    const normalized = name.toLowerCase().replace(/[\s-]/g, "");
+    for (const key of Object.keys(UPPERCASE_UNIT_LABELS)) {
+      if (normalized.includes(key)) {
+        return UPPERCASE_UNIT_LABELS[key];
+      }
+    }
+    return name;
+  }
+}
