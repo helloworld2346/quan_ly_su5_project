@@ -784,6 +784,7 @@ export default function DailyTroopReport() {
       donViName: currentUnit?.tenDonvi ?? account?.donVi?.tenDonvi,
       parentUnitName:
         currentUnit?.donViCha ?? account?.donVi?.donViCha ?? undefined,
+      nhiemVuEntries,
     });
   };
 
@@ -801,6 +802,7 @@ export default function DailyTroopReport() {
       donViName: currentUnit?.tenDonvi ?? account?.donVi?.tenDonvi,
       parentUnitName:
         currentUnit?.donViCha ?? account?.donVi?.donViCha ?? undefined,
+      nhiemVuEntries,
     });
   };
 

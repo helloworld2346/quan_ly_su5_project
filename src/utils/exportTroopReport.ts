@@ -6,6 +6,7 @@ import {
   totalsToExportCells,
 } from "../pages/DailyReport/utils/dailyTroopReportHelpers";
 import type { DisplayTotals } from "../pages/DailyReport/utils/dailyTroopReportHelpers";
+import type { NhiemVuEntry } from "../pages/DailyReport/dailyTroopReportTypes";  
 
 type TrucNguoi = {
   tenNguoitruc?: string;
@@ -23,6 +24,7 @@ type ExportArgs = {
   trucBanTacChien?: TrucNguoi | null;
   donViName?: string;
   parentUnitName?: string;
+  nhiemVuEntries?: NhiemVuEntry[];
 };
 
 const COLUMN_COUNT = 18;
@@ -55,6 +57,7 @@ export async function exportTroopReportToExcel({
   trucBanTacChien,
   donViName,
   parentUnitName,
+  nhiemVuEntries,
 }: ExportArgs): Promise<void> {
   const wb = new ExcelJS.Workbook();
   const ws = wb.addWorksheet("Thống kê quân số");
@@ -176,10 +179,61 @@ export async function exportTroopReportToExcel({
 
   rowIdx++;
 
+  if (nhiemVuEntries && nhiemVuEntries.length > 0) {
+    ws.getRow(rowIdx).height = 12;
+    rowIdx++;
+
+    setMerged(ws, rowIdx, 1, rowIdx, COLUMN_COUNT, "NHIỆM VỤ NGÀY");
+    const titleCell = ws.getCell(rowIdx, 1);
+    titleCell.font = {
+      name: FONT,
+      bold: true,
+      size: 14,
+      color: { argb: COLOR.WHITE },
+    };
+    titleCell.alignment = { horizontal: "center", vertical: "middle" };
+    titleCell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: COLOR.HEADER_FILL },
+    };
+    titleCell.border = thinBorder();
+    ws.getRow(rowIdx).height = 22;
+    rowIdx++;
+
+    for (const entry of nhiemVuEntries) {  
+  setMerged(ws, rowIdx, 1, rowIdx, COLUMN_COUNT, entry.title);  
+  const unitCell = ws.getCell(rowIdx, 1);  
+  unitCell.font = { name: FONT, bold: true, size: 14 };  
+  unitCell.alignment = { horizontal: "left", vertical: "middle" };  
+  unitCell.border = thinBorder();  
+  rowIdx++;  
+  
+  const d = entry.data;  
+  if (!d) continue;  
+  
+  const lines: [string, string | undefined][] = [  
+    ["Tình hình an ninh", d.securityStatus === "safe" ? "An toàn" : "Không an toàn"],  
+    ["Nội dung đột xuất", d.incidentStatus === "yes" ? d.incidentDetail : undefined],  
+    ["Ưu điểm", d.advantageStatus === "yes" ? d.advantageDetail : undefined],  
+    ["Khuyết điểm", d.disadvantageStatus === "yes" ? d.disadvantageDetail : undefined],  
+    ["Nội dung cần giải quyết", d.pendingStatus === "yes" ? d.pendingDetail : undefined],  
+  ];  
+  
+  for (const [label, content] of lines) {  
+    if (!content) continue;  
+    setMerged(ws, rowIdx, 1, rowIdx, COLUMN_COUNT, `${label}: ${content}`);  
+    const c = ws.getCell(rowIdx, 1);  
+    c.font = { name: FONT, size: 14 };  
+    c.alignment = { horizontal: "left", vertical: "middle", wrapText: true };  
+    c.border = thinBorder();  
+    rowIdx++;  
+  }  
+}
+
   ws.getRow(rowIdx).height = 12;
   rowIdx++;
 
-  // Cuối file: MẬT KHẨU / Trực chỉ huy / Trực ban tác chiến
   const passwordRow = rowIdx;
   setMerged(
     ws,
@@ -355,3 +409,4 @@ function formatUnitName(name: string): string {
   }
   return name;
 }
+  }

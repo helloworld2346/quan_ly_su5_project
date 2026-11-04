@@ -21,6 +21,7 @@ import {
   totalsToExportCells,
 } from "../pages/DailyReport/utils/dailyTroopReportHelpers";
 import type { DisplayTotals } from "../pages/DailyReport/utils/dailyTroopReportHelpers";
+import type { NhiemVuEntry } from "../pages/DailyReport/dailyTroopReportTypes";
 
 type TrucNguoi = {
   tenNguoitruc?: string;
@@ -38,6 +39,7 @@ type ExportArgs = {
   trucBanTacChien?: TrucNguoi | null;
   donViName?: string;
   parentUnitName?: string;
+  nhiemVuEntries?: NhiemVuEntry[];
 };
 
 const FONT = "Times New Roman";
@@ -88,6 +90,7 @@ export async function exportTroopReportToWord({
   trucBanTacChien,
   donViName,
   parentUnitName,
+  nhiemVuEntries,
 }: ExportArgs): Promise<void> {
   const leftTop = (parentUnitName ?? "Quân khu 7").toUpperCase();
   const leftBottom = (donViName ?? "Sư đoàn 5").toUpperCase();
@@ -208,168 +211,226 @@ export async function exportTroopReportToWord({
     rows: [headerRow1, headerRow2, headerRow3, ...bodyRows, totalRow],
   });
 
-  const children: (Paragraph | Table)[] = [
-    headerTable,
-    empty(),
-    center(boldRun("BÁO CÁO QUÂN SỐ", { size: 32 })),
-    empty(),
-    dataTable,
-    empty(),
-    center(boldRun(`MẬT KHẨU: ${(matkhau ?? "").toUpperCase()}`, { size: 36 })),
-    center(
-      new TextRun({
-        text: `Trực chỉ huy: ${formatTruc(trucChiHuy)}`,
-        font: FONT,
-        size: 24,
-      }),
-    ),
-    center(
-      new TextRun({
-        text: `Trực ban tác chiến: ${formatTruc(trucBanTacChien)}`,
-        font: FONT,
-        size: 24,
-      }),
-    ),
-  ];
+  const nhiemVuParagraphs: (Paragraph | Table)[] = [];
+  if (nhiemVuEntries && nhiemVuEntries.length > 0) {
+    nhiemVuParagraphs.push(
+      center(boldRun("NHIỆM VỤ NGÀY", { size: 28 })),
+      empty(),
+    );
 
-  const doc = new Document({
-    sections: [
-      {
-        properties: {
-          page: { size: { orientation: "landscape" as never } },
-        },
-        children,
-      },
-    ],
-  });
+    for (const entry of nhiemVuEntries) {
+      nhiemVuParagraphs.push(left(boldRun(entry.title)));
 
-  const blob = await Packer.toBlob(doc);
-  const readonlyBlob = await applyReadonly(blob);
-  saveAs(readonlyBlob, `ThongKeQuanSo_${reportDate}.docx`);
-}
+      const d = entry.data;
+      if (!d) {
+        nhiemVuParagraphs.push(empty());
+        continue;
+      }
 
-// Chèn khóa "chỉ đọc" (không mật khẩu) vào word/settings.xml của file .docx.
-// Mở bằng Word sẽ ở chế độ Restrict Editing (read only); bấm "Stop Protection"
-// để mở khóa mà KHÔNG cần nhập mật khẩu.
-async function applyReadonly(blob: Blob): Promise<Blob> {
-  const zip = await JSZip.loadAsync(blob);
-  const settingsPath = "word/settings.xml";
-  const protection =
-    '<w:documentProtection w:edit="readOnly" w:enforcement="1"/>';
+      const lines: [string, string | undefined][] = [
+        [
+          "Tình hình an ninh",
+          d.securityStatus === "safe" ? "An toàn" : "Không an toàn",
+        ],
+        [
+          "Nội dung đột xuất",
+          d.incidentStatus === "yes" ? d.incidentDetail : undefined,
+        ],
+        [
+          "Ưu điểm",
+          d.advantageStatus === "yes" ? d.advantageDetail : undefined,
+        ],
+        [
+          "Khuyết điểm",
+          d.disadvantageStatus === "yes" ? d.disadvantageDetail : undefined,
+        ],
+        [
+          "Nội dung cần giải quyết",
+          d.pendingStatus === "yes" ? d.pendingDetail : undefined,
+        ],
+      ];
 
-  const file = zip.file(settingsPath);
-  if (file) {
-    let xml = await file.async("string");
-    if (!xml.includes("w:documentProtection")) {
-      // chèn ngay sau thẻ mở <w:settings ...>
-      xml = xml.replace(/(<w:settings\b[^>]*>)/, `$1${protection}`);
+      for (const [label, content] of lines) {
+        if (!content) continue;
+        nhiemVuParagraphs.push(
+          left(
+            new TextRun({ text: `${label}: ${content}`, font: FONT, size: 24 }),
+          ),
+        );
+      }
+      nhiemVuParagraphs.push(empty());
     }
-    zip.file(settingsPath, xml);
-  } else {
-    // hiếm khi thiếu; tạo settings.xml tối thiểu có documentProtection
-    const xml =
-      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
-      '<w:settings xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">' +
-      protection +
-      "</w:settings>";
-    zip.file(settingsPath, xml);
+
+    const children: (Paragraph | Table)[] = [
+      headerTable,
+      empty(),
+      center(boldRun("BÁO CÁO QUÂN SỐ", { size: 32 })),
+      empty(),
+      dataTable,
+      empty(),
+      ...nhiemVuParagraphs,
+      center(
+        boldRun(`MẬT KHẨU: ${(matkhau ?? "").toUpperCase()}`, { size: 36 }),
+      ),
+      center(
+        new TextRun({
+          text: `Trực chỉ huy: ${formatTruc(trucChiHuy)}`,
+          font: FONT,
+          size: 24,
+        }),
+      ),
+      center(
+        new TextRun({
+          text: `Trực ban tác chiến: ${formatTruc(trucBanTacChien)}`,
+          font: FONT,
+          size: 24,
+        }),
+      ),
+    ];
+
+    const doc = new Document({
+      sections: [
+        {
+          properties: {
+            page: { size: { orientation: "landscape" as never } },
+          },
+          children,
+        },
+      ],
+    });
+
+    const blob = await Packer.toBlob(doc);
+    const readonlyBlob = await applyReadonly(blob);
+    saveAs(readonlyBlob, `ThongKeQuanSo_${reportDate}.docx`);
   }
 
-  return zip.generateAsync({
-    type: "blob",
-    mimeType:
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  });
-}
+  // Chèn khóa "chỉ đọc" (không mật khẩu) vào word/settings.xml của file .docx.
+  // Mở bằng Word sẽ ở chế độ Restrict Editing (read only); bấm "Stop Protection"
+  // để mở khóa mà KHÔNG cần nhập mật khẩu.
+  async function applyReadonly(blob: Blob): Promise<Blob> {
+    const zip = await JSZip.loadAsync(blob);
+    const settingsPath = "word/settings.xml";
+    const protection =
+      '<w:documentProtection w:edit="readOnly" w:enforcement="1"/>';
 
-function headerCell(
-  text: string,
-  opts: { rowSpan?: number; columnSpan?: number } = {},
-): TableCell {
-  return new TableCell({
-    rowSpan: opts.rowSpan,
-    columnSpan: opts.columnSpan,
-    shading: { fill: HEADER_FILL },
-    verticalAlign: VerticalAlign.CENTER,
-    children: [
-      new Paragraph({
-        alignment: AlignmentType.CENTER,
-        children: [
-          new TextRun({
-            text,
-            font: FONT,
-            bold: true,
-            size: 16,
-            color: "FFFFFF",
-          }),
-        ],
+    const file = zip.file(settingsPath);
+    if (file) {
+      let xml = await file.async("string");
+      if (!xml.includes("w:documentProtection")) {
+        // chèn ngay sau thẻ mở <w:settings ...>
+        xml = xml.replace(/(<w:settings\b[^>]*>)/, `$1${protection}`);
+      }
+      zip.file(settingsPath, xml);
+    } else {
+      // hiếm khi thiếu; tạo settings.xml tối thiểu có documentProtection
+      const xml =
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+        '<w:settings xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">' +
+        protection +
+        "</w:settings>";
+      zip.file(settingsPath, xml);
+    }
+
+    return zip.generateAsync({
+      type: "blob",
+      mimeType:
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    });
+  }
+
+  function headerCell(
+    text: string,
+    opts: { rowSpan?: number; columnSpan?: number } = {},
+  ): TableCell {
+    return new TableCell({
+      rowSpan: opts.rowSpan,
+      columnSpan: opts.columnSpan,
+      shading: { fill: HEADER_FILL },
+      verticalAlign: VerticalAlign.CENTER,
+      children: [
+        new Paragraph({
+          alignment: AlignmentType.CENTER,
+          children: [
+            new TextRun({
+              text,
+              font: FONT,
+              bold: true,
+              size: 16,
+              color: "FFFFFF",
+            }),
+          ],
+        }),
+      ],
+    });
+  }
+
+  function dataRow(
+    values: (string | number)[],
+    boldRow: boolean,
+    fill?: string,
+  ): TableRow {
+    return new TableRow({
+      height: { value: ROW_HEIGHT, rule: HeightRule.ATLEAST },
+      children: values.map((v, i) => {
+        let text: string;
+        if (typeof v === "number") text = v.toLocaleString("de-DE");
+        else if (i === 0) text = formatUnitName(v);
+        else text = v;
+        return new TableCell({
+          shading: fill ? { fill } : undefined,
+          verticalAlign: VerticalAlign.CENTER,
+          children: [
+            center(new TextRun({ text, font: FONT, bold: boldRow, size: 16 })),
+          ],
+        });
       }),
-    ],
-  });
-}
-
-function dataRow(
-  values: (string | number)[],
-  boldRow: boolean,
-  fill?: string,
-): TableRow {
-  return new TableRow({
-    height: { value: ROW_HEIGHT, rule: HeightRule.ATLEAST },
-    children: values.map((v, i) => {
-      let text: string;
-      if (typeof v === "number") text = v.toLocaleString("de-DE");
-      else if (i === 0) text = formatUnitName(v);
-      else text = v;
-      return new TableCell({
-        shading: fill ? { fill } : undefined,
-        verticalAlign: VerticalAlign.CENTER,
-        children: [
-          center(new TextRun({ text, font: FONT, bold: boldRow, size: 16 })),
-        ],
-      });
-    }),
-  });
-}
-
-function boldRun(
-  text: string,
-  opts: { underline?: boolean; size?: number } = {},
-): TextRun {
-  return new TextRun({
-    text,
-    font: FONT,
-    bold: true,
-    size: opts.size ?? 24,
-    underline: opts.underline ? {} : undefined,
-  });
-}
-
-function center(run: TextRun): Paragraph {
-  return new Paragraph({ alignment: AlignmentType.CENTER, children: [run] });
-}
-
-function empty(): Paragraph {
-  return new Paragraph({ children: [] });
-}
-
-function formatPlace(iso: string): string {
-  const [y, m, d] = iso.split("-");
-  return d && m && y
-    ? `Tây Ninh, ngày ${d} tháng ${m} năm ${y}`
-    : "Tây Ninh, ngày ..... tháng ..... năm .....";
-}
-
-function formatTruc(t?: TrucNguoi | null): string {
-  if (!t) return "";
-  return [t.capbacNguoitruc, t.tenNguoitruc, t.chucvuNguoitruc]
-    .filter(Boolean)
-    .join(" - ");
-}
-
-function formatUnitName(name: string): string {
-  const normalized = name.toLowerCase().replace(/[\s-]/g, "");
-  for (const key of Object.keys(UPPERCASE_UNIT_LABELS)) {
-    if (normalized.includes(key)) return UPPERCASE_UNIT_LABELS[key];
+    });
   }
-  return name;
+
+  function boldRun(
+    text: string,
+    opts: { underline?: boolean; size?: number } = {},
+  ): TextRun {
+    return new TextRun({
+      text,
+      font: FONT,
+      bold: true,
+      size: opts.size ?? 24,
+      underline: opts.underline ? {} : undefined,
+    });
+  }
+
+  function center(run: TextRun): Paragraph {
+    return new Paragraph({ alignment: AlignmentType.CENTER, children: [run] });
+  }
+
+  function left(run: TextRun): Paragraph {
+    return new Paragraph({ alignment: AlignmentType.LEFT, children: [run] });
+  }
+
+  function empty(): Paragraph {
+    return new Paragraph({ children: [] });
+  }
+
+  function formatPlace(iso: string): string {
+    const [y, m, d] = iso.split("-");
+    return d && m && y
+      ? `Tây Ninh, ngày ${d} tháng ${m} năm ${y}`
+      : "Tây Ninh, ngày ..... tháng ..... năm .....";
+  }
+
+  function formatTruc(t?: TrucNguoi | null): string {
+    if (!t) return "";
+    return [t.capbacNguoitruc, t.tenNguoitruc, t.chucvuNguoitruc]
+      .filter(Boolean)
+      .join(" - ");
+  }
+
+  function formatUnitName(name: string): string {
+    const normalized = name.toLowerCase().replace(/[\s-]/g, "");
+    for (const key of Object.keys(UPPERCASE_UNIT_LABELS)) {
+      if (normalized.includes(key)) return UPPERCASE_UNIT_LABELS[key];
+    }
+    return name;
+  }
 }
