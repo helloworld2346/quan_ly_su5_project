@@ -65,7 +65,7 @@ export function useReportData({
     try {
       let response;
       if (isParentUnit) {
-        if (isTrungDoan || isSuDoan) {
+        if (isTrungDoan || isSuDoan || isTieuDoan) {
           const [donViRes, tongHopRes] = await Promise.all([
             dailyReportService.searchChildrenReports(
               maDonViCurrent,
@@ -169,22 +169,51 @@ export function useReportData({
         const isAggregatingSelf =
           (isTrungDoan || isSuDoan || isTieuDoan) && !isDbOrEb;
 
+        // Fetch đơn DON_VI của chính đơn vị — tách try/catch riêng để
+        // 404 (chưa có đơn) không chặn các fetch TONG_HOP bên dưới
+        let ownRow: ReportRow | null = null;
         try {
           const ownRes = await dailyReportService.searchReportByUnitAndDate(
             maDonViCurrent,
             reportDate,
             "DON_VI",
           );
-          const ownRow =
+          ownRow =
             ownRes.success && ownRes.Result
               ? {
                   ...mapItemToRow(ownRes.Result),
                   loaiDonBaoCao: "DON_VI" as LoaiDonBaoCao,
                 }
               : null;
-          setParentOwnReportData(ownRow);
+        } catch {
+          ownRow = null;
+        }
+        setParentOwnReportData(ownRow);
 
-          if (isAggregatingSelf) {
+        if (isAggregatingSelf) {
+          try {
+            const tongHopRes =
+              await dailyReportService.searchReportByUnitAndDate(
+                maDonViCurrent,
+                reportDate,
+                "TONG_HOP",
+              );
+            const tongHopRow =
+              tongHopRes.success && tongHopRes.Result
+                ? {
+                    ...mapItemToRow(tongHopRes.Result),
+                    loaiDonBaoCao: "TONG_HOP" as LoaiDonBaoCao,
+                    isConsolidated: true,
+                  }
+                : null;
+            setParentReportData(tongHopRow);
+          } catch {
+            setParentReportData(null);
+          }
+        } else if (isTrungDoan || isTieuDoan || isSuDoan) {
+          // Tiểu đoàn db/eb: ưu tiên đơn TONG_HOP nếu đã tồn tại
+          let tongHopRow: ReportRow | null = null;
+          if (isTieuDoan && isDbOrEb) {
             try {
               const tongHopRes =
                 await dailyReportService.searchReportByUnitAndDate(
@@ -192,7 +221,7 @@ export function useReportData({
                   reportDate,
                   "TONG_HOP",
                 );
-              const tongHopRow =
+              tongHopRow =
                 tongHopRes.success && tongHopRes.Result
                   ? {
                       ...mapItemToRow(tongHopRes.Result),
@@ -200,20 +229,14 @@ export function useReportData({
                       isConsolidated: true,
                     }
                   : null;
-              setParentReportData(tongHopRow);
             } catch {
-              setParentReportData(null);
+              tongHopRow = null;
             }
-          } else if (isTrungDoan || isTieuDoan || isSuDoan) {
-            // Tiểu đoàn db/eb: đơn của chính nó chính là đơn tổng hợp hiển thị
-            setParentReportData(
-              ownRow ? { ...ownRow, isConsolidated: true } : null,
-            );
-          } else {
-            setParentReportData(null);
           }
-        } catch {
-          setParentOwnReportData(null);
+          setParentReportData(
+            tongHopRow ?? (ownRow ? { ...ownRow, isConsolidated: true } : null),
+          );
+        } else {
           setParentReportData(null);
         }
       } else {
@@ -226,6 +249,25 @@ export function useReportData({
           reportDate,
           loaiChiHuy,
         );
+
+        // Tiểu đoàn db/eb: đơn TONG_HOP của chính nó không nằm trong
+        // kết quả DON_VI -> fetch riêng và ưu tiên hiển thị nó
+        if (isTieuDoan && isDbOrEb) {
+          try {
+            const tongHopRes =
+              await dailyReportService.searchReportByUnitAndDate(
+                maDonViCurrent,
+                reportDate,
+                "TONG_HOP",
+              );
+            if (tongHopRes.success && tongHopRes.Result) {
+              response = tongHopRes;
+            }
+          } catch {
+            // giữ nguyên response DON_VI
+          }
+        }
+
         setParentReportData(null);
         setParentOwnReportData(null);
       }

@@ -12,6 +12,7 @@ import {
   VerticalAlign,
   TableLayoutType,
   HeightRule,
+  PageBreak,
 } from "docx";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
@@ -214,89 +215,175 @@ export async function exportTroopReportToWord({
   const nhiemVuParagraphs: (Paragraph | Table)[] = [];
   if (nhiemVuEntries && nhiemVuEntries.length > 0) {
     nhiemVuParagraphs.push(
-      center(boldRun("NHIỆM VỤ NGÀY", { size: 28 })),
+      center(boldRun("NHIỆM VỤ NGÀY", { size: 32 })),
       empty(),
     );
 
     for (const entry of nhiemVuEntries) {
-      nhiemVuParagraphs.push(left(boldRun(entry.title)));
-
       const d = entry.data;
-      if (!d) {
-        nhiemVuParagraphs.push(empty());
-        continue;
-      }
+      if (!d) continue;
 
-      const lines: string[] = [
-        `Nhiệm vụ các phân đội đóng quân canh phòng và các phân đội khác: ${
+      const lines: [string, string][] = [
+        [
+          "Nhiệm vụ các phân đội đóng quân canh phòng và các phân đội khác",
           d.securityStatus === "safe"
-            ? "✓ Đảm bảo an toàn"
-            : "✕ Không đảm bảo an toàn"
-        }`,
-        `Những việc đột xuất xảy ra: ${
-          d.incidentStatus === "yes" ? "⚠ Có phát sinh" : "✓ Không phát sinh"
-        }${d.incidentStatus === "yes" && d.incidentDetail ? ` — ${d.incidentDetail}` : ""}`,
-        `Ưu điểm: ${
-          d.advantageStatus === "yes" ? "✓ Có" : "— Không có"
-        }${d.advantageStatus === "yes" && d.advantageDetail ? ` — ${d.advantageDetail}` : ""}`,
-        `Khuyết điểm: ${
-          d.disadvantageStatus === "yes" ? "✕ Có" : "✓ Không có"
-        }${d.disadvantageStatus === "yes" && d.disadvantageDetail ? ` — ${d.disadvantageDetail}` : ""}`,
-        `Những việc cần tiếp tục giải quyết: ${
-          d.pendingStatus === "yes" ? "⚠ Cần xử lý" : "✓ Không có"
-        }${d.pendingStatus === "yes" && d.pendingDetail ? ` — ${d.pendingDetail}` : ""}`,
+            ? "Đảm bảo an toàn"
+            : "Không đảm bảo an toàn",
+        ],
+        [
+          "Những việc đột xuất xảy ra",
+          d.incidentStatus === "yes"
+            ? `Có phát sinh${d.incidentDetail ? ` - ${d.incidentDetail}` : ""}`
+            : "Không phát sinh",
+        ],
+        [
+          "Ưu điểm",
+          d.advantageStatus === "yes" ? d.advantageDetail || "Có" : "Không có",
+        ],
+        [
+          "Khuyết điểm",
+          d.disadvantageStatus === "yes"
+            ? d.disadvantageDetail || "Có"
+            : "Không có",
+        ],
+        [
+          "Những việc cần tiếp tục giải quyết",
+          d.pendingStatus === "yes"
+            ? d.pendingDetail || "Cần xử lý"
+            : "Không có",
+        ],
       ];
 
-      for (const text of lines) {
-        nhiemVuParagraphs.push(
-          left(new TextRun({ text, font: FONT, size: 24 })),
-        );
-      }
-      nhiemVuParagraphs.push(empty());
+      nhiemVuParagraphs.push(
+        new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          layout: TableLayoutType.FIXED,
+          columnWidths: [5000, 10000],
+          rows: lines.map(
+            ([label, content]) =>
+              new TableRow({
+                children: [
+                  new TableCell({
+                    shading: { fill: ZEBRA_FILL },
+                    verticalAlign: VerticalAlign.CENTER,
+                    margins: { top: 80, bottom: 80, left: 160, right: 160 }, // <-- thêm
+                    children: [
+                      new Paragraph({
+                        alignment: AlignmentType.LEFT,
+                        children: [
+                          new TextRun({
+                            text: label,
+                            font: FONT,
+                            bold: true,
+                            size: 24,
+                          }),
+                        ],
+                      }),
+                    ],
+                  }),
+                  new TableCell({
+                    verticalAlign: VerticalAlign.CENTER,
+                    margins: { top: 80, bottom: 80, left: 160, right: 160 }, // <-- thêm
+                    children: [
+                      new Paragraph({
+                        alignment: AlignmentType.LEFT,
+                        children: [
+                          new TextRun({
+                            text: content,
+                            font: FONT,
+                            size: 24,
+                          }),
+                        ],
+                      }),
+                    ],
+                  }),
+                ],
+              }),
+          ),
+        }),
+        empty(),
+      );
     }
-
-    const children: (Paragraph | Table)[] = [
-      headerTable,
-      empty(),
-      center(boldRun("BÁO CÁO QUÂN SỐ", { size: 32 })),
-      empty(),
-      dataTable,
-      empty(),
-      ...nhiemVuParagraphs,
-      center(
-        boldRun(`MẬT KHẨU: ${(matkhau ?? "").toUpperCase()}`, { size: 36 }),
-      ),
-      center(
-        new TextRun({
-          text: `Trực chỉ huy: ${formatTruc(trucChiHuy)}`,
-          font: FONT,
-          size: 24,
-        }),
-      ),
-      center(
-        new TextRun({
-          text: `Trực ban tác chiến: ${formatTruc(trucBanTacChien)}`,
-          font: FONT,
-          size: 24,
-        }),
-      ),
-    ];
-
-    const doc = new Document({
-      sections: [
-        {
-          properties: {
-            page: { size: { orientation: "landscape" as never } },
-          },
-          children,
-        },
-      ],
-    });
-
-    const blob = await Packer.toBlob(doc);
-    const readonlyBlob = await applyReadonly(blob);
-    saveAs(readonlyBlob, `ThongKeQuanSo_${reportDate}.docx`);
   }
+
+  // ── MẬT KHẨU: kiểu chữ ký cuối trang, 2 cột trực ban ──
+  const signatureTable = new Table({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    layout: TableLayoutType.FIXED,
+    columnWidths: [7500, 7500],
+    borders: noTableBorder,
+    rows: [
+      new TableRow({
+        children: [
+          new TableCell({
+            borders: noCellBorder,
+            children: [center(boldRun("TRỰC CHỈ HUY"))],
+          }),
+          new TableCell({
+            borders: noCellBorder,
+            children: [center(boldRun("TRỰC BAN TÁC CHIẾN"))],
+          }),
+        ],
+      }),
+      new TableRow({
+        children: [
+          new TableCell({
+            borders: noCellBorder,
+            children: [
+              center(
+                new TextRun({
+                  text: formatTruc(trucChiHuy),
+                  font: FONT,
+                  size: 24,
+                }),
+              ),
+            ],
+          }),
+          new TableCell({
+            borders: noCellBorder,
+            children: [
+              center(
+                new TextRun({
+                  text: formatTruc(trucBanTacChien),
+                  font: FONT,
+                  size: 24,
+                }),
+              ),
+            ],
+          }),
+        ],
+      }),
+    ],
+  });
+
+  const children: (Paragraph | Table)[] = [
+    headerTable,
+    empty(),
+    center(boldRun("BÁO CÁO QUÂN SỐ", { size: 32 })),
+    empty(),
+    dataTable,
+    pageBreak(),
+    empty(),
+    ...nhiemVuParagraphs,
+    center(boldRun(`MẬT KHẨU: ${(matkhau ?? "").toUpperCase()}`, { size: 36 })),
+    empty(),
+    signatureTable,
+  ];
+
+  const doc = new Document({
+    sections: [
+      {
+        properties: {
+          page: { size: { orientation: "landscape" as never } },
+        },
+        children,
+      },
+    ],
+  });
+
+  const blob = await Packer.toBlob(doc);
+  const readonlyBlob = await applyReadonly(blob);
+  saveAs(readonlyBlob, `ThongKeQuanSo_${reportDate}.docx`);
 
   // Chèn khóa "chỉ đọc" (không mật khẩu) vào word/settings.xml của file .docx.
   // Mở bằng Word sẽ ở chế độ Restrict Editing (read only); bấm "Stop Protection"
@@ -398,12 +485,12 @@ export async function exportTroopReportToWord({
     return new Paragraph({ alignment: AlignmentType.CENTER, children: [run] });
   }
 
-  function left(run: TextRun): Paragraph {
-    return new Paragraph({ alignment: AlignmentType.LEFT, children: [run] });
-  }
-
   function empty(): Paragraph {
     return new Paragraph({ children: [] });
+  }
+
+  function pageBreak(): Paragraph {
+    return new Paragraph({ children: [new PageBreak()] });
   }
 
   function formatPlace(iso: string): string {

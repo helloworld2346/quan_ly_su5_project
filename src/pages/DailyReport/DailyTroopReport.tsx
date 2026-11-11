@@ -249,20 +249,23 @@ export default function DailyTroopReport() {
     preferDutyShiftForCaTruc: useDutyShiftForCaTruc,
   });
 
+  const signatureTargetReport =
+    isChiHuy && isParentUnit ? (commanderReport ?? ownReport) : ownReport;
+
   const nhiemVuEntriesForExport = useMemo(
     () => nhiemVuEntries.filter((e) => e.id === maDonViCurrent),
     [nhiemVuEntries, maDonViCurrent],
   );
 
   const handleCompleteSignature = async () => {
-    if (!ownReport?.idDonBaoCao || !signatureBase64) {
+    if (!signatureTargetReport?.idDonBaoCao || !signatureBase64) {
       setSignatureDone(true);
       return;
     }
 
-    const raw = ownReport.rawItem;
+    const raw = signatureTargetReport.rawItem;
     try {
-      await dailyReportService.updateReport(ownReport.idDonBaoCao, {
+      await dailyReportService.updateReport(signatureTargetReport.idDonBaoCao, {
         quanSoTong: raw.quanSoTong,
         quanSoHienDien: raw.quanSoHienDien,
         quanSoVang: raw.quanSoVang,
@@ -288,11 +291,11 @@ export default function DailyTroopReport() {
   };
 
   const [prevReportId, setPrevReportId] = useState<string | undefined>(
-    ownReport?.idDonBaoCao,
+    signatureTargetReport?.idDonBaoCao,
   );
-  if (ownReport?.idDonBaoCao !== prevReportId) {
-    setPrevReportId(ownReport?.idDonBaoCao);
-    const saved = ownReport?.rawItem?.chuKySo;
+  if (signatureTargetReport?.idDonBaoCao !== prevReportId) {
+    setPrevReportId(signatureTargetReport?.idDonBaoCao);
+    const saved = signatureTargetReport?.rawItem?.chuKySo;
     setSignatureBase64(saved ?? undefined);
     setSignatureDone(Boolean(saved));
   }
@@ -1085,7 +1088,7 @@ export default function DailyTroopReport() {
               ? `${nguoiBaoCao.capbacNguoitruc} - ${nguoiBaoCao.tenNguoitruc}`
               : undefined
           }
-          signature={ownReport?.rawItem?.chuKySo}
+          signature={signatureTargetReport?.rawItem?.chuKySo}
           onSign={setSignatureBase64}
           onComplete={handleCompleteSignature}
           completed={signatureDone}
