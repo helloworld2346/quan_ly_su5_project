@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { MouseEvent, RefObject } from "react";
 import styles from "../DailyTroopReport.module.css";
 import type { ReportRow } from "../../../types/dailyReport";
@@ -104,6 +105,21 @@ export default function DailyTroopStatisticsSection({
 
   const canShowConsolidatedBlock =
     !shouldHideConsolidatedSections && canConsolidateUnit;
+  
+  const [expandedUnits, setExpandedUnits] = useState<Set<string>>(new Set());
+
+  const toggleExpand = (maDonVi: string) =>
+    setExpandedUnits((prev) => {
+      const next = new Set(prev);
+      if (next.has(maDonVi)) next.delete(maDonVi);
+      else next.add(maDonVi);
+      return next;
+    });
+
+  // Row cháu chỉ hiện khi cha được expand
+  const visibleRows = displayRows.filter(
+    (r) => !r.isGrandchildRow || expandedUnits.has(r.parentUnitId ?? ""),
+  );
 
   return (
     <section className={styles.sectionBlock}>
@@ -178,11 +194,17 @@ export default function DailyTroopStatisticsSection({
                         </tr>
                       )}
 
-                    {displayRows.map((row) => (
+                    {visibleRows.map((row) => (
                       <ReportTableRow
-                        key={row.idDonBaoCao}
+                        key={`${row.parentUnitId ?? ""}-${row.idDonBaoCao}`}
                         row={row}
                         isConsolidatedRow={false}
+                        isExpanded={expandedUnits.has(row.donVi)}
+                        onToggleExpand={
+                          row.hasChildren
+                            ? () => toggleExpand(row.donVi)
+                            : undefined
+                        }
                         {...sharedRowProps}
                       />
                     ))}
@@ -201,20 +223,19 @@ export default function DailyTroopStatisticsSection({
                         />
                       )}
 
-                    {canShowConsolidatedBlock &&
-                      parentReportData && (
-                        <>
-                          <tr className={styles.separatorRow}>
-                            <td colSpan={23}>Báo cáo tổng hợp</td>
-                          </tr>
-                          <ReportTableRow
-                            key={`parent-${parentReportData.idDonBaoCao}`}
-                            row={parentReportData}
-                            isConsolidatedRow={true}
-                            {...sharedRowProps}
-                          />
-                        </>
-                      )}
+                    {canShowConsolidatedBlock && parentReportData && (
+                      <>
+                        <tr className={styles.separatorRow}>
+                          <td colSpan={23}>Báo cáo tổng hợp</td>
+                        </tr>
+                        <ReportTableRow
+                          key={`parent-${parentReportData.idDonBaoCao}`}
+                          row={parentReportData}
+                          isConsolidatedRow={true}
+                          {...sharedRowProps}
+                        />
+                      </>
+                    )}
                   </>
                 )}
               </tbody>

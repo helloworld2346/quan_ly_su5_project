@@ -6,6 +6,8 @@ import {
   faEye,
   faPenToSquare,
   faRotateLeft,
+  faChevronDown,
+  faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 import KySoInfoModal from "../KySoInfoModal";
 import ReportStatusBadge from "../../../components/ui/ReportStatusBadge/ReportStatusBadge";
@@ -46,6 +48,8 @@ type Props = {
   onEditReport: (row: ReportRow) => void;
   onReturnReport?: (row: ReportRow) => void;
   canReturnRow?: boolean;
+  isExpanded?: boolean;
+  onToggleExpand?: () => void;
 };
 
 export default function ReportTableRow({
@@ -69,6 +73,8 @@ export default function ReportTableRow({
   onViewDetail,
   onEditReport,
   onReturnReport,
+  isExpanded = false,
+  onToggleExpand,
 }: Props) {
   const menuKey = isConsolidatedRow ? `parent-${row.idDonBaoCao}` : row.donVi;
   const isMenuOpen = activeMenuUnit === menuKey;
@@ -78,10 +84,10 @@ export default function ReportTableRow({
     row.donVi === maDonViCurrent &&
     (unitSymbol === "ch/f" || unitSymbol === "ch/e");
 
-const displayUnitName =
-  row.loaiDonBaoCao === "TONG_HOP" && unitSymbol === "ch/f"
-    ? "f5"
-    : normalizeUnitName(row.kyhieuDonVi || row.tenDonVi);
+  const displayUnitName =
+    row.loaiDonBaoCao === "TONG_HOP" && unitSymbol === "ch/f"
+      ? "f5"
+      : normalizeUnitName(row.kyhieuDonVi || row.tenDonVi);
 
   const canEditNotSubmitted = canEditOwnNotSubmitted && isOwnCommandRow;
   const canInlineEditThisRow = canInlineInputChf && isOwnCommandRow;
@@ -147,7 +153,23 @@ const displayUnitName =
             .join(" ") || undefined
         }
       >
-        <td className={styles.unitCell}>{displayUnitName}</td>
+        <td className={styles.unitCell}>
+          {row.hasChildren && (
+            <button
+              type="button"
+              className={styles.expandBtn}
+              onClick={onToggleExpand}
+              aria-label={isExpanded ? "Thu gọn" : "Mở rộng"}
+            >
+              <FontAwesomeIcon
+                icon={isExpanded ? faChevronDown : faChevronRight}
+              />
+            </button>
+          )}
+          <span style={row.isGrandchildRow ? { paddingLeft: 16 } : undefined}>
+            {displayUnitName}
+          </span>
+        </td>
 
         {/* 2 -> 18. Xử lý 17 cột số liệu (Logic Inline Editing của bạn) */}
         {isInlineEditing && inlineValue ? (
@@ -331,7 +353,23 @@ const displayUnitName =
           .join(" ") || undefined
       }
     >
-      <td className={styles.unitCell}>{displayUnitName}</td>
+      <td className={styles.unitCell}>
+        {row.hasChildren && (
+          <button
+            type="button"
+            className={styles.expandBtn}
+            onClick={onToggleExpand}
+            aria-label={isExpanded ? "Thu gọn" : "Mở rộng"}
+          >
+            <FontAwesomeIcon
+              icon={isExpanded ? faChevronDown : faChevronRight}
+            />
+          </button>
+        )}
+        <span style={row.isGrandchildRow ? { paddingLeft: 16 } : undefined}>
+          {displayUnitName}
+        </span>
+      </td>
 
       {isInlineEditing && inlineValue ? (
         <>

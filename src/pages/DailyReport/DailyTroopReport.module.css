@@ -1127,3 +1127,11 @@
     font-size: 10px;  
   }  
 }
+
+.expandBtn {  
+  background: none;  
+  border: none;  
+  cursor: pointer;  
+  padding: 0 6px 0 0;  
+  color: inherit;  
+}

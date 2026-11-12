@@ -353,6 +353,9 @@ export interface ReportRow {
   notSubmitted?: boolean;
   isConsolidated?: boolean;
   loaiDonBaoCao?: LoaiDonBaoCao;
+  isGrandchildRow?: boolean;
+  parentUnitId?: string;
+  hasChildren?: boolean;
 }
 
 export type EditModalData = {

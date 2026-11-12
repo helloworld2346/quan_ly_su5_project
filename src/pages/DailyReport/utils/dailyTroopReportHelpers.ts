@@ -14,7 +14,15 @@ type ChildUnit = {
   tenDonvi: string;
   kyhieuDonvi?: string;
   capDonVi?: string | null;
-  donViCon?: string[];
+  donViCon?: Array<
+    | string
+    | {
+        maDonVi: string;
+        tenDonvi?: string;
+        kyhieuDonvi?: string;
+        capDonVi?: string | null;
+      }
+  >;
 };
 
 type CaTrucFromApi = {
@@ -332,27 +340,59 @@ export function buildDisplayRows(args: {
         )
   ).filter((unit) => unit.kyhieuDonvi !== "CH/e");
 
-  const childRows = visibleChildUnits.map((unit) => {
-    const isAggregatingChild =
+  const normalizeGrandchild = (
+    gc: NonNullable<ChildUnit["donViCon"]>[number],
+  ): ChildUnit =>
+    typeof gc === "string"
+      ? { maDonVi: gc, tenDonvi: gc }
+      : { ...gc, tenDonvi: gc.tenDonvi ?? gc.maDonVi };
+
+  const matchRowForUnit = (unit: ChildUnit): ReportRow | undefined => {
+    const isAggregating =
       (unit.capDonVi === "TRUNG_DOAN" || unit.capDonVi === "TIEU_DOAN") &&
       (unit.donViCon?.length ?? 0) > 0;
 
-    const matched = isAggregatingChild
+    return isAggregating
       ? filtered.find(
           (row) =>
             row.donVi === unit.maDonVi && row.loaiDonBaoCao === "TONG_HOP",
         )
       : filtered.find((row) => row.donVi === unit.maDonVi);
+  };
 
-    if (matched) {
-      return { ...matched, notSubmitted: false };
-    }
+  const childRows = visibleChildUnits.flatMap((unit) => {
+    const isAggregatingChild =
+      (unit.capDonVi === "TRUNG_DOAN" || unit.capDonVi === "TIEU_DOAN") &&
+      (unit.donViCon?.length ?? 0) > 0;
 
-    return createEmptyReportRow({
-      idDonBaoCao: unit.maDonVi,
-      tenDonVi: unit.tenDonvi,
-      kyhieuDonVi: unit.kyhieuDonvi,
+    const matched = matchRowForUnit(unit);
+    const parentRow: ReportRow = matched
+      ? { ...matched, notSubmitted: false, hasChildren: isAggregatingChild }
+      : {
+          ...createEmptyReportRow({
+            idDonBaoCao: unit.maDonVi,
+            tenDonVi: unit.tenDonvi,
+            kyhieuDonVi: unit.kyhieuDonvi,
+          }),
+          hasChildren: isAggregatingChild,
+        };
+
+    if (!isAggregatingChild) return [parentRow];
+
+    const grandchildRows: ReportRow[] = (unit.donViCon ?? []).map((gc) => {
+      const gcUnit = normalizeGrandchild(gc);
+      const gcMatched = matchRowForUnit(gcUnit);
+      const base: ReportRow = gcMatched
+        ? { ...gcMatched, notSubmitted: false }
+        : createEmptyReportRow({
+            idDonBaoCao: gcUnit.maDonVi,
+            tenDonVi: gcUnit.tenDonvi,
+            kyhieuDonVi: gcUnit.kyhieuDonvi,
+          });
+      return { ...base, isGrandchildRow: true, parentUnitId: unit.maDonVi };
     });
+
+    return [parentRow, ...grandchildRows];
   });
 
   return [...ownUnitRow, ...trungDoanOwnRow, ...childRows];
@@ -383,7 +423,9 @@ function sumVangByRank(rows: ReportRow[]): {
 }
 
 export function buildDisplayTotals(displayRows: ReportRow[]): DisplayTotals {
-  const submittedRows = displayRows.filter((r) => !r.notSubmitted);
+  const submittedRows = displayRows.filter(
+    (r) => !r.notSubmitted && !r.isGrandchildRow,
+  );
 
   return {
     quanSoTong: submittedRows.reduce((s, r) => s + r.quanSoTong, 0),
