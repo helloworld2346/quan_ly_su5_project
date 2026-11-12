@@ -1,3 +1,4 @@
+// src/pages/DailyReport/utils/dailyTroopReportHelpers.ts
 import type {
   CaTrucInfo,
   CreateReportResponse,
@@ -113,13 +114,6 @@ export function totalsToExportCells(t: DisplayTotals): (string | number)[] {
   ];
 }
 
-// export function isPastDateForReport(reportDate: string): boolean {
-//   const selectedDate = new Date(`${reportDate}T00:00:00`);
-//   const today = new Date();
-//   today.setHours(0, 0, 0, 0);
-//   return selectedDate < today;
-// }
-
 export function isPastDateForReport(): boolean {
   return false;
 }
@@ -173,6 +167,7 @@ export function createEmptyReportRow(args: {
     notSubmitted: true,
   };
 }
+
 function normalizeText(value: unknown): string {
   return String(value ?? "").toLowerCase();
 }
@@ -225,6 +220,7 @@ export function buildDisplayRows(args: {
   parentReportData: ReportRow | null;
   parentOwnReportData: ReportRow | null;
   childUnits: ChildUnit[];
+  allUnits?: ChildUnit[];
   isParentUnit: boolean;
   isTrungDoan: boolean;
   isTieuDoan: boolean;
@@ -236,9 +232,9 @@ export function buildDisplayRows(args: {
   const {
     query,
     reportData,
-    // parentReportData,
     parentOwnReportData,
     childUnits,
+    allUnits = [],
     isParentUnit,
     isTrungDoan,
     isTieuDoan,
@@ -309,7 +305,6 @@ export function buildDisplayRows(args: {
       : [];
 
   // CH/e (DON_VI) của chính trung đoàn -> LUÔN hiển thị như 1 dòng cứng
-  // (giống CH/f của sư đoàn), rỗng "Chưa Nộp" khi chưa có báo cáo DON_VI
   const trungDoanOwnRow =
     isParentUnit && isTrungDoan
       ? [
@@ -340,17 +335,26 @@ export function buildDisplayRows(args: {
         )
   ).filter((unit) => unit.kyhieuDonvi !== "CH/e");
 
-  const normalizeGrandchild = (
-    gc: NonNullable<ChildUnit["donViCon"]>[number],
-  ): ChildUnit =>
-    typeof gc === "string"
-      ? { maDonVi: gc, tenDonvi: gc }
-      : { ...gc, tenDonvi: gc.tenDonvi ?? gc.maDonVi };
+  // Lấy đơn vị con trực tiếp của 1 đơn vị từ cây đơn vị thật (allUnits),
+  // match theo prefix maDonVi — không dựa vào field donViCon
+  const grandchildUnitsOf = (parentMa: string): ChildUnit[] =>
+    allUnits
+      .filter((u) => {
+        if (!u.maDonVi.startsWith(parentMa + ".")) return false;
+        const suffix = u.maDonVi.slice(parentMa.length + 1);
+        return !suffix.includes(".");
+      })
+      .map((u) => ({
+        maDonVi: u.maDonVi,
+        tenDonvi: u.tenDonvi,
+        kyhieuDonvi: u.kyhieuDonvi,
+        capDonVi: u.capDonVi,
+      }));
 
   const matchRowForUnit = (unit: ChildUnit): ReportRow | undefined => {
     const isAggregating =
       (unit.capDonVi === "TRUNG_DOAN" || unit.capDonVi === "TIEU_DOAN") &&
-      (unit.donViCon?.length ?? 0) > 0;
+      grandchildUnitsOf(unit.maDonVi).length > 0;
 
     return isAggregating
       ? filtered.find(
@@ -361,9 +365,10 @@ export function buildDisplayRows(args: {
   };
 
   const childRows = visibleChildUnits.flatMap((unit) => {
+    const grandchildUnits = grandchildUnitsOf(unit.maDonVi);
     const isAggregatingChild =
       (unit.capDonVi === "TRUNG_DOAN" || unit.capDonVi === "TIEU_DOAN") &&
-      (unit.donViCon?.length ?? 0) > 0;
+      grandchildUnits.length > 0;
 
     const matched = matchRowForUnit(unit);
     const parentRow: ReportRow = matched
@@ -379,8 +384,7 @@ export function buildDisplayRows(args: {
 
     if (!isAggregatingChild) return [parentRow];
 
-    const grandchildRows: ReportRow[] = (unit.donViCon ?? []).map((gc) => {
-      const gcUnit = normalizeGrandchild(gc);
+    const grandchildRows: ReportRow[] = grandchildUnits.map((gcUnit) => {
       const gcMatched = matchRowForUnit(gcUnit);
       const base: ReportRow = gcMatched
         ? { ...gcMatched, notSubmitted: false }

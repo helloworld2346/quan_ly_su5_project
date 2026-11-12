@@ -47,6 +47,7 @@ export type UseDailyTroopReportViewModelArgs = {
   parentReportData: ReportRow | null;
   parentOwnReportData: ReportRow | null;
   childUnits: DonVi[];
+  allUnits: DonVi[];
   caTrucFromApi: CaTrucDetail | null;
   consolidatedData: ConsolidatedData | null;
   editModalData: EditModalData | null;
@@ -101,6 +102,7 @@ export function useDailyTroopReportViewModel(
     parentReportData,
     parentOwnReportData,
     childUnits,
+    allUnits,
     caTrucFromApi,
     consolidatedData,
     editModalData,
@@ -177,6 +179,7 @@ const commanderReport = useMemo(() => {
           parentReportData,
           parentOwnReportData,
           childUnits,
+          allUnits,
           isParentUnit,
           isTrungDoan: capDonVi === "TRUNG_DOAN",
           isTieuDoan: capDonVi === "TIEU_DOAN",
@@ -193,6 +196,7 @@ const commanderReport = useMemo(() => {
       parentReportData,
       parentOwnReportData,
       childUnits,
+      allUnits,
       isParentUnit,
       capDonVi,
       isChiHuy,

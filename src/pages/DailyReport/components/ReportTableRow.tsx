@@ -154,21 +154,28 @@ export default function ReportTableRow({
         }
       >
         <td className={styles.unitCell}>
-          {row.hasChildren && (
-            <button
-              type="button"
-              className={styles.expandBtn}
-              onClick={onToggleExpand}
-              aria-label={isExpanded ? "Thu gọn" : "Mở rộng"}
+          <div className={styles.unitCellInner}>
+            <span className={styles.expandSlot}>
+              {row.hasChildren && onToggleExpand && (
+                <button
+                  type="button"
+                  className={styles.expandBtn}
+                  onClick={onToggleExpand}
+                  aria-label={isExpanded ? "Thu gọn" : "Mở rộng"}
+                >
+                  <FontAwesomeIcon
+                    icon={isExpanded ? faChevronDown : faChevronRight}
+                  />
+                </button>
+              )}
+            </span>
+            <span
+              className={styles.unitName}
+              style={row.isGrandchildRow ? { paddingLeft: 16 } : undefined}
             >
-              <FontAwesomeIcon
-                icon={isExpanded ? faChevronDown : faChevronRight}
-              />
-            </button>
-          )}
-          <span style={row.isGrandchildRow ? { paddingLeft: 16 } : undefined}>
-            {displayUnitName}
-          </span>
+              {displayUnitName}
+            </span>
+          </div>
         </td>
 
         {/* 2 -> 18. Xử lý 17 cột số liệu (Logic Inline Editing của bạn) */}

@@ -1,4 +1,3 @@
-// src/pages/DailyReport/hooks/useReportData.ts
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { dailyReportService } from "../../../services/dailyReport/dailyReportService";
 import { dutyService } from "../../../services/duty/dutyService";
@@ -16,6 +15,7 @@ import { generateId } from "../../../utils/uuid";
 import { useReportDataChangedListener } from "../../../shared/report/hooks/useReportDataChangedListener";
 import { useInitialFetch } from "../../../shared/report/hooks/useInitialFetch";
 import { useChildUnits } from "../../../shared/report/hooks/useChildUnits";
+import { getDirectChildUnits } from "../../../shared/report/utils/reportUnitTree";
 
 export type { ReportRow };
 
@@ -48,10 +48,11 @@ export function useReportData({
   const [loading, setLoading] = useState(false);
   const [caTrucFromApi, setCaTrucFromApi] = useState<CaTrucDetail | null>(null);
 
-  const { childUnits, currentUnit } = useChildUnits(
+  const { childUnits, currentUnit, allUnits } = useChildUnits(
     maDonViCurrent,
     isParentUnit,
   );
+
   const donViQuanSoTong = currentUnit?.quanSoTong ?? 0;
 
   const showErrorRef = useRef(showError);
@@ -95,16 +96,9 @@ export function useReportData({
             }
           }
 
-          const directChildren = [
-            ...(donViRes.success && donViRes.Result ? donViRes.Result : []),
-            ...(tongHopRes.success && tongHopRes.Result
-              ? tongHopRes.Result
-              : []),
-          ];
-
-          const uniqueChildUnitIds = Array.from(
-            new Set(directChildren.map((item) => item.donVi.maDonVi)),
-          );
+          const uniqueChildUnitIds = childUnits
+            .filter((u) => getDirectChildUnits(allUnits, u.maDonVi).length > 0)
+            .map((u) => u.maDonVi);
 
           const nestedResults = await Promise.all(
             uniqueChildUnitIds.map(async (childMaDonVi) => {
@@ -297,6 +291,8 @@ export function useReportData({
     isTieuDoan,
     reportDate,
     isDbOrEb,
+    childUnits,
+    allUnits,
   ]);
 
   useInitialFetch(fetchReports);
@@ -429,6 +425,7 @@ export function useReportData({
     loading,
     donViQuanSoTong,
     childUnits,
+    allUnits,
     currentUnit,
     caTrucFromApi,
     consolidatedData,
