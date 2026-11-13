@@ -221,6 +221,7 @@ export function buildDisplayRows(args: {
   parentOwnReportData: ReportRow | null;
   childUnits: ChildUnit[];
   allUnits?: ChildUnit[];
+  isDrilled?: boolean;
   isParentUnit: boolean;
   isTrungDoan: boolean;
   isTieuDoan: boolean;
@@ -235,6 +236,7 @@ export function buildDisplayRows(args: {
     parentOwnReportData,
     childUnits,
     allUnits = [],
+    isDrilled = false,
     isParentUnit,
     isTrungDoan,
     isTieuDoan,
@@ -292,7 +294,7 @@ export function buildDisplayRows(args: {
     );
 
   const ownUnitRow =
-    isParentUnit && !isTrungDoan && !isTieuDoan && ownUnitMatches
+    isParentUnit && !isDrilled && !isTrungDoan && !isTieuDoan && ownUnitMatches
       ? [
           parentOwnReportData
             ? { ...parentOwnReportData, notSubmitted: false }
@@ -304,9 +306,8 @@ export function buildDisplayRows(args: {
         ]
       : [];
 
-  // CH/e (DON_VI) của chính trung đoàn -> LUÔN hiển thị như 1 dòng cứng
   const trungDoanOwnRow =
-    isParentUnit && isTrungDoan
+    isParentUnit && !isDrilled && isTrungDoan
       ? [
           parentOwnReportData
             ? {
@@ -327,7 +328,7 @@ export function buildDisplayRows(args: {
 
   const visibleChildUnits = childUnits.filter(
     (u) => u.kyhieuDonvi !== "CH/e" && u.kyhieuDonvi !== "CH/f",
-  );  
+  );
 
   // Lấy đơn vị con trực tiếp của 1 đơn vị từ cây đơn vị thật (allUnits),
   // match theo prefix maDonVi — không dựa vào field donViCon

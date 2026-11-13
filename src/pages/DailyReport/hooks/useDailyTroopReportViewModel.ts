@@ -48,6 +48,7 @@ export type UseDailyTroopReportViewModelArgs = {
   parentOwnReportData: ReportRow | null;
   childUnits: DonVi[];
   allUnits: DonVi[];
+  drillUnit?: DonVi | null;
   caTrucFromApi: CaTrucDetail | null;
   consolidatedData: ConsolidatedData | null;
   editModalData: EditModalData | null;
@@ -103,6 +104,7 @@ export function useDailyTroopReportViewModel(
     parentOwnReportData,
     childUnits,
     allUnits,
+    drillUnit,
     caTrucFromApi,
     consolidatedData,
     editModalData,
@@ -114,14 +116,14 @@ export function useDailyTroopReportViewModel(
     preferDutyShiftForCaTruc = false,
   } = args;
 
-const isParentUnit =
-  isAdmin ||
-  (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
-  (isChiHuy &&
-    (capDonVi === "TRUNG_DOAN" ||
-      capDonVi === "SU_DOAN" ||
-      (capDonVi === "TIEU_DOAN" && !isDbOrEb))) ||
-  (isNoiVu && capDonVi === "TIEU_DOAN" && !isDbOrEb);
+  const isParentUnit =
+    isAdmin ||
+    (isTacChien && (capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN")) ||
+    (isChiHuy &&
+      (capDonVi === "TRUNG_DOAN" ||
+        capDonVi === "SU_DOAN" ||
+        (capDonVi === "TIEU_DOAN" && !isDbOrEb))) ||
+    (isNoiVu && capDonVi === "TIEU_DOAN" && !isDbOrEb);
 
   const isChiHuyLeaf = isChiHuy && childUnits.length === 0;
 
@@ -146,17 +148,17 @@ const isParentUnit =
     reportData,
   ]);
 
-const commanderReport = useMemo(() => {
-  if (!isChiHuy) return null;
-  if (isParentUnit) return parentReportData;
-  return reportData.length > 0 ? reportData[0] : null;
-}, [isChiHuy, isParentUnit, parentReportData, reportData]);
+  const commanderReport = useMemo(() => {
+    if (!isChiHuy) return null;
+    if (isParentUnit) return parentReportData;
+    return reportData.length > 0 ? reportData[0] : null;
+  }, [isChiHuy, isParentUnit, parentReportData, reportData]);
 
- const canAddReport =
-  !shouldHideDraftAndUnsubmitted &&
-  (isChiHuyLeaf ||
-    (isTacChien && (capDonVi === "SU_DOAN" || capDonVi === "TRUNG_DOAN")) ||
-    (isChiHuy && (capDonVi === "SU_DOAN" || capDonVi === "TRUNG_DOAN")));
+  const canAddReport =
+    !shouldHideDraftAndUnsubmitted &&
+    (isChiHuyLeaf ||
+      (isTacChien && (capDonVi === "SU_DOAN" || capDonVi === "TRUNG_DOAN")) ||
+      (isChiHuy && (capDonVi === "SU_DOAN" || capDonVi === "TRUNG_DOAN")));
 
   const isPastDate = isPastDateForReport();
 
@@ -170,6 +172,8 @@ const commanderReport = useMemo(() => {
     reportData,
   });
 
+  const effectiveCapDonVi = drillUnit?.capDonVi ?? capDonVi;
+
   const displayRows = useMemo(
     () =>
       filterVisibleReportRows(
@@ -181,8 +185,9 @@ const commanderReport = useMemo(() => {
           childUnits,
           allUnits,
           isParentUnit,
-          isTrungDoan: capDonVi === "TRUNG_DOAN",
-          isTieuDoan: capDonVi === "TIEU_DOAN",
+          isTrungDoan: effectiveCapDonVi === "TRUNG_DOAN",
+          isTieuDoan: effectiveCapDonVi === "TIEU_DOAN",
+          isDrilled: !!drillUnit,
           isChiHuy,
           isChiHuyLeaf,
           maDonViCurrent,
@@ -197,8 +202,9 @@ const commanderReport = useMemo(() => {
       parentOwnReportData,
       childUnits,
       allUnits,
+      drillUnit,
+      effectiveCapDonVi,
       isParentUnit,
-      capDonVi,
       isChiHuy,
       isChiHuyLeaf,
       maDonViCurrent,

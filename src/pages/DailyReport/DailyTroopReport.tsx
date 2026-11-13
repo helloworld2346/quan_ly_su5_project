@@ -258,6 +258,7 @@ export default function DailyTroopReport() {
     parentOwnReportData,
     childUnits: effectiveChildUnits,
     allUnits,
+    drillUnit,
     caTrucFromApi,
     consolidatedData,
     editModalData,
