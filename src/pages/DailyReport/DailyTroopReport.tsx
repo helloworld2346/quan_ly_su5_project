@@ -59,7 +59,8 @@ import type { DonVi } from "../../types/account";
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
   const [reportDate, setReportDate] = useState(getSharedReportDate());
-  const [drillUnit, setDrillUnit] = useState<DonVi | null>(null);
+  const [drillPath, setDrillPath] = useState<DonVi[]>([]);
+  const drillUnit = drillPath[drillPath.length - 1] ?? null;
 
   useEffect(() => {
     setSharedReportDate(reportDate);
@@ -173,15 +174,16 @@ export default function DailyTroopReport() {
 
   const effectiveChildUnits = useMemo(
     () =>
-      drillUnit
+      (drillUnit
         ? allUnits.filter((u) => {
             if (!u.maDonVi.startsWith(drillUnit.maDonVi + ".")) return false;
             const suffix = u.maDonVi.slice(drillUnit.maDonVi.length + 1);
             return !suffix.includes(".");
           })
-        : childUnits,
+        : childUnits
+      ).filter((u) => u.kyhieuDonvi !== "CH/e" && u.kyhieuDonvi !== "CH/f"),
     [drillUnit, allUnits, childUnits],
-  );
+  );  
 
   const bienCheTongTrungDoan = useMemo(() => {
     if (capDonVi !== "TRUNG_DOAN") return undefined;
@@ -864,7 +866,7 @@ export default function DailyTroopReport() {
     },
     onDrillDown: (row: ReportRow) => {
       const unit = allUnits.find((u) => u.maDonVi === row.donVi);
-      if (unit) setDrillUnit(unit);
+      if (unit) setDrillPath((prev) => [...prev, unit]);
     },
   };
 
@@ -938,7 +940,7 @@ export default function DailyTroopReport() {
         reportDate={reportDate}
         onReportDateChange={(date) => {
           setReportDate(date);
-          setDrillUnit(null);
+          setDrillPath([]);
         }}
         onAddReport={
           canAddReport && !useInlineOwnCommandReport
@@ -1059,19 +1061,31 @@ export default function DailyTroopReport() {
           value={displayTotals.vangHSQBS}
         />
       </div>
-      {drillUnit && (
+      {drillPath.length > 0 && (
         <div className={styles.breadcrumb}>
           <button
             type="button"
             className={styles.breadcrumbBtn}
-            onClick={() => setDrillUnit(null)}
+            onClick={() => setDrillPath([])}
           >
-            {currentUnit?.tenDonvi ?? account?.donVi?.tenDonvi ?? "Đơn vị"}
+            {currentUnit?.tenDonvi ?? "Đơn vị"}
           </button>
-          <span className={styles.breadcrumbSep}>/</span>
-          <span className={styles.breadcrumbCurrent}>
-            {drillUnit.tenDonvi ?? drillUnit.maDonVi}
-          </span>
+          {drillPath.map((u, i) => (
+            <span key={u.maDonVi}>
+              <span className={styles.breadcrumbSep}> / </span>
+              {i === drillPath.length - 1 ? (
+                <span className={styles.breadcrumbCurrent}>{u.tenDonvi}</span>
+              ) : (
+                <button
+                  type="button"
+                  className={styles.breadcrumbBtn}
+                  onClick={() => setDrillPath(drillPath.slice(0, i + 1))}
+                >
+                  {u.tenDonvi}
+                </button>
+              )}
+            </span>
+          ))}
         </div>
       )}
       <DailyTroopStatisticsSection

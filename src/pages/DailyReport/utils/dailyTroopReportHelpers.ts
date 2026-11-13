@@ -325,15 +325,9 @@ export function buildDisplayRows(args: {
         ]
       : [];
 
-  const visibleChildUnits = (
-    !q
-      ? childUnits
-      : childUnits.filter(
-          (unit) =>
-            filtered.some((row) => row.donVi === unit.maDonVi) ||
-            matchesQuery([unit.tenDonvi, unit.kyhieuDonvi, unit.maDonVi], q),
-        )
-  ).filter((unit) => unit.kyhieuDonvi !== "CH/e");
+  const visibleChildUnits = childUnits.filter(
+    (u) => u.kyhieuDonvi !== "CH/e" && u.kyhieuDonvi !== "CH/f",
+  );  
 
   // Lấy đơn vị con trực tiếp của 1 đơn vị từ cây đơn vị thật (allUnits),
   // match theo prefix maDonVi — không dựa vào field donViCon

@@ -428,8 +428,9 @@ const commanderReport = useMemo(() => {
     shouldHideConsolidatedSections,
     showTotalRow,
     totalRequiredCount:
-      childUnits.filter((u) => u.kyhieuDonvi !== "CH/e").length +
-      (isTrungDoan || capDonVi === "SU_DOAN" ? 1 : 0),
+      childUnits.filter(
+        (u) => u.kyhieuDonvi !== "CH/e" && u.kyhieuDonvi !== "CH/f",
+      ).length + (isTrungDoan || capDonVi === "SU_DOAN" ? 1 : 0),
     consolidatedData,
   };
 }
