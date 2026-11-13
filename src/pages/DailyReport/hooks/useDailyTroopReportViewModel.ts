@@ -245,28 +245,30 @@ export function useDailyTroopReportViewModel(
     ],
   );
 
-  const trucInfoFromReport = useMemo(() => {
-    if (drilledOwnRow) {
-      return {
-        trucChiHuy: parseTrucNguoi(drilledOwnRow.rawItem.trucBanChiHuy),
-        trucBanTacChien: parseTrucNguoi(drilledOwnRow.rawItem.trucBanTacChien),
-      };
-    }
-    return buildTrucInfoFromReport({
+    const trucInfoFromReport = useMemo(() => {
+      if (drilledOwnRow) {
+        return {
+          trucChiHuy: parseTrucNguoi(drilledOwnRow.rawItem.trucBanChiHuy),
+          trucBanTacChien: parseTrucNguoi(
+            drilledOwnRow.rawItem.trucBanTacChien,
+          ),
+        };
+      }
+      return buildTrucInfoFromReport({
+        isParentUnit,
+        isTrungDoan,
+        parentReportData,
+        parentOwnReportData,
+        reportData,
+      });
+    }, [
+      drilledOwnRow,
       isParentUnit,
-      isTrungDoan,
       parentReportData,
       parentOwnReportData,
       reportData,
-    });
-  }, [
-    drilledOwnRow,
-    isParentUnit,
-    isTrungDoan,
-    parentReportData,
-    parentOwnReportData,
-    reportData,
-  ]);
+      isTrungDoan,
+    ]);  
 
   const currentEditingReport = useMemo(() => {
     if (!editModalData) return null;
@@ -307,23 +309,31 @@ export function useDailyTroopReportViewModel(
     const entries: NhiemVuEntry[] = [];
 
     if (isParentUnit) {
-      const isSuDoan = capDonVi === "SU_DOAN";
-      const ownReportRow = isSuDoan
-        ? parentOwnReportData
-        : (parentReportData ?? null);
-      const ownNhiemVuData = isSuDoan ? cheNhiemVuData : nhiemVuData;
+      const effectiveCapDonVi = drillUnit?.capDonVi ?? capDonVi;
+      const effectiveMaDonVi = drillUnit?.maDonVi ?? maDonViCurrent;
+      const isSuDoan = effectiveCapDonVi === "SU_DOAN";
+      const ownReportRow = drillUnit
+        ? (drilledOwnRow ?? null)
+        : isSuDoan
+          ? parentOwnReportData
+          : (parentReportData ?? null);
+      const ownNhiemVuData =
+        isSuDoan && !drillUnit ? cheNhiemVuData : nhiemVuData;
 
       entries.push({
-        id: maDonViCurrent ?? "own",
-        title: account?.donVi?.tenDonvi || account?.donVi?.kyhieuDonvi || "",
-        subtitle: maDonViCurrent ?? "",
+        id: effectiveMaDonVi ?? "own",
+        title:
+          drillUnit?.tenDonvi ||
+          drillUnit?.kyhieuDonvi ||
+          account?.donVi?.tenDonvi ||
+          account?.donVi?.kyhieuDonvi ||
+          "",
+        subtitle: effectiveMaDonVi ?? "",
         data: ownNhiemVuData ? buildNhiemVuSummary(ownNhiemVuData) : null,
-        reportStatusLabel: getNhiemVuReportStatusLabel(
-          ownNhiemVuData ? ownReportRow : ownReportRow,
-        ),
+        reportStatusLabel: getNhiemVuReportStatusLabel(ownReportRow),
       });
 
-      if (isTrungDoan) {
+      if (isTrungDoan && !drillUnit) {
         const cheMatched = nhiemVuList.find(
           (item) => item.donVi.toLowerCase() === "ch/e",
         );
@@ -338,7 +348,9 @@ export function useDailyTroopReportViewModel(
       }
 
       childUnits
-        .filter((unit) => unit.kyhieuDonvi !== "CH/e")
+        .filter(
+          (unit) => unit.kyhieuDonvi !== "CH/e" && unit.kyhieuDonvi !== "CH/f",
+        )
         .forEach((unit) => {
           const isAggregatingChild =
             (unit.capDonVi === "TRUNG_DOAN" || unit.capDonVi === "TIEU_DOAN") &&
@@ -411,6 +423,8 @@ export function useDailyTroopReportViewModel(
     parentReportData,
     parentOwnReportData,
     isTrungDoan,
+    drillUnit,
+    drilledOwnRow,
     nhiemVuData,
     nhiemVuList,
     cheNhiemVuData,
