@@ -864,10 +864,7 @@ export default function DailyTroopReport() {
     },
     onDrillDown: (row: ReportRow) => {
       const unit = allUnits.find((u) => u.maDonVi === row.donVi);
-      if (unit) {
-        setDrillUnit(unit);
-        setActiveMenuUnit(null);
-      }
+      if (unit) setDrillUnit(unit);
     },
   };
 
