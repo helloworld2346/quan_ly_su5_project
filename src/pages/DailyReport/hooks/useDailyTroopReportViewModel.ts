@@ -22,6 +22,7 @@ import type {
   NhiemVuEntry,
   ConsolidatedData,
 } from "../dailyTroopReportTypes";
+import { parseTrucNguoi } from "../../../utils/reportUtils";
 
 export type { NhiemVuSummary, NhiemVuEntry, ConsolidatedData };
 
@@ -49,6 +50,7 @@ export type UseDailyTroopReportViewModelArgs = {
   childUnits: DonVi[];
   allUnits: DonVi[];
   drillUnit?: DonVi | null;
+  drilledOwnRow?: ReportRow | null;
   caTrucFromApi: CaTrucDetail | null;
   consolidatedData: ConsolidatedData | null;
   editModalData: EditModalData | null;
@@ -105,6 +107,7 @@ export function useDailyTroopReportViewModel(
     childUnits,
     allUnits,
     drillUnit,
+    drilledOwnRow,
     caTrucFromApi,
     consolidatedData,
     editModalData,
@@ -242,23 +245,28 @@ export function useDailyTroopReportViewModel(
     ],
   );
 
-  const trucInfoFromReport = useMemo(
-    () =>
-      buildTrucInfoFromReport({
-        isParentUnit,
-        isTrungDoan,
-        parentReportData,
-        parentOwnReportData,
-        reportData,
-      }),
-    [
+  const trucInfoFromReport = useMemo(() => {
+    if (drilledOwnRow) {
+      return {
+        trucChiHuy: parseTrucNguoi(drilledOwnRow.rawItem.trucBanChiHuy),
+        trucBanTacChien: parseTrucNguoi(drilledOwnRow.rawItem.trucBanTacChien),
+      };
+    }
+    return buildTrucInfoFromReport({
       isParentUnit,
+      isTrungDoan,
       parentReportData,
       parentOwnReportData,
       reportData,
-      isTrungDoan,
-    ],
-  );
+    });
+  }, [
+    drilledOwnRow,
+    isParentUnit,
+    isTrungDoan,
+    parentReportData,
+    parentOwnReportData,
+    reportData,
+  ]);
 
   const currentEditingReport = useMemo(() => {
     if (!editModalData) return null;

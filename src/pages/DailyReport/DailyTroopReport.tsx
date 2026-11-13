@@ -183,7 +183,23 @@ export default function DailyTroopReport() {
         : childUnits
       ).filter((u) => u.kyhieuDonvi !== "CH/e" && u.kyhieuDonvi !== "CH/f"),
     [drillUnit, allUnits, childUnits],
-  );  
+  );
+
+  const effectiveMaDonVi = drillUnit?.maDonVi ?? maDonViCurrent;
+
+  const drilledOwnRow = useMemo(
+    () =>
+      drillUnit
+        ? (reportData.find(
+            (row) =>
+              row.donVi === drillUnit.maDonVi &&
+              row.loaiDonBaoCao === "TONG_HOP",
+          ) ??
+          reportData.find((row) => row.donVi === drillUnit.maDonVi) ??
+          null)
+        : null,
+    [drillUnit, reportData],
+  );
 
   const bienCheTongTrungDoan = useMemo(() => {
     if (capDonVi !== "TRUNG_DOAN") return undefined;
@@ -259,6 +275,7 @@ export default function DailyTroopReport() {
     childUnits: effectiveChildUnits,
     allUnits,
     drillUnit,
+    drilledOwnRow,
     caTrucFromApi,
     consolidatedData,
     editModalData,
@@ -542,10 +559,16 @@ export default function DailyTroopReport() {
 
   useEffect(() => {
     void (async () => {
-      if (!maDonViCurrent) return;
-      const ownRow = isParentUnit
-        ? (parentReportData ?? parentOwnReportData)
-        : reportData.find((row) => row.donVi === maDonViCurrent);
+      if (!effectiveMaDonVi) return;
+      const ownRow = drillUnit
+        ? (reportData.find(
+            (row) =>
+              row.donVi === drillUnit.maDonVi &&
+              row.loaiDonBaoCao === "TONG_HOP",
+          ) ?? reportData.find((row) => row.donVi === drillUnit.maDonVi))
+        : isParentUnit
+          ? (parentReportData ?? parentOwnReportData)
+          : reportData.find((row) => row.donVi === maDonViCurrent);
 
       if (!ownRow?.idDonBaoCao) {
         setNhiemVuData(null);
@@ -566,18 +589,17 @@ export default function DailyTroopReport() {
     parentReportData,
     parentOwnReportData,
     maDonViCurrent,
+    effectiveMaDonVi,
+    drillUnit,
     isParentUnit,
     reportDate,
   ]);
+
   useEffect(() => {
     let cancelled = false;
 
     const fetchNhiemVuList = async () => {
-      if (
-        !isParentUnit ||
-        !maDonViCurrent ||
-        !(isTrungDoan || isTieuDoan || isSuDoan)
-      ) {
+      if (!isParentUnit || !effectiveMaDonVi) {
         if (!cancelled) setNhiemVuList([]);
         return;
       }
@@ -585,17 +607,17 @@ export default function DailyTroopReport() {
       try {
         const ownTongHopRow = reportData.find(
           (row) =>
-            row.donVi === maDonViCurrent && row.loaiDonBaoCao === "TONG_HOP",
+            row.donVi === effectiveMaDonVi && row.loaiDonBaoCao === "TONG_HOP",
         );
 
         const [donViRes, tongHopRes, ownRes] = await Promise.all([
           dailyReportService.searchNhiemVuNgayChildrenByDonVi(
-            maDonViCurrent,
+            effectiveMaDonVi!,
             reportDate,
             "DON_VI",
           ),
           dailyReportService.searchNhiemVuNgayChildrenByDonVi(
-            maDonViCurrent,
+            effectiveMaDonVi!,
             reportDate,
             "TONG_HOP",
           ),
@@ -623,7 +645,7 @@ export default function DailyTroopReport() {
 
         for (const item of tongHopRes.Result ?? []) {
           const ma = item.donViResponse.maDonVi;
-          const child = childUnits.find((u) => u.maDonVi === ma);
+          const child = effectiveChildUnits.find((u) => u.maDonVi === ma);
           const kyhieu = (
             child?.kyhieuDonvi ??
             item.donViResponse.kyhieuDonvi ??
@@ -666,13 +688,14 @@ export default function DailyTroopReport() {
         );
 
         const ownNv = ownRes?.Result;
-        if (ownNv) {
+        if (ownNv && effectiveMaDonVi) {
           const ownUnit =
-            childUnits.find((u) => u.maDonVi === maDonViCurrent) ??
+            effectiveChildUnits.find((u) => u.maDonVi === effectiveMaDonVi) ??
+            drillUnit ??
             account?.donVi;
           list.push({
-            maDonVi: maDonViCurrent,
-            donVi: ownUnit?.kyhieuDonvi ?? account?.donVi?.kyhieuDonvi ?? "",
+            maDonVi: effectiveMaDonVi,
+            donVi: ownUnit?.kyhieuDonvi ?? "",
             loaiDonBaoCao: "TONG_HOP",
             data: {
               idNhiemvuNgay: ownNv.idNhiemvuNgay,
@@ -689,7 +712,7 @@ export default function DailyTroopReport() {
           (row) =>
             row.idDonBaoCao &&
             !row.notSubmitted &&
-            row.donVi !== maDonViCurrent &&
+            row.donVi !== effectiveMaDonVi &&
             !list.some(
               (l) =>
                 l.maDonVi === row.donVi &&
@@ -746,6 +769,9 @@ export default function DailyTroopReport() {
     isTrungDoan,
     isTieuDoan,
     isSuDoan,
+    effectiveMaDonVi,
+    effectiveChildUnits,
+    drillUnit,
     childUnits,
     reportData,
     account?.donVi,
@@ -1129,7 +1155,8 @@ export default function DailyTroopReport() {
               : (trucInfoFromReport?.trucBanTacChien ?? undefined)
           }
           labelSecond={
-            capDonVi === "TRUNG_DOAN" || capDonVi === "SU_DOAN"
+            (drillUnit?.capDonVi ?? capDonVi) === "TRUNG_DOAN" ||
+            (drillUnit?.capDonVi ?? capDonVi) === "SU_DOAN"
               ? "Trực ban tác chiến"
               : "Trực ban nội vụ"
           }
