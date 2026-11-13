@@ -354,7 +354,8 @@ export function buildDisplayRows(args: {
   const matchRowForUnit = (unit: ChildUnit): ReportRow | undefined => {
     const isAggregating =
       (unit.capDonVi === "TRUNG_DOAN" || unit.capDonVi === "TIEU_DOAN") &&
-      grandchildUnitsOf(unit.maDonVi).length > 0;
+      (grandchildUnitsOf(unit.maDonVi).length > 0 ||
+        (unit.donViCon?.length ?? 0) > 0);
 
     return isAggregating
       ? filtered.find(

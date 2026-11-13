@@ -54,13 +54,17 @@ import {
   isNeedUpdateStatus,
   normalizeReportStatus,
 } from "../../utils/reportStatus";
+import type { DonVi } from "../../types/account";
 
 export default function DailyTroopReport() {
   const [query, setQuery] = useState("");
   const [reportDate, setReportDate] = useState(getSharedReportDate());
+  const [drillUnit, setDrillUnit] = useState<DonVi | null>(null);
+
   useEffect(() => {
     setSharedReportDate(reportDate);
   }, [reportDate]);
+
   const [selectedReportRow, setSelectedReportRow] = useState<ReportRow | null>(
     null,
   );
@@ -167,6 +171,18 @@ export default function DailyTroopReport() {
     showError,
   });
 
+  const effectiveChildUnits = useMemo(
+    () =>
+      drillUnit
+        ? allUnits.filter((u) => {
+            if (!u.maDonVi.startsWith(drillUnit.maDonVi + ".")) return false;
+            const suffix = u.maDonVi.slice(drillUnit.maDonVi.length + 1);
+            return !suffix.includes(".");
+          })
+        : childUnits,
+    [drillUnit, allUnits, childUnits],
+  );
+
   const bienCheTongTrungDoan = useMemo(() => {
     if (capDonVi !== "TRUNG_DOAN") return undefined;
     const childAgg = childUnits
@@ -238,7 +254,7 @@ export default function DailyTroopReport() {
     reportData,
     parentReportData,
     parentOwnReportData,
-    childUnits,
+    childUnits: effectiveChildUnits,
     allUnits,
     caTrucFromApi,
     consolidatedData,
@@ -846,6 +862,13 @@ export default function DailyTroopReport() {
       setDialogAction("return");
       handleRefuseReportClick(row);
     },
+    onDrillDown: (row: ReportRow) => {
+      const unit = allUnits.find((u) => u.maDonVi === row.donVi);
+      if (unit) {
+        setDrillUnit(unit);
+        setActiveMenuUnit(null);
+      }
+    },
   };
 
   const handleReconsolidate = async () => {
@@ -916,7 +939,10 @@ export default function DailyTroopReport() {
         query={query}
         onQueryChange={setQuery}
         reportDate={reportDate}
-        onReportDateChange={setReportDate}
+        onReportDateChange={(date) => {
+          setReportDate(date);
+          setDrillUnit(null);
+        }}
         onAddReport={
           canAddReport && !useInlineOwnCommandReport
             ? handleAddReport
@@ -1036,6 +1062,21 @@ export default function DailyTroopReport() {
           value={displayTotals.vangHSQBS}
         />
       </div>
+      {drillUnit && (
+        <div className={styles.breadcrumb}>
+          <button
+            type="button"
+            className={styles.breadcrumbBtn}
+            onClick={() => setDrillUnit(null)}
+          >
+            {currentUnit?.tenDonvi ?? account?.donVi?.tenDonvi ?? "Đơn vị"}
+          </button>
+          <span className={styles.breadcrumbSep}>/</span>
+          <span className={styles.breadcrumbCurrent}>
+            {drillUnit.tenDonvi ?? drillUnit.maDonVi}
+          </span>
+        </div>
+      )}
       <DailyTroopStatisticsSection
         loading={showSkeleton}
         displayRows={displayRows}
