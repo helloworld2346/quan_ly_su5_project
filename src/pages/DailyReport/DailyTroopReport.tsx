@@ -161,6 +161,7 @@ export default function DailyTroopReport() {
     refetchCaTruc,
     consolidatedData,
     fetchReports,
+    ensureChildrenFetched,
   } = useReportData({
     maDonViCurrent,
     isParentUnit,
@@ -184,6 +185,10 @@ export default function DailyTroopReport() {
       ).filter((u) => u.kyhieuDonvi !== "CH/e" && u.kyhieuDonvi !== "CH/f"),
     [drillUnit, allUnits, childUnits],
   );
+
+  useEffect(() => {
+    if (drillUnit) void ensureChildrenFetched(drillUnit.maDonVi);
+  }, [drillUnit, ensureChildrenFetched]);
 
   const effectiveMaDonVi = drillUnit?.maDonVi ?? maDonViCurrent;
 

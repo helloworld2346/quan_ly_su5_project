@@ -60,6 +60,8 @@ export function useReportData({
     showErrorRef.current = showError;
   }, [showError]);
 
+  const fetchedChildUnitsRef = useRef<Set<string>>(new Set());  
+
   const fetchReports = useCallback(async () => {
     if (!maDonViCurrent) return;
     setLoading(true);
@@ -295,6 +297,48 @@ export function useReportData({
     allUnits,
   ]);
 
+  const ensureChildrenFetched = useCallback(
+    async (maDonVi: string) => {
+      const key = `${maDonVi}|${reportDate}`;
+      if (fetchedChildUnitsRef.current.has(key)) return;
+      fetchedChildUnitsRef.current.add(key);
+      try {
+        const [donViRes, tongHopRes] = await Promise.all([
+          dailyReportService.searchChildrenReports(
+            maDonVi,
+            reportDate,
+            "DON_VI",
+          ),
+          dailyReportService.searchChildrenReports(
+            maDonVi,
+            reportDate,
+            "TONG_HOP",
+          ),
+        ]);
+        const items: ReportItemInput[] = [
+          ...(donViRes.success && donViRes.Result ? donViRes.Result : []),
+          ...(tongHopRes.success && tongHopRes.Result
+            ? tongHopRes.Result.map((i) => ({
+                ...i,
+                loaiDonBaoCao: "TONG_HOP" as LoaiDonBaoCao,
+              }))
+            : []),
+        ];
+        if (items.length === 0) return;
+        setReportData((prev) => {
+          const map = new Map(prev.map((r) => [r.donVi, r]));
+          for (const item of items) {
+            map.set(item.donVi.maDonVi, mapItemToRow(item));
+          }
+          return Array.from(map.values());
+        });
+      } catch {
+        // bỏ qua — đơn vị không có báo cáo con
+      }
+    },
+    [reportDate],
+  );  
+
   useInitialFetch(fetchReports);
   useReportDataChangedListener(fetchReports);
 
@@ -430,6 +474,7 @@ export function useReportData({
     caTrucFromApi,
     consolidatedData,
     fetchReports,
+    ensureChildrenFetched,
     refetchCaTruc: fetchCaTruc,
   };
 }
