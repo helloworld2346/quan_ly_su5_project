@@ -187,8 +187,8 @@ export default function DailyTroopReport() {
   );
 
   useEffect(() => {
-    if (drillUnit) void ensureChildrenFetched(drillUnit.maDonVi);
-  }, [drillUnit, ensureChildrenFetched]);
+    if (isAdmin && drillUnit) void ensureChildrenFetched(drillUnit.maDonVi);
+  }, [isAdmin, drillUnit, ensureChildrenFetched]);
 
   const effectiveMaDonVi = drillUnit?.maDonVi ?? maDonViCurrent;
 
@@ -896,10 +896,12 @@ export default function DailyTroopReport() {
       setDialogAction("return");
       handleRefuseReportClick(row);
     },
-    onDrillDown: (row: ReportRow) => {
-      const unit = allUnits.find((u) => u.maDonVi === row.donVi);
-      if (unit) setDrillPath((prev) => [...prev, unit]);
-    },
+    onDrillDown: isAdmin
+      ? (row: ReportRow) => {
+          const unit = allUnits.find((u) => u.maDonVi === row.donVi);
+          if (unit) setDrillPath((prev) => [...prev, unit]);
+        }
+      : undefined,
   };
 
   const handleReconsolidate = async () => {
@@ -1093,7 +1095,7 @@ export default function DailyTroopReport() {
           value={displayTotals.vangHSQBS}
         />
       </div>
-      {drillPath.length > 0 && (
+      {isAdmin && drillPath.length > 0 && (
         <div className={styles.breadcrumb}>
           <button
             type="button"
